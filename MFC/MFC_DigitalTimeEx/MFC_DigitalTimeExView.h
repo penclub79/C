@@ -40,6 +40,17 @@ protected:
 // 생성된 메시지 맵 함수
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	bool m_bTimerRun;	// true : "년, 월, 일, 시, 분, 초" | false : "시, 분, 초"
+
+public:
+	bool m_bTimerType;
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	CString m_strTimer;
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnDestroy();
 };
 
 #ifndef _DEBUG  // MFC_DigitalTimeExView.cpp의 디버그 버전
