@@ -18,7 +18,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MFCApplication1.h">
+    <ClInclude Include="MFC_DigitalTimeEx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
@@ -30,10 +30,10 @@
     <ClInclude Include="MainFrm.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="MFCApplication1Doc.h">
+    <ClInclude Include="MFC_DigitalTimeExDoc.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="MFCApplication1View.h">
+    <ClInclude Include="MFC_DigitalTimeExView.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
@@ -41,7 +41,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MFCApplication1.cpp">
+    <ClCompile Include="MFC_DigitalTimeEx.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -50,38 +50,32 @@
     <ClCompile Include="MainFrm.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="MFCApplication1Doc.cpp">
+    <ClCompile Include="MFC_DigitalTimeExDoc.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="MFCApplication1View.cpp">
+    <ClCompile Include="MFC_DigitalTimeExView.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MFCApplication1.rc">
+    <ResourceCompile Include="MFC_DigitalTimeEx.rc">
       <Filter>리소스 파일</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="UserImages.bmp">
+    <None Include="res\MFC_DigitalTimeEx.rc2">
+      <Filter>리소스 파일</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\MFC_DigitalTimeExDoc.ico">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\MFCApplication1Doc.ico">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="res\MFCApplication1.ico">
+    <Image Include="res\MFC_DigitalTimeEx.ico">
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\Toolbar.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\Toolbar256.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\MFCApplication1.rc2">
-      <Filter>리소스 파일</Filter>
-    </None>
   </ItemGroup>
 </Project>
