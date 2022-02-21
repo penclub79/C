@@ -49,6 +49,17 @@ END_MESSAGE_MAP()
 
 CMFC6_DialogBox_DigitalTimeExDlg::CMFC6_DialogBox_DigitalTimeExDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC6_DialogBox_DigitalTimeExDlg::IDD, pParent)
+	, m_strYear(_T(""))
+	, m_strSecond(_T(""))
+	, m_strMonth(_T(""))
+	, m_strMinute(_T(""))
+	, m_strHour(_T(""))
+	, m_strDay(_T(""))
+	, m_strAMPM(_T(""))
+	, m_bRadioClockType(false)
+	, m_bCheckYear(false)
+	, m_bCheckHour(false)
+	, m_bViewHelp(false)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -56,12 +67,26 @@ CMFC6_DialogBox_DigitalTimeExDlg::CMFC6_DialogBox_DigitalTimeExDlg(CWnd* pParent
 void CMFC6_DialogBox_DigitalTimeExDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_EDIT_YEAR, m_strYear);
+	DDX_Text(pDX, IDC_EDIT_SECOND, m_strSecond);
+	DDX_Text(pDX, IDC_EDIT_MONTH, m_strMonth);
+	DDX_Text(pDX, IDC_EDIT_MINUTE, m_strMinute);
+	DDX_Text(pDX, IDC_EDIT_HOUR, m_strHour);
+	DDX_Text(pDX, IDC_EDIT_DAY, m_strDay);
+	DDX_Text(pDX, IDC_EDIT_AMPM, m_strAMPM);
 }
 
 BEGIN_MESSAGE_MAP(CMFC6_DialogBox_DigitalTimeExDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	//ON_EN_CHANGE(IDC_EDIT1, &CMFC6_DialogBox_DigitalTimeExDlg::OnEnChangeEdit1)
+	ON_COMMAND(IDC_RADIO12, &CMFC6_DialogBox_DigitalTimeExDlg::OnRadio12)
+	ON_COMMAND(IDC_RADIO24, &CMFC6_DialogBox_DigitalTimeExDlg::OnRadio24)
+	ON_BN_CLICKED(IDC_CHECK_YEAR, &CMFC6_DialogBox_DigitalTimeExDlg::OnClickedCheckYear)
+	ON_BN_CLICKED(IDC_CHECK_HOUR, &CMFC6_DialogBox_DigitalTimeExDlg::OnClickedCheckHour)
+	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BUTTON_HELP, &CMFC6_DialogBox_DigitalTimeExDlg::OnClickedButtonHelp)
 END_MESSAGE_MAP()
 
 
@@ -97,6 +122,26 @@ BOOL CMFC6_DialogBox_DigitalTimeExDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	// Radio Button과 Check Box 초기화
+	((CButton*)GetDlgItem(IDC_RADIO12))->SetCheck(TRUE);
+	((CButton*)GetDlgItem(IDC_CHECK_HOUR))->SetCheck(TRUE);
+
+	// 년,월,일 Edit Control 초기화
+	GetDlgItem(IDC_EDIT_YEAR)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_EDIT_MONTH)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_EDIT_DAY)->ShowWindow(SW_HIDE);
+
+	// 년,월,일 Static Text 초기화
+	GetDlgItem(IDC_STATIC_YEAR)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC_MONTH)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC_DAY)->ShowWindow(SW_HIDE);
+
+	// 맴버 변수 초기화
+	m_bRadioClockType = true;
+	m_bCheckHour = true;
+	m_bCheckYear = false;
+
+	SetTimer(0, 1000, NULL);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -150,3 +195,151 @@ HCURSOR CMFC6_DialogBox_DigitalTimeExDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CMFC6_DialogBox_DigitalTimeExDlg::OnEnChangeEdit1()
+{
+	// TODO:  RICHEDIT 컨트롤인 경우, 이 컨트롤은
+	// CDialogEx::OnInitDialog() 함수를 재지정 
+	//하고 마스크에 OR 연산하여 설정된 ENM_CHANGE 플래그를 지정하여 CRichEditCtrl().SetEventMask()를 호출하지 않으면
+	// 이 알림 메시지를 보내지 않습니다.
+
+	// TODO:  여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CMFC6_DialogBox_DigitalTimeExDlg::OnRadio12()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	m_bRadioClockType = true;
+}
+
+
+void CMFC6_DialogBox_DigitalTimeExDlg::OnRadio24()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	m_bRadioClockType = false;
+}
+
+
+void CMFC6_DialogBox_DigitalTimeExDlg::OnClickedCheckYear()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	if (m_bCheckYear == false)									// 년,월,일 표시 체크 박스가 눌렸을 때
+	{
+		GetDlgItem(IDC_EDIT_YEAR)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_EDIT_MONTH)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_EDIT_DAY)->ShowWindow(SW_SHOW);
+
+		GetDlgItem(IDC_STATIC_YEAR)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_MONTH)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_DAY)->ShowWindow(SW_SHOW);
+		m_bCheckYear = true;
+	}
+	else														// 년,월,일 표시 체크 박스가 해지됐을 때
+	{
+		GetDlgItem(IDC_EDIT_YEAR)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_MONTH)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_DAY)->ShowWindow(SW_HIDE);
+
+		GetDlgItem(IDC_STATIC_YEAR)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_MONTH)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_DAY)->ShowWindow(SW_HIDE);
+		m_bCheckYear = false;
+	}
+}
+
+
+void CMFC6_DialogBox_DigitalTimeExDlg::OnClickedCheckHour()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	if (m_bCheckHour == false)									// 시,분,초 표시 체크 박스가 눌렸을 때
+	{
+		GetDlgItem(IDC_EDIT_HOUR)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_EDIT_MINUTE)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_EDIT_SECOND)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_EDIT_AMPM)->ShowWindow(SW_SHOW);
+
+		GetDlgItem(IDC_STATIC_HOUR)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_MINUTE)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_SECOND)->ShowWindow(SW_SHOW);
+		m_bCheckHour = true;
+	}
+	else														// 시,분,초 표시 체크 박스가 해지됐을 때
+	{
+		GetDlgItem(IDC_EDIT_HOUR)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_MINUTE)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_SECOND)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_AMPM)->ShowWindow(SW_HIDE);
+
+		GetDlgItem(IDC_STATIC_HOUR)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_MINUTE)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_SECOND)->ShowWindow(SW_HIDE);
+		m_bCheckHour = false;
+	}
+}
+
+
+void CMFC6_DialogBox_DigitalTimeExDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	int hour;
+	CTime timer;
+	timer = CTime::GetCurrentTime();
+
+	m_strYear.Format(_T("%d"), timer.GetYear());
+	m_strMonth.Format(_T("%d"), timer.GetMonth());
+	m_strDay.Format(_T("%d"), timer.GetDay());
+
+	hour = timer.GetHour();
+	if (m_bRadioClockType)
+	{
+		if (hour >= 12)
+		{
+			m_strAMPM = _T("PM");
+			if (hour >= 13)
+				hour = hour - 12;
+			
+		}
+		else
+		{
+			m_strAMPM = _T("AM");
+		}
+	}
+	else
+	{
+		m_strAMPM.Empty();
+	}
+	m_strHour.Format(_T("%d"), hour);
+	m_strMinute.Format(_T("%d"), timer.GetMinute());
+	m_strSecond.Format(_T("%d"), timer.GetSecond());
+	UpdateData(FALSE);
+
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CMFC6_DialogBox_DigitalTimeExDlg::OnClickedButtonHelp()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+	if (m_bViewHelp == false)
+	{
+		m_dlgClockHelp.Create(IDD_DIALOG_HELP, this);
+
+		CRect rectMain, rectHelp;
+		GetWindowRect(&rectMain);
+
+		m_dlgClockHelp.GetWindowRect(&rectHelp);
+		m_dlgClockHelp.MoveWindow(rectMain.right, rectMain.top, rectHelp.Width(), rectHelp.Height());
+
+		m_dlgClockHelp.ShowWindow(SW_SHOW);
+		m_bViewHelp = true;
+	}
+	else
+	{
+		m_dlgClockHelp.ShowWindow(SW_HIDE);
+		m_dlgClockHelp.DestroyWindow();
+		m_bViewHelp = false;
+	}
+}
