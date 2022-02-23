@@ -189,11 +189,13 @@ END
 
 IDR_POPUP_EDIT MENU
 BEGIN
-    POPUP "편집"
+    POPUP "그리기"
     BEGIN
-        MENUITEM "잘라내기(&T)\tCtrl+X",            ID_EDIT_CUT
-        MENUITEM "복사(&C)\tCtrl+C",              ID_EDIT_COPY
-        MENUITEM "붙여넣기(&P)\tCtrl+V",            ID_EDIT_PASTE
+        MENUITEM "직선(&L)\tCtrl+L",              ID_LINE
+        MENUITEM "원(&E)\tCtrl+E",               ID_32794
+        MENUITEM "다각형(&G)\tCtrl+G",             ID_32795
+        MENUITEM SEPARATOR
+        MENUITEM "선 색상(&N)",                    ID_32796
     END
 END
 

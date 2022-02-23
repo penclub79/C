@@ -36,11 +36,16 @@ BEGIN_MESSAGE_MAP(CMFC8_UserInterfaceExView, CView)
 	ON_COMMAND(ID_BDIAGONAL, &CMFC8_UserInterfaceExView::OnBdiagonal)
 	ON_COMMAND(ID_CROSS, &CMFC8_UserInterfaceExView::OnCross)
 	ON_COMMAND(ID_VERTICAL, &CMFC8_UserInterfaceExView::OnVertical)
+	ON_UPDATE_COMMAND_UI(ID_LINE, &CMFC8_UserInterfaceExView::OnUpdateLine)
+	ON_UPDATE_COMMAND_UI(ID_ELLIPSE, &CMFC8_UserInterfaceExView::OnUpdateEllipse)
+	ON_UPDATE_COMMAND_UI(ID_POLYGON, &CMFC8_UserInterfaceExView::OnUpdatePolygon)
 END_MESSAGE_MAP()
 
 // CMFC8_UserInterfaceExView 생성/소멸
 
 CMFC8_UserInterfaceExView::CMFC8_UserInterfaceExView()
+: m_nDrawMode(0)
+, m_nHatchStyle(0)
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
 
@@ -139,8 +144,8 @@ void CMFC8_UserInterfaceExView::OnLine()
 {	
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
-	// 직선 메뉴를 선택했을 때 메시지 출력
-	AfxMessageBox(_T("직선을 그립니다."));
+	// 직선그리기 모드 변경
+	m_nDrawMode = LINE_MODE;
 }
 
 
@@ -148,8 +153,9 @@ void CMFC8_UserInterfaceExView::OnEllipse()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
-	// 원 메뉴를 선택했을 때 메시지 출력
+	// 원 그리기 모드 변경
 	AfxMessageBox(_T("원을 그립니다."));
+	m_nDrawMode = ELLIPSE_MODE;
 }
 
 
@@ -157,8 +163,9 @@ void CMFC8_UserInterfaceExView::OnPolygon()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
-	// 다각형 메뉴를 선택했을 때 메시지 출력
+	// 다각형 그리기 모드 변경
 	AfxMessageBox(_T("다각형을 그립니다."));
+	m_nDrawMode = POLYGON_MODE;
 }
 
 
@@ -168,6 +175,7 @@ void CMFC8_UserInterfaceExView::OnLineColor()
 
 	// 선 색상 메뉴를 선택했을 때 메시지 출력
 	AfxMessageBox(_T("선의 색상을 변경합니다."));
+	
 }
 
 
@@ -177,6 +185,7 @@ void CMFC8_UserInterfaceExView::OnFaceColor()
 
 	// 면 색상 메뉴를 선택했을 때 메시지 출력
 	AfxMessageBox(_T("면의 색상을 변경합니다."));
+	
 }
 
 
@@ -184,8 +193,10 @@ void CMFC8_UserInterfaceExView::OnBdiagonal()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
-	// 브러시 스타일을 왼쪽 45도 메뉴를 선택했을 때 메시지 출력
+	// 왼쪽 45도 빗금 변경
 	AfxMessageBox(_T("왼쪽 45도 패턴으로 변경합니다."));
+	m_nHatchStyle = HS_BDIAGONAL;
+	
 }
 
 
@@ -193,8 +204,9 @@ void CMFC8_UserInterfaceExView::OnCross()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
-	// 브러시 스타일을 십자가 메뉴를 선택했을 때 메시지 출력
+	// 십자가 빗금 변경
 	AfxMessageBox(_T("십자가 패턴으로 변경합니다."));
+	m_nHatchStyle = HS_CROSS;
 }
 
 
@@ -202,6 +214,35 @@ void CMFC8_UserInterfaceExView::OnVertical()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
-	// 브러시 스타일을 수집 메뉴를 선택했을 때 메시지 출력
+	// 수직 빗금 변경
 	AfxMessageBox(_T("수직 패턴으로 변경합니다."));
+	m_nHatchStyle = HS_VERTICAL;
+}
+
+
+void CMFC8_UserInterfaceExView::OnUpdateLine(CCmdUI *pCmdUI)
+{
+	// TODO: 여기에 명령 업데이트 UI 처리기 코드를 추가합니다.
+	
+	// 직선 그리기 모드이면 메뉴에 체크 표시
+	pCmdUI->SetCheck(m_nDrawMode == LINE_MODE ? 1 : 0);
+}
+
+
+void CMFC8_UserInterfaceExView::OnUpdateEllipse(CCmdUI *pCmdUI)
+{
+	// TODO: 여기에 명령 업데이트 UI 처리기 코드를 추가합니다.
+
+	// 원 그리기 모드이면 메뉴에 체크 표시
+	pCmdUI->SetCheck(m_nDrawMode == ELLIPSE_MODE ? 1 : 0);
+}
+
+
+
+void CMFC8_UserInterfaceExView::OnUpdatePolygon(CCmdUI *pCmdUI)
+{
+	// TODO: 여기에 명령 업데이트 UI 처리기 코드를 추가합니다.
+
+	// 다각형 그리기 모드이면 메뉴에 체크 표시
+	pCmdUI->SetCheck(m_nDrawMode == POLYGON_MODE ? 1 : 0);
 }
