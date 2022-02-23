@@ -108,11 +108,13 @@ BEGIN
     BUTTON      ID_FILE_OPEN
     BUTTON      ID_FILE_SAVE
     SEPARATOR
-    BUTTON      ID_EDIT_CUT
-    BUTTON      ID_EDIT_COPY
-    BUTTON      ID_EDIT_PASTE
-    SEPARATOR
     BUTTON      ID_FILE_PRINT
+    BUTTON      ID_LINE
+    BUTTON      ID_BUTTON32801
+    BUTTON      ID_BUTTON32798
+    BUTTON      ID_BUTTON32800
+    BUTTON      ID_BUTTON32799
+    SEPARATOR
     BUTTON      ID_APP_ABOUT
 END
 
@@ -189,11 +191,13 @@ END
 
 IDR_POPUP_EDIT MENU
 BEGIN
-    POPUP "편집"
+    POPUP "그리기"
     BEGIN
-        MENUITEM "잘라내기(&T)\tCtrl+X",            ID_EDIT_CUT
-        MENUITEM "복사(&C)\tCtrl+C",              ID_EDIT_COPY
-        MENUITEM "붙여넣기(&P)\tCtrl+V",            ID_EDIT_PASTE
+        MENUITEM "직선(&L)\tCtrl+L",              ID_LINE
+        MENUITEM "원(&E)\tCtrl+E",               ID_32794
+        MENUITEM "다각형(&G)\tCtrl+G",             ID_32795
+        MENUITEM SEPARATOR
+        MENUITEM "선 색상(&N)",                    ID_32796
     END
 END
 
@@ -449,6 +453,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_EDIT_MENU           "편집"
+    ID_INDICATOR_POINT      "마우스:    X좌표    Y좌표"
 END
 
 STRINGTABLE

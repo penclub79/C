@@ -1,7 +1,7 @@
 
 // MFC8_UserInterfaceExView.h : CMFC8_UserInterfaceExView 클래스의 인터페이스
 //
-
+enum DRAW_MODE { LINE_MODE, ELLIPSE_MODE, POLYGON_MODE };
 #pragma once
 
 
@@ -52,6 +52,12 @@ public:
 	afx_msg void OnBdiagonal();
 	afx_msg void OnCross();
 	afx_msg void OnVertical();
+	int m_nDrawMode;
+	int m_nHatchStyle;
+	afx_msg void OnUpdateLine(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateEllipse(CCmdUI *pCmdUI);
+	afx_msg void OnUpdatePolygon(CCmdUI *pCmdUI);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };
 
 #ifndef _DEBUG  // MFC8_UserInterfaceExView.cpp의 디버그 버전
