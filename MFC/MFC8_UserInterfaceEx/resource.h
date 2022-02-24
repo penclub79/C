@@ -52,13 +52,10 @@
 #define ID_32794                        32794
 #define ID_32795                        32795
 #define ID_32796                        32796
-<<<<<<< HEAD
 #define ID_BUTTON32798                  32798
 #define ID_BUTTON32799                  32799
 #define ID_BUTTON32800                  32800
 #define ID_BUTTON32801                  32801
-=======
->>>>>>> 9abe66b48605c633308cb4c163889a4a4a8d420d
 
 // Next default values for new objects
 // 

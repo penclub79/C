@@ -48,6 +48,7 @@ END_MESSAGE_MAP()
 CMFC8_UserInterfaceExView::CMFC8_UserInterfaceExView()
 : m_nDrawMode(0)
 , m_nHatchStyle(0)
+, m_ptStart(0)
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
 

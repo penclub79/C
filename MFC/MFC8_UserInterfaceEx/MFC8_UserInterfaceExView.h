@@ -1,6 +1,7 @@
 
 // MFC8_UserInterfaceExView.h : CMFC8_UserInterfaceExView 클래스의 인터페이스
 //
+#include "atltypes.h"
 enum DRAW_MODE { LINE_MODE, ELLIPSE_MODE, POLYGON_MODE };
 #pragma once
 
@@ -57,10 +58,8 @@ public:
 	afx_msg void OnUpdateLine(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateEllipse(CCmdUI *pCmdUI);
 	afx_msg void OnUpdatePolygon(CCmdUI *pCmdUI);
-<<<<<<< HEAD
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-=======
->>>>>>> 9abe66b48605c633308cb4c163889a4a4a8d420d
+CPoint m_ptStart;
 };
 
 #ifndef _DEBUG  // MFC8_UserInterfaceExView.cpp의 디버그 버전
