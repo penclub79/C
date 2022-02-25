@@ -19,6 +19,9 @@ public:
 // 작업입니다.
 public:
 
+	void DrawImageFromFile(CDC* pDC);
+
+
 // 재정의입니다.
 public:
 	virtual void OnDraw(CDC* pDC);  // 이 뷰를 그리기 위해 재정의되었습니다.
@@ -47,6 +50,11 @@ protected:
 public:
 	int m_nPenSize;
 	int m_nEraserSize;
+	HANDLE m_hFile;
+	LPBYTE m_pByte;
+	BITMAPFILEHEADER m_bmFileHeader;
+	LPBITMAPINFO m_lpBitmapInfo;
+
 	COLORREF m_colorPen;
 	CPoint m_ptPrev;
 	afx_msg void OnPenSize();
@@ -55,6 +63,7 @@ public:
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnImgFileAppend();
 };
 
 #ifndef _DEBUG  // MFC11_GDIPlusExView.cpp의 디버그 버전

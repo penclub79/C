@@ -119,6 +119,7 @@ BEGIN
     BEGIN
         MENUITEM "새로 만들기(&N)\tCtrl+N",          ID_FILE_NEW
         MENUITEM SEPARATOR
+        MENUITEM "이미지 추가",                      ID_IMG_FILE_APPEND
         MENUITEM "펜의 크기",                       ID_PEN_SIZE, GRAYED
         MENUITEM "펜의 색상",                       ID_PEN_COLOR
         MENUITEM "지우개 크기",                      ID_ERASER_SIZE

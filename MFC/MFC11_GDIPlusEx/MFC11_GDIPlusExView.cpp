@@ -34,6 +34,7 @@ BEGIN_MESSAGE_MAP(CMFC11_GDIPlusExView, CView)
 	ON_COMMAND(ID_PEN_SIZE, &CMFC11_GDIPlusExView::OnPenSize)
 	ON_COMMAND(ID_ERASER_SIZE, &CMFC11_GDIPlusExView::OnEraserSize)
 	ON_COMMAND(ID_PEN_COLOR, &CMFC11_GDIPlusExView::OnPenColor)
+	ON_COMMAND(ID_IMG_FILE_APPEND, &CMFC11_GDIPlusExView::OnImgFileAppend)
 	ON_WM_RBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDOWN()
@@ -47,14 +48,27 @@ CMFC11_GDIPlusExView::CMFC11_GDIPlusExView()
 , m_ptPrev(0)
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
+	m_hFile = INVALID_HANDLE_VALUE;
 	m_nPenSize = 2;
 	m_nEraserSize = 4;
 	m_colorPen = RGB(0, 0, 0);
+
+	m_pByte = NULL;
+	memset(&m_bmFileHeader, 0, sizeof(m_bmFileHeader));
+	m_lpBitmapInfo = NULL;
 
 }
 
 CMFC11_GDIPlusExView::~CMFC11_GDIPlusExView()
 {
+	if (NULL != m_pByte)
+	{
+		delete[] m_pByte;
+		m_pByte = NULL;
+	}
+
+	if (m_hFile) { CloseHandle(m_hFile); m_hFile = INVALID_HANDLE_VALUE; }
+
 }
 
 BOOL CMFC11_GDIPlusExView::PreCreateWindow(CREATESTRUCT& cs)
@@ -67,7 +81,7 @@ BOOL CMFC11_GDIPlusExView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CMFC11_GDIPlusExView 그리기
 
-void CMFC11_GDIPlusExView::OnDraw(CDC* /*pDC*/)
+void CMFC11_GDIPlusExView::OnDraw(CDC* pDC)
 {
 	CMFC11_GDIPlusExDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -75,8 +89,19 @@ void CMFC11_GDIPlusExView::OnDraw(CDC* /*pDC*/)
 		return;
 
 	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
+	if (INVALID_HANDLE_VALUE != m_hFile)
+	{
+		DrawImageFromFile(pDC);
+	}
+
 }
 
+void CMFC11_GDIPlusExView::DrawImageFromFile(CDC* pDC)
+{
+	HDC hdc = pDC->GetSafeHdc();
+
+	TRACE(_T("DrawImageFromFile \n"));
+}
 
 // CMFC11_GDIPlusExView 인쇄
 
@@ -224,4 +249,45 @@ void CMFC11_GDIPlusExView::OnLButtonDown(UINT nFlags, CPoint point)
 	SetCursor(hCursor);
 
 	CView::OnLButtonDown(nFlags, point);
+}
+
+
+void CMFC11_GDIPlusExView::OnImgFileAppend()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	///*HWND hwnd = GetDesktopWindow();*/
+	LPVOID lpDIBits = NULL;
+
+	if (INVALID_HANDLE_VALUE != m_hFile)
+		return;
+
+	m_hFile = CreateFile(_T("D:\\C\\MFC\\UserImages.bmp"), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+
+	if (INVALID_HANDLE_VALUE == m_hFile)
+	{
+		return;
+	}
+
+	DWORD dwReadBytes	= 0;
+
+	// 1. BITMAPFILEHEADER 구조체 만큼 파일에서 읽기
+	ReadFile(m_hFile, &m_bmFileHeader, sizeof(BITMAPFILEHEADER), &dwReadBytes, NULL);
+
+	// 2. DIB에 사용할 BITMAPINFO 구조체를 파일에서 읽기
+	// BITMAPINFO는 BITMAPINFOHEADER + RGBQUAD의 구조체
+	int iBitmapInfoSize = m_bmFileHeader.bfOffBits - sizeof(BITMAPFILEHEADER);
+	m_pByte = new BYTE[iBitmapInfoSize];
+	ReadFile(m_hFile, m_pByte, iBitmapInfoSize, &dwReadBytes, NULL);
+
+	//// 3. pixel Data를 받아서 DIB에 복사
+	//HDC hdc = GetDC(hwnd);
+	//lpBitmapInfo = (LPBITMAPINFO)pByte;
+	//HBITMAP hDib = CreateDIBSection(hdc, lpBitmapInfo, DIB_RGB_COLORS, &lpDIBits, NULL, 0);
+	//ReadFile(hFile, lpDIBits, lpBitmapInfo->bmiHeader.biSizeImage, &dwReadBytes, NULL);
+	//ReleaseDC(hwnd, hdc);
+
+	//// 4. 마무리
+	//if (pByte) { delete[] pByte; pByte = 0; }
+
+	InvalidateRect(NULL, TRUE);
 }
