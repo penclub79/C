@@ -15,6 +15,8 @@ protected: // serialization에서만 만들어집니다.
 public:
 	CMFC12_BitMapExDoc* GetDocument() const;
 
+	PBYTE		m_pBuffer;
+
 // 작업입니다.
 public:
 

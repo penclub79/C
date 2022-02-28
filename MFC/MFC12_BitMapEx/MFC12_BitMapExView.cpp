@@ -37,11 +37,16 @@ END_MESSAGE_MAP()
 CMFC12_BitMapExView::CMFC12_BitMapExView()
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
-
+	m_pBuffer = NULL;
 }
 
 CMFC12_BitMapExView::~CMFC12_BitMapExView()
 {
+	if (m_pBuffer)
+	{
+		free(m_pBuffer);
+		m_pBuffer = NULL;
+	}
 }
 
 BOOL CMFC12_BitMapExView::PreCreateWindow(CREATESTRUCT& cs)
@@ -64,7 +69,7 @@ BOOL CMFC12_BitMapExView::PreCreateWindow(CREATESTRUCT& cs)
 //	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
 //}
 
-void CMFC12_BitMapExView::OnDraw(CDC* /*pDC*/)
+void CMFC12_BitMapExView::OnDraw(CDC* _pDC)
 {
 	CMFC12_BitMapExDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -73,6 +78,27 @@ void CMFC12_BitMapExView::OnDraw(CDC* /*pDC*/)
 
 	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
 
+	BYTE *pFileData = NULL;
+	BITMAPFILEHEADER *pfh = NULL;
+	BITMAPINFOHEADER *pih = NULL;
+	int bx, by = 0;
+	BYTE *pRaster = NULL;
+	HDC hdc = NULL;
+
+	if (m_pBuffer)
+	{
+		pfh = (BITMAPFILEHEADER*)m_pBuffer;
+		pih = (BITMAPINFOHEADER *)((PBYTE)m_pBuffer + sizeof(BITMAPFILEHEADER));
+		pRaster = (PBYTE)m_pBuffer + pfh->bfOffBits;
+
+
+		bx = pih->biWidth;
+		by = pih->biHeight;
+
+		//CClientDC dc(this);
+		SetDIBitsToDevice(_pDC->GetSafeHdc(), 0, 0, bx, by, 0, 0, 0, by, pRaster, (BITMAPINFO *)pih, DIB_RGB_COLORS);
+
+	}
 }
 
 // CMFC12_BitMapExView 인쇄
@@ -156,38 +182,55 @@ void CMFC12_BitMapExView::OnImageRoad()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
-	BITMAPFILEHEADER *fh = NULL;
-	BITMAPINFOHEADER *ih;
-	int bx, by;
-	BYTE *pRaster;
-	HDC hdc;
-	
-	HANDLE hFile;
-	DWORD FileSize, dwRead;
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+	DWORD dwFileSize = 0;
+	DWORD dwRead = 0;
 
-	hFile = CreateFile(L"D:\\C\\MFC\\test.bmp", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	hFile = CreateFile(L"D:\\C\\MFC\\MFC12_BitMapEx\\background.bmp", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
 		return;
 	}
 
-	FileSize = GetFileSize(hFile, NULL);
-
-	if (fh)
+	if (m_pBuffer)
 	{
-		free(fh);
+		free(m_pBuffer);
+		m_pBuffer = NULL;
 	}
-	fh = (BITMAPFILEHEADER *)malloc(FileSize);
-	ReadFile(hFile, fh, FileSize, &dwRead, NULL);
-	CloseHandle(hFile);
 
-	pRaster = (PBYTE)fh + fh->bfOffBits;
-	ih = (BITMAPINFOHEADER *)((PBYTE)fh + sizeof(BITMAPFILEHEADER));
-	bx = ih->biWidth;
-	by = ih->biHeight;
-
-	CClientDC dc(this);
-	SetDIBitsToDevice(dc.m_hDC, 0, 0, bx, by, 0, 0, 0, by, pRaster, (BITMAPINFO *)ih, DIB_RGB_COLORS);
 	AfxMessageBox(_T("읽어 왔습니다."));
 
+	dwFileSize = GetFileSize(hFile, NULL);
+
+	m_pBuffer = (PBYTE)malloc(dwFileSize);
+	ReadFile(hFile, m_pBuffer, dwFileSize, &dwRead, NULL);
+
+	CloseHandle(hFile);
+	hFile = INVALID_HANDLE_VALUE;
+
+
+
+	//hFile = CreateFile(L"D:\\C\\MFC\\MFC12_BitMapEx\\insert.bmp", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	//if (hFile == INVALID_HANDLE_VALUE)
+	//{
+	//	return;
+	//}
+
+	//if (m_pBuffer)
+	//{
+	//	free(m_pBuffer);
+	//	m_pBuffer = NULL;
+	//}
+
+	//AfxMessageBox(_T("읽어 왔습니다."));
+
+	//dwFileSize = GetFileSize(hFile, NULL);
+
+	//m_pBuffer = (PBYTE)malloc(dwFileSize);
+	//ReadFile(hFile, m_pBuffer, dwFileSize, &dwRead, NULL);
+
+	//CloseHandle(hFile);
+	//hFile = INVALID_HANDLE_VALUE;
+
+	InvalidateRect(NULL);
 }
