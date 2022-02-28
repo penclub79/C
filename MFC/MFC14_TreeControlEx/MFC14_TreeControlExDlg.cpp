@@ -49,6 +49,9 @@ END_MESSAGE_MAP()
 
 CMFC14_TreeControlExDlg::CMFC14_TreeControlExDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC14_TreeControlExDlg::IDD, pParent)
+	, m_strNodeText(_T(""))
+	, m_strSelectedNode(_T(""))
+	, m_bChecked(false)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -56,12 +59,19 @@ CMFC14_TreeControlExDlg::CMFC14_TreeControlExDlg(CWnd* pParent /*=NULL*/)
 void CMFC14_TreeControlExDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_TREE_CONTROL, m_treeControl);
+	DDX_Text(pDX, IDC_EDIT_NODE_TEXT, m_strNodeText);
+	DDX_Text(pDX, IDC_EDIT_SELECTED_NODE, m_strSelectedNode);
 }
 
 BEGIN_MESSAGE_MAP(CMFC14_TreeControlExDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_NOTIFY(TVN_SELCHANGED, IDC_TREE_CONTROL, &CMFC14_TreeControlExDlg::OnSelchangedTreeControl)
+	ON_BN_CLICKED(IDC_BUTTON_INSERT, &CMFC14_TreeControlExDlg::OnClickedButtonInsert)
+	ON_BN_CLICKED(IDC_BUTTON_MODIFY, &CMFC14_TreeControlExDlg::OnClickedButtonModify)
+	ON_BN_CLICKED(IDC_BUTTON_DELETE, &CMFC14_TreeControlExDlg::OnClickedButtonDelete)
 END_MESSAGE_MAP()
 
 
@@ -97,6 +107,8 @@ BOOL CMFC14_TreeControlExDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	m_hRoot = m_treeControl.InsertItem(_T("루트 노드"), 0, TVI_LAST);
+	((CButton*)GetDlgItem(IDC_CHECK_EXPAND))->SetCheck(TRUE);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -150,3 +162,81 @@ HCURSOR CMFC14_TreeControlExDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CMFC14_TreeControlExDlg::OnSelchangedTreeControl(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	// 현재 선택한 아이템의 핸들 값을 멤버 변수에 저장한다.
+	m_hSelectedNode = pNMTreeView->itemNew.hItem;
+
+	// 선택한 아이템의 이름을 대화상자의 Edit Control에 설정한다.
+	m_strSelectedNode = m_treeControl.GetItemText(m_hSelectedNode);
+	UpdateData(FALSE);		// 대화상자의 컨트롤에 데이터를 출력한다.
+	*pResult = 0;
+}
+
+
+void CMFC14_TreeControlExDlg::OnClickedButtonInsert()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	// 에러처리 - 입력할 텍스트가 비어있나 검사한다.
+	if (!m_strNodeText.IsEmpty())
+	{
+		m_treeControl.InsertItem(m_strNodeText, m_hSelectedNode, TVI_LAST);
+		m_treeControl.Expand(m_hSelectedNode, TVE_EXPAND);
+	}
+	else
+	{
+		AfxMessageBox(_T("입력 노드의 텍스트를 입력하세요."));
+	}
+	// Edit Box의 텍스트를 비운다.
+	m_strNodeText.Empty();
+	UpdateData(FALSE);
+}
+
+
+void CMFC14_TreeControlExDlg::OnClickedButtonModify()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	// 입력할 텍스트가 비어 있는지 검사
+	if (!m_strNodeText.IsEmpty())
+	{
+		if (m_hSelectedNode != m_hRoot)
+		{
+			// 선택된 아이템의 텍스트를 수정한다.
+			m_treeControl.SetItemText(m_hSelectedNode, m_strNodeText);
+			
+			// 현재 선택된 아이템의 이름을 표현하는 Edit Control의 내용도 수정해 준다.
+			m_strSelectedNode = m_strNodeText;
+		}
+		else
+		{
+			AfxMessageBox(_T("루트 노드는 수정해서는 안 됩니다."));
+		}
+	}
+	else
+	{
+		AfxMessageBox(_T("수정 노드의 텍스트를 입력하세요."));
+	}
+	m_strNodeText.Empty();
+	UpdateData(FALSE);
+}
+
+
+void CMFC14_TreeControlExDlg::OnClickedButtonDelete()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	if (m_hSelectedNode != m_hRoot)
+	{
+		if (MessageBox(_T("정말 삭제하시겠습니까?"), _T("삭제 경고"), MB_YESNO) == IDYES)
+			m_treeControl.DeleteItem(m_hSelectedNode);
+	}
+	else
+	{
+		AfxMessageBox(_T("루트 노드는 삭제해서는 안 됩니다."));
+	}
+}

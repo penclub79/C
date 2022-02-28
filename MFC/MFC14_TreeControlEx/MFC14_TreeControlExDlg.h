@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "afxcmn.h"
 
 
 // CMFC14_TreeControlExDlg 대화 상자
@@ -29,4 +30,15 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	CTreeCtrl m_treeControl;
+	CString m_strNodeText;
+	CString m_strSelectedNode;
+	HTREEITEM m_hRoot;
+	HTREEITEM m_hSelectedNode;
+	bool m_bChecked;
+	afx_msg void OnSelchangedTreeControl(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnClickedButtonInsert();
+	afx_msg void OnClickedButtonModify();
+	afx_msg void OnClickedButtonDelete();
 };
