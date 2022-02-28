@@ -1,13 +1,14 @@
-﻿빌드 시작: 2022-02-17 오후 1:39:41
-     1>2 노드의 "D:\C-\Win32Project1\Win32Project1\Win32Project1.vcxproj" 프로젝트(Build 대상)입니다.
+﻿빌드 시작: 2022-02-28 오전 11:19:19
+     1>2 노드의 "D:\C\Win32Project1\Win32Project1\Win32Project1.vcxproj" 프로젝트(Build 대상)입니다.
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Practice1_1.cpp
          Practice1_1.cpp
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\C-\Win32Project1\Debug\Win32Project1.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\C-\Win32Project1\Debug\Win32Project1.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\C-\Win32Project1\Debug\Win32Project1.lib" /MACHINE:X86 Debug\Practice1_1.obj
-         Win32Project1.vcxproj -> D:\C-\Win32Project1\Debug\Win32Project1.exe
-     1>"D:\C-\Win32Project1\Win32Project1\Win32Project1.vcxproj" 프로젝트를 빌드했습니다(Build 대상).
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\C\Win32Project1\Debug\Win32Project1.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\C\Win32Project1\Debug\Win32Project1.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\C\Win32Project1\Debug\Win32Project1.lib" /MACHINE:X86 Debug\Practice1_1.obj
+         LINK : D:\C\Win32Project1\Debug\Win32Project1.exe을(를) 찾을 수 없거나 마지막 증분 링크에 의해 빌드되지 않았습니다. 전체 링크를 수행하고 있습니다.
+         Win32Project1.vcxproj -> D:\C\Win32Project1\Debug\Win32Project1.exe
+     1>"D:\C\Win32Project1\Win32Project1\Win32Project1.vcxproj" 프로젝트를 빌드했습니다(Build 대상).
 
 빌드했습니다.
 
-경과 시간: 00:00:01.23
+경과 시간: 00:00:00.81
