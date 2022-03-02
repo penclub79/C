@@ -42,6 +42,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnImageRoad();
+	afx_msg void OnImageRoad2();
 };
 
 #ifndef _DEBUG  // MFC12_2_BitMapExView.cpp의 디버그 버전

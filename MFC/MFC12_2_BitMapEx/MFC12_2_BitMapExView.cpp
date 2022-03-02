@@ -109,4 +109,13 @@ void CMFC12_2_BitMapExView::OnImageRoad()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	AfxMessageBox(_T("불러왔습니다."));
+
+	OnImageRoad2();
+
+}
+
+void CMFC12_2_BitMapExView::OnImageRoad2()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	AfxMessageBox(_T("불러왔습니다.2"));
 }
