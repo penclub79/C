@@ -101,7 +101,6 @@ void CMFC12_2_BitMapExView::OnDraw(CDC* _pDC)
 
 }
 
-
 // CMFC12_2_BitMapExView ¿Œº‚
 
 BOOL CMFC12_2_BitMapExView::OnPreparePrinting(CPrintInfo* pInfo)
