@@ -243,8 +243,6 @@ void CMFC12_3_BitMapExView::OnImageRoad()
 	}
 
 	// m_pBuffer 버퍼에 이미지 Merge 작업 
-	//mergeX = (apickX[0] * apickY[1]) + (apickX[1] * apickY[0]);
-
 	m_pBuffer = (PBYTE)malloc(adwFileSize[iBigImgID]);
 
 	// 큰 사이즈의 이미지 정보가 담긴 버퍼의 내용와 사이즈를 복사한다.
