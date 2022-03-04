@@ -37,11 +37,9 @@ END_MESSAGE_MAP()
 CMFC12_4_BitMapExView::CMFC12_4_BitMapExView()
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
+	m_bClick = FALSE;
 	m_ibx = 0;
 	m_iby = 0;
-	m_bCheck = FALSE;
-	m_bClick = FALSE;
-
 	for (int i = 0; i < 2; i++)
 	{
 		m_apBuffer[i] = NULL;
@@ -116,11 +114,6 @@ void CMFC12_4_BitMapExView::OnDraw(CDC* _pDC)
 			pRaster,
 			(BITMAPINFO *)pih, DIB_RGB_COLORS);
 	}
-
-	/*if (m_bClick)
-	{
-		cdc.TextOut()
-	}*/
 }
 
 
@@ -241,7 +234,6 @@ void CMFC12_4_BitMapExView::OnImageRoad()
 		}
 	}
 
-
 	// 큰 이미지 사이즈 만큼 m_pBuffer 버퍼 할당
 	if (adwFileSize[0] > adwFileSize[1])
 	{
@@ -261,15 +253,14 @@ void CMFC12_4_BitMapExView::OnImageRoad()
 	memcpy(m_pBuffer, m_apBuffer[iBigImgID], adwFileSize[iBigImgID]);
 	pRasterResult = m_pBuffer + apfh[iBigImgID]->bfOffBits;
 
-	m_ibx = apih[iSmallImgID]->biWidth; // 그림1 가로 * 그림2 가로 = 그림3 가로
-	m_iby = apih[iSmallImgID]->biHeight; // 그림1 세로 & 그림2 세로 = 그림3 세로
-
 	// 헤더 크기 그림1 + 그림2
 
 	int iIndexSrc = 0;
 	int iIndexDst = 0;
 	int iWidthBitSrc = (apih[iSmallImgID]->biWidth * (apih[iSmallImgID]->biBitCount / 8) + 3) & ~3;
 	int iWidthBitDst = (apih[iBigImgID]->biWidth * (apih[iBigImgID]->biBitCount / 8) + 3) & ~3;
+	m_ibx = apih[iBigImgID]->biWidth;
+	m_iby = apih[iBigImgID]->biHeight;
 
 	for (int ih = 0; ih < apih[iSmallImgID]->biHeight; ih++)
 	{
@@ -294,12 +285,8 @@ void CMFC12_4_BitMapExView::OnImageRoad()
 			//pRasterResult[iIndexDst] = (apRaster[iSmallImgID][iIndexSrc]); // B
 		}
 	}
-
-
 	// 읽은 버퍼에서 필요한 데이터를 m_pBuffer에 추출 하는 곳 ///////////////////////
 	////////////////////////////////////////////////////////////////////////////////
-
-
 
 	m_rect.left = 0;
 	m_rect.top = 0;
@@ -319,7 +306,6 @@ void CMFC12_4_BitMapExView::OnLButtonDown(UINT nFlags, CPoint _point)
 	
 	m_bClick = TRUE;		// 마우스 클릭 true
 	Invalidate(true);	// 화면 갱신
-		
 	
 	//if (m_rect.PtInRect(_point))
 	//{
@@ -327,13 +313,7 @@ void CMFC12_4_BitMapExView::OnLButtonDown(UINT nFlags, CPoint _point)
 	// 이동거리 계산을 위한 좌표 기억
 	m_cpMouse = _point;
 	
-
-	// hWnd 윈도우가 마우스 커서를 캡처하도록하고 커서가 윈도우의 영역밖을 벗어나더라도 마우스 메시지를 보내준다. 주로 드래그 동작을 할 때 캡처가 필요하다.
 	SetCapture();
-	//GetClientRect(&m_rect);
-	//ClientToScreen(&m_rect);
-
-	//}
 
 	CView::OnLButtonDown(nFlags, _point);
 }
@@ -341,16 +321,8 @@ void CMFC12_4_BitMapExView::OnLButtonDown(UINT nFlags, CPoint _point)
 
 void CMFC12_4_BitMapExView::OnLButtonUp(UINT nFlags, CPoint _point)
 {
-	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	if (m_bCheck == 1)
-	{
-		// 드래그 하다가 마우스를 땟을 때
-		m_bCheck = 0;
-
-		// SetCapture 기능 해제 필요
-		ReleaseCapture();
-	}
-
+	// SetCapture 기능 해제 필요
+	ReleaseCapture();
 	m_bClick = FALSE;
 
 	CView::OnLButtonUp(nFlags, _point);
@@ -360,25 +332,27 @@ void CMFC12_4_BitMapExView::OnLButtonUp(UINT nFlags, CPoint _point)
 void CMFC12_4_BitMapExView::OnMouseMove(UINT nFlags, CPoint _point)
 {
 	CPoint cpDistance;  // 마우스 이동 거리를 계산.
-
+	BITMAPFILEHEADER *pfh = NULL;
+	BITMAPINFOHEADER *pih = NULL;
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
 	if (m_bClick == TRUE)
 	{
 		// 마우스가 이동한 거리를 계산.
-		cpDistance.x = _point.x;
-		cpDistance.y = _point.y;
 
 		int iWidth = m_rect.Width();
 		int iHeight = m_rect.Height();
+
+		TRACE(_T("x : %d , y : %d \n"), _point.x, _point.y);
+		TRACE(_T("right : %d , bottom : %d \n"), m_rect.right, m_rect.bottom);
+		cpDistance.x = _point.x + m_rect.right;		// 0			0 + ? = X
+		cpDistance.y = _point.y - m_rect.bottom;	// 0			0 + ? = Y
 		
 		// 마우스 이동거리만큼 사진을 옮긴다.
 		m_rect.left = cpDistance.x;
 		m_rect.top = cpDistance.y;
 		m_rect.right = m_rect.left + iWidth;
 		m_rect.bottom = m_rect.top + iHeight;
-
-		// 다음 이동거리 계산을 위해 현재 좌표를 이전 좌표로 설정한다.
-		//m_cpMouse = _point;
 
 		// 화면갱신
 		Invalidate();		
