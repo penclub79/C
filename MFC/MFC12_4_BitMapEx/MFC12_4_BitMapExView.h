@@ -17,8 +17,9 @@ public:
 
 // 작업입니다.
 public:
-	PBYTE m_apBuffer[2];
-	PBYTE m_pBuffer;
+	PBYTE m_apBuffer[2];		// 필요한 이미지 정보를 담을 버퍼
+	PBYTE m_pBuffer;			// 그림1 그림2의 합친 결과를 담을 버퍼
+	int m_ibx = 0, m_iby = 0;	// 첫번째, 두번째 이미지 사이즈 변수
 	
 
 // 재정의입니다.
@@ -45,6 +46,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnImageRoad();
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };
 
 #ifndef _DEBUG  // MFC12_4_BitMapExView.cpp의 디버그 버전

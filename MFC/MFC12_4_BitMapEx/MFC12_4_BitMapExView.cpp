@@ -27,6 +27,9 @@ BEGIN_MESSAGE_MAP(CMFC12_4_BitMapExView, CView)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
 	ON_COMMAND(ID_IMAGE_ROAD, &CMFC12_4_BitMapExView::OnImageRoad)
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 // CMFC12_4_BitMapExView 생성/소멸
@@ -34,6 +37,17 @@ END_MESSAGE_MAP()
 CMFC12_4_BitMapExView::CMFC12_4_BitMapExView()
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
+	
+	for (int i = 0; i < 2; i++)
+	{
+		m_apBuffer[i] = NULL;
+	}
+	m_pBuffer = NULL;
+
+}
+
+CMFC12_4_BitMapExView::~CMFC12_4_BitMapExView()
+{
 	for (int i = 0; i < 2; i++)
 	{
 		if (m_apBuffer[i])
@@ -48,11 +62,6 @@ CMFC12_4_BitMapExView::CMFC12_4_BitMapExView()
 		free(m_pBuffer);
 		m_pBuffer = NULL;
 	}
-
-}
-
-CMFC12_4_BitMapExView::~CMFC12_4_BitMapExView()
-{
 }
 
 BOOL CMFC12_4_BitMapExView::PreCreateWindow(CREATESTRUCT& cs)
@@ -65,7 +74,7 @@ BOOL CMFC12_4_BitMapExView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CMFC12_4_BitMapExView 그리기
 
-void CMFC12_4_BitMapExView::OnDraw(CDC* /*pDC*/)
+void CMFC12_4_BitMapExView::OnDraw(CDC* _pDC)
 {
 	CMFC12_4_BitMapExDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -73,6 +82,35 @@ void CMFC12_4_BitMapExView::OnDraw(CDC* /*pDC*/)
 		return;
 
 	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
+
+	BITMAPFILEHEADER *pfh = NULL;
+	BITMAPINFOHEADER *pih = NULL;
+	BYTE *pRaster = NULL;
+	int bx = 0, by = 0;
+
+	HDC hdc = NULL;
+
+	// 버퍼에 데이터가 있는지 체크 있다면= 출력, 없다면= 경고
+	//for (int i = 2; i < 3; i++)
+
+	if (m_pBuffer)
+	{
+		pfh = (BITMAPFILEHEADER *)m_pBuffer;
+		pih = (BITMAPINFOHEADER *)((PBYTE)m_pBuffer + sizeof(BITMAPFILEHEADER));
+		pRaster = (PBYTE)m_pBuffer + pfh->bfOffBits;
+
+		bx = pih->biWidth;
+		by = pih->biHeight;
+		//m_ibx = pih->biWidth;
+		//m_iby = pih->biHeight;
+
+		::SetDIBitsToDevice(
+			_pDC->GetSafeHdc(),
+			10, 50, bx, by,
+			0, 0, 0, by,
+			pRaster,
+			(BITMAPINFO *)pih, DIB_RGB_COLORS);
+	}
 }
 
 
@@ -123,22 +161,161 @@ void CMFC12_4_BitMapExView::OnImageRoad()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
-	// 2개 이미지 파일 가져오는 것
-	BITMAPFILEHEADER *afh[2] = { NULL };
-	BITMAPINFOHEADER *aih[2] = { NULL };
-	BYTE *pRaster[2] = { NULL };
-
 	HANDLE ahFile[2] = { INVALID_HANDLE_VALUE };
 	DWORD adwFileSize[2] = { 0 };
 	DWORD adwRead[2] = { 0 };
-
 	TCHAR aszFileName[2][MAX_PATH] = { 0 };
+	int iBigImgID = 0;
+	int iSmallImgID = 0;
+	int isx = 0, isy = 0;
 
-	wsprintf(aszFileName[0], L"D:\\C\\MFC\\MFC12_4_BitMapEx\\background.bmp");
-	wsprintf(aszFileName[1], L"D:\\C\\MFC\\MFC12_4_BitMapEx\\insert.bmp");
+	// DIB헤더
+	BITMAPFILEHEADER *apfh[2] = { NULL };
+	BITMAPINFOHEADER *apih[2] = { NULL };
+	BYTE *apRaster[2] = { NULL };
+	BYTE *pRasterResult = NULL;
+
+
+
+	wsprintf(aszFileName[0], L"D:\\C\\MFC\\MFC12_2_BitMapEx\\background.bmp");
+	wsprintf(aszFileName[1], L"D:\\C\\MFC\\MFC12_2_BitMapEx\\insert.bmp");
+
+	////////////////////////////////////////////////////////////////////////////////
+	// 파일에서 버퍼로 데이터를 담는 곳 /////////////////////////////////////////////
+
+	for (int i = 0; i < 2; i++)
+	{
+		ahFile[i] = CreateFile(aszFileName[i], GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+		if (ahFile[i] == INVALID_HANDLE_VALUE)
+		{
+			break;
+		}
+
+		adwFileSize[i] = GetFileSize(ahFile[i], NULL);
+
+		// 버퍼에 값이 있는지 체크
+		if (m_apBuffer[i])
+		{
+			free(m_apBuffer[i]);
+			m_apBuffer[i] = NULL;
+		}
+
+		// 버퍼 메모리 할당
+		m_apBuffer[i] = (PBYTE)malloc(adwFileSize[i]);
+
+		// 파일 읽어오기
+		ReadFile(ahFile[i], m_apBuffer[i], adwFileSize[i], &adwRead[i], NULL);
+
+		// 메모리 해제
+		CloseHandle(ahFile[i]);
+
+		// 파일 핸들 닫기
+		ahFile[i] = INVALID_HANDLE_VALUE;
+	}
+
+	// 파일에서 버퍼로 데이터를 담는 곳 /////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	// 읽은 버퍼에서 필요한 데이터를 m_pBuffer에 추출 하는 곳 ///////////////////////
+	for (int i = 0; i < 2; i++)
+	{
+		// 두 버퍼에서 파일 정보 가져온다. 
+		if (m_apBuffer[i])
+		{
+			apfh[i] = (BITMAPFILEHEADER *)m_apBuffer[i];
+			apih[i] = (BITMAPINFOHEADER *)((PBYTE)m_apBuffer[i] + sizeof(BITMAPFILEHEADER));
+			apRaster[i] = (PBYTE)m_apBuffer[i] + apfh[i]->bfOffBits;
+		}
+	}
+
+
+	// 큰 이미지 사이즈 만큼 m_pBuffer 버퍼 할당
+	if (adwFileSize[0] > adwFileSize[1])
+	{
+		iBigImgID = 0;
+		iSmallImgID = 1;
+	}
+	else
+	{
+		iBigImgID = 1;
+		iSmallImgID = 0;
+	}
+
+	// m_pBuffer 버퍼에 이미지 Merge 작업 
+	m_pBuffer = (PBYTE)malloc(adwFileSize[iBigImgID]);
+
+	// 큰 사이즈의 이미지 정보가 담긴 버퍼의 내용와 사이즈를 복사한다.
+	memcpy(m_pBuffer, m_apBuffer[iBigImgID], adwFileSize[iBigImgID]);
+	pRasterResult = m_pBuffer + apfh[iBigImgID]->bfOffBits;
+
+	m_ibx = apih[iSmallImgID]->biWidth; // 그림1 가로 * 그림2 가로 = 그림3 가로
+	m_iby = apih[iSmallImgID]->biHeight; // 그림1 세로 & 그림2 세로 = 그림3 세로
+
+	// 헤더 크기 그림1 + 그림2
+
+	int iIndexSrc = 0;
+	int iIndexDst = 0;
+	int iWidthBitSrc = (apih[iSmallImgID]->biWidth * (apih[iSmallImgID]->biBitCount / 8) + 3) & ~3;
+	int iWidthBitDst = (apih[iBigImgID]->biWidth * (apih[iBigImgID]->biBitCount / 8) + 3) & ~3;
+
+	for (int ih = 0; ih < apih[iSmallImgID]->biHeight; ih++)
+	{
+		for (int iw = 0; iw < iWidthBitSrc / 3; iw++)
+		{
+			iIndexSrc = iw * 3 + 0 + (iWidthBitSrc)*ih;
+			iIndexDst = iw * 3 + 0 + (iWidthBitDst)*ih;
+
+			pRasterResult[iIndexDst] = (apRaster[iBigImgID][iIndexDst] + apRaster[iSmallImgID][iIndexSrc]) / 2;	// R
+			//pRasterResult[iIndexDst] = (apRaster[iSmallImgID][iIndexSrc]);	// R
+
+			iIndexSrc = iw * 3 + 1 + (iWidthBitSrc)*ih;
+			iIndexDst = iw * 3 + 1 + (iWidthBitDst)*ih;
+
+			pRasterResult[iIndexDst] = (apRaster[iBigImgID][iIndexDst] + apRaster[iSmallImgID][iIndexSrc]) / 2; // G
+			//pRasterResult[iIndexDst] = (apRaster[iSmallImgID][iIndexSrc]); // G
+
+			iIndexSrc = iw * 3 + 2 + (iWidthBitSrc)*ih;
+			iIndexDst = iw * 3 + 2 + (iWidthBitDst)*ih;
+
+			pRasterResult[iIndexDst] = (apRaster[iBigImgID][iIndexDst] + apRaster[iSmallImgID][iIndexSrc]) / 2; // B
+			//pRasterResult[iIndexDst] = (apRaster[iSmallImgID][iIndexSrc]); // B
+		}
+	}
+
+
+	// 읽은 버퍼에서 필요한 데이터를 m_pBuffer에 추출 하는 곳 ///////////////////////
+	////////////////////////////////////////////////////////////////////////////////
+
+	InvalidateRect(NULL);
+
+
+}
+
+
+void CMFC12_4_BitMapExView::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	
-	ahFile[0] = CreateFile(aszFileName[0], GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	ahFile[1] = CreateFile(aszFileName[1], GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	AfxMessageBox(_T("버튼"));
+
+	CView::OnLButtonDown(nFlags, point);
+}
 
 
+void CMFC12_4_BitMapExView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	AfxMessageBox(_T("버튼 업"));
+	CView::OnLButtonUp(nFlags, point);
+}
+
+
+void CMFC12_4_BitMapExView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	AfxMessageBox(_T("마우스 무브"));
+	CView::OnMouseMove(nFlags, point);
 }
