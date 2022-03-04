@@ -19,8 +19,13 @@ public:
 public:
 	PBYTE m_apBuffer[2];		// 필요한 이미지 정보를 담을 버퍼
 	PBYTE m_pBuffer;			// 그림1 그림2의 합친 결과를 담을 버퍼
-	int m_ibx = 0, m_iby = 0;	// 첫번째, 두번째 이미지 사이즈 변수
-	
+	int m_ibx;
+	int m_iby;	// 첫번째, 두번째 이미지 사이즈 변수
+
+	CRect m_rect;			// 사각형 좌표 기억하는 변수
+	CPoint m_cpMouse;		// 이전 마우스 좌표 기억할 변수
+	bool m_bCheck;			// 마우스 사각형을 클릭했는지 여부 체크
+	bool m_bClick;			// 클릭 여부
 
 // 재정의입니다.
 public:

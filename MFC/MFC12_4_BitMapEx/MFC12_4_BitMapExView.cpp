@@ -37,7 +37,11 @@ END_MESSAGE_MAP()
 CMFC12_4_BitMapExView::CMFC12_4_BitMapExView()
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
-	
+	m_ibx = 0;
+	m_iby = 0;
+	m_bCheck = FALSE;
+	m_bClick = FALSE;
+
 	for (int i = 0; i < 2; i++)
 	{
 		m_apBuffer[i] = NULL;
@@ -89,6 +93,7 @@ void CMFC12_4_BitMapExView::OnDraw(CDC* _pDC)
 	int bx = 0, by = 0;
 
 	HDC hdc = NULL;
+	CPaintDC cdc(this);
 
 	// 버퍼에 데이터가 있는지 체크 있다면= 출력, 없다면= 경고
 	//for (int i = 2; i < 3; i++)
@@ -106,11 +111,16 @@ void CMFC12_4_BitMapExView::OnDraw(CDC* _pDC)
 
 		::SetDIBitsToDevice(
 			_pDC->GetSafeHdc(),
-			10, 50, bx, by,
+			m_rect.left, m_rect.top, m_rect.Width(), m_rect.Height(),
 			0, 0, 0, by,
 			pRaster,
 			(BITMAPINFO *)pih, DIB_RGB_COLORS);
 	}
+
+	/*if (m_bClick)
+	{
+		cdc.TextOut()
+	}*/
 }
 
 
@@ -289,33 +299,91 @@ void CMFC12_4_BitMapExView::OnImageRoad()
 	// 읽은 버퍼에서 필요한 데이터를 m_pBuffer에 추출 하는 곳 ///////////////////////
 	////////////////////////////////////////////////////////////////////////////////
 
+
+
+	m_rect.left = 0;
+	m_rect.top = 0;
+	m_rect.right = m_rect.left + apih[iBigImgID]->biWidth;
+	m_rect.bottom = m_rect.top + apih[iBigImgID]->biHeight;
+
+
 	InvalidateRect(NULL);
 
 
 }
 
 
-void CMFC12_4_BitMapExView::OnLButtonDown(UINT nFlags, CPoint point)
+void CMFC12_4_BitMapExView::OnLButtonDown(UINT nFlags, CPoint _point)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	
-	AfxMessageBox(_T("버튼"));
+	m_bClick = TRUE;		// 마우스 클릭 true
+	Invalidate(true);	// 화면 갱신
+		
+	
+	//if (m_rect.PtInRect(_point))
+	//{
 
-	CView::OnLButtonDown(nFlags, point);
+	// 이동거리 계산을 위한 좌표 기억
+	m_cpMouse = _point;
+	
+
+	// hWnd 윈도우가 마우스 커서를 캡처하도록하고 커서가 윈도우의 영역밖을 벗어나더라도 마우스 메시지를 보내준다. 주로 드래그 동작을 할 때 캡처가 필요하다.
+	SetCapture();
+	//GetClientRect(&m_rect);
+	//ClientToScreen(&m_rect);
+
+	//}
+
+	CView::OnLButtonDown(nFlags, _point);
 }
 
 
-void CMFC12_4_BitMapExView::OnLButtonUp(UINT nFlags, CPoint point)
+void CMFC12_4_BitMapExView::OnLButtonUp(UINT nFlags, CPoint _point)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	AfxMessageBox(_T("버튼 업"));
-	CView::OnLButtonUp(nFlags, point);
+	if (m_bCheck == 1)
+	{
+		// 드래그 하다가 마우스를 땟을 때
+		m_bCheck = 0;
+
+		// SetCapture 기능 해제 필요
+		ReleaseCapture();
+	}
+
+	m_bClick = FALSE;
+
+	CView::OnLButtonUp(nFlags, _point);
 }
 
 
-void CMFC12_4_BitMapExView::OnMouseMove(UINT nFlags, CPoint point)
+void CMFC12_4_BitMapExView::OnMouseMove(UINT nFlags, CPoint _point)
 {
+	CPoint cpDistance;  // 마우스 이동 거리를 계산.
+
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	AfxMessageBox(_T("마우스 무브"));
-	CView::OnMouseMove(nFlags, point);
+	if (m_bClick == TRUE)
+	{
+		// 마우스가 이동한 거리를 계산.
+		cpDistance.x = _point.x;
+		cpDistance.y = _point.y;
+
+		int iWidth = m_rect.Width();
+		int iHeight = m_rect.Height();
+		
+		// 마우스 이동거리만큼 사진을 옮긴다.
+		m_rect.left = cpDistance.x;
+		m_rect.top = cpDistance.y;
+		m_rect.right = m_rect.left + iWidth;
+		m_rect.bottom = m_rect.top + iHeight;
+
+		// 다음 이동거리 계산을 위해 현재 좌표를 이전 좌표로 설정한다.
+		//m_cpMouse = _point;
+
+		// 화면갱신
+		Invalidate();		
+	}
+
+
+	CView::OnMouseMove(nFlags, _point);
 }
