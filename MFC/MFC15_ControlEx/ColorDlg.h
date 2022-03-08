@@ -28,4 +28,6 @@ public:
 	int m_nBlue;
 	COLORREF m_colorObject;
 	virtual BOOL OnInitDialog();
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+//	afx_msg void OnSpinSize();
 };

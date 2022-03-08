@@ -67,6 +67,7 @@ BEGIN_MESSAGE_MAP(CMFC15_ControlExDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_SELECTION, &CMFC15_ControlExDlg::OnSelchangeTabSelection)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SIZE, &CMFC15_ControlExDlg::OnDeltaposSpinSize)
 END_MESSAGE_MAP()
 
 
@@ -164,6 +165,36 @@ void CMFC15_ControlExDlg::OnPaint()
 	{
 		CDialogEx::OnPaint();
 	}
+
+	CRect rectView, rectFigure;
+	GetDlgItem(IDC_STATIC_VIEW)->GetWindowRect(&rectView);
+	CPoint ptCenter = rectView.CenterPoint();
+	ScreenToClient(&ptCenter);
+
+	rectFigure.left = ptCenter.x - (int)(rectView.Width() / 2.0f * (float)m_nSize / 100.0f);
+	rectFigure.right = ptCenter.x + (int)(rectView.Width() / 2.0f * (float)m_nSize / 100.0f);
+	rectFigure.top = ptCenter.y - (int)(rectView.Width() / 2.0f * (float)m_nSize / 100.0f);
+	rectFigure.bottom = ptCenter.y + (int)(rectView.Width() / 2.0f * (float)m_nSize / 100.0f);
+
+	CClientDC dc(this);
+
+	CBrush NewBrush, *oldBrush;
+
+	NewBrush.CreateSolidBrush(m_dlgColor.m_colorObject);
+	oldBrush = dc.SelectObject(&NewBrush);
+
+	switch (m_dlgObject.m_nSelObject)
+	{
+	case 1:
+		dc.Rectangle(&rectFigure);
+		break;
+	case 2:
+		dc.Ellipse(&rectFigure);
+		break;
+	}
+
+	dc.SelectObject(oldBrush);
+	NewBrush.DeleteObject();
 }
 
 // 사용자가 최소화된 창을 끄는 동안에 커서가 표시되도록 시스템에서
@@ -203,5 +234,15 @@ void CMFC15_ControlExDlg::OnSelchangeTabSelection(NMHDR *pNMHDR, LRESULT *pResul
 		break;
 	}
 
+	*pResult = 0;
+}
+
+
+void CMFC15_ControlExDlg::OnDeltaposSpinSize(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	UpdateDrawing();
 	*pResult = 0;
 }

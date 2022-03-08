@@ -40,4 +40,5 @@ public:
 	CColorDlg m_dlgColor;
 	void UpdateDrawing();
 	afx_msg void OnSelchangeTabSelection(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnDeltaposSpinSize(NMHDR *pNMHDR, LRESULT *pResult);
 };

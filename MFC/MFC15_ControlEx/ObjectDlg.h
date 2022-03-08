@@ -21,4 +21,6 @@ protected:
 public:
 	int m_nSelObject;
 	virtual BOOL OnInitDialog();
+	afx_msg void OnRadioRect();
+	afx_msg void OnRadioCircle();
 };
