@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MFC17_Calendar_DLLEx", "MFC17_Calendar_DLLEx\MFC17_Calendar_DLLEx.vcxproj", "{985537E6-CE26-4146-B2CA-9D54DA02E9B7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CalenderDll", "CalenderDll\CalenderDll.vcxproj", "{EE306C20-02C2-427F-81FC-24424A5372BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -15,6 +17,10 @@ Global
 		{985537E6-CE26-4146-B2CA-9D54DA02E9B7}.Debug|Win32.Build.0 = Debug|Win32
 		{985537E6-CE26-4146-B2CA-9D54DA02E9B7}.Release|Win32.ActiveCfg = Release|Win32
 		{985537E6-CE26-4146-B2CA-9D54DA02E9B7}.Release|Win32.Build.0 = Release|Win32
+		{EE306C20-02C2-427F-81FC-24424A5372BA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EE306C20-02C2-427F-81FC-24424A5372BA}.Debug|Win32.Build.0 = Debug|Win32
+		{EE306C20-02C2-427F-81FC-24424A5372BA}.Release|Win32.ActiveCfg = Release|Win32
+		{EE306C20-02C2-427F-81FC-24424A5372BA}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -68,6 +68,8 @@ BEGIN_MESSAGE_MAP(CMFC17_Calendar_DLLExDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_CBN_SELCHANGE(IDC_COMBO_MONTH, &CMFC17_Calendar_DLLExDlg::OnSelchangeComboMonth)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_YEAR, &CMFC17_Calendar_DLLExDlg::OnDeltaposSpinYear)
 END_MESSAGE_MAP()
 
 
@@ -153,6 +155,46 @@ void CMFC17_Calendar_DLLExDlg::OnPaint()
 	}
 	else
 	{
+		// 날짜를 저장할 변수를 지정한 뒤 모두 0으로 초기화한다.
+		int m_nDays[6][7] = { 0, };
+		int i, j, x, y;
+
+		x = 30;
+		y = 105;		// 대화상자와 컨트롤의 배치에 따라 변경될 수 있다.
+
+		CString m_WeekDays[7] = { _T("Sun"), _T("Mon"), _T("Tue"), _T("Wed"), _T("Thu"), _T("Fri"), _T("Sat") };
+
+		CString m_Number;
+
+		CPaintDC dc(this);
+		dc.SetBkColor(RGB(240, 238, 228));
+
+		// 월화수목금토일 등의 문자를 제일 처음 설정하여준다.
+		for (i = 0; i < 7; i++)
+		{
+			dc.TextOut(x, y, m_WeekDays[i]);
+			x += 35;
+		}
+
+		// DLL로 제작한 함수를 사용한다.
+		Calender(m_nYear, m_nMonth, &m_nDays[0][0]);
+
+		// 날짜를 표시하여준다. 단 날짜 데이터가 0일 경우는 표시하지 않는다.
+		for (i = 0; i < 6; i++)
+		{
+			x = 30;
+			for (j = 0; j < 7; j++)
+			{
+				if (m_nDays[i][j] != 0)
+				{
+					m_Number.Format(_T("%d"), m_nDays[i][j]);
+					dc.TextOut(x, y + 20, m_Number);
+				}
+				x += 35;
+			}
+			y += 20;
+		}
+
 		CDialogEx::OnPaint();
 	}
 }
@@ -164,3 +206,34 @@ HCURSOR CMFC17_Calendar_DLLExDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CMFC17_Calendar_DLLExDlg::OnSelchangeComboMonth()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	// 현재 선택된 아이템이 몇 월인지를 저장한 다음 화면을 갱신한다.
+	int nItem = m_cbMonth.GetCurSel();
+	m_nMonth = nItem;
+	Invalidate();
+}
+
+
+void CMFC17_Calendar_DLLExDlg::OnDeltaposSpinYear(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	// 년도를 설정한다.
+	m_nYear += pNMUpDown->iDelta;
+
+	// 최소 년도와 최고 연도의 범위를 벗어나지 않도록 설정한다.
+	if (m_nYear <= 1583)
+	{
+		m_nYear = 1583;
+	}
+	if (m_nYear > 4040)
+	{
+		m_nYear = 4040;
+	}
+	Invalidate();
+	*pResult = 0;
+}

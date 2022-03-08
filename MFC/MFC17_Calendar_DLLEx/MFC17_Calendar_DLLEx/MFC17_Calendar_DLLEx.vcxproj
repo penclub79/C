@@ -124,7 +124,17 @@
   <ItemGroup>
     <Image Include="res\MFC17_Calendar_DLLEx.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CalenderDll\CalenderDll.vcxproj">
+      <Project>{ee306c20-02c2-427f-81fc-24424a5372ba}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="MFC17_Calendar_DLLEx.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

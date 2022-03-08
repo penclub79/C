@@ -3,6 +3,8 @@
 //
 
 #pragma once
+#include "afxcmn.h"
+#include "afxwin.h"
 
 
 // CMFC17_Calendar_DLLExDlg 대화 상자
@@ -29,4 +31,11 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	int m_nYear;
+	CSpinButtonCtrl m_spinYear;
+	CComboBox m_cbMonth;
+	int m_nMonth;
+	afx_msg void OnSelchangeComboMonth();
+	afx_msg void OnDeltaposSpinYear(NMHDR *pNMHDR, LRESULT *pResult);
 };
