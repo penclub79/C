@@ -49,6 +49,8 @@ END_MESSAGE_MAP()
 
 CMFC16_Controllers_DataSimulatorExDlg::CMFC16_Controllers_DataSimulatorExDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC16_Controllers_DataSimulatorExDlg::IDD, pParent)
+	, m_nTransmitRate(0)
+	, m_nData(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -56,12 +58,21 @@ CMFC16_Controllers_DataSimulatorExDlg::CMFC16_Controllers_DataSimulatorExDlg(CWn
 void CMFC16_Controllers_DataSimulatorExDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_IPADDRESS_SENDER, m_addrSenderIP);
+	DDX_Control(pDX, IDC_IPADDRESS_RECEIVER, m_addrReceiverIP);
+	DDX_Control(pDX, IDC_SPIN_DATA, m_spinData);
+	DDX_Control(pDX, IDC_PROGRESS_TRANSMIT, m_prgsTransmit);
+	DDX_Control(pDX, IDC_EDIT_SUMMARY, m_edSummary);
+	DDX_Control(pDX, IDC_DATETIMEPICKER_DATE, m_timeTransmit);
+	DDX_Text(pDX, IDC_EDIT_DATA, m_nData);
 }
 
 BEGIN_MESSAGE_MAP(CMFC16_Controllers_DataSimulatorExDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON_TRANSMIT, &CMFC16_Controllers_DataSimulatorExDlg::OnClickedButtonTransmit)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -97,6 +108,9 @@ BOOL CMFC16_Controllers_DataSimulatorExDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	m_prgsTransmit.SetRange(0, 100);
+	m_prgsTransmit.SetPos(0);
+	m_spinData.SetRange(-100, 100);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -150,3 +164,65 @@ HCURSOR CMFC16_Controllers_DataSimulatorExDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CMFC16_Controllers_DataSimulatorExDlg::OnClickedButtonTransmit()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	// 현재 데이터 전송률을 0 퍼센트로 설정한다.
+	m_nTransmitRate = 0;
+
+	// 타이머를 지정한다. 타이머 ID = 1, 구간 = 30
+	SetTimer(1, 30, NULL);
+
+	// 데이터 전송이 시작되면 버튼을 비활성화 시킨다.
+	GetDlgItem(IDC_BUTTON_TRANSMIT)->EnableWindow(FALSE);
+}
+
+
+void CMFC16_Controllers_DataSimulatorExDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	CString strSummary;
+
+	if (m_nTransmitRate != 100)
+	{
+		m_nTransmitRate++;
+		m_prgsTransmit.SetPos(m_nTransmitRate);
+		strSummary.Format(_T("데이터 전송 중입니다. - %d 퍼센트 \r\n\r\n 잠시 기다려주십시오....."), m_nTransmitRate);
+		m_edSummary.SetWindowTextW(strSummary);
+	}
+	else
+	{
+		KillTimer(1);
+		GetDlgItem(IDC_BUTTON_TRANSMIT)->EnableWindow(TRUE);
+		UpdateData(TRUE);
+
+		CString strTrans, strDataDesc;
+		m_prgsTransmit.SetPos(m_nTransmitRate);
+		strTrans.Format(_T("데이터 전송을 완료했습니다. - %d 퍼센트\r\n\r\n"), m_nTransmitRate);
+
+		BYTE first, second, third, forth;
+
+		CString strSender, strReceiver;
+		m_addrSenderIP.GetAddress(first, second, third, forth);
+		strSender.Format(_T("송신측 주소 : %d.%d.%d.%d\t\t"), first, second, third, forth);
+
+		m_addrReceiverIP.GetAddress(first, second, third, forth);
+		strReceiver.Format(_T("수신측 주소 : %d.%d.%d.%d\r\n\r\n"), first, second, third, forth);
+
+		CTime timeTime;
+		DWORD dwResult = m_timeTransmit.GetTime(timeTime);
+
+		CString strDate;
+		strDate.Format(_T("전송 날짜 : %s\r\n\r\n"), timeTime.Format("%A, %B %d, %Y"));
+
+		CString strData;
+		strData.Format(_T("전송 데이터 내용 : %d"), m_nData);
+
+		strSummary = strTrans + strSender + strReceiver + strDate + strData;
+		m_edSummary.SetWindowTextW(strSummary);
+	}
+
+	CDialogEx::OnTimer(nIDEvent);
+}

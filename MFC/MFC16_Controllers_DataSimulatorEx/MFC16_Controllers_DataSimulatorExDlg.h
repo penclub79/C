@@ -3,6 +3,9 @@
 //
 
 #pragma once
+#include "afxcmn.h"
+#include "afxwin.h"
+#include "afxdtctl.h"
 
 
 // CMFC16_Controllers_DataSimulatorExDlg 대화 상자
@@ -29,4 +32,15 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	int m_nTransmitRate;
+	CIPAddressCtrl m_addrSenderIP;
+	CIPAddressCtrl m_addrReceiverIP;
+	CSpinButtonCtrl m_spinData;
+	CProgressCtrl m_prgsTransmit;
+	CEdit m_edSummary;
+	CDateTimeCtrl m_timeTransmit;
+	afx_msg void OnClickedButtonTransmit();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	int m_nData;
 };
