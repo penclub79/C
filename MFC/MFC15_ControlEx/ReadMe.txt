@@ -1,0 +1,1 @@
+﻿Tab Control, Slider Control, Spin Control을 이용해서 프로그램을 작성.
