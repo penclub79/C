@@ -3,6 +3,8 @@
 //
 
 #pragma once
+#include "afxcmn.h"
+#include "afxwin.h"
 
 
 // CMFC19_SocketExDlg 대화 상자
@@ -13,7 +15,7 @@ public:
 	CMFC19_SocketExDlg(CWnd* pParent = NULL);	// 표준 생성자입니다.
 
 // 대화 상자 데이터입니다.
-	enum { IDD = IDD_MFC19_SOCKETEX_DIALOG };
+	enum { IDD = IDD_CHATTING_DIALOG };
 
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
@@ -29,4 +31,10 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	CIPAddressCtrl m_IPAddress;
+	CListBox m_listChat;
+	int m_nChatMode;
+	CString m_strMyIP;
+	CString m_nOtherIP;
 };

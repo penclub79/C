@@ -49,6 +49,9 @@ END_MESSAGE_MAP()
 
 CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC19_SocketExDlg::IDD, pParent)
+	, m_nChatMode(0)
+	, m_strMyIP(_T(""))
+	, m_nOtherIP(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -56,6 +59,10 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 void CMFC19_SocketExDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_IPADDRESS_SERVER, m_IPAddress);
+	DDX_Control(pDX, IDC_LIST_CHAT, m_listChat);
+	//  DDX_Control(pDX, IDC_RADIO_SERVER, m_nChatMode);
+	DDX_Radio(pDX, IDC_RADIO_SERVER, m_nChatMode);
 }
 
 BEGIN_MESSAGE_MAP(CMFC19_SocketExDlg, CDialogEx)
@@ -97,6 +104,9 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	// IP주소 가져오기
+	char name[255];
+
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }

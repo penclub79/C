@@ -30,6 +30,7 @@ BEGIN_MESSAGE_MAP(CMFC12_4_BitMapExView, CView)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
+	ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 // CMFC12_4_BitMapExView 생성/소멸
@@ -72,6 +73,16 @@ BOOL CMFC12_4_BitMapExView::PreCreateWindow(CREATESTRUCT& cs)
 	//  Window 클래스 또는 스타일을 수정합니다.
 
 	return CView::PreCreateWindow(cs);
+}
+
+int CMFC12_4_BitMapExView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CView::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	// TODO:  여기에 특수화된 작성 코드를 추가합니다.
+
+	return 0;
 }
 
 // CMFC12_4_BitMapExView 그리기
@@ -361,3 +372,6 @@ void CMFC12_4_BitMapExView::OnMouseMove(UINT nFlags, CPoint _point)
 
 	CView::OnMouseMove(nFlags, _point);
 }
+
+
+
