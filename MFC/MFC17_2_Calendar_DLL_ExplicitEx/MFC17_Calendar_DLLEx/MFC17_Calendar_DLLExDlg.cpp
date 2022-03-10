@@ -10,8 +10,8 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
-extern "C" __declspec(dllimport) void Calender(int year, int month, int *Days);
+// Implicit 링킹으로 읽어왔던 부분을 주석
+//extern "C" __declspec(dllimport) void Calender(int year, int month, int *Days);
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
@@ -177,7 +177,20 @@ void CMFC17_Calendar_DLLExDlg::OnPaint()
 		}
 
 		// DLL로 제작한 함수를 사용한다.
-		Calender(m_nYear, m_nMonth, &m_nDays[0][0]);
+		//Calender(m_nYear, m_nMonth, &m_nDays[0][0]);
+
+		HINSTANCE hDll;
+		hDll = LoadLibrary(_T("CalenderDll.dll"));	// DLL 파일을 읽어온다.
+
+		// DLL에서 읽어올 함수 형을 지정한다.
+		typedef int(*CalenderFunc)(int year, int month, int *Days);
+
+		CalenderFunc IpCalender;
+		// 함수를 읽어온다.
+		IpCalender = (CalenderFunc)GetProcAddress(hDll, "Calender");
+
+		// DLL로 제작한 함수를 사용한다.
+		IpCalender(m_nYear, m_nMonth, &m_nDays[0][0]);
 
 		// 날짜를 표시하여준다. 단 날짜 데이터가 0일 경우는 표시하지 않는다.
 		for (i = 0; i < 6; i++)
