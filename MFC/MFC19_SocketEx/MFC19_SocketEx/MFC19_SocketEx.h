@@ -26,17 +26,18 @@ public:
 	virtual BOOL InitInstance();
 
 // 구현입니다.
-
 	DECLARE_MESSAGE_MAP()
+	
+public:
 	CServerSock* m_pServer;
 	CClientSock* m_pClient;
-	void InitServer();
-	void Accept();
-	void CleanUp();
+	void InitServer(void);
+	void Accept(void);
+	void CleanUp(void);
 	void Connect(CString strIP);
-	void ReceiveData();
+	void ReceiveData(void);
 	void SendData(CString strData);
-	void CloseChild();
+	void CloseChild(void);
 };
 
 extern CMFC19_SocketExApp theApp;
