@@ -23,6 +23,8 @@ END_MESSAGE_MAP()
 CMFC19_SocketExApp::CMFC19_SocketExApp()
 : m_pServer(NULL)
 , m_pClient(NULL)
+, m_pAccept(NULL)
+
 {
 	// 다시 시작 관리자 지원
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -120,13 +122,13 @@ void CMFC19_SocketExApp::InitServer()
 
 void CMFC19_SocketExApp::Accept()
 {
-	if (m_pClient == NULL)
+	if (m_pAccept == NULL)
 	{
-		m_pClient = new CClientSock;
-		m_pServer->Accept(*m_pClient);
+		m_pAccept = new CClientSock;
+		m_pServer->Accept(*m_pAccept);
 		CString strSock;
 		UINT nPort;
-		m_pClient->GetPeerName(strSock, nPort);
+		m_pAccept->GetPeerName(strSock, nPort);
 		((CMFC19_SocketExDlg*)m_pMainWnd)->Accept(strSock);
 	}
 }
@@ -143,6 +145,11 @@ void CMFC19_SocketExApp::CleanUp()
 	{
 		delete m_pClient;
 	}
+
+	if (m_pAccept)
+	{
+		delete m_pAccept;
+	}
 }
 
 
@@ -154,11 +161,10 @@ void CMFC19_SocketExApp::Connect(CString strIP)
 }
 
 
-void CMFC19_SocketExApp::ReceiveData(
-	)
+void CMFC19_SocketExApp::ReceiveData(CClientSock* pSocket)
 {
 	wchar_t temp[MAX_PATH];
-	m_pClient->Receive(temp, sizeof(temp));
+	pSocket->Receive(temp, sizeof(temp));
 	((CMFC19_SocketExDlg*)m_pMainWnd)->ReceiveData(temp);
 }
 

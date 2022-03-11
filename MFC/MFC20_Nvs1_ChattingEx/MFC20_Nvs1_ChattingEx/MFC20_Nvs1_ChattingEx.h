@@ -27,8 +27,6 @@ public:
 // 구현입니다.
 
 	DECLARE_MESSAGE_MAP()
-	CString m_strMyIP;
-	CString m_strOtherIP;
 };
 
 extern CMFC20_Nvs1_ChattingExApp theApp;

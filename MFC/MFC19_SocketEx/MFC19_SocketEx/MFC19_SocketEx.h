@@ -31,11 +31,12 @@ public:
 public:
 	CServerSock* m_pServer;
 	CClientSock* m_pClient;
+	CClientSock* m_pAccept;
 	void InitServer(void);
 	void Accept(void);
 	void CleanUp(void);
 	void Connect(CString strIP);
-	void ReceiveData(void);
+	void ReceiveData(CClientSock* pSocket);
 	void SendData(CString strData);
 	void CloseChild(void);
 };
