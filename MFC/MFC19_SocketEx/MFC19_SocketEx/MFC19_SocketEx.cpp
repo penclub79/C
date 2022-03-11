@@ -21,6 +21,8 @@ END_MESSAGE_MAP()
 // CMFC19_SocketExApp 생성
 
 CMFC19_SocketExApp::CMFC19_SocketExApp()
+: m_pServer(NULL)
+, m_pClient(NULL)
 {
 	// 다시 시작 관리자 지원
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -106,3 +108,73 @@ BOOL CMFC19_SocketExApp::InitInstance()
 	return FALSE;
 }
 
+
+
+void CMFC19_SocketExApp::InitServer()
+{
+	m_pServer = new CServerSock;
+	m_pServer->Create(7777);
+	m_pServer->Listen();
+}
+
+
+void CMFC19_SocketExApp::Accept()
+{
+	if (m_pClient == NULL)
+	{
+		m_pClient = new CClientSock;
+		m_pServer->Accept(*m_pClient);
+		CString strSock;
+		UINT nPort;
+		m_pClient->GetPeerName(strSock, nPort);
+		((CMFC19_SocketExDlg*)m_pMainWnd)->Accept(strSock);
+	}
+}
+
+
+void CMFC19_SocketExApp::CleanUp()
+{
+	if (m_pServer)
+	{
+		delete m_pServer;
+	}
+
+	if (m_pClient)
+	{
+		delete m_pClient;
+	}
+}
+
+
+void CMFC19_SocketExApp::Connect(CString strIP)
+{
+	m_pClient = new CClientSock;
+	m_pClient->Create();
+	m_pClient->Connect(strIP, 7777);
+}
+
+
+void CMFC19_SocketExApp::ReceiveData(
+	)
+{
+	wchar_t temp[MAX_PATH];
+	m_pClient->Receive(temp, sizeof(temp));
+	((CMFC19_SocketExDlg*)m_pMainWnd)->ReceiveData(temp);
+}
+
+
+void CMFC19_SocketExApp::SendData(CString strData)
+{
+	if (m_pClient)
+	{
+		m_pClient->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
+	}
+}
+
+
+void CMFC19_SocketExApp::CloseChild()
+{
+	AfxMessageBox(_T("상대방 연결 끊김"));
+	delete m_pClient;
+	m_pClient = NULL;
+}

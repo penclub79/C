@@ -9,7 +9,8 @@
 #endif
 
 #include "resource.h"		// 주 기호입니다.
-
+#include "ServerSock.h"
+#include "ClientSock.h"
 
 // CMFC19_SocketExApp:
 // 이 클래스의 구현에 대해서는 MFC19_SocketEx.cpp을 참조하십시오.
@@ -27,6 +28,15 @@ public:
 // 구현입니다.
 
 	DECLARE_MESSAGE_MAP()
+	CServerSock* m_pServer;
+	CClientSock* m_pClient;
+	void InitServer();
+	void Accept();
+	void CleanUp();
+	void Connect(CString strIP);
+	void ReceiveData();
+	void SendData(CString strData);
+	void CloseChild();
 };
 
 extern CMFC19_SocketExApp theApp;
