@@ -49,8 +49,9 @@ END_MESSAGE_MAP()
 
 CMFC20_Nvs1_ChattingExDlg::CMFC20_Nvs1_ChattingExDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC20_Nvs1_ChattingExDlg::IDD, pParent)
-	, m_nChat(0)
-	, m_nChatMode(0)
+	/*, m_nChat(0)
+	, m_nChatMode(0)*/
+	, m_ChatMode(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -62,6 +63,7 @@ void CMFC20_Nvs1_ChattingExDlg::DoDataExchange(CDataExchange* pDX)
 	//  DDX_IPAddress(pDX, IDC_IPADDRESS_SERVER, m_nChatMode);
 	DDX_Control(pDX, IDC_LIST_CHAT, m_listChat);
 	DDX_Control(pDX, IDC_IPADDRESS_SERVER, m_IPAddress);
+	DDX_Radio(pDX, IDC_RADIO_SERVER, m_ChatMode);
 }
 
 BEGIN_MESSAGE_MAP(CMFC20_Nvs1_ChattingExDlg, CDialogEx)
@@ -103,6 +105,22 @@ BOOL CMFC20_Nvs1_ChattingExDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	// IP주소 가져오기
+	char szName[255];
+	PHOSTENT stHostinfo;
+	if (gethostname(szName, sizeof(szName)) == 0)
+	{
+		if ((stHostinfo = gethostbyname(szName)) != NULL)
+		{
+			m_strMyIP = inet_ntoa (*(struct in_addr *)*stHostinfo->h_addr_list);
+		}
+	}
+
+	// 컨트롤 초기화
+	m_IPAddress.SetWindowTextW(m_strMyIP);	// ipaddress 상자에 ip 값을 넣어준다.
+	m_IPAddress.EnableWindow(FALSE);  // ipaddress 상자를 비활성화 시킨다.
+	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Open"));
+
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }

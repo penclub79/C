@@ -21,6 +21,7 @@ END_MESSAGE_MAP()
 // CMFC20_Nvs1_ChattingExApp 생성
 
 CMFC20_Nvs1_ChattingExApp::CMFC20_Nvs1_ChattingExApp()
+: m_strMyIP(_T(""))
 {
 	// 다시 시작 관리자 지원
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;

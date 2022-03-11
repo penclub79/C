@@ -5,6 +5,9 @@
 
 #pragma once
 
+// 보안 이유로 인해 에러 뜰것을 방지.
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN            // 거의 사용되지 않는 내용은 Windows 헤더에서 제외합니다.
 #endif

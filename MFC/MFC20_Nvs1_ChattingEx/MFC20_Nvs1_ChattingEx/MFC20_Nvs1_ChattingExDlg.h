@@ -34,4 +34,5 @@ protected:
 public:
 	CListBox m_listChat;
 	CIPAddressCtrl m_IPAddress;
+	int m_ChatMode;
 };
