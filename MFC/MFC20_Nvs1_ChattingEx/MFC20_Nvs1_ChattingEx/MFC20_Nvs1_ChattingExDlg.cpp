@@ -51,7 +51,9 @@ CMFC20_Nvs1_ChattingExDlg::CMFC20_Nvs1_ChattingExDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC20_Nvs1_ChattingExDlg::IDD, pParent)
 	/*, m_nChat(0)
 	, m_nChatMode(0)*/
-	, m_ChatMode(0)
+	, m_nChatMode(0)
+	, m_strMyIP(_T(""))
+	, m_strOtherIP(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -63,13 +65,17 @@ void CMFC20_Nvs1_ChattingExDlg::DoDataExchange(CDataExchange* pDX)
 	//  DDX_IPAddress(pDX, IDC_IPADDRESS_SERVER, m_nChatMode);
 	DDX_Control(pDX, IDC_LIST_CHAT, m_listChat);
 	DDX_Control(pDX, IDC_IPADDRESS_SERVER, m_IPAddress);
-	DDX_Radio(pDX, IDC_RADIO_SERVER, m_ChatMode);
+	DDX_Radio(pDX, IDC_RADIO_SERVER, m_nChatMode);
 }
 
 BEGIN_MESSAGE_MAP(CMFC20_Nvs1_ChattingExDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_RADIO_SERVER, &CMFC20_Nvs1_ChattingExDlg::OnClickedRadioServer)
+	//ON_COMMAND(IDC_RADIO_CLIENT, &CMFC20_Nvs1_ChattingExDlg::OnRadioClient)
+	ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CMFC20_Nvs1_ChattingExDlg::OnClickedButtonConnect)
+	ON_BN_CLICKED(IDC_BUTTON_SEND, &CMFC20_Nvs1_ChattingExDlg::OnClickedButtonSend)
 END_MESSAGE_MAP()
 
 
@@ -119,6 +125,8 @@ BOOL CMFC20_Nvs1_ChattingExDlg::OnInitDialog()
 	// 컨트롤 초기화
 	m_IPAddress.SetWindowTextW(m_strMyIP);	// ipaddress 상자에 ip 값을 넣어준다.
 	m_IPAddress.EnableWindow(FALSE);  // ipaddress 상자를 비활성화 시킨다.
+	GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
+	GetDlgItem(IDC_RADIO_CLIENT)->EnableWindow(FALSE);
 	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Open"));
 
 
@@ -174,3 +182,63 @@ HCURSOR CMFC20_Nvs1_ChattingExDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CMFC20_Nvs1_ChattingExDlg::OnClickedRadioServer()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_IPAddress.SetWindowTextW(m_strMyIP);
+	m_IPAddress.EnableWindow(FALSE);
+	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Open"));
+}
+
+
+void CMFC20_Nvs1_ChattingExDlg::OnRadioClient()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	m_IPAddress.SetWindowTextW(_T(""));
+	m_IPAddress.EnableWindow(TRUE);
+	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
+}
+
+
+void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonConnect()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData();
+	((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->InitServer();
+	GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
+	GetDlgItem(IDC_RADIO_CLIENT)->EnableWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
+	
+	CString strIP;
+	GetDlgItemText(IDC_IPADDRESS_SERVER, strIP);
+	
+}
+
+
+void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonSend()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString strSend, strInsert;
+	GetDlgItemText(IDC_EDIT_SEND, strSend);
+	strInsert.Format(_T("서버[%s]:%s"), m_strMyIP, strSend);
+	theApp.SendData(strSend);
+	int sel = m_listChat.InsertString(-1, strInsert);
+	m_listChat.SetCurSel(sel);
+	SetDlgItemText(IDC_EDIT_SEND, _T(""));
+}
+
+
+void CMFC20_Nvs1_ChattingExDlg::ReceiveData(CString strReceive)
+{
+	CString strInsert;
+	strInsert.Format(_T("클라이언트[%s]:%s"), m_strOtherIP, strReceive);
+	int sel = m_listChat.InsertString(-1, strInsert);
+}
+
+
+void CMFC20_Nvs1_ChattingExDlg::Accept(CString strSock)
+{
+	m_strOtherIP = strSock;
+}

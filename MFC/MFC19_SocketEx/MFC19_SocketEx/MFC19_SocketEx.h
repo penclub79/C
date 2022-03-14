@@ -29,16 +29,16 @@ public:
 	DECLARE_MESSAGE_MAP()
 	
 public:
-	CServerSock* m_pServer;
-	CClientSock* m_pClient;
-	CClientSock* m_pAccept;
+	//CServerSock* m_pServer;
+	CBasicSock* m_pClient;
+	//CClientSock* m_pAccept;
 	void InitServer(void);
-	void Accept(void);
+	//void Accept(void);
 	void CleanUp(void);
 	void Connect(CString strIP);
-	void ReceiveData(CClientSock* pSocket);
+	void ReceiveData();
 	void SendData(CString strData);
-	void CloseChild(void);
+	void CloseChild();
 };
 
 extern CMFC19_SocketExApp theApp;

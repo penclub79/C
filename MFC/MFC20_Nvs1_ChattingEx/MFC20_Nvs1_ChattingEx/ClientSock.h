@@ -1,10 +1,12 @@
 #pragma once
 #include "afxsock.h"
-class CClientSock :
+class CBasicSock :
 	public CAsyncSocket
 {
 public:
-	CClientSock();
-	~CClientSock();
+	CBasicSock();
+	~CBasicSock();
+	virtual void OnReceive(int nErrorCode);
+	virtual void OnClose(int nErrorCode);
 };
 

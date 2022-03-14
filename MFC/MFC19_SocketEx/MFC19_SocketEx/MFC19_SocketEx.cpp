@@ -1,6 +1,6 @@
 
 // MFC19_SocketEx.cpp : 응용 프로그램에 대한 클래스 동작을 정의합니다.
-//
+// 클라이언트
 
 #include "stdafx.h"
 #include "MFC19_SocketEx.h"
@@ -21,9 +21,9 @@ END_MESSAGE_MAP()
 // CMFC19_SocketExApp 생성
 
 CMFC19_SocketExApp::CMFC19_SocketExApp()
-: m_pServer(NULL)
-, m_pClient(NULL)
-, m_pAccept(NULL)
+//: m_pServer(NULL)
+  : m_pClient(NULL)
+//, m_pAccept(NULL)
 
 {
 	// 다시 시작 관리자 지원
@@ -112,65 +112,74 @@ BOOL CMFC19_SocketExApp::InitInstance()
 
 
 
-void CMFC19_SocketExApp::InitServer()
-{
-	m_pServer = new CServerSock;
-	m_pServer->Create(7777);
-	m_pServer->Listen();
-}
+//void CMFC19_SocketExApp::InitServer()
+//{
+//	m_pServer = new CServerSock;
+//	m_pServer->Create(7777);
+//	m_pServer->Listen();
+//}
 
 
-void CMFC19_SocketExApp::Accept()
-{
-	if (m_pAccept == NULL)
-	{
-		m_pAccept = new CClientSock;
-		m_pServer->Accept(*m_pAccept);
-		CString strSock;
-		UINT nPort;
-		m_pAccept->GetPeerName(strSock, nPort);
-		((CMFC19_SocketExDlg*)m_pMainWnd)->Accept(strSock);
-	}
-}
+//void CMFC19_SocketExApp::Accept()
+//{
+//	if (m_pAccept == NULL)
+//	{
+//		m_pAccept = new CClientSock;
+//		m_pServer->Accept(*m_pAccept);
+//		CString strSock;
+//		UINT nPort;
+//		m_pAccept->GetPeerName(strSock, nPort);
+//		((CMFC19_SocketExDlg*)m_pMainWnd)->Accept(strSock);
+//	}
+//}
 
 
 void CMFC19_SocketExApp::CleanUp()
 {
-	if (m_pServer)
+	/*if (m_pServer)
 	{
 		delete m_pServer;
-	}
+	}*/
+
+	/*if (m_pAccept)
+	{
+	delete m_pAccept;
+	}*/
 
 	if (m_pClient)
 	{
 		delete m_pClient;
-	}
-
-	if (m_pAccept)
-	{
-		delete m_pAccept;
 	}
 }
 
 
 void CMFC19_SocketExApp::Connect(CString strIP)
 {
-	m_pClient = new CClientSock;
-	m_pClient->Create();
-	m_pClient->Connect(strIP, 7777);
+	if (strIP)
+	{
+		m_pClient = new CBasicSock;
+		m_pClient->Create();
+		m_pClient->Connect(strIP, 7777);
+	}
+	
 }
 
 
-void CMFC19_SocketExApp::ReceiveData(CClientSock* pSocket)
+void CMFC19_SocketExApp::ReceiveData()
 {
 	wchar_t temp[MAX_PATH];
-	pSocket->Receive(temp, sizeof(temp));
+	m_pClient->Receive(temp, sizeof(temp));
 	((CMFC19_SocketExDlg*)m_pMainWnd)->ReceiveData(temp);
 }
 
 
 void CMFC19_SocketExApp::SendData(CString strData)
 {
+	/*if (m_pAccept)
+	{
+		m_pAccept->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
+	}*/
+
 	if (m_pClient)
 	{
 		m_pClient->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
@@ -180,7 +189,8 @@ void CMFC19_SocketExApp::SendData(CString strData)
 
 void CMFC19_SocketExApp::CloseChild()
 {
-	AfxMessageBox(_T("상대방 연결 끊김"));
+	AfxMessageBox(_T("서버 연결 끊김"));
+	
 	delete m_pClient;
 	m_pClient = NULL;
 }

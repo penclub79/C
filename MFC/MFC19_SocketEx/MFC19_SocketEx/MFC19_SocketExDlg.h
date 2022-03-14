@@ -45,4 +45,5 @@ public:
 	CString m_strMyIP;
 	CString m_nOtherIP;
 	CString m_strOtherIP;
+	afx_msg void OnBnClickedRadioServer();
 };

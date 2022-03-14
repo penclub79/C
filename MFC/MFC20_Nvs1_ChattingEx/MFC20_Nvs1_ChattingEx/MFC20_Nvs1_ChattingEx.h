@@ -1,6 +1,6 @@
 
 // MFC20_Nvs1_ChattingEx.h : PROJECT_NAME 응용 프로그램에 대한 주 헤더 파일입니다.
-//
+// 서버
 
 #pragma once
 
@@ -9,6 +9,9 @@
 #endif
 
 #include "resource.h"		// 주 기호입니다.
+#include "ServerSock.h"
+#include "ClientSock.h"
+#include "afxcoll.h"
 
 
 // CMFC20_Nvs1_ChattingExApp:
@@ -27,6 +30,19 @@ public:
 // 구현입니다.
 
 	DECLARE_MESSAGE_MAP()
+
+public:
+	CServerSock* m_pServer;
+	//CClientSock* m_pClient;
+	void InitServer();
+	void Accept();
+	CBasicSock* m_pAccept;
+	void CleanUp();
+	//void Connect(CString strIP);
+	void ReceiveData(CBasicSock* pClientSock);
+	void SendData(CString strData);
+	void CloseChild(CBasicSock* pClientSock);
+	CObList m_ClientList;
 };
 
 extern CMFC20_Nvs1_ChattingExApp theApp;

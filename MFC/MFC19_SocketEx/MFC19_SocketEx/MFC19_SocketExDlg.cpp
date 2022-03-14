@@ -49,7 +49,7 @@ END_MESSAGE_MAP()
 
 CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC19_SocketExDlg::IDD, pParent)
-	, m_nChatMode(0)
+	, m_nChatMode(1)
 	, m_strMyIP(_T(""))
 	, m_nOtherIP(_T(""))
 	, m_strOtherIP(_T(""))
@@ -70,10 +70,11 @@ BEGIN_MESSAGE_MAP(CMFC19_SocketExDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_RADIO_SERVER, &CMFC19_SocketExDlg::OnClickedRadioServer)
+	//ON_BN_CLICKED(IDC_RADIO_SERVER, &CMFC19_SocketExDlg::OnClickedRadioServer)
 	ON_COMMAND(IDC_RADIO_CLIENT, &CMFC19_SocketExDlg::OnRadioClient)
 	ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CMFC19_SocketExDlg::OnClickedButtonConnect)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CMFC19_SocketExDlg::OnClickedButtonSend)
+	//ON_BN_CLICKED(IDC_RADIO_SERVER, &CMFC19_SocketExDlg::OnBnClickedRadioServer)
 END_MESSAGE_MAP()
 
 
@@ -123,7 +124,8 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	// 컨트롤 초기화
 	m_IPAddress.SetWindowText(m_strMyIP);
 	m_IPAddress.EnableWindow(FALSE);
-	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Open"));
+	GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
+	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
 
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
@@ -180,13 +182,13 @@ HCURSOR CMFC19_SocketExDlg::OnQueryDragIcon()
 
 
 
-void CMFC19_SocketExDlg::OnClickedRadioServer()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	m_IPAddress.SetWindowText(m_strMyIP);
-	m_IPAddress.EnableWindow(FALSE);
-	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Open"));
-}
+//void CMFC19_SocketExDlg::OnClickedRadioServer()
+//{
+//	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+//	m_IPAddress.SetWindowText(m_strMyIP);
+//	m_IPAddress.EnableWindow(FALSE);
+//	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Open"));
+//}
 
 
 void CMFC19_SocketExDlg::OnRadioClient()
@@ -202,7 +204,7 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateData();
-	if (!m_nChatMode)
+	/*if (!m_nChatMode)
 	{
 		((CMFC19_SocketExApp*)AfxGetApp())->InitServer();
 		GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
@@ -210,13 +212,11 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
 	}
 	else
-	{
+	{*/
 		CString strIP;
 		GetDlgItemText(IDC_IPADDRESS_SERVER, strIP);
 		if (strIP != _T("0.0.0.0"))
 		{
-			GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
-			GetDlgItem(IDC_RADIO_CLIENT)->EnableWindow(FALSE);
 			GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
 			((CMFC19_SocketExApp*)AfxGetApp())->Connect(strIP);
 			m_strOtherIP = strIP;
@@ -226,7 +226,7 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 			AfxMessageBox(_T("접속할 서버의 IP주소를 입력하세요"));
 		}
 		
-	}
+	//}
 }
 
 
@@ -235,8 +235,8 @@ void CMFC19_SocketExDlg::OnClickedButtonSend()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString strSend, strInsert;
 	GetDlgItemText(IDC_EDIT_SEND, strSend);
-	strInsert.Format(_T("[%s]:%s"), m_strMyIP, strSend);
-	theApp.SendData(strSend);
+	strInsert.Format(_T("클라이언트[%s]:%s"), m_strMyIP, strSend);
+	((CMFC19_SocketExApp*)AfxGetApp())->SendData(strSend);
 	int sel = m_listChat.InsertString(-1, strInsert);
 	m_listChat.SetCurSel(sel);
 	SetDlgItemText(IDC_EDIT_SEND, _T(""));
@@ -246,7 +246,7 @@ void CMFC19_SocketExDlg::OnClickedButtonSend()
 void CMFC19_SocketExDlg::ReceiveData(CString strReceive)
 {
 	CString strInsert;
-	strInsert.Format(_T("[%s]:%s"), m_strOtherIP, strReceive);
+	strInsert.Format(_T("서버[%s]:%s"), m_strOtherIP, strReceive);
 	int sel = m_listChat.InsertString(-1, strInsert);
 	m_listChat.SetCurSel(sel);
 }
