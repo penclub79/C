@@ -206,7 +206,10 @@ void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonConnect()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateData();
+	
 	((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->InitServer();
+
+
 	GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
 	GetDlgItem(IDC_RADIO_CLIENT)->EnableWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);

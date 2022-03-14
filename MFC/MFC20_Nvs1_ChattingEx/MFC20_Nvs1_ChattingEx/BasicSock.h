@@ -8,5 +8,6 @@ public:
 	~CBasicSock();
 	virtual void OnReceive(int nErrorCode);
 	virtual void OnClose(int nErrorCode);
+
 };
 

@@ -32,15 +32,18 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	CListBox m_listChat;
-	CIPAddressCtrl m_IPAddress;
-	CString m_strMyIP;
-	CString m_strOtherIP;
-	int m_nChatMode;
 	afx_msg void OnClickedRadioServer();
 	afx_msg void OnRadioClient();
 	afx_msg void OnClickedButtonConnect();
 	afx_msg void OnClickedButtonSend();
 	void ReceiveData(CString strReceive);
 	void Accept(CString strSock);
+
+	CListBox m_listChat;
+	CIPAddressCtrl m_IPAddress;
+	CString m_strMyIP;
+	CString m_strOtherIP;
+	int m_nChatMode;
+	
+	
 };

@@ -1,10 +1,11 @@
 #include "stdafx.h"
-#include "ClientSock.h"
+#include "BasicSock.h"
 #include "MFC20_Nvs1_ChattingEx.h"
 
 
 CBasicSock::CBasicSock()
 {
+
 }
 
 

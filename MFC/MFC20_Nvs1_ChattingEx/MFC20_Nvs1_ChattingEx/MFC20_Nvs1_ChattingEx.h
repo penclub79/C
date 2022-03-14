@@ -10,7 +10,7 @@
 
 #include "resource.h"		// 주 기호입니다.
 #include "ServerSock.h"
-#include "ClientSock.h"
+#include "BasicSock.h"
 #include "afxcoll.h"
 
 
@@ -32,6 +32,9 @@ public:
 	DECLARE_MESSAGE_MAP()
 
 public:
+
+private:
+
 	CServerSock* m_pServer;
 	//CClientSock* m_pClient;
 	void InitServer();
@@ -39,7 +42,7 @@ public:
 	CBasicSock* m_pAccept;
 	void CleanUp();
 	//void Connect(CString strIP);
-	void ReceiveData(CBasicSock* pClientSock);
+	void ReceiveData(CAcceptSocket* pClientSock);
 	void SendData(CString strData);
 	void CloseChild(CBasicSock* pClientSock);
 	CObList m_ClientList;

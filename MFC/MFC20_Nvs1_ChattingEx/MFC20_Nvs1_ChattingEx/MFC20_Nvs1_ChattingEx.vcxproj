@@ -100,7 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AcceptSock.h" />
-    <ClInclude Include="ClientSock.h" />
+    <ClInclude Include="BasicSock.h" />
     <ClInclude Include="MFC20_Nvs1_ChattingEx.h" />
     <ClInclude Include="MFC20_Nvs1_ChattingExDlg.h" />
     <ClInclude Include="Resource.h" />
@@ -109,7 +109,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ClientSock.cpp" />
+    <ClCompile Include="AcceptSock.cpp" />
+    <ClCompile Include="BasicSock.cpp" />
     <ClCompile Include="MFC20_Nvs1_ChattingEx.cpp" />
     <ClCompile Include="MFC20_Nvs1_ChattingExDlg.cpp" />
     <ClCompile Include="ServerSock.cpp" />

@@ -142,6 +142,8 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 		UINT nPort;
 		m_pAccept->GetPeerName(strSock, nPort);
 
+		m_pAccept->SetUserName("ȣö");
+
 		m_ClientList.AddTail(m_pAccept);
 		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
 	}
@@ -167,13 +169,9 @@ void CMFC20_Nvs1_ChattingExApp::CleanUp()
 void CMFC20_Nvs1_ChattingExApp::ReceiveData(CBasicSock* pClientSock)
 {
 	wchar_t temp[MAX_PATH];
-	POSITION pos = m_ClientList.GetHeadPosition();
-	while (pos != NULL)
-	{
-		pClientSock = (CBasicSock*)m_ClientList.GetAt(pos);
-		m_ClientList.GetNext(pos);
-	}
-	pClientSock->Receive(temp, sizeof(temp));
+	(pClientSock->Receive(temp, sizeof(temp)));
+
+
 	((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->ReceiveData(temp);
 
 
@@ -182,10 +180,18 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CBasicSock* pClientSock)
 
 void CMFC20_Nvs1_ChattingExApp::SendData(CString strData)
 {
-	if (m_pAccept)
+	CBasicSock* pClientSock;
+	POSITION pos = m_ClientList.GetHeadPosition();
+	while (pos != NULL)
+	{
+		pClientSock = (CBasicSock*)m_ClientList.GetAt(pos);
+		m_ClientList.GetNext(pos);
+		pClientSock->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
+	}
+	/*if (m_pAccept)
 	{
 		m_pAccept->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
-	}
+	}*/
 }
 
 
