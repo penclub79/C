@@ -142,8 +142,6 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 		UINT nPort;
 		m_pAccept->GetPeerName(strSock, nPort);
 
-		m_pAccept->SetUserName("ȣö");
-
 		m_ClientList.AddTail(m_pAccept);
 		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
 	}

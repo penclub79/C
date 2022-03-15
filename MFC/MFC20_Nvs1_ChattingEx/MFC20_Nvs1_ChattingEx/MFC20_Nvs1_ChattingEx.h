@@ -33,8 +33,7 @@ public:
 
 public:
 
-private:
-
+public:
 	CServerSock* m_pServer;
 	//CClientSock* m_pClient;
 	void InitServer();
@@ -42,7 +41,7 @@ private:
 	CBasicSock* m_pAccept;
 	void CleanUp();
 	//void Connect(CString strIP);
-	void ReceiveData(CAcceptSocket* pClientSock);
+	void ReceiveData(CBasicSock* pClientSock);
 	void SendData(CString strData);
 	void CloseChild(CBasicSock* pClientSock);
 	CObList m_ClientList;
