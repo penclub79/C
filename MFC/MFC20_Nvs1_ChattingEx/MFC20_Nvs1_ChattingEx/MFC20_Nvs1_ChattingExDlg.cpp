@@ -222,11 +222,13 @@ void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonConnect()
 
 void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonSend()
 {
+	
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString strSend, strInsert;
 	GetDlgItemText(IDC_EDIT_SEND, strSend);
 	strInsert.Format(_T("서버[%s]:%s"), m_strMyIP, strSend);
-	theApp.SendData(strSend);
+	//((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendData(strSend);
+	((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendData(strSend);
 	int sel = m_listChat.InsertString(-1, strInsert);
 	m_listChat.SetCurSel(sel);
 	SetDlgItemText(IDC_EDIT_SEND, _T(""));
@@ -237,6 +239,7 @@ void CMFC20_Nvs1_ChattingExDlg::ReceiveData(CString strReceive)
 {
 	CString strInsert;
 	strInsert.Format(_T("클라이언트[%s]:%s"), m_strOtherIP, strReceive);
+	((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendData(strReceive);
 	int sel = m_listChat.InsertString(-1, strInsert);
 }
 

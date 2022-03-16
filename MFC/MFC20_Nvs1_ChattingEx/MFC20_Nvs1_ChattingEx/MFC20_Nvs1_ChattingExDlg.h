@@ -31,6 +31,8 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+
+	void InitServer();
 public:
 	afx_msg void OnClickedRadioServer();
 	afx_msg void OnRadioClient();

@@ -11,6 +11,7 @@
 #include "resource.h"		// 주 기호입니다.
 #include "ServerSock.h"
 #include "BasicSock.h"
+#include "AcceptSock.h"
 #include "afxcoll.h"
 
 
@@ -33,18 +34,23 @@ public:
 
 public:
 
-public:
+private:
 	CServerSock* m_pServer;
-	//CClientSock* m_pClient;
-	void InitServer();
-	void Accept();
-	CBasicSock* m_pAccept;
-	void CleanUp();
-	//void Connect(CString strIP);
-	void ReceiveData(CBasicSock* pClientSock);
-	void SendData(CString strData);
-	void CloseChild(CBasicSock* pClientSock);
+	//CAcceptSock* m_pAccept;
 	CObList m_ClientList;
+	void CleanUp();
+	
+public:
+	void ReceiveData(CBasicSock* pClientSock);
+	void CloseChild(CBasicSock* pClientSock);
+	void Accept();
+	void SendDataAll(CString strData);
+	void InitServer();
+	void OnSend(CString strData);
+
+protected:
+	
+	
 };
 
 extern CMFC20_Nvs1_ChattingExApp theApp;

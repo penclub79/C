@@ -8,5 +8,8 @@ public:
 	CServerSock();
 	~CServerSock();
 	virtual void OnAccept(int nErrorCode);
+
+protected:
+	void InitServer();
 };
 

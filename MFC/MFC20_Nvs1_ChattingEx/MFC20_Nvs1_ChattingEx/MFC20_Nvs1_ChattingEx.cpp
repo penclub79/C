@@ -22,7 +22,7 @@ END_MESSAGE_MAP()
 
 CMFC20_Nvs1_ChattingExApp::CMFC20_Nvs1_ChattingExApp()
 : m_pServer(NULL)
-, m_pAccept(NULL)
+
 {
 	// 다시 시작 관리자 지원
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -135,14 +135,14 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 
 #else
 
-	m_pAccept = new CBasicSock;
-	if (m_pServer->Accept(*m_pAccept))
+	CAcceptSock* pAccept = new CAcceptSock;
+	if (m_pServer->Accept(*pAccept))
 	{
 		CString strSock;
 		UINT nPort;
-		m_pAccept->GetPeerName(strSock, nPort);
+		pAccept->GetPeerName(strSock, nPort);
 
-		m_ClientList.AddTail(m_pAccept);
+		m_ClientList.AddTail(pAccept);
 		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
 	}
 
@@ -156,17 +156,34 @@ void CMFC20_Nvs1_ChattingExApp::CleanUp()
 	if (m_pServer)
 	{
 		delete m_pServer;
+		m_pServer = NULL;
 	}
-	if (m_pAccept)
+	/*if (m_pAccept)
 	{
 		delete m_pAccept;
+	}*/
+	CAcceptSock* pAccept;
+	POSITION pos = m_ClientList.GetHeadPosition();
+	while (pos != NULL)
+	{
+
+		pAccept = (CAcceptSock*)m_ClientList.GetAt(pos);
+		m_ClientList.GetNext(pos);
+		delete pAccept;
+		pAccept = NULL;
 	}
+
+	m_ClientList.RemoveAll();
+	
+	
 }
 
 
 void CMFC20_Nvs1_ChattingExApp::ReceiveData(CBasicSock* pClientSock)
 {
+	
 	wchar_t temp[MAX_PATH];
+	// 클라이언트로 부터 받은 메시지
 	(pClientSock->Receive(temp, sizeof(temp)));
 
 
@@ -176,12 +193,13 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CBasicSock* pClientSock)
 }
 
 
-void CMFC20_Nvs1_ChattingExApp::SendData(CString strData)
+void CMFC20_Nvs1_ChattingExApp::SendDataAll(CString strData)
 {
 	CBasicSock* pClientSock;
 	POSITION pos = m_ClientList.GetHeadPosition();
 	while (pos != NULL)
 	{
+	
 		pClientSock = (CBasicSock*)m_ClientList.GetAt(pos);
 		m_ClientList.GetNext(pos);
 		pClientSock->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
