@@ -53,6 +53,7 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 	, m_strMyIP(_T(""))
 	, m_nOtherIP(_T(""))
 	, m_strOtherIP(_T(""))
+	, m_strInitLoc(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -126,6 +127,13 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	// 컨트롤 초기화
 	m_IPAddress.SetWindowText(m_strMyIP);
 	m_IPAddress.EnableWindow(FALSE);
+
+
+	// Text Static ServerIP초기 좌표가져오기
+	GetDlgItem(IDC_STATIC_SERVER_IP)->GetWindowRect(&m_strInitLoc);
+	// 다이얼로그 내에 상대적 좌표로 변환
+	ScreenToClient(&m_strInitLoc);
+
 	//GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
 	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
 
@@ -257,7 +265,59 @@ void CMFC19_SocketExDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
+	if (NULL == this->GetSafeHwnd())
+		return;
+
+	
+
+	// Server IP STATIC
+	CWnd* pstrCtl = GetDlgItem(IDC_STATIC_SERVER_IP);
+
+	if (NULL == pstrCtl)
+		return;
+
+	// IPADDRESS Loc
+	RECT stIpAdrEditLoc = { 0 };
+	GetDlgItem(IDC_IPADDRESS_SERVER)->GetWindowRect(&stIpAdrEditLoc);
+	ScreenToClient(&stIpAdrEditLoc);
+
+	RECT stPortStaticLoc = { 0 };
+	GetDlgItem(IDC_STATIC_PORT)->GetWindowRect(&stPortStaticLoc);
+	ScreenToClient(&stPortStaticLoc);
+
+	// Server IP STATIC
+	pstrCtl->MoveWindow(m_strInitLoc.left, m_strInitLoc.top, 100, 39, TRUE);
+	
+	// IPADDRESS EDIT
+	pstrCtl = GetDlgItem(IDC_IPADDRESS_SERVER);
+	pstrCtl->MoveWindow(stIpAdrEditLoc.left, stIpAdrEditLoc.top, (cx / 3), 39, TRUE);
+
+	// PORT STATIC
+	pstrCtl = GetDlgItem(IDC_STATIC_PORT);
+	pstrCtl->MoveWindow(stPortStaticLoc.left, stPortStaticLoc.top, 90, 39, TRUE);
+
+	// PORT EDIT
+	pstrCtl = GetDlgItem(IDC_EDIT_PORT);
+	pstrCtl->MoveWindow(stPortStaticLoc.right + 15, 45, 100, 39, TRUE);
+
+	//pstrCtl->MoveWindow(40, 40, (cx / 4), 39, TRUE);
+
+	//if (!pstrCtl) return;
+
+	
+	//RECT rtRect = { 0 };							// 에디트 박스 영역
+
+	////pstrCtl->GetClientRect(&rtRect);
+	//pstrCtl->GetWindowRect(&rtRect);
+	//ScreenToClient(&rtRect);				// 에디트 박스의 스크린 영역을 CDialog 객체의 클라이언트 영역 기준으로 변경
+	////GetClientRect(&strRectCtl);
+
+	////pstrCtl->MoveWindow(strRectCtl.left, strRectCtl.top, cx-2 * strRectCtl.left, cy - strRectCtl.top - strRectCtl.left, TRUE);
+	//pstrCtl->MoveWindow(rtRect.left, rtRect.top, (rtRect.top, cx / 4), 39, TRUE);
+	
+	
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+
 }
 
 
