@@ -5,12 +5,23 @@
 
 CAcceptSock::CAcceptSock()
 {
+
 }
 
 
 CAcceptSock::~CAcceptSock()
 {
 }
+
+void CAcceptSock::SendWhoAreYou()
+{
+	PACKET_HEADER	stWhoAreYou = { 0 };
+
+	stWhoAreYou.iPacketID = PACKET_ID_REQ_WHOAREYOU;
+
+	Send((LPCTSTR)&stWhoAreYou, sizeof(stWhoAreYou));
+}
+
 
 //void CAcceptSock::OnReceive(int nErrorCode)
 //{
@@ -20,4 +31,15 @@ CAcceptSock::~CAcceptSock()
 //
 //	CAsyncSocket::OnReceive(nErrorCode);
 //}
+
+void CAcceptSock::SetUserID(int iID)
+{
+	iIndex = iID;
+}
+
+int CAcceptSock::GetUserID()
+{
+	return iIndex;
+	//((CMFC20_Nvs1_ChattingExApp*)AfxGetApp)->ReceiveData();
+}
 

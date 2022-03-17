@@ -23,6 +23,7 @@ END_MESSAGE_MAP()
 CMFC20_Nvs1_ChattingExApp::CMFC20_Nvs1_ChattingExApp()
 : m_pServer(NULL)
 
+
 {
 	// 다시 시작 관리자 지원
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -136,13 +137,19 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 #else
 
 	CAcceptSock* pAccept = new CAcceptSock;
+	
 	if (m_pServer->Accept(*pAccept))
 	{
 		CString strSock;
 		UINT nPort;
 		pAccept->GetPeerName(strSock, nPort);
-
+		
+		// user id 부여
+		pAccept->SetUserID(m_ClientList.GetCount());
+		
 		m_ClientList.AddTail(pAccept);
+
+		pAccept->SendWhoAreYou();
 		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
 	}
 
@@ -179,30 +186,41 @@ void CMFC20_Nvs1_ChattingExApp::CleanUp()
 }
 
 
-void CMFC20_Nvs1_ChattingExApp::ReceiveData(CBasicSock* pClientSock)
+void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pClientSock)
 {
 	
 	wchar_t temp[MAX_PATH];
 	// 클라이언트로 부터 받은 메시지
 	(pClientSock->Receive(temp, sizeof(temp)));
 
-
-	((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->ReceiveData(temp);
-
+	((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->ReceiveData(pClientSock, temp);
 
 }
 
 
-void CMFC20_Nvs1_ChattingExApp::SendDataAll(CString strData)
+
+
+void CMFC20_Nvs1_ChattingExApp::SendDataAll(CAcceptSock* pAccept, CString strData)
 {
-	CBasicSock* pClientSock;
+	//CAcceptSock* pAccept;
 	POSITION pos = m_ClientList.GetHeadPosition();
+	//int iID = pAccept->GetUserID();
+	//int iIndex = 0;
+	
 	while (pos != NULL)
 	{
-	
-		pClientSock = (CBasicSock*)m_ClientList.GetAt(pos);
-		m_ClientList.GetNext(pos);
-		pClientSock->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
+		/*if (iID == iIndex)
+		{
+			pAccept = (CAcceptSock*)m_ClientList.GetAt(pos);
+			m_ClientList.GetNext(pos);
+		}*/
+		//else
+		{
+			pAccept = (CAcceptSock*)m_ClientList.GetAt(pos);
+			m_ClientList.GetNext(pos);
+			pAccept->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
+		}
+		//iIndex++;
 	}
 	/*if (m_pAccept)
 	{
@@ -211,7 +229,7 @@ void CMFC20_Nvs1_ChattingExApp::SendDataAll(CString strData)
 }
 
 
-void CMFC20_Nvs1_ChattingExApp::CloseChild(CBasicSock* pClientSock)
+void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
 {
 	/*CClientSock* pClient;
 	POSITION pos = m_ClientList.Find(pSock);
@@ -228,7 +246,7 @@ void CMFC20_Nvs1_ChattingExApp::CloseChild(CBasicSock* pClientSock)
 	if (pos != NULL)
 	{
 		AfxMessageBox(_T("클라이언트 연결 끊김"));
-		pClientSock = (CBasicSock*)m_ClientList.GetAt(pos);
+		pClientSock = (CAcceptSock*)m_ClientList.GetAt(pos);
 		m_ClientList.RemoveAt(pos);
 		delete pClientSock;
 		pClientSock = NULL;

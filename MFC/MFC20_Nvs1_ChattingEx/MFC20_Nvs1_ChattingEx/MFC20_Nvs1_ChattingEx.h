@@ -41,12 +41,12 @@ private:
 	void CleanUp();
 	
 public:
-	void ReceiveData(CBasicSock* pClientSock);
-	void CloseChild(CBasicSock* pClientSock);
+	void ReceiveData(CAcceptSock* pClientSock);
+	void CloseChild(CAcceptSock* pClientSock);
 	void Accept();
-	void SendDataAll(CString strData);
+	void SendDataAll(CAcceptSock* pAccept, CString strData);
 	void InitServer();
-	void OnSend(CString strData);
+	//void OnSend(CString strData);
 
 protected:
 	

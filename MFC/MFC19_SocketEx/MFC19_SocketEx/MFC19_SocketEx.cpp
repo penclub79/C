@@ -21,9 +21,7 @@ END_MESSAGE_MAP()
 // CMFC19_SocketExApp 생성
 
 CMFC19_SocketExApp::CMFC19_SocketExApp()
-//: m_pServer(NULL)
   : m_pClient(NULL)
-//, m_pAccept(NULL)
 
 {
 	// 다시 시작 관리자 지원
@@ -111,41 +109,8 @@ BOOL CMFC19_SocketExApp::InitInstance()
 }
 
 
-
-//void CMFC19_SocketExApp::InitServer()
-//{
-//	m_pServer = new CServerSock;
-//	m_pServer->Create(7777);
-//	m_pServer->Listen();
-//}
-
-
-//void CMFC19_SocketExApp::Accept()
-//{
-//	if (m_pAccept == NULL)
-//	{
-//		m_pAccept = new CClientSock;
-//		m_pServer->Accept(*m_pAccept);
-//		CString strSock;
-//		UINT nPort;
-//		m_pAccept->GetPeerName(strSock, nPort);
-//		((CMFC19_SocketExDlg*)m_pMainWnd)->Accept(strSock);
-//	}
-//}
-
-
 void CMFC19_SocketExApp::CleanUp()
 {
-	/*if (m_pServer)
-	{
-		delete m_pServer;
-	}*/
-
-	/*if (m_pAccept)
-	{
-	delete m_pAccept;
-	}*/
-
 	if (m_pClient)
 	{
 		delete m_pClient;
@@ -157,7 +122,7 @@ void CMFC19_SocketExApp::Connect(CString strIP)
 {
 	if (strIP)
 	{
-		m_pClient = new CBasicSock;
+		m_pClient = new CClientSock;
 		m_pClient->Create();
 		m_pClient->Connect(strIP, 7777);
 	}
@@ -167,19 +132,26 @@ void CMFC19_SocketExApp::Connect(CString strIP)
 
 void CMFC19_SocketExApp::ReceiveData()
 {
-	wchar_t temp[MAX_PATH];
-	m_pClient->Receive(temp, sizeof(temp));
-	((CMFC19_SocketExDlg*)m_pMainWnd)->ReceiveData(temp);
+	//wchar_t temp[MAX_PATH];
+	PACKET_HEADER	stRecvHeader = { 0 };
+	PACKET_HEADER	stSendHeader = { 0 };
+
+	m_pClient->Receive(&stRecvHeader, sizeof(stRecvHeader));
+
+	if (PACKET_ID_REQ_WHOAREYOU == stRecvHeader.iPacketID)
+	{
+		//((CMFC19_SocketExDlg*)m_pMainWnd)->GetUserID();
+
+		stSendHeader.iPacketID = PACKET_ID_RSP_WHOAREYOU;
+		stSendHeader.wszPacketText;
+
+		//m_pClient->Send(stSendHeader);
+	}
 }
 
 
 void CMFC19_SocketExApp::SendData(CString strData)
 {
-	/*if (m_pAccept)
-	{
-		m_pAccept->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
-	}*/
-
 	if (m_pClient)
 	{
 		m_pClient->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));

@@ -46,4 +46,6 @@ public:
 	CString m_nOtherIP;
 	CString m_strOtherIP;
 	afx_msg void OnBnClickedRadioServer();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 };

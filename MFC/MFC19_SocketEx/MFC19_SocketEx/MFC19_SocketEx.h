@@ -9,7 +9,6 @@
 #endif
 
 #include "resource.h"		// 주 기호입니다.
-#include "ServerSock.h"
 #include "ClientSock.h"
 
 // CMFC19_SocketExApp:
@@ -29,11 +28,8 @@ public:
 	DECLARE_MESSAGE_MAP()
 	
 public:
-	//CServerSock* m_pServer;
-	CBasicSock* m_pClient;
-	//CClientSock* m_pAccept;
-	void InitServer(void);
-	//void Accept(void);
+	CClientSock* m_pClient;
+
 	void CleanUp(void);
 	void Connect(CString strIP);
 	void ReceiveData();
