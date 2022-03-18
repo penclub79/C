@@ -20,6 +20,9 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
+private:
+	CRect m_strInitLoc; // 다이얼로그 화면 server ip static 위치
+
 
 // 구현입니다.
 protected:
@@ -40,6 +43,7 @@ public:
 	afx_msg void OnClickedButtonSend();
 	void ReceiveData(CAcceptSock* pAccept, CString strReceive);
 	void Accept(CString strSock);
+	void ResizeControl(int cx, int cy);
 
 	CListBox m_listChat;
 	CIPAddressCtrl m_IPAddress;
@@ -47,4 +51,6 @@ public:
 	CString m_strOtherIP;
 	
 	
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 };

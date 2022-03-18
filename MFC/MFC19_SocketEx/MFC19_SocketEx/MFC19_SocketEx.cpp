@@ -118,7 +118,7 @@ void CMFC19_SocketExApp::CleanUp()
 }
 
 
-void CMFC19_SocketExApp::Connect(CString strIP)
+void CMFC19_SocketExApp::Connect(CString strIP, int iPort)
 {
 	if (strIP)
 	{

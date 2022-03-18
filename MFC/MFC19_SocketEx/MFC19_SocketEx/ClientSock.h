@@ -12,6 +12,13 @@ typedef struct _tagPACKET_HEADER{
 	TCHAR	wszPacketText[64];
 }PACKET_HEADER;
 
+// 클라이언트 구조체
+struct Client
+{
+	int iPort;
+	CString szUserId;
+};
+
 class CClientSock :
 	public CAsyncSocket
 {
@@ -19,7 +26,7 @@ public:
 	CClientSock();
 	~CClientSock();
 
-
+	
 	virtual void OnReceive(int nErrorCode);
 	virtual void OnClose(int nErrorCode);
 };

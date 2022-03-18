@@ -31,7 +31,7 @@ public:
 	CClientSock* m_pClient;
 
 	void CleanUp(void);
-	void Connect(CString strIP);
+	void Connect(CString strIP, int iPort);
 	void ReceiveData();
 	void SendData(CString strData);
 	void CloseChild();

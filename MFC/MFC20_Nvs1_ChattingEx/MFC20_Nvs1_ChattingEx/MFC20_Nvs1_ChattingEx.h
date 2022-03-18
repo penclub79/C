@@ -43,6 +43,7 @@ private:
 public:
 	void ReceiveData(CAcceptSock* pClientSock);
 	void CloseChild(CAcceptSock* pClientSock);
+
 	void Accept();
 	void SendDataAll(CAcceptSock* pAccept, CString strData);
 	void InitServer();

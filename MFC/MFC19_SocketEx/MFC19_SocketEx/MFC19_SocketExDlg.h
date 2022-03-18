@@ -35,12 +35,12 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnClickedRadioServer();
-	afx_msg void OnRadioClient();
 	afx_msg void OnClickedButtonConnect();
 	afx_msg void OnClickedButtonSend();
 	void ReceiveData(CString strReceive);
 	void Accept(CString strSock);
+	void ResizeControl(int cx, int cy);
+
 
 	CIPAddressCtrl m_IPAddress;
 	CListBox m_listChat;
