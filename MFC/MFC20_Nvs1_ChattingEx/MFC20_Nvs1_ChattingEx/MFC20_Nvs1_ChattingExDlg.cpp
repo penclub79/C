@@ -296,56 +296,6 @@ void CMFC20_Nvs1_ChattingExDlg::ResizeControl(int cx, int cy)
 	if (NULL == pstrCtl)
 		return;
 
-	// IPADDRESS Loc
-	//RECT stIpAdrEditLoc = { 0 };
-	//GetDlgItem(IDC_IPADDRESS_SERVER)->GetWindowRect(&stIpAdrEditLoc);
-	//ScreenToClient(&stIpAdrEditLoc);
-
-
-	//// CONNECT BUTTON Loc
-	//RECT stConnectButtonLoc = { 0 };
-	//GetDlgItem(IDC_BUTTON_CONNECT)->GetWindowRect(&stConnectButtonLoc);
-	//ScreenToClient(&stConnectButtonLoc);
-
-	//// LIST BOX Loc
-	//RECT stListBoxLoc = { 0 };
-	//GetDlgItem(IDC_LIST_CHAT)->GetWindowRect(&stListBoxLoc);
-	//ScreenToClient(&stListBoxLoc);
-
-	//// SEND EDIT Loc
-	//RECT stSendEditLoc = { 0 };
-	//GetDlgItem(IDC_EDIT_SEND)->GetWindowRect(&stSendEditLoc);
-	//ScreenToClient(&stSendEditLoc);
-
-	//// SEND BUTTON Loc
-	//RECT stSendButtonLoc = { 0 };
-	//GetDlgItem(IDC_BUTTON_SEND)->GetWindowRect(&stSendButtonLoc);
-	//ScreenToClient(&stSendButtonLoc);
-	///* 위치 정보 가져오기(컨트롤) - END */
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///* 위치 정보 적용(컨트롤) - START */
-	//// Server IP STATIC
-	//pstrCtl->MoveWindow(m_strInitLoc.left, m_strInitLoc.top, 100, 39, TRUE);
-
-	//// IPADDRESS EDIT
-	//pstrCtl = GetDlgItem(IDC_IPADDRESS_SERVER);
-	//pstrCtl->MoveWindow(stIpAdrEditLoc.left, stIpAdrEditLoc.top, (cx / 3), 39, TRUE);
-
-	//// CONNECT BUTTON
-	//pstrCtl = GetDlgItem(IDC_BUTTON_CONNECT);
-	//pstrCtl->MoveWindow(stIpAdrEditLoc.right + 20, stConnectButtonLoc.top, stConnectButtonLoc.right - stConnectButtonLoc.left, stConnectButtonLoc.bottom - stConnectButtonLoc.top);
-
-	//// LISTBOX 
-	//pstrCtl = GetDlgItem(IDC_LIST_CHAT);
-	//pstrCtl->MoveWindow(stListBoxLoc.left, stListBoxLoc.top, cx / 1.3, cy / 1.9);
-
-	//// SEND EDIT
-	//pstrCtl = GetDlgItem(IDC_EDIT_SEND);
-	//pstrCtl->MoveWindow(stSendEditLoc.left, stListBoxLoc.bottom + 24, cx / 1.5, stSendEditLoc.bottom - stSendEditLoc.top);
-
-	//// SEND BUTTON
-	//pstrCtl = GetDlgItem(IDC_BUTTON_SEND);
-	//pstrCtl->MoveWindow(stSendEditLoc.right + 20, stListBoxLoc.bottom + 24, stSendButtonLoc.right - stSendButtonLoc.left, stSendButtonLoc.bottom - stSendButtonLoc.top);
 	int iMarginX = 20;
 	int iMarginY = 10;
 	int iHeight = 40;

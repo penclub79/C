@@ -198,8 +198,6 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pClientSock)
 }
 
 
-
-
 void CMFC20_Nvs1_ChattingExApp::SendDataAll(CAcceptSock* pAccept, CString strData)
 {
 	//CAcceptSock* pAccept;
