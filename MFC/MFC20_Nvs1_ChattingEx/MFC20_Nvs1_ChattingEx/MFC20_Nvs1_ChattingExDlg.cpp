@@ -302,31 +302,31 @@ void CMFC20_Nvs1_ChattingExDlg::ResizeControl(int cx, int cy)
 
 	/* 위치 정보 적용(컨트롤) - START */
 	// Server IP STATIC
-	pstrCtl->MoveWindow(iMarginX, iMarginY + 40, 100, iHeight, TRUE);
+	pstrCtl->MoveWindow(iMarginX, iMarginY, 100, iHeight, TRUE);
 
 	// IPADDRESS EDIT
 	pstrCtl = GetDlgItem(IDC_IPADDRESS_SERVER);
-	pstrCtl->MoveWindow(iMarginX + 100 + iMarginX, iMarginY + 40, (cx / 3), iHeight, TRUE);
+	pstrCtl->MoveWindow(iMarginX + 100 + iMarginX, iMarginY, cx - (cx/2 + iMarginX + 100 + iMarginX), iHeight, TRUE);
 
 	// CONNECT BUTTON
 	pstrCtl = GetDlgItem(IDC_BUTTON_CONNECT);
-	pstrCtl->MoveWindow(iMarginX + 100 + iMarginX + cx / 3 + iMarginX + 100 + iMarginX + 150, iMarginY + 40, 150, iHeight, TRUE);
+	pstrCtl->MoveWindow(cx - (iMarginX + iMarginX + iMarginX + 150) + iMarginX + iMarginX, iMarginY, 150, iHeight, TRUE);
 
 	// LISTBOX 
 	pstrCtl = GetDlgItem(IDC_LIST_CHAT);
-	pstrCtl->MoveWindow(iMarginX, iMarginY + 39 + 10 + iHeight + 20, (cx - iMarginX * 2), cy - (iMarginY + 39 + 10 + iHeight + 300));
+	pstrCtl->MoveWindow(iMarginX, iMarginY + iHeight + iMarginY, (cx - iMarginX * 2), cy - (iMarginY + 39 + 10 + iHeight + 300));
 
 	// SEND EDIT
 	pstrCtl = GetDlgItem(IDC_EDIT_SEND);
-	pstrCtl->MoveWindow(iMarginX, iMarginY + (39 + 10 + iHeight + 20) + (cy - (iMarginY + 39 + 10 + iHeight + 300)) + iMarginY * 3, iMarginX + 100 + iMarginX + cx / 3 + iMarginX + 100 + iMarginX + 110, iHeight, TRUE);
+	pstrCtl->MoveWindow(iMarginX, cy - (iMarginY + 39 + 10 + iHeight + 300) + iMarginY + iHeight + iMarginY + iMarginY, cx - (iMarginX + iMarginX + iMarginX + 150), iHeight, TRUE);
 
 	// SEND BUTTON
 	pstrCtl = GetDlgItem(IDC_BUTTON_SEND);
-	pstrCtl->MoveWindow(iMarginX + 100 + iMarginX + cx / 3 + iMarginX + 100 + iMarginX + 150, iMarginY + (39 + 10 + iHeight + 20) + (cy - (iMarginY + 39 + 10 + iHeight + 300)) + iMarginY * 3, 150, iHeight, TRUE);
+	pstrCtl->MoveWindow(cx - (iMarginX + iMarginX + iMarginX + 150) + iMarginX + iMarginX, cy - (iMarginY + 39 + 10 + iHeight + 300) + iMarginY + iHeight + iMarginY + iMarginY, 150, iHeight, TRUE);
 
 	// CLOSE BUTTON
 	pstrCtl = GetDlgItem(IDC_BUTTON_CLOSE);
-	pstrCtl->MoveWindow((cx / 2) - (150 / 2), (iMarginY + (39 + 10 + iHeight + (iMarginY + 20)) + (cy - (iMarginY + 39 + 10 + iHeight + 300)) + iMarginY + iHeight) + iMarginY * 9, 150, iHeight + 20, TRUE);
+	pstrCtl->MoveWindow((cx / 2) - (150 / 2), cy - (iMarginY + 39 + 10 + iHeight + 300) + iMarginY + iHeight + iMarginY + iMarginY + iHeight + iMarginX, 150, iHeight + 20, TRUE);
 
 	/* 위치 정보 적용(컨트롤) - END */
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
