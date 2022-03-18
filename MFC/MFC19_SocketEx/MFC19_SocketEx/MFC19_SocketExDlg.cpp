@@ -54,6 +54,7 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 	, m_nOtherIP(_T(""))
 	, m_strOtherIP(_T(""))
 	, m_strInitLoc(0)
+	, m_rectDlg(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -133,6 +134,10 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	GetDlgItem(IDC_STATIC_SERVER_IP)->GetWindowRect(&m_strInitLoc);
 	// 다이얼로그 내에 상대적 좌표로 변환
 	ScreenToClient(&m_strInitLoc);
+
+	
+	this->GetWindowRect(&m_rectDlg);
+
 
 	//GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
 	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
@@ -268,11 +273,10 @@ void CMFC19_SocketExDlg::OnSize(UINT nType, int cx, int cy)
 	if (NULL == this->GetSafeHwnd())
 		return;
 
-	
-
+	/* 위치 정보 가져오기(컨트롤) - START */
 	// Server IP STATIC
 	CWnd* pstrCtl = GetDlgItem(IDC_STATIC_SERVER_IP);
-
+	//TRACE(_T("left : %d, right : %d, top : %d, bottom : %d,", m_rectDlg.left, m_rectDlg.right, m_rectDlg.top, m_rectDlg.bottom));
 	if (NULL == pstrCtl)
 		return;
 
@@ -281,10 +285,48 @@ void CMFC19_SocketExDlg::OnSize(UINT nType, int cx, int cy)
 	GetDlgItem(IDC_IPADDRESS_SERVER)->GetWindowRect(&stIpAdrEditLoc);
 	ScreenToClient(&stIpAdrEditLoc);
 
+	// PORT STATIC Loc
 	RECT stPortStaticLoc = { 0 };
 	GetDlgItem(IDC_STATIC_PORT)->GetWindowRect(&stPortStaticLoc);
 	ScreenToClient(&stPortStaticLoc);
 
+	// PORT EDIT Loc
+	RECT stPortEditLoc = { 0 };
+	GetDlgItem(IDC_EDIT_PORT)->GetWindowRect(&stPortEditLoc);
+	ScreenToClient(&stPortEditLoc);
+
+	// USER ID STATIC Loc
+	RECT stUserIdStaticLoc = { 0 };
+	GetDlgItem(IDC_STATIC_USERID)->GetWindowRect(&stUserIdStaticLoc);
+	ScreenToClient(&stUserIdStaticLoc);
+
+	// USER ID EDIT Loc
+	RECT stUserIdEditLoc = { 0 };
+	GetDlgItem(IDC_EDIT_USERID)->GetWindowRect(&stUserIdEditLoc);
+	ScreenToClient(&stUserIdEditLoc);
+
+	// CONNECT BUTTON Loc
+	RECT stConnectButtonLoc = { 0 };
+	GetDlgItem(IDC_BUTTON_CONNECT)->GetWindowRect(&stConnectButtonLoc);
+	ScreenToClient(&stConnectButtonLoc);
+
+	// LIST BOX Loc
+	RECT stListBoxLoc = { 0 };
+	GetDlgItem(IDC_LIST_CHAT)->GetWindowRect(&stListBoxLoc);
+	ScreenToClient(&stListBoxLoc);
+
+	// SEND EDIT Loc
+	RECT stSendEditLoc = { 0 };
+	GetDlgItem(IDC_EDIT_SEND)->GetWindowRect(&stSendEditLoc);
+	ScreenToClient(&stSendEditLoc);
+
+	// SEND BUTTON Loc
+	RECT stSendButtonLoc = { 0 };
+	GetDlgItem(IDC_BUTTON_SEND)->GetWindowRect(&stSendButtonLoc);
+	ScreenToClient(&stSendButtonLoc);
+	/* 위치 정보 가져오기(컨트롤) - END */
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/* 위치 정보 적용(컨트롤) - START */
 	// Server IP STATIC
 	pstrCtl->MoveWindow(m_strInitLoc.left, m_strInitLoc.top, 100, 39, TRUE);
 	
@@ -294,26 +336,41 @@ void CMFC19_SocketExDlg::OnSize(UINT nType, int cx, int cy)
 
 	// PORT STATIC
 	pstrCtl = GetDlgItem(IDC_STATIC_PORT);
-	pstrCtl->MoveWindow(stPortStaticLoc.left, stPortStaticLoc.top, 90, 39, TRUE);
+	pstrCtl->MoveWindow(stIpAdrEditLoc.right + 10, stPortStaticLoc.top, 90, 39, TRUE);
 
 	// PORT EDIT
 	pstrCtl = GetDlgItem(IDC_EDIT_PORT);
-	pstrCtl->MoveWindow(stPortStaticLoc.right + 15, 45, 100, 39, TRUE);
+	//pstrCtl->MoveWindow((stPortStaticLoc.right + 15) + m_stWindowLoc.left, 45, 100, 39, TRUE);
+	//pstrCtl->MoveWindow(cx - (stPortStaticLoc.left + stPortStaticLoc.right + 15), 45, 100, 39, TRUE);
+	//pstrCtl->MoveWindow(stPortStaticLoc.right + 15, stIpAdrEditLoc.top, (m_rectDlg.left) + stPortEditLoc.right - stPortEditLoc.left, 39, TRUE);
+	pstrCtl->MoveWindow(stPortStaticLoc.right + 15, stIpAdrEditLoc.top, cx / 4 , 39, TRUE);
 
-	//pstrCtl->MoveWindow(40, 40, (cx / 4), 39, TRUE);
+	// USER ID STATIC
+	pstrCtl = GetDlgItem(IDC_STATIC_USERID);
+	pstrCtl->MoveWindow(stUserIdStaticLoc.left, stUserIdStaticLoc.top, 100, 39, TRUE);
 
-	//if (!pstrCtl) return;
-
+	// USER ID EDIT
+	pstrCtl = GetDlgItem(IDC_EDIT_USERID);
+	pstrCtl->MoveWindow(stUserIdEditLoc.left, stUserIdEditLoc.top, cx / 4, 39, TRUE);
 	
-	//RECT rtRect = { 0 };							// 에디트 박스 영역
+	// CONNECT BUTTON
+	pstrCtl = GetDlgItem(IDC_BUTTON_CONNECT);
+	pstrCtl->MoveWindow(stUserIdEditLoc.right + 150, stConnectButtonLoc.top, stConnectButtonLoc.right - stConnectButtonLoc.left, stConnectButtonLoc.bottom - stConnectButtonLoc.top);
+	
+	// LISTBOX 
+	pstrCtl = GetDlgItem(IDC_LIST_CHAT);
+	pstrCtl->MoveWindow(stListBoxLoc.left, stListBoxLoc.top, cx / 1.1, cy / 1.9);
 
-	////pstrCtl->GetClientRect(&rtRect);
-	//pstrCtl->GetWindowRect(&rtRect);
-	//ScreenToClient(&rtRect);				// 에디트 박스의 스크린 영역을 CDialog 객체의 클라이언트 영역 기준으로 변경
-	////GetClientRect(&strRectCtl);
+	// SEND EDIT
+	pstrCtl = GetDlgItem(IDC_EDIT_SEND);
+	pstrCtl->MoveWindow(stSendEditLoc.left, stListBoxLoc.bottom + 20, cx / 1.5, stSendEditLoc.bottom - stSendEditLoc.top);
 
-	////pstrCtl->MoveWindow(strRectCtl.left, strRectCtl.top, cx-2 * strRectCtl.left, cy - strRectCtl.top - strRectCtl.left, TRUE);
-	//pstrCtl->MoveWindow(rtRect.left, rtRect.top, (rtRect.top, cx / 4), 39, TRUE);
+	// SEND BUTTON
+	pstrCtl = GetDlgItem(IDC_BUTTON_SEND);
+	pstrCtl->MoveWindow(stSendEditLoc.right + 20, stListBoxLoc.bottom + 20, stSendButtonLoc.right - stSendButtonLoc.left, stSendButtonLoc.bottom - stSendButtonLoc.top);
+
+	/* 위치 정보 적용(컨트롤) - END */
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.

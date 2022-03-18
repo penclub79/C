@@ -21,7 +21,8 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
 private:
-	CRect m_strInitLoc;
+	CRect m_strInitLoc; // 다이얼로그 화면 server ip static 위치
+	CRect m_rectDlg; // 다이얼로그 크기
 
 // 구현입니다.
 protected:
