@@ -139,8 +139,11 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 
 	// 클라이언트 구조체 초기화
 	struct Client stClient;
-	stClient.iPort = 0;
+	stClient.iPort = 7777;
 	stClient.szUserId = "";
+
+	// 포트 적용
+	
 
 	//GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
 	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
@@ -207,25 +210,6 @@ HCURSOR CMFC19_SocketExDlg::OnQueryDragIcon()
 }
 
 
-
-//void CMFC19_SocketExDlg::OnClickedRadioServer()
-//{
-//	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-//	m_IPAddress.SetWindowText(m_strMyIP);
-//	m_IPAddress.EnableWindow(FALSE);
-//	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Open"));
-//}
-
-
-//void CMFC19_SocketExDlg::OnRadioClient()
-//{
-//	// TODO: 여기에 명령 처리기 코드를 추가합니다.
-//	m_IPAddress.SetWindowText(_T(""));
-//	m_IPAddress.EnableWindow(TRUE);
-//	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
-//}
-
-
 void CMFC19_SocketExDlg::OnClickedButtonConnect()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
@@ -247,8 +231,6 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	{
 		AfxMessageBox(_T("접속할 서버의 IP주소를 입력하세요"));
 	}
-
-	
 		
 }
 
