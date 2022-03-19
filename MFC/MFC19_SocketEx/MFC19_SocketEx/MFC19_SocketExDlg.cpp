@@ -217,9 +217,14 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 
 	CString strIP;
 	struct Client client;
+
+	// 구조체 -> 포트를 CString으로 변환
+	CString strPort;
+	strPort.Format(_T("%d"), client.iPort);
+
+	// 다이얼로그에 데이터 담기
 	GetDlgItemText(IDC_IPADDRESS_SERVER, strIP);
-	//GetDlgItemText(IDC_BUTTON_CONNECT, client.iPort);
-	
+	GetDlgItemText(IDC_BUTTON_CONNECT, strPort);
 
 	if (strIP != _T("0.0.0.0"))
 	{
