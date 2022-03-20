@@ -144,7 +144,6 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 
 	// 포트 적용
 	
-
 	//GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
 	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
 	///////////////////////////////////////////////////////////
@@ -222,9 +221,13 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	CString strPort;
 	strPort.Format(_T("%d"), client.iPort);
 
+	
 	// 다이얼로그에 데이터 담기
 	GetDlgItemText(IDC_IPADDRESS_SERVER, strIP);
-	GetDlgItemText(IDC_BUTTON_CONNECT, strPort);
+	GetDlgItemText(IDC_EDIT_PORT, strPort);
+	GetDlgItemText(IDC_EDIT_USERID, client.szUserId);
+
+	TRACE(_T("%d", strPort));
 
 	if (strIP != _T("0.0.0.0"))
 	{
@@ -275,7 +278,6 @@ void CMFC19_SocketExDlg::OnSize(UINT nType, int cx, int cy)
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 	ResizeControl(cx, cy);
-
 }
 
 
