@@ -1,16 +1,7 @@
 #pragma once
 #include "afxsock.h"
-#include "ClientSock.h"
+#include "BasicDefine.h"
 
-enum{
-	PACKET_ID_REQ_WHOAREYOU = 1,
-	PACKET_ID_RSP_WHOAREYOU,
-};
-
-typedef struct _tagPACKET_HEADER{
-	int		iPacketID;
-	TCHAR	wszPacketText[64];
-}PACKET_HEADER;
 
 // 클라이언트 구조체
 struct Client
@@ -19,12 +10,13 @@ struct Client
 	CString szUserId;
 };
 
-class CClientSock :
+class CBasicSock :
 	public CAsyncSocket
 {
 public:
-	CClientSock();
-	~CClientSock();
+	CBasicSock();
+	~CBasicSock();
+	bool m_bIsConnect;
 
 	
 	virtual void OnReceive(int nErrorCode);

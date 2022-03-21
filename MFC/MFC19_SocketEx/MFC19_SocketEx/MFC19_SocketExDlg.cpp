@@ -140,10 +140,12 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 
 
 	/* 클라이언트 구조체 초기화 */
-	struct Client stClient;
+	/*struct Client stClient;
 	stClient.iPort = 7777;
-	stClient.szUserId = "";
-
+	stClient.szUserId = "";*/
+	
+	Client stClient = { 0 };
+	stClient.iPort = 7777;
 	// 포트 적용
 	SetDlgItemInt(IDC_EDIT_PORT, stClient.iPort);
 	// 포트 상자 비활성화
@@ -222,8 +224,8 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	UpdateData();
 
 	CString strIP;
-	struct Client client;
-
+	Client stClient;
+	CBasicSock* strBasic;
 	// 구조체 -> 포트를 CString으로 변환
 	/*CString strPort;
 	strPort.Format(_T("%d"), client.iPort);*/
@@ -231,23 +233,29 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	
 	// 다이얼로그에 데이터 담기
 
+
 	// IP 담기
 	GetDlgItemText(IDC_IPADDRESS_SERVER, strIP);
 	// USER ID 담기
-	GetDlgItemText(IDC_EDIT_USERID, client.szUserId);
-
-	TRACE(_T("%d", strPort));
+	GetDlgItemText(IDC_EDIT_USERID, stClient.szUserId);
 
 	// IP가 입력이 되어 있을 때
 	if (strIP != _T("0.0.0.0"))
 	{
-
-		// 서버와 연결이 되었을 때
 		
-		// Connect 버튼은 비활성화 , DisConnect 버튼은 활성화
-		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
-		((CMFC19_SocketExApp*)AfxGetApp())->Connect(strIP, client.iPort);
-		m_strOtherIP = strIP;
+		// 서버와 연결이 되었을 때
+		if (TRUE)
+		{
+			// Connect 버튼은 비활성화 , DisConnect 버튼은 활성화
+			GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
+			((CMFC19_SocketExApp*)AfxGetApp())->Connect(strIP, 7777);
+			m_strOtherIP = strIP;
+		}
+		else  // 서버와 연결이 실패했을 때
+		{
+			GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
+		}
+		
 	}
 	else
 	{

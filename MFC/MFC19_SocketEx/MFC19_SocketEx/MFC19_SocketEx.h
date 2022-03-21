@@ -9,7 +9,7 @@
 #endif
 
 #include "resource.h"		// 주 기호입니다.
-#include "ClientSock.h"
+#include "BasicSock.h"
 
 // CMFC19_SocketExApp:
 // 이 클래스의 구현에 대해서는 MFC19_SocketEx.cpp을 참조하십시오.
@@ -28,10 +28,11 @@ public:
 	DECLARE_MESSAGE_MAP()
 	
 public:
-	CClientSock* m_pClient;
+	CBasicSock* m_pClient;
 
 	void CleanUp(void);
 	void Connect(CString strIP, int iPort);
+	void Connect(bool bIsConnect);
 	void ReceiveData();
 	void SendData(CString strData);
 	void CloseChild();

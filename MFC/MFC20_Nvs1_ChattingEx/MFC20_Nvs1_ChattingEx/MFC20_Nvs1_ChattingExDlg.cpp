@@ -137,8 +137,17 @@ BOOL CMFC20_Nvs1_ChattingExDlg::OnInitDialog()
 
 	// 다이얼로그 초기화
 	RECT stDlgLoc = { 0 };
-	GetClientRect(&stDlgLoc);
+	this->GetClientRect(&stDlgLoc);
 	ResizeControl(stDlgLoc.right - stDlgLoc.left, stDlgLoc.bottom - stDlgLoc.top);
+
+
+	::GetClientRect(::GetDlgItem(this->GetSafeHwnd(), IDC_EDIT_SEND), &stDlgLoc);
+
+
+	//// SetWindowPos() 함수
+	//::SetWindowPos(this->GetSafeHwnd(), HWND_TOPMOST, 0, 0, 900, 900, SWP_NOZORDER | SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW);
+
+	//SetWindowPos(&CWnd::wndBottom, )
 
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.

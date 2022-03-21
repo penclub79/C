@@ -117,17 +117,27 @@ void CMFC19_SocketExApp::CleanUp()
 	}
 }
 
-
+// Connect 함수 오버 로딩 매개: IP, Port 
 void CMFC19_SocketExApp::Connect(CString strIP, int iPort)
 {
+	AfxMessageBox(_T("Connect 함수1"));
 	if (strIP)
 	{
-		m_pClient = new CClientSock;
+		m_pClient = new CBasicSock;
 		m_pClient->Create();
 		m_pClient->Connect(strIP, iPort);
-		m_pClient->Listen();
+
+		//m_pDlg = new CMFC19_SocketExDlg;
+		//m_pDlg->OnClickedButtonConnect(m_pClient->m_bIsConnect);
 	}
 	
+}
+
+// Connect 함수 오버 로딩 매개 : 성공/실패 여부
+void CMFC19_SocketExApp::Connect(bool bIsConnect)
+{
+	AfxMessageBox(_T("Connect 함수2"));
+	bool IsConnect = bIsConnect;
 }
 
 

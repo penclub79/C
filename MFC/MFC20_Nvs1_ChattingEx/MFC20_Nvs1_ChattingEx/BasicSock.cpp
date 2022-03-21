@@ -13,10 +13,6 @@ CBasicSock::~CBasicSock()
 {
 }
 
-
-
-
-
 void CBasicSock::OnReceive(int nErrorCode)
 {
 	

@@ -1,15 +1,6 @@
 #pragma once
 #include "afxsock.h"
-
-enum{
-	PACKET_ID_REQ_WHOAREYOU = 1,
-	PACKET_ID_RSP_WHOAREYOU,
-};
-
-typedef struct _tagPACKET_HEADER{
-	int		iPacketID;
-	TCHAR	wszPacketText[64];
-}PACKET_HEADER;
+#include "BasicDefine.h"
 
 
 class CBasicSock :

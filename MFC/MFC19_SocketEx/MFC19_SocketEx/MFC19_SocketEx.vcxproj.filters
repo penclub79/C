@@ -33,10 +33,10 @@
     <ClInclude Include="Resource.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ServerSock.h">
+    <ClInclude Include="BasicSock.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ClientSock.h">
+    <ClInclude Include="BasicDefine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,7 +50,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ClientSock.cpp">
+    <ClCompile Include="BasicSock.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
