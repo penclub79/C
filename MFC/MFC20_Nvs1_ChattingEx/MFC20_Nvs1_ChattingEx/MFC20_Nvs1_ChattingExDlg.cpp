@@ -76,6 +76,7 @@ BEGIN_MESSAGE_MAP(CMFC20_Nvs1_ChattingExDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CMFC20_Nvs1_ChattingExDlg::OnClickedButtonSend)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
+	ON_BN_CLICKED(IDC_BUTTON_CLOSE, &CMFC20_Nvs1_ChattingExDlg::OnClickedButtonClose)
 END_MESSAGE_MAP()
 
 
@@ -125,8 +126,6 @@ BOOL CMFC20_Nvs1_ChattingExDlg::OnInitDialog()
 	// 컨트롤 초기화
 	m_IPAddress.SetWindowTextW(m_strMyIP);	// ipaddress 상자에 ip 값을 넣어준다.
 	m_IPAddress.EnableWindow(FALSE);  // ipaddress 상자를 비활성화 시킨다.
-	//GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_RADIO_CLIENT)->EnableWindow(FALSE);
 	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Open"));
 
 	// Text Static ServerIP초기 좌표가져오기
@@ -330,4 +329,10 @@ void CMFC20_Nvs1_ChattingExDlg::ResizeControl(int cx, int cy)
 
 	/* 위치 정보 적용(컨트롤) - END */
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+
+void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonClose()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	AfxGetMainWnd()->PostMessageW(WM_CLOSE);
 }

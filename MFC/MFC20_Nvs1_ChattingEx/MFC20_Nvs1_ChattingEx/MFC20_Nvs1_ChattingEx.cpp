@@ -165,15 +165,10 @@ void CMFC20_Nvs1_ChattingExApp::CleanUp()
 		delete m_pServer;
 		m_pServer = NULL;
 	}
-	/*if (m_pAccept)
-	{
-		delete m_pAccept;
-	}*/
 	CAcceptSock* pAccept;
 	POSITION pos = m_ClientList.GetHeadPosition();
 	while (pos != NULL)
 	{
-
 		pAccept = (CAcceptSock*)m_ClientList.GetAt(pos);
 		m_ClientList.GetNext(pos);
 		delete pAccept;
@@ -207,38 +202,17 @@ void CMFC20_Nvs1_ChattingExApp::SendDataAll(CAcceptSock* pAccept, CString strDat
 	
 	while (pos != NULL)
 	{
-		/*if (iID == iIndex)
-		{
-			pAccept = (CAcceptSock*)m_ClientList.GetAt(pos);
-			m_ClientList.GetNext(pos);
-		}*/
-		//else
 		{
 			pAccept = (CAcceptSock*)m_ClientList.GetAt(pos);
 			m_ClientList.GetNext(pos);
 			pAccept->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
 		}
-		//iIndex++;
 	}
-	/*if (m_pAccept)
-	{
-		m_pAccept->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
-	}*/
 }
 
 
 void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
 {
-	/*CClientSock* pClient;
-	POSITION pos = m_ClientList.Find(pSock);
-	if (pos != NULL)
-	{
-		pClient = (CClientSock*)m_ClientList.GetAt(pos);
-		m_ClientList.RemoveAt(pos);
-		delete pClient;
-	}*/
-	/*delete m_pClient;
-	m_pClient = NULL;*/
 
 	POSITION pos = m_ClientList.Find(pClientSock);
 	if (pos != NULL)

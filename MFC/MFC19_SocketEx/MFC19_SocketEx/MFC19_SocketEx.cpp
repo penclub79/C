@@ -124,7 +124,8 @@ void CMFC19_SocketExApp::Connect(CString strIP, int iPort)
 	{
 		m_pClient = new CClientSock;
 		m_pClient->Create();
-		m_pClient->Connect(strIP, 7777);
+		m_pClient->Connect(strIP, iPort);
+		m_pClient->Listen();
 	}
 	
 }

@@ -81,6 +81,7 @@ BEGIN_MESSAGE_MAP(CMFC19_SocketExDlg, CDialogEx)
 	//ON_BN_CLICKED(IDC_RADIO_SERVER, &CMFC19_SocketExDlg::OnBnClickedRadioServer)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
+	ON_BN_CLICKED(IDC_BUTTON_CLOSE, &CMFC19_SocketExDlg::OnClickedButtonClose)
 END_MESSAGE_MAP()
 
 
@@ -118,35 +119,41 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	// IP주소 가져오기
 	char name[255];
-	PHOSTENT hostinfo;
+	PHOSTENT stHostinfo;
 	if (gethostname(name, sizeof(name)) == 0)
 	{
-		if ((hostinfo = gethostbyname(name)) != NULL)
+		if ((stHostinfo = gethostbyname(name)) != NULL)
 		{
-			m_strMyIP = inet_ntoa(*(struct in_addr *)*hostinfo->h_addr_list);
+			m_strMyIP = inet_ntoa(*(struct in_addr*)*stHostinfo->h_addr_list);
 		}
 	}
 	/*컨트롤 초기화*/
 	m_IPAddress.SetWindowText(m_strMyIP);
 	m_IPAddress.EnableWindow(FALSE);
 
-
-
 	// Text Static ServerIP초기 좌표가져오기
 	GetDlgItem(IDC_STATIC_SERVER_IP)->GetWindowRect(&m_strInitLoc);
 	// 다이얼로그 내에 상대적 좌표로 변환
 	ScreenToClient(&m_strInitLoc);
 
-	// 클라이언트 구조체 초기화
+
+
+
+	/* 클라이언트 구조체 초기화 */
 	struct Client stClient;
 	stClient.iPort = 7777;
 	stClient.szUserId = "";
 
 	// 포트 적용
-	
+	SetDlgItemInt(IDC_EDIT_PORT, stClient.iPort);
+	// 포트 상자 비활성화
+	GetDlgItem(IDC_EDIT_PORT)->EnableWindow(FALSE);
+
 	//GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
 	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
-	///////////////////////////////////////////////////////////
+	
+
+
 
 	/*다이얼로그 사이즈 초기화*/
 	RECT stDlgLoc = { 0 };
@@ -218,19 +225,26 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	struct Client client;
 
 	// 구조체 -> 포트를 CString으로 변환
-	CString strPort;
-	strPort.Format(_T("%d"), client.iPort);
+	/*CString strPort;
+	strPort.Format(_T("%d"), client.iPort);*/
 
 	
 	// 다이얼로그에 데이터 담기
+
+	// IP 담기
 	GetDlgItemText(IDC_IPADDRESS_SERVER, strIP);
-	GetDlgItemText(IDC_EDIT_PORT, strPort);
+	// USER ID 담기
 	GetDlgItemText(IDC_EDIT_USERID, client.szUserId);
 
 	TRACE(_T("%d", strPort));
 
+	// IP가 입력이 되어 있을 때
 	if (strIP != _T("0.0.0.0"))
 	{
+
+		// 서버와 연결이 되었을 때
+		
+		// Connect 버튼은 비활성화 , DisConnect 버튼은 활성화
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
 		((CMFC19_SocketExApp*)AfxGetApp())->Connect(strIP, client.iPort);
 		m_strOtherIP = strIP;
@@ -354,4 +368,11 @@ void CMFC19_SocketExDlg::ResizeControl(int cx, int cy)
 	/* 위치 정보 적용(컨트롤) - END */
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+}
+
+
+void CMFC19_SocketExDlg::OnClickedButtonClose()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	AfxGetMainWnd()->PostMessageW(WM_CLOSE);
 }
