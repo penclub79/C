@@ -26,13 +26,23 @@ public:
 
 // 구현입니다.
 	DECLARE_MESSAGE_MAP()
-	
-public:
+
+private:
+	// 클래스
 	CBasicSock* m_pClient;
 
+	// 자료형
+	int m_iConnectCode;
+
+
+public:
+	// 함수
 	void CleanUp(void);
+
 	void Connect(CString strIP, int iPort);
-	void Connect(bool bIsConnect);
+	int GetConnectStatus();
+	void SetConnectStatus(int iErrorCode);
+
 	void ReceiveData();
 	void SendData(CString strData);
 	void CloseChild();

@@ -21,7 +21,8 @@ END_MESSAGE_MAP()
 // CMFC19_SocketExApp 생성
 
 CMFC19_SocketExApp::CMFC19_SocketExApp()
-  : m_pClient(NULL)
+: m_pClient(NULL)
+, m_iConnectCode(0)
 
 {
 	// 다시 시작 관리자 지원
@@ -105,6 +106,7 @@ BOOL CMFC19_SocketExApp::InitInstance()
 
 	// 대화 상자가 닫혔으므로 응용 프로그램의 메시지 펌프를 시작하지 않고  응용 프로그램을 끝낼 수 있도록 FALSE를
 	// 반환합니다.
+
 	return FALSE;
 }
 
@@ -120,25 +122,38 @@ void CMFC19_SocketExApp::CleanUp()
 // Connect 함수 오버 로딩 매개: IP, Port 
 void CMFC19_SocketExApp::Connect(CString strIP, int iPort)
 {
-	AfxMessageBox(_T("Connect 함수1"));
 	if (strIP)
 	{
 		m_pClient = new CBasicSock;
 		m_pClient->Create();
 		m_pClient->Connect(strIP, iPort);
-
-		//m_pDlg = new CMFC19_SocketExDlg;
-		//m_pDlg->OnClickedButtonConnect(m_pClient->m_bIsConnect);
 	}
 	
 }
 
-// Connect 함수 오버 로딩 매개 : 성공/실패 여부
-void CMFC19_SocketExApp::Connect(bool bIsConnect)
+// : 성공/실패 여부
+int CMFC19_SocketExApp::GetConnectStatus()
 {
-	AfxMessageBox(_T("Connect 함수2"));
-	bool IsConnect = bIsConnect;
+	return m_iConnectCode;
 }
+
+void CMFC19_SocketExApp::SetConnectStatus(int iErrorCode)
+{
+	//;	== AfxGetApp()->m_pMainWnd
+	//AfxGetApp();
+	
+
+	((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(iErrorCode);
+
+	CString strConnectMessage;
+	//strConnectMessage.Format(_T("연결 성공"));
+	// SetConnectStatus , SetErrorCode
+	/*m_bIsConnect = 1;
+	AfxMessageBox(strConnectMessage);*/
+
+	m_iConnectCode = iErrorCode;
+}
+
 
 
 void CMFC19_SocketExApp::ReceiveData()

@@ -10,6 +10,11 @@ struct Client
 	CString szUserId;
 };
 
+struct ErrorCode
+{
+	int iErrorCode;
+};
+
 class CBasicSock :
 	public CAsyncSocket
 {

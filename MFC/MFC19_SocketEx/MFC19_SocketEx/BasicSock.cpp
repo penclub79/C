@@ -3,7 +3,7 @@
 #include "MFC19_SocketEx.h"
 
 CBasicSock::CBasicSock()
-:m_bIsConnect(0)
+//:m_bIsConnect(0)
 {
 }
 
@@ -33,22 +33,7 @@ void CBasicSock::OnClose(int nErrorCode)
 void CBasicSock::OnConnect(int nErrorCode)
 {
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
-	CString strConnectMessage;
+	((CMFC19_SocketExApp*)AfxGetApp())->SetConnectStatus(nErrorCode);
 
-	if (nErrorCode == 0)
-	{
-		strConnectMessage.Format(_T("연결 성공"));
-		AfxMessageBox(strConnectMessage);
-		m_bIsConnect = 1;
-		((CMFC19_SocketExApp*)AfxGetApp())->Connect(m_bIsConnect);
-	}
-	else
-	{
-		strConnectMessage.Format(_T("Error code : %d\n 연결이 거부되었습니다."), nErrorCode);
-		AfxMessageBox(strConnectMessage);
-		m_bIsConnect = 0;
-		((CMFC19_SocketExApp*)AfxGetApp())->Connect(m_bIsConnect);
-	}
-	
 	CAsyncSocket::OnConnect(nErrorCode);
 }
