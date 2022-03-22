@@ -40,6 +40,7 @@ public:
 	void CleanUp(void);
 
 	void Connect(CString strIP, int iPort);
+
 	int GetConnectStatus();
 	void SetConnectStatus(int iErrorCode);
 

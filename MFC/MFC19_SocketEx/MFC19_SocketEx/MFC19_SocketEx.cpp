@@ -137,19 +137,12 @@ int CMFC19_SocketExApp::GetConnectStatus()
 	return m_iConnectCode;
 }
 
+
 void CMFC19_SocketExApp::SetConnectStatus(int iErrorCode)
 {
-	//;	== AfxGetApp()->m_pMainWnd
-	//AfxGetApp();
-	
+	CString strConnectMessage;
 
 	((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(iErrorCode);
-
-	CString strConnectMessage;
-	//strConnectMessage.Format(_T("연결 성공"));
-	// SetConnectStatus , SetErrorCode
-	/*m_bIsConnect = 1;
-	AfxMessageBox(strConnectMessage);*/
 
 	m_iConnectCode = iErrorCode;
 }

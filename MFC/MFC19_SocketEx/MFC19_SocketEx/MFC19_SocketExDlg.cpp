@@ -48,15 +48,15 @@ END_MESSAGE_MAP()
 
 
 CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CMFC19_SocketExDlg::IDD, pParent)
-	// 멤버변수 초기화
-	, m_nChatMode(1)
-	, m_strMyIP(_T(""))
-	, m_nOtherIP(_T(""))
-	, m_strOtherIP(_T(""))
-	, m_strInitLoc(0)
-	, m_rectDlg(0)
-	, m_bIsConnect(0)
+: CDialogEx(CMFC19_SocketExDlg::IDD, pParent)
+// 멤버변수 초기화
+, m_nChatMode(1)
+, m_strMyIP(_T(""))
+, m_nOtherIP(_T(""))
+, m_strOtherIP(_T(""))
+, m_strInitLoc(0)
+, m_rectDlg(0)
+, m_bIsConnect(0)
 
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -83,6 +83,7 @@ BEGIN_MESSAGE_MAP(CMFC19_SocketExDlg, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_BN_CLICKED(IDC_BUTTON_CLOSE, &CMFC19_SocketExDlg::OnClickedButtonClose)
+	ON_BN_CLICKED(IDC_BUTTON_DISCONNECT, &CMFC19_SocketExDlg::OnClickedButtonDisconnect)
 END_MESSAGE_MAP()
 
 
@@ -228,9 +229,10 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	
 	CString strIP;
 	Client stClient;
+	stClient.iPort = 7777;
 	// 구조체 -> 포트를 CString으로 변환
 	/*CString strPort;
-	strPort.Format(_T("%d"), client.iPort);*/
+	strPort.Format(_T("%d"), stClient.iPort);*/
 
 	
 	// 다이얼로그에 데이터 담기
@@ -244,15 +246,12 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	if (strIP != _T("0.0.0.0"))
 	{
 		((CMFC19_SocketExApp*)AfxGetApp())->Connect(strIP, stClient.iPort);
-			//GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
 			m_strOtherIP = strIP;
-			//GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
 	}
 	else
 	{
 		AfxMessageBox(_T("접속할 서버의 IP주소를 입력하세요"));
 	}
-			
 }
 
 
@@ -385,11 +384,11 @@ void CMFC19_SocketExDlg::SetConnectStatus(int iErrorCode)
 	{
 		strMessage.Format(_T("연결 성공"));
 		AfxMessageBox(strMessage);
-		// DisConnect 비활성화
-		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
-		// Send 비활성화
+		// DisConnect 활성화
+		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(TRUE);
+		// Send 활성화
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(TRUE);
-		// Connect 활성화
+		// Connect 비활성화
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
 	}
 	else	// 실패
@@ -399,18 +398,9 @@ void CMFC19_SocketExDlg::SetConnectStatus(int iErrorCode)
 	}
 }
 
-//bool CMFC19_SocketExDlg::IsConnect()
-//{
-//	if (iErrorCode == 0)
-//	{
-//		return TRUE;
-//		/*GetDlgItem(IDC_BUTTON_CLOSE)->EnableWindow(FALSE);
-//		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);*/
-//	}
-//	else
-//	{
-//		return FALSE;
-//		//GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
-//	}
-//	
-//}
+
+void CMFC19_SocketExDlg::OnClickedButtonDisconnect()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+}
