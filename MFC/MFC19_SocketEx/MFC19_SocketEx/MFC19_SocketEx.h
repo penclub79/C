@@ -49,6 +49,9 @@ public:
 	int GetConnectStatus();
 	void SetConnectStatus(int iErrorCode);
 
+	// 사용자ID 받기
+	void SetUserID(CString strUserID);
+
 	// 데이터 받기
 	void ReceiveData();
 

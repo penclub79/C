@@ -9,8 +9,6 @@ public:
 	CAcceptSock();
 	~CAcceptSock();
 
-	void SendWhoAreYou();
-
 	//int iIndex;
 	//void OnReceive(int nErrorCode);
 	//virtual void OnClose(int nErrorCode);
@@ -18,6 +16,9 @@ protected:
 	int iIndex;
 
 public:
+
+	void SendWhoAreYou();
+
 	void SetUserID(int iID);
 	int GetUserID();
 };

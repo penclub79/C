@@ -23,6 +23,7 @@ END_MESSAGE_MAP()
 CMFC19_SocketExApp::CMFC19_SocketExApp()
 : m_pClient(NULL)
 , m_iConnectCode(0)
+, m_strUserID("")
 
 {
 	// 다시 시작 관리자 지원
@@ -127,6 +128,7 @@ void CMFC19_SocketExApp::Connect(CString strIP, int iPort)
 		m_pClient = new CBasicSock;
 		m_pClient->Create();
 		m_pClient->Connect(strIP, iPort);
+		
 	}
 	
 }
@@ -153,6 +155,10 @@ void CMFC19_SocketExApp::SetConnectStatus(int iErrorCode)
 	m_iConnectCode = iErrorCode;
 }
 
+void CMFC19_SocketExApp::SetUserID(CString strUserID)
+{
+	m_strUserID = strUserID;
+}
 
 
 void CMFC19_SocketExApp::ReceiveData()
@@ -170,13 +176,13 @@ void CMFC19_SocketExApp::ReceiveData()
 		stSendHeader.iPacketID = PACKET_ID_RSP_WHOAREYOU;
 		stSendHeader.wszPacketText;
 
-		//m_pClient->Send(stSendHeader);
+		m_pClient->Send(&stSendHeader.sizeof(stSendHeader), 0);
 	}
 }
 
 
 void CMFC19_SocketExApp::SendData(CString strData)
-{
+{	
 	if (m_pClient)
 	{
 		m_pClient->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
