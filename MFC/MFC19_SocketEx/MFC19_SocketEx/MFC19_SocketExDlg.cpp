@@ -233,7 +233,6 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	// 구조체 -> 포트를 CString으로 변환
 	/*CString strPort;
 	strPort.Format(_T("%d"), stClient.iPort);*/
-
 	
 	// 다이얼로그에 데이터 담기
 
@@ -398,9 +397,19 @@ void CMFC19_SocketExDlg::SetConnectStatus(int iErrorCode)
 	}
 }
 
-
+// DISConnect
 void CMFC19_SocketExDlg::OnClickedButtonDisconnect()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString strMessage;
+
+	((CMFC19_SocketExApp*)AfxGetApp())->Close();
+
+	strMessage.Format(_T("연결을 끊었습니다."));
+	AfxMessageBox(strMessage);
+
+	GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
+	GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
 
 }

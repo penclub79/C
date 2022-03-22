@@ -39,13 +39,23 @@ public:
 	// 함수
 	void CleanUp(void);
 
+	// 연결
 	void Connect(CString strIP, int iPort);
 
+	// 연결 끊기
+	void Close();
+
+	// 연결 상태
 	int GetConnectStatus();
 	void SetConnectStatus(int iErrorCode);
 
+	// 데이터 받기
 	void ReceiveData();
+
+	// 데이터 보내기
 	void SendData(CString strData);
+
+	// 서버가 끊겼을 때
 	void CloseChild();
 };
 

@@ -119,10 +119,10 @@ void CMFC19_SocketExApp::CleanUp()
 	}
 }
 
-// Connect 함수 오버 로딩 매개: IP, Port 
+// Connect 연결 (IP, Port)
 void CMFC19_SocketExApp::Connect(CString strIP, int iPort)
 {
-	if (strIP)
+	if (strIP && iPort)
 	{
 		m_pClient = new CBasicSock;
 		m_pClient->Create();
@@ -131,7 +131,13 @@ void CMFC19_SocketExApp::Connect(CString strIP, int iPort)
 	
 }
 
-// : 성공/실패 여부
+// Connect 끊기
+void CMFC19_SocketExApp::Close()
+{
+	m_pClient->Close();
+}
+
+// Connect 성공/실패 여부 Error Code 리턴
 int CMFC19_SocketExApp::GetConnectStatus()
 {
 	return m_iConnectCode;
