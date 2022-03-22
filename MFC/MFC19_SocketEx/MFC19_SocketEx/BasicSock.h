@@ -3,17 +3,6 @@
 #include "BasicDefine.h"
 
 
-// 클라이언트 구조체
-struct Client
-{
-	int iPort;
-	CString szUserId;
-};
-
-struct ErrorCode
-{
-	int iErrorCode;
-};
 
 class CBasicSock :
 	public CAsyncSocket

@@ -166,17 +166,23 @@ void CMFC19_SocketExApp::ReceiveData()
 	//wchar_t temp[MAX_PATH];
 	PACKET_HEADER	stRecvHeader = { 0 };
 	PACKET_HEADER	stSendHeader = { 0 };
+	
+	TCHAR *pstUserID = (TCHAR*)(LPCTSTR)m_strUserID.GetBuffer();
+	//stRecvHeader.wszPacketText;
 
 	m_pClient->Receive(&stRecvHeader, sizeof(stRecvHeader));
 
+	// 요청 패킷과 받은 헤더의 패킷ID가 같으면
 	if (PACKET_ID_REQ_WHOAREYOU == stRecvHeader.iPacketID)
 	{
 		//((CMFC19_SocketExDlg*)m_pMainWnd)->GetUserID();
 
 		stSendHeader.iPacketID = PACKET_ID_RSP_WHOAREYOU;
-		stSendHeader.wszPacketText;
 
-		m_pClient->Send(&stSendHeader.sizeof(stSendHeader), 0);
+		wsprintf(stSendHeader.wszPacketText, _T("%s"), pstUserID);
+		//_tcscpy_s(stSendHeader.wszPacketText, sizeof(stSendHeader.wszPacketText), pstUserID);
+
+		m_pClient->Send(&stSendHeader, sizeof(stSendHeader));
 	}
 }
 

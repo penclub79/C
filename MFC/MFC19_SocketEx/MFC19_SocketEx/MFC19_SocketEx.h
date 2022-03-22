@@ -30,6 +30,7 @@ public:
 private:
 	// 클래스
 	CBasicSock* m_pClient;
+	CString m_strUserID;
 
 	// 자료형
 	int m_iConnectCode;

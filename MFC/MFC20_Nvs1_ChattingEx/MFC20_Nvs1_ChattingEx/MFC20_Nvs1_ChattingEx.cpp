@@ -140,10 +140,12 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 	
 	if (m_pServer->Accept(*pAccept))
 	{
+		PACKET_HEADER stRecvHeader = { 0 };
 		CString strSock;
 		UINT nPort;
 		pAccept->GetPeerName(strSock, nPort);
-		
+		pAccept->Receive(&stRecvHeader, sizeof(stRecvHeader));
+
 		// user id ºÎ¿©
 		pAccept->SetUserID(m_ClientList.GetCount());
 		

@@ -152,7 +152,7 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	stClient.iPort = 7777;
 	stClient.szUserId = "";*/
 	
-	Client stClient = { 0 };
+	CLIENT_INFO stClient = { 0 };
 	stClient.iPort = 7777;
 	// 포트 적용
 	SetDlgItemInt(IDC_EDIT_PORT, stClient.iPort);
@@ -228,7 +228,7 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	UpdateData();
 	
 	CString strIP;
-	Client stClient;
+	CLIENT_INFO stClient;
 	stClient.iPort = 7777;
 	// 구조체 -> 포트를 CString으로 변환
 	/*CString strPort;
@@ -239,12 +239,13 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	// IP 담기
 	GetDlgItemText(IDC_IPADDRESS_SERVER, strIP);
 	// USER ID 담기
-	GetDlgItemText(IDC_EDIT_USERID, stClient.szUserId);
+	GetDlgItemText(IDC_EDIT_USERID, stClient.szUserId, MAX_LENGTH_USERID);
 	
 	// IP가 입력이 되어 있을 때
 	if (strIP != _T("0.0.0.0"))
 	{
 		((CMFC19_SocketExApp*)AfxGetApp())->Connect(strIP, stClient.iPort);
+		((CMFC19_SocketExApp*)AfxGetApp())->SetUserID(stClient.szUserId);
 			m_strOtherIP = strIP;
 	}
 	else
@@ -389,6 +390,8 @@ void CMFC19_SocketExDlg::SetConnectStatus(int iErrorCode)
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(TRUE);
 		// Connect 비활성화
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
+		// USER ID 비활성화
+		GetDlgItem(IDC_EDIT_USERID)->EnableWindow(FALSE);
 	}
 	else	// 실패
 	{
@@ -411,5 +414,6 @@ void CMFC19_SocketExDlg::OnClickedButtonDisconnect()
 	GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
 	GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_USERID)->EnableWindow(TRUE);
 
 }

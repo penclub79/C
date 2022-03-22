@@ -16,7 +16,7 @@ CAcceptSock::~CAcceptSock()
 void CAcceptSock::SendWhoAreYou()
 {
 	PACKET_HEADER	stWhoAreYou = { 0 };
-
+	
 	stWhoAreYou.iPacketID = PACKET_ID_REQ_WHOAREYOU;
 
 	Send((LPCTSTR)&stWhoAreYou, sizeof(stWhoAreYou));
