@@ -179,7 +179,9 @@ void CMFC19_SocketExApp::ReceiveData()
 
 		stSendHeader.iPacketID = PACKET_ID_RSP_WHOAREYOU;
 
+		// wsprintf는 String의 데이터를 배열에 복사하기 위한 함수이다. 많이 사용함.
 		wsprintf(stSendHeader.wszPacketText, _T("%s"), pstUserID);
+
 		//_tcscpy_s(stSendHeader.wszPacketText, sizeof(stSendHeader.wszPacketText), pstUserID);
 
 		m_pClient->Send(&stSendHeader, sizeof(stSendHeader));

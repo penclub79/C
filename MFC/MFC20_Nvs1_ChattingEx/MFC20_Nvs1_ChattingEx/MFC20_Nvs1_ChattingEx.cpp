@@ -153,6 +153,7 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 
 		pAccept->SendWhoAreYou();
 		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
+
 	}
 
 #endif
