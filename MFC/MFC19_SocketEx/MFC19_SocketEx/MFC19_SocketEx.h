@@ -57,7 +57,7 @@ public:
 	void ReceiveData();
 
 	// 데이터 보내기
-	void SendIAm();
+	void SendReqLoginPacket();
 	void SendText(CString strData);
 
 	// 서버가 끊겼을 때

@@ -187,66 +187,59 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pClientSock)
 {
 	char*					pBuffer					= new char[1024];
 	PACKET_HEADER*			pstHeader				= (PACKET_HEADER*)pBuffer;
-	PACKET_ID_REQ_LOGIN*	pstReceiveUserHeader	= NULL;
-	PACKET_ID_REQ_TEXT*		pstReceiveTextHeader	= NULL;
+	PACKET_REQ_LOGIN*		pstReceiveUserHeader	= NULL;
+	PACKET_REQ_TEXT*		pstReceiveTextHeader	= NULL;
 	PACKET_RSP_TEXT			stRSPText = { 0 };
 	PACKET_RSP_LOGIN		stRSPLogin = { 0 };
 
 	memset(pBuffer, 0, 1024);
 
-
 	/////////////////////////////////////////////////////////////////
 	// Receive //////////////////////////////////////////////////////
 	//wchar_t temp[MAX_PATH];
 	// 클라이언트로 부터 받은 메시지
-	pClientSock->Receive(pBuffer, sizeof(PACKET_HEADER));
+	pClientSock->Receive(pstHeader, sizeof(PACKET_HEADER));
 	pClientSock->Receive(&pBuffer[sizeof(PACKET_HEADER)], pstHeader->iPacketSize - sizeof(PACKET_HEADER) );
-
 	/////////////////////////////////////////////////////////////////
-
-
 
 	/////////////////////////////////////////////////////////////////
 	// Parsing //////////////////////////////////////////////////////
 	// Parsing : 패킷 데이터를 열어 본다. ///////////////////////////
 	if (MARKER_CLIENT == pstHeader->iMarker)
 	{
-		switch(pstHeader->iPacketID)
+		switch (pstHeader->iPacketID)
 		{
-		case PACKET_ID_REQ_LOGIN:
-		{
-			pstReceiveUserHeader = (PACKET_ID_REQ_LOGIN*)pBuffer;
-			// UserID
-			pClientSock->SetUserID(pstReceiveUserHeader->wszUserID);
+			case PACKET_ID_REQ_LOGIN:
+			{
+				pstReceiveUserHeader = (PACKET_REQ_LOGIN*)pBuffer;
 
-			// UserHeader Send to Client
-			// Code 
-			stRSPLogin.stHeader.iMarker;
-			stRSPLogin.stHeader.iVersion
-				stRSPLogin.stHeader.iPacketID;
-			pClientSock->Send(&stRSPLogin, sizeof(stRSPLogin));
+				// UserID
+				pClientSock->SetUserID(pstReceiveUserHeader->wszUserID);
+
+				// UserHeader Send to Client
+				// Code 
+				stRSPLogin.stHeader.iMarker = MARKER_CLIENT;
+				stRSPLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
+				stRSPLogin.stHeader.iPacketID = PACKET_ID_RSP_LOGIN;
+				stRSPLogin.stHeader.iPacketSize = sizeof(PACKET_RSP_LOGIN);
+				// sizeof는 구조체를 넣는 걸로 규칙을 정함 -> 변수랑 포인터 변수랑 헤깔린다.
+				stRSPLogin.iResultCode = REQ_SUCCESS;
+
+				pClientSock->Send(&stRSPLogin, sizeof(PACKET_RSP_LOGIN));
+
+				//((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->ReceiveData(pClientSock, stRSPLogin.wszPacketText);
+				break;
+			}
+
+			case PACKET_ID_REQ_TEXT:
+			{
+					pstReceiveTextHeader = (PACKET_REQ_TEXT*)pBuffer;
+					break;
+			}
 		}
-			break;
-
-		case PACKET_ID_REQ_TEXT:
-		{
-			pstReceiveTextHeader = (PACKET_ID_REQ_TEXT*)pBuffer;
-
-		}
-		break;
 	}
 
-
-	/////////////////////////////////////////////////////////////////
-
-
-	/////////////////////////////////////////////////////////////////
-	// Processing ///////////////////////////////////////////////////
-
-	((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->ReceiveData(pClientSock, stReceiveTextHeader.wszPacketText);
-
-	/////////////////////////////////////////////////////////////////
-
+	// 메모리 해제
 	if (pBuffer)
 	{
 		delete [] pBuffer;

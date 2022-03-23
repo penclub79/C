@@ -15,16 +15,16 @@ typedef enum{
 
 // Success Code
 typedef enum{
-	LOGIN_SUCCESS = 0,
-	TEXT_SUCCESS,
+	REQ_SUCCESS = 0,
+	//TEXT_SUCCESS,
 };
 
 
 typedef struct _tagPACKET_HEADER{
-	int		iVersion;
 	int		iMarker;
-	int		iPacketID;
-	int		iPacketSize;
+	unsigned int		iVersion;
+	unsigned int		iPacketID;
+	unsigned int		iPacketSize;
 }PACKET_HEADER;
 
 typedef struct _tagPACKET_REQ_LOGIN{

@@ -75,11 +75,8 @@ BEGIN_MESSAGE_MAP(CMFC19_SocketExDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	//ON_BN_CLICKED(IDC_RADIO_SERVER, &CMFC19_SocketExDlg::OnClickedRadioServer)
-	//ON_COMMAND(IDC_RADIO_CLIENT, &CMFC19_SocketExDlg::OnRadioClient)
 	ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CMFC19_SocketExDlg::OnClickedButtonConnect)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CMFC19_SocketExDlg::OnClickedButtonSend)
-	//ON_BN_CLICKED(IDC_RADIO_SERVER, &CMFC19_SocketExDlg::OnBnClickedRadioServer)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_BN_CLICKED(IDC_BUTTON_CLOSE, &CMFC19_SocketExDlg::OnClickedButtonClose)
@@ -380,7 +377,7 @@ void CMFC19_SocketExDlg::SetConnectStatus(int iErrorCode)
 	CString strMessage;
 
 	// 연결 성공
-	if (iErrorCode == 0)
+	if (0 == iErrorCode)
 	{
 		strMessage.Format(_T("연결 성공"));
 		AfxMessageBox(strMessage);

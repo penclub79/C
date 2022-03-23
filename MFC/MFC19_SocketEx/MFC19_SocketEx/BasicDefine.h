@@ -10,6 +10,10 @@
 #define	MARKER_CLIENT			0xffff1234
 
 typedef enum{
+	RSP_SUCCESS
+};
+
+typedef enum{
 	PACKET_ID_REQ_LOGIN		= 1,
 	PACKET_ID_RSP_LOGIN		,	
 	PACKET_ID_REQ_TEXT		,
@@ -17,10 +21,19 @@ typedef enum{
 };
 
 typedef struct _tagPACKET_HEADER{
-	int		iMarker		;
-	int		iVersion	;
-	int		iPacketID	;
-	int		iPacketSize	;
+	/*
+	추후 유지보수를 위해서 Marker와 Version을 헤더에서 관리한다.
+
+	Marker : 헤더를 받았을 때, 
+
+	Version : 예를들어 로그인 할때 비밀번호까지 관리하고 싶다면 비밀번호 담을 변수를 추가한다.
+			  패킷의 업데이트나 수정/추가로 인해 Version 업이된다면, 해당 버전의 하위호환으로 사용
+			  할 수도 있으니 Version 관리를 하면 유지보수하기 수월하다.
+	*/
+	unsigned int		iMarker;
+	unsigned int		iVersion;
+	unsigned int		iPacketID;
+	unsigned int		iPacketSize;
 }PACKET_HEADER;
 
 typedef struct _tagPACKET_REQ_LOGIN{
@@ -48,7 +61,7 @@ typedef struct _tagPACKET_RSP_TEXT{
 typedef struct _tagCLIENT_INFO
 {
 	int iPort;
-	// 구조체에 클래스는 별로 추천하지않음
+	// 구조체에 클래스는 추천 하지 않음.
 	TCHAR szUserId[MAX_LENGTH_USERID];
 }CLIENT_INFO;
 
