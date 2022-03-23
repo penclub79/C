@@ -261,7 +261,7 @@ void CMFC19_SocketExDlg::OnClickedButtonSend()
 	CString strSend, strInsert;
 	GetDlgItemText(IDC_EDIT_SEND, strSend);
 	strInsert.Format(_T("클라이언트[%s]:%s"), m_strMyIP, strSend);
-	((CMFC19_SocketExApp*)AfxGetApp())->SendData(strSend);
+	((CMFC19_SocketExApp*)AfxGetApp())->SendText(strSend);
 
 	//int sel = m_listChat.InsertString(-1, strInsert);
 	//m_listChat.SetCurSel(sel);

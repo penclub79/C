@@ -140,18 +140,17 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 	
 	if (m_pServer->Accept(*pAccept))
 	{
-		PACKET_HEADER stRecvHeader = { 0 };
 		CString strSock;
 		UINT nPort;
 		pAccept->GetPeerName(strSock, nPort);
-		pAccept->Receive(&stRecvHeader, sizeof(stRecvHeader));
-
+		
 		// user id 부여
-		pAccept->SetUserID(m_ClientList.GetCount());
+		//pAccept->SetUserID(m_ClientList.GetCount());
 		
 		m_ClientList.AddTail(pAccept);
 
-		pAccept->SendWhoAreYou();
+		//pAccept->SendWhoAreYou();
+		/*pAccept->Receive(&stRecvHeader, sizeof(stRecvHeader));*/
 		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
 
 	}
@@ -186,13 +185,73 @@ void CMFC20_Nvs1_ChattingExApp::CleanUp()
 
 void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pClientSock)
 {
-	
-	wchar_t temp[MAX_PATH];
+	char*					pBuffer					= new char[1024];
+	PACKET_HEADER*			pstHeader				= (PACKET_HEADER*)pBuffer;
+	PACKET_ID_REQ_LOGIN*	pstReceiveUserHeader	= NULL;
+	PACKET_ID_REQ_TEXT*		pstReceiveTextHeader	= NULL;
+	PACKET_RSP_TEXT			stRSPText = { 0 };
+	PACKET_RSP_LOGIN		stRSPLogin = { 0 };
+
+	memset(pBuffer, 0, 1024);
+
+
+	/////////////////////////////////////////////////////////////////
+	// Receive //////////////////////////////////////////////////////
+	//wchar_t temp[MAX_PATH];
 	// 클라이언트로 부터 받은 메시지
-	(pClientSock->Receive(temp, sizeof(temp)));
+	pClientSock->Receive(pBuffer, sizeof(PACKET_HEADER));
+	pClientSock->Receive(&pBuffer[sizeof(PACKET_HEADER)], pstHeader->iPacketSize - sizeof(PACKET_HEADER) );
 
-	((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->ReceiveData(pClientSock, temp);
+	/////////////////////////////////////////////////////////////////
 
+
+
+	/////////////////////////////////////////////////////////////////
+	// Parsing //////////////////////////////////////////////////////
+	// Parsing : 패킷 데이터를 열어 본다. ///////////////////////////
+	if (MARKER_CLIENT == pstHeader->iMarker)
+	{
+		switch(pstHeader->iPacketID)
+		{
+		case PACKET_ID_REQ_LOGIN:
+		{
+			pstReceiveUserHeader = (PACKET_ID_REQ_LOGIN*)pBuffer;
+			// UserID
+			pClientSock->SetUserID(pstReceiveUserHeader->wszUserID);
+
+			// UserHeader Send to Client
+			// Code 
+			stRSPLogin.stHeader.iMarker;
+			stRSPLogin.stHeader.iVersion
+				stRSPLogin.stHeader.iPacketID;
+			pClientSock->Send(&stRSPLogin, sizeof(stRSPLogin));
+		}
+			break;
+
+		case PACKET_ID_REQ_TEXT:
+		{
+			pstReceiveTextHeader = (PACKET_ID_REQ_TEXT*)pBuffer;
+
+		}
+		break;
+	}
+
+
+	/////////////////////////////////////////////////////////////////
+
+
+	/////////////////////////////////////////////////////////////////
+	// Processing ///////////////////////////////////////////////////
+
+	((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->ReceiveData(pClientSock, stReceiveTextHeader.wszPacketText);
+
+	/////////////////////////////////////////////////////////////////
+
+	if (pBuffer)
+	{
+		delete [] pBuffer;
+		pBuffer = NULL;
+	}
 }
 
 
@@ -208,7 +267,7 @@ void CMFC20_Nvs1_ChattingExApp::SendDataAll(CAcceptSock* pAccept, CString strDat
 		{
 			pAccept = (CAcceptSock*)m_ClientList.GetAt(pos);
 			m_ClientList.GetNext(pos);
-			pAccept->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
+			pAccept->Send((LPCTSTR)strData.GetBuffer(), sizeof(TCHAR)*(strData.GetLength() + 1));
 		}
 	}
 }

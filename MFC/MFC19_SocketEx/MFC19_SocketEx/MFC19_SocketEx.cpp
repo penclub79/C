@@ -150,51 +150,80 @@ void CMFC19_SocketExApp::SetConnectStatus(int iErrorCode)
 {
 	CString strConnectMessage;
 
-	((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(iErrorCode);
-
 	m_iConnectCode = iErrorCode;
+
+	// connect는 성공했다면 다음으로 클라이언트 패킷을 체크
+	if (0 == iErrorCode)
+	{
+		SendIAm();
+	}
+	else  // connect가 실패면 연결 실패 박스를 띄움
+	{
+		((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(iErrorCode);
+	}
 }
+
+void CMFC19_SocketExApp::SendIAm()
+{
+	PACKET_HEADER_IAM	stSendHeader = { 0 };
+	stSendHeader.iPacketID = PACKET_ID_IAM;
+
+	/*
+	웬만하면 (TCHAR*)(LPCTSTR)m_strUserID 쓰지 않는다.
+	CString은 클래스이므로 클래스는 다양한 함수와 변수들이 존재하는데.
+	메모리 범위를 어떤것으로 잡을지 모른다. 하지만 CString에서만 제공하는 .GetBuffer() 함수 덕분에
+	버퍼사이즈를 넘겨줄 수 있다.
+	*/
+	TCHAR *pstUserID = (TCHAR*)(LPCTSTR)m_strUserID.GetBuffer();
+
+	// wsprintf는 String의 데이터를 배열에 복사하기 위한 함수이다. 많이 사용함.
+	wsprintf(stSendHeader.wszUserID, _T("%s"), pstUserID);
+	TRACE(_T("%s"), pstUserID);
+
+	//_tcscpy_s(stSendHeader.wszPacketText, sizeof(stSendHeader.wszPacketText), pstUserID);
+
+	m_pClient->Send(&stSendHeader, sizeof(stSendHeader));
+}
+
 
 void CMFC19_SocketExApp::SetUserID(CString strUserID)
 {
 	m_strUserID = strUserID;
 }
 
-
+// 서버에서 받은 데이터
 void CMFC19_SocketExApp::ReceiveData()
 {
-	//wchar_t temp[MAX_PATH];
-	PACKET_HEADER	stRecvHeader = { 0 };
-	PACKET_HEADER	stSendHeader = { 0 };
-	
-	TCHAR *pstUserID = (TCHAR*)(LPCTSTR)m_strUserID.GetBuffer();
-	//stRecvHeader.wszPacketText;
+	PACKET_HEADER_IAM	stRecvHeader = { 0 };
 
 	m_pClient->Receive(&stRecvHeader, sizeof(stRecvHeader));
 
 	// 요청 패킷과 받은 헤더의 패킷ID가 같으면
-	if (PACKET_ID_REQ_WHOAREYOU == stRecvHeader.iPacketID)
+	if (PACKET_ID_IAM == stRecvHeader.iPacketID)
 	{
 		//((CMFC19_SocketExDlg*)m_pMainWnd)->GetUserID();
-
-		stSendHeader.iPacketID = PACKET_ID_RSP_WHOAREYOU;
-
-		// wsprintf는 String의 데이터를 배열에 복사하기 위한 함수이다. 많이 사용함.
-		wsprintf(stSendHeader.wszPacketText, _T("%s"), pstUserID);
-
-		//_tcscpy_s(stSendHeader.wszPacketText, sizeof(stSendHeader.wszPacketText), pstUserID);
-
-		m_pClient->Send(&stSendHeader, sizeof(stSendHeader));
+		((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(0);	
 	}
 }
 
 
-void CMFC19_SocketExApp::SendData(CString strData)
+void CMFC19_SocketExApp::SendText(CString strData)
 {	
-	if (m_pClient)
-	{
-		m_pClient->Send((LPCTSTR)strData, sizeof(TCHAR)*(strData.GetLength() + 1));
-	}
+	PACKET_HEADER_TEXT	stSendHeader = { 0 };
+	
+	stSendHeader.iPacketID = PACKET_ID_TEXT;
+
+	TCHAR *pstUserID = (TCHAR*)(LPCTSTR)m_strUserID.GetBuffer();
+
+	// wsprintf는 String의 데이터를 배열에 복사하기 위한 함수이다. 많이 사용함.
+	wsprintf(stSendHeader.wszPacketText, _T("%s"), strData.GetBuffer());
+	//TRACE(_T("%s"), pstUserID);
+
+
+	////_tcscpy_s(stSendHeader.wszPacketText, sizeof(stSendHeader.wszPacketText), pstUserID);
+
+	m_pClient->Send(&stSendHeader, sizeof(stSendHeader));
+
 }
 
 

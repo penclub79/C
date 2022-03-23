@@ -13,13 +13,13 @@ public:
 	//void OnReceive(int nErrorCode);
 	//virtual void OnClose(int nErrorCode);
 protected:
-	int iIndex;
+	CString m_strUserID;
 
 public:
 
-	void SendWhoAreYou();
+	//void SendWhoAreYou();
 
-	void SetUserID(int iID);
-	int GetUserID();
+	void SetUserID(CString strID);
+	CString GetUserID();
 };
 

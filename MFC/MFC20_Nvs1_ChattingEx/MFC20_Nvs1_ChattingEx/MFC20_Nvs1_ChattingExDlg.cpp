@@ -261,11 +261,21 @@ void CMFC20_Nvs1_ChattingExDlg::ReceiveData(CAcceptSock* pAccept, CString strRec
 {
 	
 	CString strInsert;
-	int iID = pAccept->GetUserID();
+	CString strDisplayUserID;
+	CString strUserID = pAccept->GetUserID();
+	
+	strDisplayUserID.Format(_T("[%s] 입장"), strUserID);
+	m_listChat.InsertString(-1, strDisplayUserID);
 
-	strInsert.Format(_T("%d.클라이언트[%s]:%s"),iID, m_strOtherIP, strReceive);
-	((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendDataAll(pAccept, strReceive);
-	int sel = m_listChat.InsertString(-1, strInsert);
+	if (strReceive != "")
+	{
+		strInsert.Format(_T("[%s]:%s"), strUserID, strReceive);
+		((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendDataAll(pAccept, strReceive);
+		int iMessageSel = m_listChat.InsertString(-1, strInsert);
+	}
+
+	//strInsert.Format(_T("[%s]님이 입장"), strUserID, strReceive);
+	
 }
 
 
