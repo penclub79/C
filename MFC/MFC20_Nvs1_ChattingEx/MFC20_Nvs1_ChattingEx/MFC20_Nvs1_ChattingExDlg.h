@@ -41,9 +41,11 @@ public:
 	afx_msg void OnRadioClient();
 	afx_msg void OnClickedButtonConnect();
 	afx_msg void OnClickedButtonSend();
-	void ReceiveData(CAcceptSock* pAccept, CString strReceive);
+	void ReceiveMessage(CAcceptSock* pAccept, CString strReceive);
 	void Accept(CString strSock);
 	void ResizeControl(int cx, int cy);
+	void EntryClient(CAcceptSock* pAccept);
+	void onClose(CAcceptSock* pAccept);
 
 	CListBox m_listChat;
 	CIPAddressCtrl m_IPAddress;

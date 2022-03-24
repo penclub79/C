@@ -35,18 +35,13 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	//CMFC19_SocketExApp* m_pApp;
-	CMFC19_SocketExApp* m_pApp;
-
 	afx_msg void OnClickedButtonConnect();
 	afx_msg void OnClickedButtonSend();
 	void ReceiveData(CString strReceive);
 	void Accept(CString strSock);
 	void ResizeControl(int cx, int cy);
 	void SetConnectStatus(int iErrorCode);
-
-	bool m_bIsConnect;
-	//bool IsConnect();
+	void SetUserID();
 
 
 	CIPAddressCtrl m_IPAddress;

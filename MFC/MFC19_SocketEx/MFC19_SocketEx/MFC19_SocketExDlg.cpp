@@ -56,7 +56,6 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 , m_strOtherIP(_T(""))
 , m_strInitLoc(0)
 , m_rectDlg(0)
-, m_bIsConnect(0)
 
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -251,16 +250,16 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	}
 }
 
-
+// 메시지 Send 버튼
 void CMFC19_SocketExDlg::OnClickedButtonSend()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString strSend, strInsert;
 	GetDlgItemText(IDC_EDIT_SEND, strSend);
 	strInsert.Format(_T("클라이언트[%s]:%s"), m_strMyIP, strSend);
-	((CMFC19_SocketExApp*)AfxGetApp())->SendText(strSend);
+	((CMFC19_SocketExApp*)AfxGetApp())->SendReqMessagePacket(strSend);
 
-	//int sel = m_listChat.InsertString(-1, strInsert);
+	int sel = m_listChat.InsertString(-1, strInsert);
 	//m_listChat.SetCurSel(sel);
 	SetDlgItemText(IDC_EDIT_SEND, _T(""));
 }

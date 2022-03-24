@@ -10,7 +10,6 @@ class CBasicSock :
 public:
 	CBasicSock();
 	~CBasicSock();
-	bool m_bIsConnect;
 
 	
 	virtual void OnReceive(int nErrorCode);

@@ -203,25 +203,6 @@ HCURSOR CMFC20_Nvs1_ChattingExDlg::OnQueryDragIcon()
 }
 
 
-
-//void CMFC20_Nvs1_ChattingExDlg::OnClickedRadioServer()
-//{
-//	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-//	m_IPAddress.SetWindowTextW(m_strMyIP);
-//	m_IPAddress.EnableWindow(FALSE);
-//	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Open"));
-//}
-
-
-//void CMFC20_Nvs1_ChattingExDlg::OnRadioClient()
-//{
-//	// TODO: 여기에 명령 처리기 코드를 추가합니다.
-//	m_IPAddress.SetWindowTextW(_T(""));
-//	m_IPAddress.EnableWindow(TRUE);
-//	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
-//}
-
-
 void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonConnect()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
@@ -255,34 +236,47 @@ void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonSend()
 	SetDlgItemText(IDC_EDIT_SEND, _T(""));
 	
 }
-
-
-void CMFC20_Nvs1_ChattingExDlg::ReceiveData(CAcceptSock* pAccept, CString strReceive)
+// 사용자가 채팅방에 들어왔을 때
+void CMFC20_Nvs1_ChattingExDlg::EntryClient(CAcceptSock* pAccept)
 {
-	
 	CString strInsert;
 	CString strDisplayUserID;
+
+	// 클라이언트 ID를 받아온다.
 	CString strUserID = pAccept->GetUserID();
-	
+	// 채팅방에 들어온 사용자 변수 데이터 가공
 	strDisplayUserID.Format(_T("[%s] 입장"), strUserID);
+	// 채팅방 리스트 다이얼로그에 insert
 	m_listChat.InsertString(-1, strDisplayUserID);
-
-	if (strReceive != "")
-	{
-		strInsert.Format(_T("[%s]:%s"), strUserID, strReceive);
-		((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendDataAll(pAccept, strReceive);
-		int iMessageSel = m_listChat.InsertString(-1, strInsert);
-	}
-
-	//strInsert.Format(_T("[%s]님이 입장"), strUserID, strReceive);
-	
 }
 
+// 사용자가 채팅방을 나갔을 때
+void CMFC20_Nvs1_ChattingExDlg::onClose(CAcceptSock* pAccept)
+{
+	CString strInsert;
+	CString strDisplayUserID;
 
+	// 클라이언트 ID를 받아온다.
+	CString strUserID = pAccept->GetUserID();
+	strDisplayUserID.Format(_T("[%s] 퇴장"), strUserID);
+	// 채팅방 리스트 다이얼로그에 insert
+	m_listChat.InsertString(-1, strDisplayUserID);
+}
+
+// 클라이언트로부터 메시지를 받았을 때
+void CMFC20_Nvs1_ChattingExDlg::ReceiveMessage(CAcceptSock* pAccept, CString strReceive)
+{
+	CString strInsert;
+	
+	//strInsert.Format(_T("[%s]:%s"), strUserID, strReceive);
+	((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendDataAll(pAccept, strReceive);
+	int iMessageSel = m_listChat.InsertString(-1, strInsert);	
+}
+
+// 연결된 클라이언트 IP받기
 void CMFC20_Nvs1_ChattingExDlg::Accept(CString strSock)
 {
 	m_strOtherIP = strSock;
-
 }
 
 

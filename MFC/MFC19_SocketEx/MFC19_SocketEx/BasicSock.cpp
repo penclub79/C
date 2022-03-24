@@ -3,7 +3,6 @@
 #include "MFC19_SocketEx.h"
 
 CBasicSock::CBasicSock()
-//:m_bIsConnect(0)
 {
 }
 

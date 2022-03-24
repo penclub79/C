@@ -199,7 +199,7 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pClientSock)
 	//wchar_t temp[MAX_PATH];
 	// 클라이언트로 부터 받은 메시지
 	pClientSock->Receive(pstHeader, sizeof(PACKET_HEADER));
-	pClientSock->Receive(&pBuffer[sizeof(PACKET_HEADER)], pstHeader->iPacketSize - sizeof(PACKET_HEADER) );
+	pClientSock->Receive(&pBuffer[sizeof(PACKET_HEADER)], pstHeader->iPacketSize - sizeof(PACKET_HEADER));
 	/////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pClientSock)
 			{
 				pstReceiveUserHeader = (PACKET_REQ_LOGIN*)pBuffer;
 
-				// UserID
+				// UserID 부여
 				pClientSock->SetUserID(pstReceiveUserHeader->wszUserID);
 
 				// UserHeader Send to Client
@@ -227,6 +227,8 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pClientSock)
 
 				pClientSock->Send(&stRSPLogin, sizeof(PACKET_RSP_LOGIN));
 
+				// 클라이언트 검증 후 방에 들어왔다는 것을 표시
+				((CMFC20_Nvs1_ChattingExDlg*)AfxGetMainWnd())->EntryClient(pClientSock);
 				//((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->ReceiveData(pClientSock, stRSPLogin.wszPacketText);
 				break;
 			}
@@ -270,9 +272,14 @@ void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
 {
 
 	POSITION pos = m_ClientList.Find(pClientSock);
+	/*CString strInsert;
+	CString strDisplayUser;
+	CString strUserID = pClientSock->GetUserID();*/
+
+
 	if (pos != NULL)
 	{
-		AfxMessageBox(_T("클라이언트 연결 끊김"));
+		((CMFC20_Nvs1_ChattingExDlg*)AfxGetMainWnd())->onClose(pClientSock);
 		pClientSock = (CAcceptSock*)m_ClientList.GetAt(pos);
 		m_ClientList.RemoveAt(pos);
 		delete pClientSock;

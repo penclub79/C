@@ -57,8 +57,10 @@ public:
 	void ReceiveData();
 
 	// 데이터 보내기
+		// 클라이언트 데이터
 	void SendReqLoginPacket();
-	void SendText(CString strData);
+		// 메시지 데이터
+	void SendReqMessagePacket(CString strData);
 
 	// 서버가 끊겼을 때
 	void CloseChild();
