@@ -15,8 +15,8 @@ typedef enum{
 
 // Success Code
 typedef enum{
-	REQ_SUCCESS = 0,
-	//TEXT_SUCCESS,
+	LOGIN_SUCCESS = 0,
+	TEXT_SUCCESS = 10,
 };
 
 
@@ -45,15 +45,19 @@ typedef struct _tagPACKET_REQ_TEXT{
 typedef struct _tagPACKET_RSP_TEXT{
 	PACKET_HEADER	stHeader;
 	int				iResultCode;
+	TCHAR			wszPacketText[64];
+	TCHAR			wszSendUserID[MAX_LENGTH_USERID];
 }PACKET_RSP_TEXT;
 
-// 클라이언트 구조체
-typedef struct _tagCLIENT_INFO
-{
-	int iPort;
-	// 구조체에 클래스는 별로 추천하지않음
-	TCHAR szUserId[MAX_LENGTH_USERID];
-}CLIENT_INFO;
+
+
+//// 클라이언트 구조체
+//typedef struct _tagCLIENT_INFO
+//{
+//	int iPort;
+//	// 구조체에 클래스는 별로 추천하지않음
+//	TCHAR szUserId[MAX_LENGTH_USERID];
+//}CLIENT_INFO;
 
 typedef struct _tagERRORCODE
 {

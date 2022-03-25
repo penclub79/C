@@ -37,11 +37,9 @@ protected:
 public:
 	afx_msg void OnClickedButtonConnect();
 	afx_msg void OnClickedButtonSend();
-	void ReceiveData(CString strReceive);
-	void Accept(CString strSock);
+	void ReceiveMessage(CString strReceive, CString strOtherUserID);
 	void ResizeControl(int cx, int cy);
 	void SetConnectStatus(int iErrorCode);
-	void SetUserID();
 
 
 	CIPAddressCtrl m_IPAddress;

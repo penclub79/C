@@ -37,7 +37,7 @@ public:
 private:
 	CServerSock* m_pServer;
 	//CAcceptSock* m_pAccept;
-	CObList m_ClientList;
+	CObList m_AcceptSocketList;
 	void CleanUp();
 	
 public:
@@ -45,7 +45,7 @@ public:
 	void CloseChild(CAcceptSock* pClientSock);
 
 	void Accept();
-	void SendDataAll(CAcceptSock* pAccept, CString strData);
+	//void SendDataAll(CAcceptSock* pAccept, CString strData);
 	void InitServer();
 	//void OnSend(CString strData);
 

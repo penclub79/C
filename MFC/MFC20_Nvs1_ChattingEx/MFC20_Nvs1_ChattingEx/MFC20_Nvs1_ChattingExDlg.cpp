@@ -229,7 +229,7 @@ void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonSend()
 	
 	strInsert.Format(_T("클라이언트[%s]:%s"), m_strMyIP, strSend);
 	//((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendData(strSend);
-	((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendDataAll(NULL, strSend);
+	//((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendDataAll(NULL, strSend);
 	int sel = m_listChat.InsertString(-1, strInsert);
 	m_listChat.SetCurSel(sel);
 	
@@ -264,14 +264,15 @@ void CMFC20_Nvs1_ChattingExDlg::onClose(CAcceptSock* pAccept)
 }
 
 // 클라이언트로부터 메시지를 받았을 때
-void CMFC20_Nvs1_ChattingExDlg::ReceiveMessage(CAcceptSock* pAccept, CString strReceive)
-{
-	CString strInsert;
-	
-	//strInsert.Format(_T("[%s]:%s"), strUserID, strReceive);
-	((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendDataAll(pAccept, strReceive);
-	int iMessageSel = m_listChat.InsertString(-1, strInsert);	
-}
+//void CMFC20_Nvs1_ChattingExDlg::ReceiveMessage(CAcceptSock* pAccept, CString strReceive)
+//{
+//	CString strInsert;
+//	
+//	//strInsert.Format(_T("[%s]:%s"), strUserID, strReceive);
+//	//((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendDataAll(pAccept, strReceive);
+//	((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->ReceiveData(pAccept);
+//	int iMessageSel = m_listChat.InsertString(-1, strInsert);	
+//}
 
 // 연결된 클라이언트 IP받기
 void CMFC20_Nvs1_ChattingExDlg::Accept(CString strSock)
@@ -338,7 +339,7 @@ void CMFC20_Nvs1_ChattingExDlg::ResizeControl(int cx, int cy)
 
 	// CLOSE BUTTON
 	pstrCtl = GetDlgItem(IDC_BUTTON_CLOSE);
-	pstrCtl->MoveWindow((cx / 2) - (150 / 2), cy - (iMarginY + 39 + 10 + iHeight + 300) + iMarginY + iHeight + iMarginY + iMarginY + iHeight + iMarginX, 150, iHeight + 20, TRUE);
+	pstrCtl->MoveWindow((cx / 2) - (150 / 2), cy - (iMarginY + 39 + 10 + iHeight + 300) + iMarginY + iHeight + iMarginY + iMarginY + iHeight + iMarginX, 150, iHeight, TRUE);
 
 	/* 위치 정보 적용(컨트롤) - END */
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

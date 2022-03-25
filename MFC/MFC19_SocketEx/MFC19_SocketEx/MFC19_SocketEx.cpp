@@ -170,9 +170,8 @@ void CMFC19_SocketExApp::SendReqLoginPacket()
 	메모리 범위를 어떤것으로 잡을지 모른다. 하지만 CString에서만 제공하는 .GetBuffer() 함수 덕분에
 	버퍼사이즈를 넘겨줄 수 있다.
 	*/
-	TCHAR *pstUserID = (TCHAR*)(LPCTSTR)m_strUserID.GetBuffer();
+	TCHAR* pstUserID = (TCHAR*)(LPCTSTR)m_strUserID.GetBuffer();
 	
-
 	// 헤더 패킷
 	PACKET_REQ_LOGIN	stSendLoginHeader = { 0 };
 	stSendLoginHeader.stHeader.iPacketID = PACKET_ID_REQ_LOGIN;
@@ -190,21 +189,18 @@ void CMFC19_SocketExApp::SendReqLoginPacket()
 
 void CMFC19_SocketExApp::SendReqMessagePacket(CString strData)
 {
-	
-	//PACKET_HEADER_TEXT	stSendHeader = { 0 };
-	//
-	//stSendHeader.iPacketID = PACKET_ID_TEXT;
+	TCHAR *pstMessage = (TCHAR*)(LPSTR)strData.GetBuffer();
 
-	//TCHAR *pstUserID = (TCHAR*)(LPCTSTR)m_strUserID.GetBuffer();
+	// 헤더 패킷
+	PACKET_REQ_TEXT		stSendMessageHeader = { 0 };
+	stSendMessageHeader.stHeader.iPacketID = PACKET_ID_REQ_TEXT;
+	stSendMessageHeader.stHeader.iMarker = MARKER_CLIENT;
+	stSendMessageHeader.stHeader.iPacketSize = sizeof(PACKET_REQ_TEXT);
+	stSendMessageHeader.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
 
-	//// wsprintf는 String의 데이터를 배열에 복사하기 위한 함수이다. 많이 사용함.
-	//wsprintf(stSendHeader.wszPacketText, _T("%s"), strData.GetBuffer());
-	////TRACE(_T("%s"), pstUserID);
-
-	//////_tcscpy_s(stSendHeader.wszPacketText, sizeof(stSendHeader.wszPacketText), pstUserID);
-
-	//m_pClient->Send(&stSendHeader, sizeof(stSendHeader));
-
+	// REQ Message 패킷을 서버로 보냄
+	wsprintf(stSendMessageHeader.wszPacketText, _T("%s"), pstMessage);
+	m_pClient->Send(&stSendMessageHeader, sizeof(PACKET_REQ_TEXT));
 }
 
 void CMFC19_SocketExApp::SetUserID(CString strUserID)
@@ -212,20 +208,27 @@ void CMFC19_SocketExApp::SetUserID(CString strUserID)
 	m_strUserID = strUserID;
 }
 
-// 서버에서 받은 데이터
+CString CMFC19_SocketExApp::GetUserID()
+{
+	return m_strUserID;
+}
+
+// 서버에서 받은 패킷 데이터
 void CMFC19_SocketExApp::ReceiveData()
 {
 	char*					pBuffer						= new char[1024];
 	PACKET_HEADER*			pstHeader					= (PACKET_HEADER*)pBuffer;
 	PACKET_RSP_LOGIN*		pstResponseLoginPacket		= NULL;	// 메모리주소 초기화
-	PACKET_RSP_TEXT*		pstResponseTextPacket		= NULL;
-	
+	PACKET_RSP_TEXT*		pstResponseTextIDPacket		= NULL;
+	PACKET_REQ_LOGIN*		pstRequestLoginPacket		= NULL;
+	//PACKET_REQ_TEXT*		pstResponseTextPacket		= NULL;
+	CString					strOtherUserID				= _T("");
+
 	// 메모리 초기화: memset(초기화할 변수(포인터), Value, Size)
 	memset(pBuffer, 0, 1024);
 
-	
 	// 헤더 부분
-	m_pClient->Receive(pstHeader, sizeof(PACKET_HEADER));
+	m_pClient->Receive(&pBuffer[0], sizeof(PACKET_HEADER));
 
 	// 헤더 페이로드(?) 부분
 	m_pClient->Receive(&pBuffer[sizeof(PACKET_HEADER)], pstHeader->iPacketSize - sizeof(PACKET_HEADER));
@@ -239,23 +242,33 @@ void CMFC19_SocketExApp::ReceiveData()
 		{
 			case PACKET_ID_RSP_LOGIN:
 			{
-				((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(RSP_SUCCESS);
+				pstResponseLoginPacket = (PACKET_RSP_LOGIN*)pBuffer;
+				((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(pstResponseLoginPacket->iResultCode);
 				break;
 			}
 
 			case PACKET_ID_RSP_TEXT:
 			{
+				// Text 응답 패킷 받기
+				pstResponseTextIDPacket = (PACKET_RSP_TEXT*)pBuffer;
+
+				// 보낸 UserID 받기
+				/*pstRequestLoginPacket = (PACKET_REQ_LOGIN*)pBuffer;
+				strOtherUserID.Format(_T("%s"), pstRequestLoginPacket->wszUserID);*/
+
+				((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(pstResponseTextIDPacket->iResultCode);
+				((CMFC19_SocketExDlg*)AfxGetMainWnd())->ReceiveMessage(pstResponseTextIDPacket->wszPacketText, pstResponseTextIDPacket->wszSendUserID);
 				break;
 			}
 		}
 	}
 
-	//// 버퍼 메모리 해제
-	//if (pBuffer)
-	//{
-	//	delete[] pBuffer;
-	//	pBuffer = NULL;
-	//}
+	// 버퍼 메모리 해제
+	if (pBuffer)
+	{
+		delete[] pBuffer;
+		pBuffer = NULL;
+	}
 
 }
 

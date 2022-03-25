@@ -52,6 +52,7 @@ public:
 
 	// 사용자ID 받기
 	void SetUserID(CString strUserID);
+	CString GetUserID();
 
 	// 데이터 받기
 	void ReceiveData();

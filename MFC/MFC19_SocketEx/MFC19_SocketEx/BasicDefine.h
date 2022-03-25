@@ -54,6 +54,8 @@ typedef struct _tagPACKET_REQ_TEXT{
 typedef struct _tagPACKET_RSP_TEXT{
 	PACKET_HEADER	stHeader;
 	int				iResultCode;
+	TCHAR			wszPacketText[64];
+	TCHAR			wszSendUserID[MAX_LENGTH_USERID];
 }PACKET_RSP_TEXT;
 
 

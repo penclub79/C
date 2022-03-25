@@ -255,8 +255,9 @@ void CMFC19_SocketExDlg::OnClickedButtonSend()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString strSend, strInsert;
+	CString strUserID = ((CMFC19_SocketExApp*)AfxGetApp())->GetUserID();
 	GetDlgItemText(IDC_EDIT_SEND, strSend);
-	strInsert.Format(_T("클라이언트[%s]:%s"), m_strMyIP, strSend);
+	strInsert.Format(_T("[%s]:%s"), strUserID, strSend);
 	((CMFC19_SocketExApp*)AfxGetApp())->SendReqMessagePacket(strSend);
 
 	int sel = m_listChat.InsertString(-1, strInsert);
@@ -265,19 +266,18 @@ void CMFC19_SocketExDlg::OnClickedButtonSend()
 }
 
 
-void CMFC19_SocketExDlg::ReceiveData(CString strReceive)
+void CMFC19_SocketExDlg::ReceiveMessage(CString strReceive, CString strOtherUserID)
 {
+	
 	CString strInsert;
-	strInsert.Format(_T("다른-클라이언트[%s]:%s"), m_strOtherIP, strReceive);
+	//CString test;
+	//test.Format(_T("%s"), strOtherUserID);
+	strInsert.Format(_T("다른-클라이언트[%s]:%s"), strOtherUserID, strReceive);
+	//m_listChat.InsertString(-1, strInsert);
 	int sel = m_listChat.InsertString(-1, strInsert);
 	m_listChat.SetCurSel(sel);
 }
 
-
-void CMFC19_SocketExDlg::Accept(CString strSock)
-{
-	m_strOtherIP = strSock;
-}
 
 
 void CMFC19_SocketExDlg::OnSize(UINT nType, int cx, int cy)
@@ -357,11 +357,10 @@ void CMFC19_SocketExDlg::ResizeControl(int cx, int cy)
 
 	// CLOSE BUTTON
 	pstrCtl = GetDlgItem(IDC_BUTTON_CLOSE);
-	pstrCtl->MoveWindow((cx / 2) - (150 / 2), (iMarginY + 39 + 10 + iHeight + iMarginY) + (iHeight + iMarginY) + (cy - (iMarginY + 39 + 10 + iHeight + 300)) + iMarginY + iHeight + iMarginY, 150, iHeight + 20, TRUE);
+	pstrCtl->MoveWindow((cx / 2) - (150 / 2), (iMarginY + 39 + 10 + iHeight + iMarginY) + (iHeight + iMarginY) + (cy - (iMarginY + 39 + 10 + iHeight + 300)) + iMarginY + iHeight + iMarginY, 150, iHeight, TRUE);
 
 	/* 위치 정보 적용(컨트롤) - END */
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 }
 
 
@@ -375,25 +374,38 @@ void CMFC19_SocketExDlg::SetConnectStatus(int iErrorCode)
 {
 	CString strMessage;
 
-	// 연결 성공
-	if (0 == iErrorCode)
+	switch (iErrorCode)
 	{
-		strMessage.Format(_T("연결 성공"));
-		AfxMessageBox(strMessage);
-		// DisConnect 활성화
-		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(TRUE);
-		// Send 활성화
-		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(TRUE);
-		// Connect 비활성화
-		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
-		// USER ID 비활성화
-		GetDlgItem(IDC_EDIT_USERID)->EnableWindow(FALSE);
+		// UserID 패킷 검증
+		case 0:
+		{
+			  strMessage.Format(_T("연결 성공"));
+			  AfxMessageBox(strMessage);
+			  // DisConnect 활성화
+			  GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(TRUE);
+			  // Send 활성화
+			  GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(TRUE);
+			  // Connect 비활성화
+			  GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
+			  // USER ID 비활성화
+			  GetDlgItem(IDC_EDIT_USERID)->EnableWindow(FALSE);
+			  break;
+		}
+		// Message 패킷 검증
+		case 10:
+		{
+			   break;
+		}
+
+		// Error 처리
+		default:
+		{
+			   strMessage.Format(_T("ErrorCode : %d\n 연결 실패"), iErrorCode);
+			   AfxMessageBox(strMessage);
+			   break;
+		}
 	}
-	else	// 실패
-	{
-		strMessage.Format(_T("ErrorCode : %d\n 연결 실패"), iErrorCode);
-		AfxMessageBox(strMessage);
-	}
+
 }
 
 // DISConnect
