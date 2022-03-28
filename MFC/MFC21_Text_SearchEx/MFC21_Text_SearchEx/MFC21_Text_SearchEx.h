@@ -11,6 +11,7 @@
 #include "resource.h"		// 주 기호입니다.
 
 
+
 // CMFC21_Text_SearchExApp:
 // 이 클래스의 구현에 대해서는 MFC21_Text_SearchEx.cpp을 참조하십시오.
 //
@@ -19,11 +20,14 @@ class CMFC21_Text_SearchExApp : public CWinApp
 {
 public:
 	CMFC21_Text_SearchExApp();
+	
 
 // 재정의입니다.
 public:
 	virtual BOOL InitInstance();
 
+
+	
 // 구현입니다.
 
 	DECLARE_MESSAGE_MAP()

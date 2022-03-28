@@ -3,6 +3,8 @@
 //
 
 #pragma once
+#include "afxcmn.h"
+#include "afxwin.h"
 
 
 // CMFC21_Text_SearchExDlg 대화 상자
@@ -22,6 +24,9 @@ public:
 // 구현입니다.
 protected:
 	HICON m_hIcon;
+	CEdit m_pFile;
+
+	
 
 	// 생성된 메시지 맵 함수
 	virtual BOOL OnInitDialog();
@@ -29,4 +34,8 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	char*	m_strBuffer;
+
+	afx_msg void OnClickedButtonImport();
 };
