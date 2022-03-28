@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8264DB53-E8F3-4100-B11C-3130F98D0DAD}</ProjectGuid>
-    <RootNamespace>MFC_SDI_Stack</RootNamespace>
+    <ProjectGuid>{277D626E-B3A4-495B-AB64-1D9696D01922}</ProjectGuid>
+    <RootNamespace>MFC21_Text_SearchEx</RootNamespace>
     <Keyword>MFCProj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -99,35 +99,30 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MFC_SDI_Stack.h" />
-    <ClInclude Include="MFC_SDI_StackDlg.h" />
+    <ClInclude Include="MFC21_Text_SearchEx.h" />
+    <ClInclude Include="MFC21_Text_SearchExDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MFC_SDI_Stack.cpp" />
-    <ClCompile Include="MFC_SDI_StackDlg.cpp" />
+    <ClCompile Include="MFC21_Text_SearchEx.cpp" />
+    <ClCompile Include="MFC21_Text_SearchExDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MFC_SDI_Stack.rc" />
+    <ResourceCompile Include="MFC21_Text_SearchEx.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\MFC_SDI_Stack.rc2" />
+    <None Include="res\MFC21_Text_SearchEx.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\MFC_SDI_Stack.ico" />
+    <Image Include="res\MFC21_Text_SearchEx.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties RESOURCE_FILE="MFC_SDI_Stack.rc" />
-    </VisualStudio>
-  </ProjectExtensions>
 </Project>

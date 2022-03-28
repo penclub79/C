@@ -18,10 +18,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MFC_SDI_Stack.h">
+    <ClInclude Include="MFC21_Text_SearchEx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="MFC_SDI_StackDlg.h">
+    <ClInclude Include="MFC21_Text_SearchExDlg.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
@@ -35,10 +35,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MFC_SDI_Stack.cpp">
+    <ClCompile Include="MFC21_Text_SearchEx.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="MFC_SDI_StackDlg.cpp">
+    <ClCompile Include="MFC21_Text_SearchExDlg.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -46,17 +46,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MFC_SDI_Stack.rc">
+    <ResourceCompile Include="MFC21_Text_SearchEx.rc">
       <Filter>리소스 파일</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\MFC_SDI_Stack.rc2">
+    <None Include="res\MFC21_Text_SearchEx.rc2">
       <Filter>리소스 파일</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\MFC_SDI_Stack.ico">
+    <Image Include="res\MFC21_Text_SearchEx.ico">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

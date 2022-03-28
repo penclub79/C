@@ -263,17 +263,6 @@ void CMFC20_Nvs1_ChattingExDlg::onClose(CAcceptSock* pAccept)
 	m_listChat.InsertString(-1, strDisplayUserID);
 }
 
-// 클라이언트로부터 메시지를 받았을 때
-//void CMFC20_Nvs1_ChattingExDlg::ReceiveMessage(CAcceptSock* pAccept, CString strReceive)
-//{
-//	CString strInsert;
-//	
-//	//strInsert.Format(_T("[%s]:%s"), strUserID, strReceive);
-//	//((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendDataAll(pAccept, strReceive);
-//	((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->ReceiveData(pAccept);
-//	int iMessageSel = m_listChat.InsertString(-1, strInsert);	
-//}
-
 // 연결된 클라이언트 IP받기
 void CMFC20_Nvs1_ChattingExDlg::Accept(CString strSock)
 {

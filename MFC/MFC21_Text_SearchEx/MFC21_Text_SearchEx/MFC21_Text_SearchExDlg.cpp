@@ -1,10 +1,10 @@
 
-// MFC_SDI_StackDlg.cpp : 구현 파일
+// MFC21_Text_SearchExDlg.cpp : 구현 파일
 //
 
 #include "stdafx.h"
-#include "MFC_SDI_Stack.h"
-#include "MFC_SDI_StackDlg.h"
+#include "MFC21_Text_SearchEx.h"
+#include "MFC21_Text_SearchExDlg.h"
 #include "afxdialogex.h"
 
 #ifdef _DEBUG
@@ -43,31 +43,31 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CMFC_SDI_StackDlg 대화 상자
+// CMFC21_Text_SearchExDlg 대화 상자
 
 
 
-CMFC_SDI_StackDlg::CMFC_SDI_StackDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CMFC_SDI_StackDlg::IDD, pParent)
+CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CMFC21_Text_SearchExDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
-void CMFC_SDI_StackDlg::DoDataExchange(CDataExchange* pDX)
+void CMFC21_Text_SearchExDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CMFC_SDI_StackDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CMFC21_Text_SearchExDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 END_MESSAGE_MAP()
 
 
-// CMFC_SDI_StackDlg 메시지 처리기
+// CMFC21_Text_SearchExDlg 메시지 처리기
 
-BOOL CMFC_SDI_StackDlg::OnInitDialog()
+BOOL CMFC21_Text_SearchExDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
@@ -101,7 +101,7 @@ BOOL CMFC_SDI_StackDlg::OnInitDialog()
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
-void CMFC_SDI_StackDlg::OnSysCommand(UINT nID, LPARAM lParam)
+void CMFC21_Text_SearchExDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
@@ -118,7 +118,7 @@ void CMFC_SDI_StackDlg::OnSysCommand(UINT nID, LPARAM lParam)
 //  아래 코드가 필요합니다.  문서/뷰 모델을 사용하는 MFC 응용 프로그램의 경우에는
 //  프레임워크에서 이 작업을 자동으로 수행합니다.
 
-void CMFC_SDI_StackDlg::OnPaint()
+void CMFC21_Text_SearchExDlg::OnPaint()
 {
 	if (IsIconic())
 	{
@@ -145,7 +145,7 @@ void CMFC_SDI_StackDlg::OnPaint()
 
 // 사용자가 최소화된 창을 끄는 동안에 커서가 표시되도록 시스템에서
 //  이 함수를 호출합니다.
-HCURSOR CMFC_SDI_StackDlg::OnQueryDragIcon()
+HCURSOR CMFC21_Text_SearchExDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }

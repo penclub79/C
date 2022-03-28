@@ -1,19 +1,19 @@
 
-// MFC_SDI_StackDlg.h : 헤더 파일
+// MFC21_Text_SearchExDlg.h : 헤더 파일
 //
 
 #pragma once
 
 
-// CMFC_SDI_StackDlg 대화 상자
-class CMFC_SDI_StackDlg : public CDialogEx
+// CMFC21_Text_SearchExDlg 대화 상자
+class CMFC21_Text_SearchExDlg : public CDialogEx
 {
 // 생성입니다.
 public:
-	CMFC_SDI_StackDlg(CWnd* pParent = NULL);	// 표준 생성자입니다.
+	CMFC21_Text_SearchExDlg(CWnd* pParent = NULL);	// 표준 생성자입니다.
 
 // 대화 상자 데이터입니다.
-	enum { IDD = IDD_MFC_SDI_STACK_DIALOG };
+	enum { IDD = IDD_MFC21_TEXT_SEARCHEX_DIALOG };
 
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.

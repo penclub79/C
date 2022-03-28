@@ -1,26 +1,26 @@
 
-// MFC_SDI_Stack.cpp : 응용 프로그램에 대한 클래스 동작을 정의합니다.
+// MFC21_Text_SearchEx.cpp : 응용 프로그램에 대한 클래스 동작을 정의합니다.
 //
 
 #include "stdafx.h"
-#include "MFC_SDI_Stack.h"
-#include "MFC_SDI_StackDlg.h"
+#include "MFC21_Text_SearchEx.h"
+#include "MFC21_Text_SearchExDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CMFC_SDI_StackApp
+// CMFC21_Text_SearchExApp
 
-BEGIN_MESSAGE_MAP(CMFC_SDI_StackApp, CWinApp)
+BEGIN_MESSAGE_MAP(CMFC21_Text_SearchExApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
-// CMFC_SDI_StackApp 생성
+// CMFC21_Text_SearchExApp 생성
 
-CMFC_SDI_StackApp::CMFC_SDI_StackApp()
+CMFC21_Text_SearchExApp::CMFC21_Text_SearchExApp()
 {
 	// 다시 시작 관리자 지원
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -30,14 +30,14 @@ CMFC_SDI_StackApp::CMFC_SDI_StackApp()
 }
 
 
-// 유일한 CMFC_SDI_StackApp 개체입니다.
+// 유일한 CMFC21_Text_SearchExApp 개체입니다.
 
-CMFC_SDI_StackApp theApp;
+CMFC21_Text_SearchExApp theApp;
 
 
-// CMFC_SDI_StackApp 초기화
+// CMFC21_Text_SearchExApp 초기화
 
-BOOL CMFC_SDI_StackApp::InitInstance()
+BOOL CMFC21_Text_SearchExApp::InitInstance()
 {
 	// 응용 프로그램 매니페스트가 ComCtl32.dll 버전 6 이상을 사용하여 비주얼 스타일을
 	// 사용하도록 지정하는 경우, Windows XP 상에서 반드시 InitCommonControlsEx()가 필요합니다.
@@ -70,7 +70,7 @@ BOOL CMFC_SDI_StackApp::InitInstance()
 	// 적절한 내용으로 수정해야 합니다.
 	SetRegistryKey(_T("로컬 응용 프로그램 마법사에서 생성된 응용 프로그램"));
 
-	CMFC_SDI_StackDlg dlg;
+	CMFC21_Text_SearchExDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)

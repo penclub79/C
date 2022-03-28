@@ -142,7 +142,6 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	// 다이얼로그 내에 상대적 좌표로 변환
 	ScreenToClient(&m_strInitLoc);
 
-
 	/* 클라이언트 구조체 초기화 */
 	/*struct Client stClient;
 	stClient.iPort = 7777;
@@ -160,10 +159,11 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	/*다이얼로그 사이즈 초기화*/
 	RECT stDlgLoc = { 0 };
 	GetClientRect(&stDlgLoc);
-
 	/*RECT stIpAdrEditLoc = { 0 };
 	GetDlgItem(IDC_IPADDRESS_SERVER)->GetWindowRect(&stIpAdrEditLoc)*/
-	ResizeControl(stDlgLoc.right - stDlgLoc.left, stDlgLoc.bottom - stDlgLoc.top);
+	//MoveWindow(stDlgLoc.left, stDlgLoc.right, (stDlgLoc.right - stDlgLoc.left) + 20, (stDlgLoc.bottom - stDlgLoc.top) - 50);
+
+	ResizeControl((stDlgLoc.right - stDlgLoc.left) - 2, (stDlgLoc.bottom - stDlgLoc.top) + 50);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -270,10 +270,9 @@ void CMFC19_SocketExDlg::ReceiveMessage(CString strReceive, CString strOtherUser
 {
 	
 	CString strInsert;
-	//CString test;
-	//test.Format(_T("%s"), strOtherUserID);
+	
 	strInsert.Format(_T("다른-클라이언트[%s]:%s"), strOtherUserID, strReceive);
-	//m_listChat.InsertString(-1, strInsert);
+
 	int sel = m_listChat.InsertString(-1, strInsert);
 	m_listChat.SetCurSel(sel);
 }
@@ -294,6 +293,7 @@ void CMFC19_SocketExDlg::OnSizing(UINT fwSide, LPRECT pRect)
 	CDialogEx::OnSizing(fwSide, pRect);
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	
 }
 
 void CMFC19_SocketExDlg::ResizeControl(int cx, int cy)
