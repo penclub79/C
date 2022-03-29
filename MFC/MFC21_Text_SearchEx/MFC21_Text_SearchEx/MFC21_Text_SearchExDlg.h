@@ -35,7 +35,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	char*	m_strBuffer;
+	char*	m_pszBuffer;
 
 	afx_msg void OnClickedButtonImport();
 };

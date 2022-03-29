@@ -56,7 +56,7 @@ END_MESSAGE_MAP()
 
 CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 : CDialogEx(CMFC21_Text_SearchExDlg::IDD, pParent)
-, m_strBuffer(NULL)
+, m_pszBuffer(NULL)
 
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -182,78 +182,50 @@ HCURSOR CMFC21_Text_SearchExDlg::OnQueryDragIcon()
 void CMFC21_Text_SearchExDlg::OnClickedButtonImport()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	static TCHAR BASED_CODE szFilter[] = _T("텍스트 파일(*.txt) | *.txt;|모든파일(*.*)|*.*||");
+	char* szBuffer = NULL;
+	/*CString strPathName = _T("");
+	static TCHAR BASED_CODE szFilter[] = _T("|모든파일(*.*)|*.*||");
+	CFileDialog dlg(TRUE, _T("*.txt"), _T("image"), OFN_HIDEREADONLY, szFilter);*/
+
+	/*
 	
-	/* 
-	CFileDialog 000 (
-	1 param : TRUE -> 열기용 , FALSE -> 저장용
-	2 param : NULL -> 기본 확장자
-	3 param : NULL -> 기본 파일명
-	4 param : 플래그
-	5 param : 필터링 확장자
-	)
-	*/
-	CFileDialog dlg(TRUE, _T("*.txt"), _T(""), OFN_HIDEREADONLY, szFilter);
-	CString strTmp;
 	if (IDOK == dlg.DoModal())
 	{
-		CString strPathName = dlg.GetPathName();
-		///////////////////////////////////////////////////////////////////
-		char Tv_StrTest[1000];
-
-		memset(Tv_StrTest, 0, 1000);
-
-		char* str = Tv_StrTest;
-		int temp = 0;
-
-		for (int i = 0; i < 100; i++)
-		{
-			*str = 100 - i;
-			str++;
-		}
-		////////////////////////////////////////////////////////////////////
-		// 파일 내용 읽어오기
-		CString strFileName = dlg.GetFileName();	// 파일명
-		char* stText = LPSTR(LPCTSTR(strPathName));	// 형변환 CString -> char
-		int fileLoc = 0;
-		FILE* p_File = fopen("D:\\C\\MFC\\MFC21_Text_SearchEx\\MFC21_Text_SearchEx\\upload\\test.txt", "r");	// 파일 내용열기
-		//m_strBuffer = fgets(m_strBuffer, 1000, p_File);
-		//char *test;
-
-		CSearch strSearch;
-		char stFindtext[] = { "ls" };
-		
-		//BOOL CSearch::IsStrFindGet(char* A_PtrFindStr, int A_FindStrSize, char* A_PtrTextStr, int A_TextSize)
-		
-		//fseek(p_File, 0, SEEK_END);  // 파일 포인터를 파일의 끝으로 이동
-		//fileLoc = ftell(p_File);	// 파일 포인터의 현재 위치
-		//m_strBuffer = (char*)malloc(fileLoc + 1);		// 파일 크기 + 1바이트(문자열 마지막)만큼 동적 메모리 할당
-		//memset(m_strBuffer, 0, fileLoc + 1);			// 파일 크기 + 1바이트만큼 메모리를 0으로 초기화
-
-		//strSearch.IsStrFindGet(stFindtext, sizeof(stFindtext), m_strBuffer, fileLoc);
-		//fseek(p_File, 0, SEEK_SET);			// 파일 포인터를 파일의 처음으로 이동
-		//
-		////m_str = malloc(size);
-
-		////m_obj1 = newn fld; 클래스 사용
-		//
-		////fread(m_strBuffer, 1, fileLoc, p_File); // 메모리 동적할당 후 사용할 함수
-		//
-		//CString test;
-		//test = (LPSTR)(LPCSTR)m_strBuffer;
-		
-		SetDlgItemText(IDC_EDIT_IMPORT, strPathName);
-		//strFile.Open(_T("test.txt"), CFile::Read);
-		//SetDlgItemText(IDC_STATIC_TEXT, test);
-
-
-		
-	}
-
-	if (m_strBuffer)
-	{
-		free(m_strBuffer);
-		m_strBuffer = NULL;
+		strPathName = dlg.GetPathName();
 	}
 	
+	
+	
+	*/
+
+	
+	//ConvertUnicodeToMultybyte(strPathName);
+	
+
+	// 파일 오픈 - 메모리 할당
+	//FILE* pFile = fopen(strPathName, "r");
+
+	// 파일 오픈 - 메모리 해제
+
+	// 파일 사이즈 구하기
+
+	// 텍스트를 읽어올 버퍼 동적 할당
+
+	// 버퍼 - 메모리 해제
+	
+	// 파일 읽기
+
+}
+
+
+char* CMFC21_Text_SearchExDlg::ConvertUnicodeToMultybyte(CString strUnicode)
+{
+	// 유니코드 -> 멀티바이트
+	int nLen = WideCharToMultiByte(CP_ACP, 0, strUnicode, -1, NULL, 0, NULL, NULL);
+	char* pMultibyte = new char[nLen];
+	memset(pMultibyte, 0x00, (nLen)*sizeof(char));
+
+	WideCharToMultiByte(CP_ACP, 0, strUnicode, -1, pMultibyte, nLen, NULL, NULL);
+
+	return pMultibyte;
 }

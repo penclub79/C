@@ -12,7 +12,7 @@ CSearch::~CSearch()
 {
 }
 
-BOOL CSearch::IsStrFindGet(char* A_PtrFindStr, int A_FindStrSize, char* A_PtrTextStr, int A_TextSize)
+BOOL CSearch::IsStrFind(char* A_PtrFindStr, int A_FindStrSize, char* A_PtrTextStr, int A_TextSize)
 {
 #if 0
 	char* Tv_PtrTxt;
