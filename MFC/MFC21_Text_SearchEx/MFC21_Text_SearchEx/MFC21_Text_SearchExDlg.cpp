@@ -15,6 +15,13 @@
 #define new DEBUG_NEW
 #endif
 
+typedef struct St_Test
+{
+	int test0;
+	int test100;
+	int test200;
+	int test300;
+};
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
@@ -56,10 +63,45 @@ END_MESSAGE_MAP()
 
 CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 : CDialogEx(CMFC21_Text_SearchExDlg::IDD, pParent)
-, m_pszBuffer(NULL)
+//, m_pszBuffer(NULL)
 
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	CSearch* pSearch = new CSearch;
+	St_Test* pstrST = new St_Test;
+
+	int* piBuffer = NULL;				// 메모리주소 변수
+	int iSum = 0;
+	
+
+	// 동적 메모리 할당
+	//pszBuffer = (char*)malloc((sizeof(char))* (sizeof(iArr) / sizeof(int)));
+	piBuffer = (int*)malloc(1000 * sizeof(int));
+	
+	// memset
+	pSearch->InputValue(piBuffer, 1000, 0);
+
+	// 오름차순 정렬
+	pSearch->ValueAsc(piBuffer, 1000);
+
+	// 3의 배수 합 구하기
+	iSum = pSearch->SumResult(piBuffer, 1000);
+
+	// 버퍼 몇번째의 Value가져오기
+	//pSearch->GetValue(piBuffer, pstrST);
+
+	// 메모리 해제
+	if (NULL != piBuffer)
+	{
+		free(piBuffer);
+		piBuffer = NULL;
+	}
+	if (NULL != pSearch)
+	{
+		delete pSearch;
+		pSearch = NULL;
+	}
 
 
 	/////////////////////////////////////////////////////////////////////
@@ -182,7 +224,9 @@ HCURSOR CMFC21_Text_SearchExDlg::OnQueryDragIcon()
 void CMFC21_Text_SearchExDlg::OnClickedButtonImport()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	char* szBuffer = NULL;
+
+
+
 	/*CString strPathName = _T("");
 	static TCHAR BASED_CODE szFilter[] = _T("|모든파일(*.*)|*.*||");
 	CFileDialog dlg(TRUE, _T("*.txt"), _T("image"), OFN_HIDEREADONLY, szFilter);*/
@@ -217,15 +261,15 @@ void CMFC21_Text_SearchExDlg::OnClickedButtonImport()
 
 }
 
-
-char* CMFC21_Text_SearchExDlg::ConvertUnicodeToMultybyte(CString strUnicode)
-{
-	// 유니코드 -> 멀티바이트
-	int nLen = WideCharToMultiByte(CP_ACP, 0, strUnicode, -1, NULL, 0, NULL, NULL);
-	char* pMultibyte = new char[nLen];
-	memset(pMultibyte, 0x00, (nLen)*sizeof(char));
-
-	WideCharToMultiByte(CP_ACP, 0, strUnicode, -1, pMultibyte, nLen, NULL, NULL);
-
-	return pMultibyte;
-}
+//
+//char* CMFC21_Text_SearchExDlg::ConvertUnicodeToMultybyte(CString strUnicode)
+//{
+//	// 유니코드 -> 멀티바이트
+//	int nLen = WideCharToMultiByte(CP_ACP, 0, strUnicode, -1, NULL, 0, NULL, NULL);
+//	char* pMultibyte = new char[nLen];
+//	memset(pMultibyte, 0x00, (nLen)*sizeof(char));
+//
+//	WideCharToMultiByte(CP_ACP, 0, strUnicode, -1, pMultibyte, nLen, NULL, NULL);
+//
+//	return pMultibyte;
+//}

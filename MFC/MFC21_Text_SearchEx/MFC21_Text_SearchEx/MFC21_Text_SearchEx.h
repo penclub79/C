@@ -26,9 +26,12 @@ public:
 public:
 	virtual BOOL InitInstance();
 
-
-	
 // 구현입니다.
+	
+
+
+
+
 
 	DECLARE_MESSAGE_MAP()
 };

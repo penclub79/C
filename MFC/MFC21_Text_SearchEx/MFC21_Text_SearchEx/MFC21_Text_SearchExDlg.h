@@ -35,7 +35,9 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	char*	m_pszBuffer;
+	//char*	m_pszBuffer;
+	//char*	ConvertUnicodeToMultybyte(CString strUnicode);
+
 
 	afx_msg void OnClickedButtonImport();
 };
