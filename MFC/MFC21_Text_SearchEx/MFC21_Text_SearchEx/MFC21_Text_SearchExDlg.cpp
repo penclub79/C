@@ -1,7 +1,7 @@
 
 // MFC21_Text_SearchExDlg.cpp : 구현 파일
 //
-#define _CRT_SECURE_NO_WARNINGS
+//#define _CRT_SECURE_NO_WARNINGS
 //#define MAX 1000
 
 
@@ -15,13 +15,6 @@
 #define new DEBUG_NEW
 #endif
 
-typedef struct St_Test
-{
-	int test0;
-	int test100;
-	int test200;
-	int test300;
-};
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
@@ -69,7 +62,7 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
 	CSearch* pSearch = new CSearch;
-	St_Test* pstrST = new St_Test;
+	St_Test stResult = { 0 };
 
 	int* piBuffer = NULL;				// 메모리주소 변수
 	int iSum = 0;
@@ -89,7 +82,7 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 	iSum = pSearch->SumResult(piBuffer, 1000);
 
 	// 버퍼 몇번째의 Value가져오기
-	//pSearch->GetValue(piBuffer, pstrST);
+	pSearch->GetValue(piBuffer, 1000, &stResult);// &랑 * 헤깔리면 안된다.
 
 	// 메모리 해제
 	if (NULL != piBuffer)
@@ -102,7 +95,6 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 		delete pSearch;
 		pSearch = NULL;
 	}
-
 
 	/////////////////////////////////////////////////////////////////////
 	//char Tv_StrTest[1000];

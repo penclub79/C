@@ -5,7 +5,7 @@
 #pragma once
 #include "afxcmn.h"
 #include "afxwin.h"
-
+#include "resource.h"
 
 // CMFC21_Text_SearchExDlg 대화 상자
 class CMFC21_Text_SearchExDlg : public CDialogEx

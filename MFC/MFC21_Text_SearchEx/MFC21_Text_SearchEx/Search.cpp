@@ -56,14 +56,38 @@ int CSearch::SumResult(int* _piBuffer, int _iCount)
 	return sum;
 }
 
-//void CSearch::GetValue(int* _piBuffer, struct St_Test st)
-//{
-//	int* piNum = NULL;
-//
-//	iTempBuffer = _piBuffer;
-//	iTempSt = (int*)&st;
-//
-//}
+void CSearch::GetValue(int* _piBuffer, int _iCount, St_Test* _pstResult)
+{
+	int* piNum = NULL;
+	piNum = _piBuffer;
+	
+	for (int i = 0; i < _iCount; i++)
+	{
+		switch (i)
+		{
+		case 0:
+			_pstResult->test0 = *piNum;
+			break;
+
+		case 100:
+			_pstResult->test100 = *piNum;
+			break;
+
+		case 200:
+			_pstResult->test200 = *piNum;
+			break;
+
+		case 300:
+			_pstResult->test300 = *piNum;
+			break;
+
+		default:
+			break;
+		}
+		piNum++;
+	}
+
+}
 
 //BOOL CSearch::IsStrFind(char* A_PtrFindStr, int A_FindStrSize, char* A_PtrTextStr, int A_TextSize)
 //{
