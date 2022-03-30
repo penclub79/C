@@ -61,40 +61,109 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	CSearch* pSearch = new CSearch;
-	St_Test stResult = { 0 };
+	////////////////////////////////////////////////////////////////
+	////변수 선언 - Start
+	CSearch* pstrSearch = new CSearch;
 
-	int* piBuffer = NULL;				// 메모리주소 변수
-	int iSum = 0;
+	char* pszBuffer = NULL;
+	int iBufferSize = 0;
+	FILE* pstrFile;
+	int iFileSize = 0;
 	
+	
+	/*char pszSearchWord = NULL;
+	pszSearchWord = "hhhh";*/
+	bool bResult = FALSE;
+	////변수 선언 - End
+	////////////////////////////////////////////////////////////////
+
+
+	////////////////////////////////////////////////////////////////
+	// 파일 열기
+		pstrFile = fopen("D:\\C\\MFC\\MFC21_Text_SearchEx\\MFC21_Text_SearchEx\\upload\\test.txt", "r");
+
+		if (NULL != pstrFile)
+		{
+			// 파일 사이즈 GET
+			fseek(pstrFile, 0, SEEK_END);
+			iFileSize = ftell(pstrFile);
+			iBufferSize = (sizeof(char)* iFileSize);
+
+			fseek(pstrFile, 0, SEEK_SET);
+			// 파일 사이즈 만큼 동적 할당
+			pszBuffer = (char*)malloc(iBufferSize + 1);
+			// 메모리 초기화
+			memset(pszBuffer, 0, iBufferSize + 1);
+
+			
+			// 버퍼에 텍스트 내용 담기
+			fread(pszBuffer, 1, iBufferSize, pstrFile); 
+			
+			char szarrSearchWord[] = "OIQGQaa";
+			// 단어 검색
+			bResult = pstrSearch->TextFind(pszBuffer, iBufferSize, szarrSearchWord, strlen(szarrSearchWord));
+			if (TRUE == bResult)
+				AfxMessageBox(_T("TRUE"));
+			else
+				AfxMessageBox(_T("FALSE"));
+				
+		}
+
+	////////////////////////////////////////////////////////////////
+	//// 메모리 해제
+	if (NULL != pstrSearch)
+	{
+		delete pstrSearch;
+		pstrSearch = NULL;
+	}
+
+	if (NULL != pstrFile)
+	{
+		fclose(pstrFile);
+		pstrFile = NULL;
+	}
+
+	if (NULL != pszBuffer)
+	{
+		free(pszBuffer);
+		pszBuffer = NULL;
+	}
+	////////////////////////////////////////////////////////////////
+
+	//CSearch* pSearch = new CSearch;
+	//St_Test stResult = { 0 };
+
+	//int* piBuffer = NULL;				// 메모리주소 변수
+	//int iSum = 0;
+	//
 
 	// 동적 메모리 할당
 	//pszBuffer = (char*)malloc((sizeof(char))* (sizeof(iArr) / sizeof(int)));
-	piBuffer = (int*)malloc(1000 * sizeof(int));
-	
+	//piBuffer = (int*)malloc(1000 * sizeof(int));
+	//
 	// memset
-	pSearch->InputValue(piBuffer, 1000, 0);
+	//pSearch->InputValue(piBuffer, 1000, 0);
 
 	// 오름차순 정렬
-	pSearch->ValueAsc(piBuffer, 1000);
+	//pSearch->ValueAsc(piBuffer, 1000);
 
 	// 3의 배수 합 구하기
-	iSum = pSearch->SumResult(piBuffer, 1000);
+	//iSum = pSearch->SumResult(piBuffer, 1000);
 
 	// 버퍼 몇번째의 Value가져오기
-	pSearch->GetValue(piBuffer, 1000, &stResult);// &랑 * 헤깔리면 안된다.
+	//pSearch->GetValue(piBuffer, 1000, &stResult);// &랑 * 헤깔리면 안된다.
 
 	// 메모리 해제
-	if (NULL != piBuffer)
-	{
-		free(piBuffer);
-		piBuffer = NULL;
-	}
-	if (NULL != pSearch)
-	{
-		delete pSearch;
-		pSearch = NULL;
-	}
+	//if (NULL != piBuffer)
+	//{
+	//	free(piBuffer);
+	//	piBuffer = NULL;
+	//}
+	//if (NULL != pSearch)
+	//{
+	//	delete pSearch;
+	//	pSearch = NULL;
+	//}
 
 	/////////////////////////////////////////////////////////////////////
 	//char Tv_StrTest[1000];
@@ -218,7 +287,6 @@ void CMFC21_Text_SearchExDlg::OnClickedButtonImport()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 
 
-
 	/*CString strPathName = _T("");
 	static TCHAR BASED_CODE szFilter[] = _T("|모든파일(*.*)|*.*||");
 	CFileDialog dlg(TRUE, _T("*.txt"), _T("image"), OFN_HIDEREADONLY, szFilter);*/
@@ -252,16 +320,3 @@ void CMFC21_Text_SearchExDlg::OnClickedButtonImport()
 	// 파일 읽기
 
 }
-
-//
-//char* CMFC21_Text_SearchExDlg::ConvertUnicodeToMultybyte(CString strUnicode)
-//{
-//	// 유니코드 -> 멀티바이트
-//	int nLen = WideCharToMultiByte(CP_ACP, 0, strUnicode, -1, NULL, 0, NULL, NULL);
-//	char* pMultibyte = new char[nLen];
-//	memset(pMultibyte, 0x00, (nLen)*sizeof(char));
-//
-//	WideCharToMultiByte(CP_ACP, 0, strUnicode, -1, pMultibyte, nLen, NULL, NULL);
-//
-//	return pMultibyte;
-//}
