@@ -5,6 +5,7 @@
 
 // 생성자
 CSearch::CSearch()
+: m_iWordSize(0)
 {
 }
 
@@ -13,70 +14,53 @@ CSearch::~CSearch()
 {
 }
 
-bool CSearch::TextFind(char* _pszBuffer, int _iBufferSize, char* _pszText, int _iTextSize)
+char* CSearch::TextFind(char* _pszBuffer, int _iBufferSize, char* _pszText, int _iTextSize)
 {
+	m_iWordSize = _iTextSize;
+
 	// 동적 할당한 메모리 주소
 	char* pszFirstBufferAddress = NULL;
 	pszFirstBufferAddress = _pszBuffer;
 
-	// 단어의 첫번째 주소
-	/*char* pszFirstTextAddress = NULL;
-	pszFirstTextAddress = _pszText;*/
+	char* pszWordAddress = NULL;
+	pszWordAddress = _pszText;
 
 	// 단어 체크
 	bool bCheckWord = FALSE;
-	//char t = '\0';
 
 	// 비교
 	// 텍스트 단어
 	for (int i = 0; i < (_iBufferSize - _iTextSize); i++)
 	{
-		bCheckWord = WordCompare(pszFirstBufferAddress, _pszText, _iTextSize);
-		
-		if (TRUE == bCheckWord)
-			return TRUE;
+		bCheckWord = WordCompare(*pszFirstBufferAddress, _pszText, _iTextSize);	
+		if (0 != m_iWordSize)
+		{
+			if (TRUE == bCheckWord)
+			{
+				_pszText++;
+			}	
+		}
 		else 
-			return FALSE;
-		//for (int j = 0; i < (_iBufferSize - _iTextSize); i++)
-		//{
-			// 다음 인덱스의 검색 단어가 있는지 체크
-			//if (*_pszText != t)
-			//{
-			//	if (*pszFirstBufferAddress == *_pszText)
-			//	{
-			//		// 검색 단어의 다음 인덱스
-			//		_pszText++;
-			//		break;
-			//	}
-			//	// 검색 단어랑 일치하지 않으면 다시 처음부터
-			//	else
-			//	{
-			//		_pszText = pszFirstTextAddress;
-			//		break;
-			//	}
-			//}
-			//// 다음 검색단어 인덱스에 단어가 없으면 TRUE
-			//else
-			//{
-			//	return TRUE;
-			//}
-		//}
+		{
+			return pszWordAddress;
+		}
 		pszFirstBufferAddress++;
 	}
 	return FALSE;
 }
 
-bool CSearch::WordCompare(char* _pszText, char* _pszWord, int _iCount)
-{
-
+bool CSearch::WordCompare(char _pszText, char* _pszWord, int _iCount)
+{	
+	for (int i = 0; i < _iCount; i++)
+	{
+		if (_pszText == *_pszWord)
+		{
+			m_iWordSize--;
+			return TRUE;
+		}
+		else return FALSE;
+	}
 }
-
-//void CSearch::InputText(char* _pszBuffer, int _iCount)
-//{
-//	char* iBufferFirstAddress = NULL;
-//	iBufferFirstAddress = _pszBuffer;
-//
-//}
 
 
 

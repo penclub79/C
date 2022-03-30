@@ -27,7 +27,7 @@ public:
 	virtual BOOL InitInstance();
 
 // 구현입니다.
-	
+	int m_iCount;
 
 
 
