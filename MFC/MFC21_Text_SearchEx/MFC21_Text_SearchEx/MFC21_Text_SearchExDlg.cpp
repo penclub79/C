@@ -99,7 +99,7 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 			// 버퍼에 텍스트 내용 담기
 			fread(pszBuffer, 1, iBufferSize, pstrFile); 
 			
-			char szarrSearchWord[] = "shl";
+			char szarrSearchWord[] = "kenk";
 			// 단어 검색
 			bResult = pstrSearch->TextFind(pszBuffer, iBufferSize, szarrSearchWord, strlen(szarrSearchWord));
 			/*if (TRUE == bResult)
@@ -107,8 +107,8 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 			else
 				AfxMessageBox(_T("FALSE"));*/
 			
-			pszBuffer = bResult + strlen(szarrSearchWord);
-
+			pszBuffer = bResult;
+			TRACE("%s", pszBuffer);
 			//ptzbu + 5
 		}
 

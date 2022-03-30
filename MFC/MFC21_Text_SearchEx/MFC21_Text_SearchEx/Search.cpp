@@ -39,6 +39,10 @@ char* CSearch::TextFind(char* _pszBuffer, int _iBufferSize, char* _pszText, int 
 			{
 				_pszText++;
 			}	
+			else
+			{
+				m_iWordSize = _iTextSize;
+			}
 		}
 		else 
 		{
@@ -46,7 +50,7 @@ char* CSearch::TextFind(char* _pszBuffer, int _iBufferSize, char* _pszText, int 
 		}
 		pszFirstBufferAddress++;
 	}
-	return FALSE;
+	return NULL;
 }
 
 bool CSearch::WordCompare(char _pszText, char* _pszWord, int _iCount)
@@ -58,7 +62,10 @@ bool CSearch::WordCompare(char _pszText, char* _pszWord, int _iCount)
 			m_iWordSize--;
 			return TRUE;
 		}
-		else return FALSE;
+		else
+		{	
+			return FALSE;
+		}
 	}
 }
 
