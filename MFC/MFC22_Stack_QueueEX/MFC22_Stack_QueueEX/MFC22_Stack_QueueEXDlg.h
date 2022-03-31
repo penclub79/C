@@ -29,4 +29,9 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+
+public:
+	CButton* m_pstrCheckRadio;  // 라디오 버튼 체크
+
+
 };

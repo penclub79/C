@@ -49,8 +49,35 @@ END_MESSAGE_MAP()
 
 CMFC22_Stack_QueueEXDlg::CMFC22_Stack_QueueEXDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC22_Stack_QueueEXDlg::IDD, pParent)
+	, m_pstrCheckRadio(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	class Stack
+	{
+		int* piBuf = NULL;
+		int iIdx = 0;
+
+	public:
+		Stack(int size = 10)
+		{
+			piBuf = new int[size];
+			iIdx = 0;
+		}
+
+		// 소멸자 : 클래스 이름앞에 ~ 가 붙는 함수
+		~Stack() { delete[] piBuf; }
+
+		void push(int a) { piBuf[iIdx++] = a; }
+		int pop() { return piBuf[iIdx--]; }
+	};
+
+	Stack s1(100);
+	s1.push(10);
+	s1.push(20);
+
+	s1.pop();
+
 }
 
 void CMFC22_Stack_QueueEXDlg::DoDataExchange(CDataExchange* pDX)
@@ -97,6 +124,8 @@ BOOL CMFC22_Stack_QueueEXDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	m_pstrCheckRadio = (CButton*)GetDlgItem(IDC_RADIO_STACK);
+	m_pstrCheckRadio->SetCheck(TRUE);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
