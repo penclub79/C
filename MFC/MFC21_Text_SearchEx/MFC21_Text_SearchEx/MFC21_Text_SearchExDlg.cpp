@@ -70,38 +70,32 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 	FILE* pstrFile = 0;
 	int iFileSize = 0;
 	
-	
-	/*char pszSearchWord = NULL;
-	pszSearchWord = "hhhh";*/
 	char* bResult = 0;
 	////변수 선언 - End
 	////////////////////////////////////////////////////////////////
 
 
 	////////////////////////////////////////////////////////////////
-	// 파일 열기
+	// 파일 열기, 버퍼에 내용 담기 구현 - Start
 		pstrFile = fopen("D:\\C\\MFC\\MFC21_Text_SearchEx\\MFC21_Text_SearchEx\\upload\\test.txt", "r");
 
 		if (NULL != pstrFile)
 		{
-			// 파일 사이즈 GET
-			fseek(pstrFile, 0, SEEK_END);
-			iFileSize = ftell(pstrFile);
-			iBufferSize = (sizeof(char)* iFileSize);
+			// 파일 사이즈 얻어오기
+			fseek(pstrFile, 0, SEEK_END); // 파일의 시작에서 끝 위치로 이동
+			iFileSize = ftell(pstrFile);  // 이동한만큼의 사이즈 얻기
+			iBufferSize = (sizeof(char)* iFileSize);  // 해당 사이즈를 버퍼 사이즈로 담기
 
-			fseek(pstrFile, 0, SEEK_SET);
-			// 파일 사이즈 만큼 동적 할당
-			pszBuffer = (char*)malloc(iBufferSize + 1);
-			// 메모리 초기화
-			memset(pszBuffer, 0, iBufferSize + 1);
-
+			fseek(pstrFile, 0, SEEK_SET);  // 현재 위치 얻어오기
+			pszBuffer = (char*)malloc(iBufferSize + 1);  // 파일 사이즈 만큼 메모리 동적 할당
+			memset(pszBuffer, 0, iBufferSize + 1);  // 메모리 초기화
 			
-			// 버퍼에 텍스트 내용 담기
-			fread(pszBuffer, 1, iBufferSize, pstrFile); 
 			
-			char szarrSearchWord[] = "kenk";
+			fread(pszBuffer, 1, iBufferSize, pstrFile); // 버퍼에 텍스트 내용 담기
+			
+			char szaSearchWord[] = "kenk";  // 검색할 단어
 			// 단어 검색
-			bResult = pstrSearch->TextFind(pszBuffer, iBufferSize, szarrSearchWord, strlen(szarrSearchWord));
+			bResult = pstrSearch->TextFind(pszBuffer, iBufferSize, szaSearchWord, strlen(szaSearchWord));
 			/*if (TRUE == bResult)
 				AfxMessageBox(_T("TRUE"));
 			else
@@ -109,8 +103,9 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 			
 			pszBuffer = bResult;
 			TRACE("%s", pszBuffer);
-			//ptzbu + 5
 		}
+	// 파일 열기, 버퍼에 내용 담기 구현 - End
+	////////////////////////////////////////////////////////////////
 
 	////////////////////////////////////////////////////////////////
 	//// 메모리 해제
@@ -132,6 +127,29 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 		pszBuffer = NULL;
 	}
 	////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	//CSearch* pSearch = new CSearch;
 	//St_Test stResult = { 0 };
