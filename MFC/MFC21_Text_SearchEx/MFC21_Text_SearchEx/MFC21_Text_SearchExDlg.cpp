@@ -99,11 +99,8 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 			char szaSearchWord[] = "kenkk";  // 검색할 단어
 			
 			bResult = pstrSearch->TextFind(pszBuffer, iBufferSize, szaSearchWord, strlen(szaSearchWord)); // 단어 검색 기능 사용 -> 텍스트 파일에 단어를 찾으면 해당 단어 담기, 없으면 NULL 반환
-			/*if (TRUE == bResult)
-				AfxMessageBox(_T("TRUE"));
-			else
-				AfxMessageBox(_T("FALSE"));*/
-			
+
+			// 결과 출력
 			pszBuffer = bResult;
 			TRACE("%s", pszBuffer);
 		}
@@ -130,30 +127,7 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 		pszBuffer = NULL;
 	}
 	////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	// 노트장
 	//CSearch* pSearch = new CSearch;
 	//St_Test stResult = { 0 };
 
@@ -316,31 +290,18 @@ void CMFC21_Text_SearchExDlg::OnClickedButtonImport()
 	CFileDialog dlg(TRUE, _T("*.txt"), _T("image"), OFN_HIDEREADONLY, szFilter);*/
 
 	/*
-	
 	if (IDOK == dlg.DoModal())
 	{
 		strPathName = dlg.GetPathName();
 	}
-	
-	
-	
 	*/
 
-	
 	//ConvertUnicodeToMultybyte(strPathName);
-	
-
 	// 파일 오픈 - 메모리 할당
 	//FILE* pFile = fopen(strPathName, "r");
-
 	// 파일 오픈 - 메모리 해제
-
 	// 파일 사이즈 구하기
-
 	// 텍스트를 읽어올 버퍼 동적 할당
-
 	// 버퍼 - 메모리 해제
-	
 	// 파일 읽기
-
 }
