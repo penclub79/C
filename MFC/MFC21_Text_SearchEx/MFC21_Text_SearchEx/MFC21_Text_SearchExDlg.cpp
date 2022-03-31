@@ -67,7 +67,7 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 
 	char* pszBuffer = NULL;
 	int iBufferSize = 0;
-	FILE* pstrFile;
+	FILE* pstrFile = 0;
 	int iFileSize = 0;
 	
 	
