@@ -13,7 +13,7 @@ class CSearch
 {
 protected:
 	BOOL IsStrMatch();// 글자만 비교하는 함수
-	int m_iWordSize;
+//	int m_iWordSize;
 public:
 	CSearch();
 	~CSearch();
@@ -22,7 +22,7 @@ public:
 
 
 
-	bool WordCompare(char _pszText, char* _pszWord, int _iCount);
+	bool WordCompare(char* _pszText, char* _pszWord, int _iWordSize);
 	/*void InputValue(int* _piBuffer, int _iCount, int _iValue);
 	void ValueAsc(int* _piBuffer, int _iCount);
 	int SumResult(int* _piBuffer, int _iCount);

@@ -71,6 +71,9 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 	int iFileSize = 0;
 	
 	char* bResult = 0;
+
+	char B[10] = { "Heelo" };
+	char* data = B;
 	////변수 선언 - End
 	////////////////////////////////////////////////////////////////
 
@@ -88,14 +91,14 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 
 			fseek(pstrFile, 0, SEEK_SET);  // 현재 위치 얻어오기
 			pszBuffer = (char*)malloc(iBufferSize + 1);  // 파일 사이즈 만큼 메모리 동적 할당
+
 			memset(pszBuffer, 0, iBufferSize + 1);  // 메모리 초기화
-			
 			
 			fread(pszBuffer, 1, iBufferSize, pstrFile); // 버퍼에 텍스트 내용 담기
 			
-			char szaSearchWord[] = "kenk";  // 검색할 단어
-			// 단어 검색
-			bResult = pstrSearch->TextFind(pszBuffer, iBufferSize, szaSearchWord, strlen(szaSearchWord));
+			char szaSearchWord[] = "kenkk";  // 검색할 단어
+			
+			bResult = pstrSearch->TextFind(pszBuffer, iBufferSize, szaSearchWord, strlen(szaSearchWord)); // 단어 검색 기능 사용 -> 텍스트 파일에 단어를 찾으면 해당 단어 담기, 없으면 NULL 반환
 			/*if (TRUE == bResult)
 				AfxMessageBox(_T("TRUE"));
 			else

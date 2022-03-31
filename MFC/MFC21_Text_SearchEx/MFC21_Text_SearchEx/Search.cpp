@@ -5,7 +5,6 @@
 
 // 생성자
 CSearch::CSearch()
-: m_iWordSize(0)
 {
 }
 
@@ -16,7 +15,6 @@ CSearch::~CSearch()
 
 char* CSearch::TextFind(char* _pszBuffer, int _iBufferSize, char* _pszText, int _iTextSize)
 {
-	m_iWordSize = _iTextSize;
 
 	// 동적 할당한 메모리 주소
 	char* pszFirstBufferAddress = NULL;
@@ -32,41 +30,37 @@ char* CSearch::TextFind(char* _pszBuffer, int _iBufferSize, char* _pszText, int 
 	// 텍스트 단어
 	for (int i = 0; i < (_iBufferSize - _iTextSize); i++)
 	{
-		bCheckWord = WordCompare(*pszFirstBufferAddress, _pszText, _iTextSize);	
-		if (0 != m_iWordSize)
-		{
-			if (TRUE == bCheckWord)
-			{
-				_pszText++;
-			}	
-			else
-			{
-				m_iWordSize = _iTextSize;
-			}
-		}
-		else 
+		bCheckWord = WordCompare(pszFirstBufferAddress, _pszText, _iTextSize);	
+		
+		if (TRUE == bCheckWord)
 		{
 			return pszWordAddress;
 		}
-		pszFirstBufferAddress++;
+		else
+		{
+			pszFirstBufferAddress++;
+		}
 	}
 	return NULL;
 }
 
-bool CSearch::WordCompare(char _pszText, char* _pszWord, int _iCount)
+bool CSearch::WordCompare(char* _pszText, char* _pszWord, int _iWordSize)
 {	
-	for (int i = 0; i < _iCount; i++)
-	{
-		if (_pszText == *_pszWord)
+	for (int i = 0; i < _iWordSize; i++)
+	{	
+		// 맞으면 검색 단어의 다음 인덱스
+		if (*_pszWord == *_pszText)
 		{
-			m_iWordSize--;
-			return TRUE;
+			_pszWord++;
+			_pszText++;
 		}
+		// 아니면 검색 단어 처음 인덱스
 		else
-		{	
+		{
 			return FALSE;
-		}
+		}	
 	}
+	return TRUE;
 }
 
 
