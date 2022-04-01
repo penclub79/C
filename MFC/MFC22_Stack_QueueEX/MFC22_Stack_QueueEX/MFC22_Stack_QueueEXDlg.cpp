@@ -5,8 +5,6 @@
 #include "stdafx.h"
 #include "MFC22_Stack_QueueEX.h"
 #include "MFC22_Stack_QueueEXDlg.h"
-#include "Stack.h"
-#include "Queue.h"
 #include "afxdialogex.h"
 
 #ifdef _DEBUG
@@ -56,36 +54,22 @@ CMFC22_Stack_QueueEXDlg::CMFC22_Stack_QueueEXDlg(CWnd* pParent /*=NULL*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	class Stack
+	m_pStack = NULL;
+}
+
+CMFC22_Stack_QueueEXDlg::~CMFC22_Stack_QueueEXDlg()
+{
+	if (NULL != m_pStack)
 	{
-		int* piBuf = NULL;
-		int iIdx = 0;
-
-	public:
-		Stack(int size = 10)
-		{
-			piBuf = new int[size];
-			iIdx = 0;
-		}
-
-		// 소멸자 : 클래스 이름앞에 ~ 가 붙는 함수
-		~Stack() { delete[] piBuf; }
-
-		void push(int a) { piBuf[iIdx++] = a; }
-		int pop() { return piBuf[iIdx--]; }
-	};
-
-	Stack s1(100);
-	s1.push(10);
-	s1.push(20);
-
-	s1.pop();
-
+		delete m_pStack;
+		m_pStack = NULL;
+	}
 }
 
 void CMFC22_Stack_QueueEXDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST_OUTPUT, m_ctlListBox);
 }
 
 BEGIN_MESSAGE_MAP(CMFC22_Stack_QueueEXDlg, CDialogEx)
@@ -95,6 +79,7 @@ BEGIN_MESSAGE_MAP(CMFC22_Stack_QueueEXDlg, CDialogEx)
 	ON_COMMAND(IDC_RADIO_STACK, &CMFC22_Stack_QueueEXDlg::OnRadioStack)
 	ON_COMMAND(IDC_RADIO_QUEUE, &CMFC22_Stack_QueueEXDlg::OnRadioQueue)
 	ON_BN_CLICKED(IDC_BUTTON_PUSH, &CMFC22_Stack_QueueEXDlg::OnClickedButtonPush)
+	ON_BN_CLICKED(IDC_BUTTON_POP, &CMFC22_Stack_QueueEXDlg::OnClickedButtonPop)
 END_MESSAGE_MAP()
 
 
@@ -132,7 +117,10 @@ BOOL CMFC22_Stack_QueueEXDlg::OnInitDialog()
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	m_pstrCheckRadio = (CButton*)GetDlgItem(IDC_RADIO_STACK);
 	m_pstrCheckRadio->SetCheck(TRUE);
-	m_bIsStack = TRUE;
+	m_bIsStack	= TRUE;
+
+	m_pStack	= new CStack(10);
+
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -195,6 +183,8 @@ void CMFC22_Stack_QueueEXDlg::OnRadioStack()
 	m_pstrCheckRadio->SetCheck(TRUE);
 	m_bIsStack = TRUE;
 
+	// Stack 생성 Queue 해제
+
 }
 
 // Queue 라디오 버튼 활성화
@@ -205,6 +195,7 @@ void CMFC22_Stack_QueueEXDlg::OnRadioQueue()
 	m_pstrCheckRadio->SetCheck(TRUE);
 	m_bIsStack = FALSE;
 
+	// Queue 생성 Stack 해제
 }
 
 // 값 입력
@@ -213,29 +204,37 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString strValue = _T("");
 	int iValue = 0;
-	int* piBuf = NULL;
-
+	int iIndex = 0;
+	int* piStackValue = NULL;
 	GetDlgItemText(IDC_EDIT_INPUT, strValue);
 	iValue = _ttoi(strValue);
 
-	CStack* pstrStack = new CStack(sizeof(iValue));
-	CQueue* pstrQueue = new CQueue();
 
 	if (TRUE == m_bIsStack)
 	{
-		pstrStack->Push(iValue);
-		piBuf = pstrStack->m_piBuff;
-		
-		strValue.Format(_T("%d"), *piBuf);
+		if (NULL != m_pStack)
+		{
+			if (iValue > 0)
+			{
+				m_pStack->Push(iValue);
+				ReDrawList();
+			}
+			
+			// list박스를 clear 시키고 list박스에 슽
 
-		m_strListBox.InsertString(-1, strValue);
+
+			/*int iIndex = m_pStack->GetCount();
+			strValue.Format(_T("값:%d, Index:%d"), iValue, iIndex);
+			m_strListBox.InsertString(-1, strValue);*/
+			
+		}
 	}
 	else
 	{
 		//strQueue->Push();
 	}
 	
-
+	/*
 	// 메모리 해제
 	if (NULL != pstrStack)
 	{
@@ -248,5 +247,37 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 		pstrQueue = NULL;
 	}
 	
+	*/
+}
+
+void CMFC22_Stack_QueueEXDlg::ReDrawList()
+{
+	m_ctlListBox.ResetContent();
+
+	int iCount = m_pStack->GetCount();
+	CString strValue;
+	for (int i = 0; i < iCount; i++)
+	{
+		strValue.Format(_T("Index:%d, 값:%d"), i, m_pStack->GetAt(i));
+		m_ctlListBox.InsertString(i, strValue);
+	}
+}
+
+void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	
+	if (TRUE == m_bIsStack)
+	{
+		if (NULL != m_pStack)
+		{
+			int iResult = m_pStack->Pop();
+			if (0 < iResult)
+			{
+				// TRUE
+			}
+			ReDrawList();
+		}
+	}
 
 }

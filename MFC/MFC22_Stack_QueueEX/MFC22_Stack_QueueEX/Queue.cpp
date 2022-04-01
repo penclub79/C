@@ -2,7 +2,7 @@
 #include "Queue.h"
 #include "MFC22_Stack_QueueEXDlg.h"
 
-CQueue::CQueue()
+CQueue::CQueue(int _iSize)
 {
 }
 
@@ -12,6 +12,7 @@ CQueue::~CQueue()
 
 void CQueue::Push(int _iValue, int _iSize)
 {
+
 }
 
 

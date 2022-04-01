@@ -99,8 +99,5 @@ BOOL CMFC22_Stack_QueueEXApp::InitInstance()
 	// 반환합니다.
 	return FALSE;
 
-
-
-
 }
 

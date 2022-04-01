@@ -6,7 +6,7 @@ class CQueue
 {
 
 public:
-	CQueue();
+	CQueue(int _iSize);
 	~CQueue();
 
 
