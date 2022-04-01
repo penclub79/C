@@ -6,11 +6,11 @@ class CQueue
 {
 
 public:
-	CQueue(int _iSize);
+	CQueue();
 	~CQueue();
 
 
-	void Push(int _iValue);
+	void Push(int _iValue, int _iSize);
 	int Pop();
 
 };

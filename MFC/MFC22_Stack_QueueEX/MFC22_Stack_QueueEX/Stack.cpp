@@ -1,5 +1,5 @@
-#include "Stack.h"
 #include "stdafx.h"
+#include "Stack.h"
 #include "MFC22_Stack_QueueEXDlg.h"
 
 
@@ -15,11 +15,19 @@ CStack::CStack(int _iSize)
 // ¼Ò¸êÀÚ
 CStack::~CStack()
 {
+	if (NULL != m_piBuff)
+	{
+		delete m_piBuff;
+		m_piBuff = NULL;
+	}
 }
 
 void CStack::Push(int _iValue)
 {
 	m_piBuff[m_iIndex++] = _iValue;
+	//((CMFC22_Stack_QueueEXDlg*)AfxGetMainWnd())->
+
+	
 }
 
 int CStack::Pop()

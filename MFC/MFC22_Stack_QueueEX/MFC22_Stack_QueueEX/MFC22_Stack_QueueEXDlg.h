@@ -3,7 +3,7 @@
 //
 
 #pragma once
-
+#include "resource.h"
 
 // CMFC22_Stack_QueueEXDlg 대화 상자
 class CMFC22_Stack_QueueEXDlg : public CDialogEx
@@ -34,7 +34,7 @@ protected:
 
 public:
 	CButton* m_pstrCheckRadio;  // 라디오 버튼 체크
-	
+	CListBox m_strListBox;	// 리스트 박스
 	
 
 	afx_msg void OnRadioStack();

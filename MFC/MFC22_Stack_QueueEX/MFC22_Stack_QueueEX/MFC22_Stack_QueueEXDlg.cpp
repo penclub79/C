@@ -211,30 +211,30 @@ void CMFC22_Stack_QueueEXDlg::OnRadioQueue()
 void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	
-	
-	
 	CString strValue = _T("");
-	
 	int iValue = 0;
+	int* piBuf = NULL;
 
 	GetDlgItemText(IDC_EDIT_INPUT, strValue);
 	iValue = _ttoi(strValue);
 
-	
 	CStack* pstrStack = new CStack(sizeof(iValue));
-	CQueue* pstrQueue = new CQueue(sizeof(iValue));
+	CQueue* pstrQueue = new CQueue();
 
 	if (TRUE == m_bIsStack)
 	{
 		pstrStack->Push(iValue);
+		piBuf = pstrStack->m_piBuff;
+		
+		strValue.Format(_T("%d"), *piBuf);
+
+		m_strListBox.InsertString(-1, strValue);
 	}
 	else
 	{
 		//strQueue->Push();
 	}
 	
-
 
 	// 메모리 해제
 	if (NULL != pstrStack)
