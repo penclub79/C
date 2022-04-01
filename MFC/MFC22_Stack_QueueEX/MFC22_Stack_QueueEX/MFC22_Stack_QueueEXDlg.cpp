@@ -55,6 +55,7 @@ CMFC22_Stack_QueueEXDlg::CMFC22_Stack_QueueEXDlg(CWnd* pParent /*=NULL*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
 	m_pStack = NULL;
+	m_pQueue = NULL;
 }
 
 CMFC22_Stack_QueueEXDlg::~CMFC22_Stack_QueueEXDlg()
@@ -63,6 +64,12 @@ CMFC22_Stack_QueueEXDlg::~CMFC22_Stack_QueueEXDlg()
 	{
 		delete m_pStack;
 		m_pStack = NULL;
+	}
+
+	if (NULL != m_pQueue)
+	{
+		delete m_pQueue;
+		m_pQueue = NULL;
 	}
 }
 
@@ -120,6 +127,7 @@ BOOL CMFC22_Stack_QueueEXDlg::OnInitDialog()
 	m_bIsStack	= TRUE;
 
 	m_pStack	= new CStack(10);
+	m_pQueue	= new CQueue(10);
 
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
@@ -182,6 +190,7 @@ void CMFC22_Stack_QueueEXDlg::OnRadioStack()
 	m_pstrCheckRadio = (CButton*)GetDlgItem(IDC_RADIO_STACK);
 	m_pstrCheckRadio->SetCheck(TRUE);
 	m_bIsStack = TRUE;
+	m_ctlListBox.ResetContent();
 
 	// Stack 생성 Queue 해제
 
@@ -194,6 +203,7 @@ void CMFC22_Stack_QueueEXDlg::OnRadioQueue()
 	m_pstrCheckRadio = (CButton*)GetDlgItem(IDC_RADIO_QUEUE);
 	m_pstrCheckRadio->SetCheck(TRUE);
 	m_bIsStack = FALSE;
+	m_ctlListBox.ResetContent();
 
 	// Queue 생성 Stack 해제
 }
@@ -202,7 +212,7 @@ void CMFC22_Stack_QueueEXDlg::OnRadioQueue()
 void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString strValue = _T("");
+	CString strValue;
 	int iValue = 0;
 	int iIndex = 0;
 	int* piStackValue = NULL;
@@ -219,10 +229,7 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 				m_pStack->Push(iValue);
 				ReDrawList();
 			}
-			
 			// list박스를 clear 시키고 list박스에 슽
-
-
 			/*int iIndex = m_pStack->GetCount();
 			strValue.Format(_T("값:%d, Index:%d"), iValue, iIndex);
 			m_strListBox.InsertString(-1, strValue);*/
@@ -230,37 +237,40 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 		}
 	}
 	else
-	{
-		//strQueue->Push();
+	{	
+		if (NULL != m_pQueue)
+		{
+			m_pQueue->Push(iValue);
+			ReDrawList();
+		}
 	}
-	
-	/*
-	// 메모리 해제
-	if (NULL != pstrStack)
-	{
-		delete pstrStack;
-		pstrStack = NULL;
-	}
-	if (NULL != pstrQueue)
-	{
-		delete pstrQueue;
-		pstrQueue = NULL;
-	}
-	
-	*/
 }
 
 void CMFC22_Stack_QueueEXDlg::ReDrawList()
 {
 	m_ctlListBox.ResetContent();
-
-	int iCount = m_pStack->GetCount();
-	CString strValue;
-	for (int i = 0; i < iCount; i++)
+	
+	if (TRUE == m_bIsStack)
 	{
-		strValue.Format(_T("Index:%d, 값:%d"), i, m_pStack->GetAt(i));
-		m_ctlListBox.InsertString(i, strValue);
+		int iCount = m_pStack->GetCount();
+		CString strValue;
+		for (int i = 0; i < iCount; i++)
+		{
+			strValue.Format(_T("Index:%d, 값:%d"), i, m_pStack->GetAt(i));
+			m_ctlListBox.InsertString(i, strValue);
+		}
 	}
+	else
+	{
+		int iCount = m_pQueue->GetCount();
+		CString strValue;
+		for (int i = 0; i < iCount; i++)
+		{
+			strValue.Format(_T("Index:%d, 값:%d"), i, m_pQueue->GetAt(i));
+			m_ctlListBox.InsertString(i, strValue);
+		}
+	}
+	
 }
 
 void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
@@ -276,6 +286,14 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 			{
 				// TRUE
 			}
+			ReDrawList();
+		}
+	}
+	else
+	{
+		if (NULL != m_pQueue)
+		{
+			m_pQueue->Pop();
 			ReDrawList();
 		}
 	}

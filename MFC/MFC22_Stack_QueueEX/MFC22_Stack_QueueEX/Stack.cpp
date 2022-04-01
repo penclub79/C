@@ -36,7 +36,6 @@ void CStack::Push(int _iValue)
 
 int CStack::Pop()
 {
-	
 	if (GetCount())
 		return m_piBuff[--m_iIndex];
 	else
