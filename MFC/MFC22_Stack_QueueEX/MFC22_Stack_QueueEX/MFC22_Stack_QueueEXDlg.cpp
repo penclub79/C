@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "MFC22_Stack_QueueEX.h"
 #include "MFC22_Stack_QueueEXDlg.h"
+#include "Stack.h"
+#include "Queue.h"
 #include "afxdialogex.h"
 
 #ifdef _DEBUG
@@ -50,6 +52,7 @@ END_MESSAGE_MAP()
 CMFC22_Stack_QueueEXDlg::CMFC22_Stack_QueueEXDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC22_Stack_QueueEXDlg::IDD, pParent)
 	, m_pstrCheckRadio(NULL)
+	, m_bIsStack(TRUE)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
@@ -89,6 +92,9 @@ BEGIN_MESSAGE_MAP(CMFC22_Stack_QueueEXDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_COMMAND(IDC_RADIO_STACK, &CMFC22_Stack_QueueEXDlg::OnRadioStack)
+	ON_COMMAND(IDC_RADIO_QUEUE, &CMFC22_Stack_QueueEXDlg::OnRadioQueue)
+	ON_BN_CLICKED(IDC_BUTTON_PUSH, &CMFC22_Stack_QueueEXDlg::OnClickedButtonPush)
 END_MESSAGE_MAP()
 
 
@@ -126,6 +132,7 @@ BOOL CMFC22_Stack_QueueEXDlg::OnInitDialog()
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	m_pstrCheckRadio = (CButton*)GetDlgItem(IDC_RADIO_STACK);
 	m_pstrCheckRadio->SetCheck(TRUE);
+	m_bIsStack = TRUE;
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -179,3 +186,67 @@ HCURSOR CMFC22_Stack_QueueEXDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+// Stack 라디오 버튼 활성화
+void CMFC22_Stack_QueueEXDlg::OnRadioStack()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	m_pstrCheckRadio = (CButton*)GetDlgItem(IDC_RADIO_STACK);
+	m_pstrCheckRadio->SetCheck(TRUE);
+	m_bIsStack = TRUE;
+
+}
+
+// Queue 라디오 버튼 활성화
+void CMFC22_Stack_QueueEXDlg::OnRadioQueue()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	m_pstrCheckRadio = (CButton*)GetDlgItem(IDC_RADIO_QUEUE);
+	m_pstrCheckRadio->SetCheck(TRUE);
+	m_bIsStack = FALSE;
+
+}
+
+// 값 입력
+void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	
+	
+	
+	CString strValue = _T("");
+	
+	int iValue = 0;
+
+	GetDlgItemText(IDC_EDIT_INPUT, strValue);
+	iValue = _ttoi(strValue);
+
+	
+	CStack* pstrStack = new CStack(sizeof(iValue));
+	CQueue* pstrQueue = new CQueue(sizeof(iValue));
+
+	if (TRUE == m_bIsStack)
+	{
+		pstrStack->Push(iValue);
+	}
+	else
+	{
+		//strQueue->Push();
+	}
+	
+
+
+	// 메모리 해제
+	if (NULL != pstrStack)
+	{
+		delete pstrStack;
+		pstrStack = NULL;
+	}
+	if (NULL != pstrQueue)
+	{
+		delete pstrQueue;
+		pstrQueue = NULL;
+	}
+	
+
+}

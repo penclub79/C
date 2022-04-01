@@ -2,11 +2,15 @@
 
 #pragma once
 
-class Queue
+class CQueue
 {
 
 public:
-	void Push();
+	CQueue(int _iSize);
+	~CQueue();
+
+
+	void Push(int _iValue);
 	int Pop();
 
 };

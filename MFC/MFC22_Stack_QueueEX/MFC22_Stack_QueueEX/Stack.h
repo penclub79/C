@@ -2,11 +2,17 @@
 
 #pragma once
 
-class Stack
+class CStack
 {
 	
 public:
-	void Push();
+	CStack(int _iSize);
+	~CStack();
+
+	int* m_piBuff;
+	int m_iIndex;
+
+	void Push(int _iValue);
 	int Pop();
 
 };

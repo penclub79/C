@@ -30,8 +30,14 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 
+	bool m_bIsStack;	// Stack Check
+
 public:
 	CButton* m_pstrCheckRadio;  // 라디오 버튼 체크
+	
+	
 
-
+	afx_msg void OnRadioStack();
+	afx_msg void OnRadioQueue();
+	afx_msg void OnClickedButtonPush();
 };
