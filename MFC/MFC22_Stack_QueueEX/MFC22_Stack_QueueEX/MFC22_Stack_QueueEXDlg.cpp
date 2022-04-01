@@ -240,7 +240,7 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	{	
 		if (NULL != m_pQueue)
 		{
-			m_pQueue->Push(iValue);
+			m_pQueue->EnQueue(iValue);	// Å¥ »ðÀÔ
 			ReDrawList();
 		}
 	}
@@ -264,9 +264,11 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 	{
 		int iCount = m_pQueue->GetCount();
 		CString strValue;
+		int	iPos = 0;
 		for (int i = 0; i < iCount; i++)
 		{
-			strValue.Format(_T("Index:%d, °ª:%d"), i, m_pQueue->GetAt(i));
+			iPos = (m_pQueue->GetFront() + 1 + i) % 10;
+			strValue.Format(_T("Index:%d, °ª:%d"), iPos, m_pQueue->GetAt(iPos));
 			m_ctlListBox.InsertString(i, strValue);
 		}
 	}
@@ -282,10 +284,10 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 		if (NULL != m_pStack)
 		{
 			int iResult = m_pStack->Pop();
-			if (0 < iResult)
-			{
-				// TRUE
-			}
+			//if (0 < iResult)
+			//{
+			//	// TRUE
+			//}
 			ReDrawList();
 		}
 	}
@@ -293,7 +295,7 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 	{
 		if (NULL != m_pQueue)
 		{
-			m_pQueue->Pop();
+			m_pQueue->DeQueue();
 			ReDrawList();
 		}
 	}

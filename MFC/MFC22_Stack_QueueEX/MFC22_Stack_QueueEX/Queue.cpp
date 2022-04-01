@@ -4,12 +4,14 @@
 
 CQueue::CQueue(int _iSize)
 : m_piBuff(NULL)
-, m_iIndex(0)
+, m_iRear(0)
+, m_iFront(0)
 , m_iMaxSize(0)
+
 {
-	m_piBuff = new int[_iSize];
 	m_iMaxSize = _iSize;
-	m_iIndex = 0;
+	m_piBuff = new int[m_iMaxSize];
+	
 }
 
 CQueue::~CQueue()
@@ -21,28 +23,55 @@ CQueue::~CQueue()
 	}
 }
 
-void CQueue::Push(int _iValue)
+// 사이즈 체크 함수 만들기
+
+void CQueue::EnQueue(int _iValue)
 {
-	m_piBuff[m_iIndex++] = _iValue;
+	if ((m_iMaxSize - 1) <= GetCount()) // 포화 상태인지 체크
+	{
+		
+	}
+	else
+	{
+		m_iRear = (m_iRear + 1) % m_iMaxSize;
+		m_piBuff[m_iRear] = _iValue;
+	}
 }
 
-
-int CQueue::Pop()
+int CQueue::DeQueue()
 {
-	for (int i = 0; i < GetCount(); i++)
+	if (GetCount() <= 0)
 	{
-		return m_piBuff[i];
+		return -1;
+	}
+	else
+	{
+		m_iFront = (m_iFront + 1) % m_iMaxSize;
+		return m_piBuff[m_iFront];
 	}
 }
 
 // value count 체크
 int CQueue::GetCount()
 {
-	return m_iIndex;
+	int iCount = m_iRear - m_iFront;
+	
+	// front가 rear 보다 클 경우
+	if (iCount < 0)
+	{
+		iCount = (m_iMaxSize + m_iRear) - m_iFront;
+	}
+	return iCount;
 }
 
 // value를 가져온다
 int CQueue::GetAt(int _iIndex)
 {
 	return m_piBuff[_iIndex];
+}
+
+// value를 가져온다
+int CQueue::GetFront()
+{
+	return m_iFront;
 }

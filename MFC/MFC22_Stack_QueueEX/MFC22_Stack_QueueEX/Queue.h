@@ -7,7 +7,8 @@ class CQueue
 
 private:
 	int* m_piBuff;
-	int m_iIndex;
+	int m_iRear;
+	int m_iFront;
 	int m_iMaxSize;
 
 protected:
@@ -19,9 +20,10 @@ public:
 	CQueue(int _iSize);
 	~CQueue();
 
-	void Push(int _iValue);
-	int Pop();
+	void EnQueue(int _iValue);
+	int DeQueue();
 	int GetCount();
 	int GetAt(int _iIndex);
+	int GetFront();
 
 };
