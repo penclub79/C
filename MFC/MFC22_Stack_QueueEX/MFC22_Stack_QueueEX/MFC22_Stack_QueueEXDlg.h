@@ -43,7 +43,6 @@ protected:
 //	CListBox m_strListBox;
 	// 리스트 박스
 public:
-	
 	afx_msg void OnRadioStack();
 	afx_msg void OnRadioQueue();
 	afx_msg void OnClickedButtonPush();

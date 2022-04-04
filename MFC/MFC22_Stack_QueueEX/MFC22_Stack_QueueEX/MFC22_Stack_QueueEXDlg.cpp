@@ -126,7 +126,7 @@ BOOL CMFC22_Stack_QueueEXDlg::OnInitDialog()
 	m_pstrCheckRadio->SetCheck(TRUE);
 	m_bIsStack	= TRUE;
 
-	m_pStack	= new CStack(10);
+	m_pStack = new CStack(CStack::LINK_ITEM_TYPE_INT, 10);
 	m_pQueue	= new CQueue(10);
 
 
@@ -212,28 +212,22 @@ void CMFC22_Stack_QueueEXDlg::OnRadioQueue()
 void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	
 	CString strValue;
 	int iValue = 0;
 	int iIndex = 0;
-	int* piStackValue = NULL;
 	GetDlgItemText(IDC_EDIT_INPUT, strValue);
 	iValue = _ttoi(strValue);
 
-
-	if (TRUE == m_bIsStack)
+	if (TRUE == m_bIsStack)										
 	{
-		if (NULL != m_pStack)
+		if (NULL != m_pStack)									
 		{
 			if (iValue > 0)
 			{
 				m_pStack->Push(iValue);
 				ReDrawList();
 			}
-			// list박스를 clear 시키고 list박스에 슽
-			/*int iIndex = m_pStack->GetCount();
-			strValue.Format(_T("값:%d, Index:%d"), iValue, iIndex);
-			m_strListBox.InsertString(-1, strValue);*/
-			
 		}
 	}
 	else
@@ -249,22 +243,35 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 void CMFC22_Stack_QueueEXDlg::ReDrawList()
 {
 	m_ctlListBox.ResetContent();
+	int iListIndex = 0;
+
+	int		iVal = 0;
+	int		iCount = 0;
+	int		iPos = 0;
+	CString strValue;
+	
 	
 	if (TRUE == m_bIsStack)
 	{
-		int iCount = m_pStack->GetCount();
-		CString strValue;
-		for (int i = 0; i < iCount; i++)
+		iCount = m_pStack->GetCount();
+		
+		if (NULL != m_pStack->m_pRoot)
 		{
-			strValue.Format(_T("Index:%d, 값:%d"), i, m_pStack->GetAt(i));
-			m_ctlListBox.InsertString(i, strValue);
+			for (int i = 0; i < iCount; i++)
+			{
+				if (TRUE == m_pStack->GetAt(i, NULL, &iVal))
+				{	
+					strValue.Format(_T("주소:%d, 값:%d"), i, iVal);
+					m_ctlListBox.InsertString(i, strValue);
+				}
+			}
+			
 		}
+		
 	}
 	else
 	{
-		int iCount = m_pQueue->GetCount();
-		CString strValue;
-		int	iPos = 0;
+		iCount = m_pQueue->GetCount();
 		for (int i = 0; i < iCount; i++)
 		{
 			iPos = (m_pQueue->GetFront() + 1 + i) % 10;
@@ -278,17 +285,29 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	
+	int* piLastItem = NULL;
+	piLastItem = (int*)m_pStack->m_pLast;
+
+	char* pszLastItem = NULL;
+	pszLastItem = (char*)m_pStack->m_pLast;
+
 	if (TRUE == m_bIsStack)
 	{
 		if (NULL != m_pStack)
 		{
-			int iResult = m_pStack->Pop();
-			//if (0 < iResult)
-			//{
-			//	// TRUE
-			//}
-			ReDrawList();
+			if (NULL != piLastItem)
+			{
+				bool bResult = m_pStack->Pop(NULL, piLastItem);
+				ReDrawList();
+			}
+			
+			if (NULL != piLastItem)
+			{
+				bool bResult = m_pStack->Pop(pszLastItem, NULL);
+				ReDrawList();
+			}
+			
+			
 		}
 	}
 	else
