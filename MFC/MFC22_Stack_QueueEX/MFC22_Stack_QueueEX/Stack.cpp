@@ -13,6 +13,14 @@ CStack::CStack(int _iSize)
 	m_piBuff = new int[_iSize];
 	m_iMaxSize = _iSize;
 	m_iIndex = 0;
+
+	iItemLength
+		pszBuffer
+		pNext
+
+
+
+	int iTempSize = sizeof(Link_Item);
 }
 
 // ¼Ò¸êÀÚ
