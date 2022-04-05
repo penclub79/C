@@ -29,6 +29,7 @@ CStack::~CStack()
 
 void CStack::Push(int _iValue)
 {
+	// Int 일때
 	if (LINK_ITEM_TYPE_INT == m_iItemType)
 	{
 		
@@ -94,32 +95,66 @@ void CStack::Push(int _iValue)
 	}
 }
 
-//void CStack::Push(char* pszValue)
-//{
-//	
-//}
-
-BOOL CStack::Pop(char* pszValue, int* _iValue)
+void CStack::Push(char* _pszValue)
 {
-	if (GetCount())
+	// String 일때
+	if (LINK_ITEM_TYPE_STRING == m_iItemType)
 	{
+		Link_Item* pNode = NULL;
 
-		/*if (NULL != m_pLast->pszBuffer)
+		pNode = new Link_Item;
+		memset(pNode, 0, sizeof(Link_Item));
+
+		pNode->iItemLength = sizeof(char);
+		pNode->pszBuffer = (unsigned char*)new char;
+		// 복사
+		memcpy(pNode->pszBuffer, &_pszValue, sizeof(char));
+		pNode->pNext = NULL;
+
+		if (NULL == m_pRoot)
 		{
-			delete m_pLast->pszBuffer;
-			m_pLast->pszBuffer = NULL;
-		}*/
-
-		/*if (NULL != m_pLast)
+			m_pRoot = pNode;
+			m_pLast = m_pRoot;
+		}
+		else
 		{
-			delete m_pLast;
-			m_pLast = NULL;
-		}*/
-
-		return TRUE;
+			m_pLast->pNext = pNode;
+			m_pLast = pNode;
+		}
 	}
-	else
-		return FALSE;
+}
+
+BOOL CStack::Pop(char* pszValue, int* _piValue)
+{
+	Link_Item* pNode = m_pRoot;
+	Link_Item* pPrev = NULL;
+
+	// Int 일때
+	if (LINK_ITEM_TYPE_INT == m_iItemType)
+	{
+		if (NULL != _piValue)
+		{
+			// while문으로 돌아야한다.
+			while (NULL != pNode->pNext)
+			{
+				pPrev = pNode;
+				pNode = pNode->pNext;
+				if (NULL == pNode->pNext)
+				{
+					pPrev->pNext = NULL;
+				}
+			}
+			if (NULL == pNode->pNext)
+			{
+				pNode = NULL;
+			}
+
+			return TRUE;
+		}
+		else
+			return FALSE;
+	}
+	
 }
 
 // value count 체크
@@ -133,19 +168,11 @@ int CStack::GetCount()
 		do
 		{
 			iCount++;
-
 			// ** 
 			pNode = pNode->pNext;
 
-
 		} while (NULL != pNode);
 	}
-
-	//if (NULL == m_pRoot->pNext)
-	//{
-	//	iCount++;
-	//}
-	
 	return iCount;
 }
 

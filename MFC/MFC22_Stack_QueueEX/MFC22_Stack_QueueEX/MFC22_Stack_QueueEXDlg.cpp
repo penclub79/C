@@ -217,13 +217,18 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	int iValue = 0;
 	int iIndex = 0;
 	GetDlgItemText(IDC_EDIT_INPUT, strValue);
-	iValue = _ttoi(strValue);
+	iValue = _ttoi(strValue);	// CString -> int로 변환
+	char szStr[10] = { 0 };
+	
+	/*memcpy(&strValue, szStr, sizeof(char));
+	m_pStack->Push(&szStr[0]);
+	ReDrawList();*/
 
 	if (TRUE == m_bIsStack)										
 	{
 		if (NULL != m_pStack)									
 		{
-			if (iValue > 0)
+			if (0 < iValue)
 			{
 				m_pStack->Push(iValue);
 				ReDrawList();
@@ -250,12 +255,11 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 	int		iPos = 0;
 	CString strValue;
 	
-	
 	if (TRUE == m_bIsStack)
 	{
 		iCount = m_pStack->GetCount();
 		
-		if (NULL != m_pStack->m_pRoot)
+		if (0 < iCount)
 		{
 			for (int i = 0; i < iCount; i++)
 			{
@@ -265,9 +269,7 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 					m_ctlListBox.InsertString(i, strValue);
 				}
 			}
-			
 		}
-		
 	}
 	else
 	{
@@ -285,29 +287,28 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	int* piLastItem = NULL;
-	piLastItem = (int*)m_pStack->m_pLast;
+	int iCount = 0;
+	int iPos = 0;
 
-	char* pszLastItem = NULL;
-	pszLastItem = (char*)m_pStack->m_pLast;
+	BOOL bResult = FALSE;
+	char szPos[MAX_PATH] = { 0 };
 
 	if (TRUE == m_bIsStack)
 	{
 		if (NULL != m_pStack)
 		{
-			if (NULL != piLastItem)
+			iCount = m_pStack->GetCount();
+
+			if (iCount > 0)
 			{
-				bool bResult = m_pStack->Pop(NULL, piLastItem);
-				ReDrawList();
+				bResult = m_pStack->Pop(NULL, &iPos);
+				if (TRUE == bResult)
+					ReDrawList();
 			}
-			
-			if (NULL != piLastItem)
+			else
 			{
-				bool bResult = m_pStack->Pop(pszLastItem, NULL);
-				ReDrawList();
+				AfxMessageBox(_T("값이 없습니다."));
 			}
-			
-			
 		}
 	}
 	else
@@ -318,5 +319,4 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 			ReDrawList();
 		}
 	}
-
 }

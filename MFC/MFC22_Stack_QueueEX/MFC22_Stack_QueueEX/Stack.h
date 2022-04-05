@@ -30,22 +30,23 @@ public:
 	{
 		int				iItemLength	; 
 		unsigned char*	pszBuffer	;
-		Link_Item*		pNext		;
+		Link_Item*		pNext;
 	};
 
 	void Push(int _iValue);
-	void Push(char* pszValue );
+	void Push(char* _pszValue );
 
 	BOOL Pop(char* pszValue, int* _iValue);		// 주소값을 참조한다
 	BOOL GetAt(int _iIndex, char* pszValue, int* _iValue );						// value를 가져온다
 
 	int GetCount();								// value count 체크
+	
+								
+private:
 	Link_Item*	m_pLast;
 	Link_Item*	m_pRoot;
 
-private:
 	int* m_piBuff;
-	int	m_iItemType;							// 0 : int, 1: String
-
+	int	m_iItemType;				// 0 : int, 1: String
 	int m_iMaxSize;
 };
