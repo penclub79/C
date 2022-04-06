@@ -35,6 +35,7 @@ public:
 
 	void Push(int _iValue);
 	void Push(char* _pszValue );
+	void DeleteAll();
 
 	BOOL Pop(char* pszValue, int* _iValue);		// 주소값을 참조한다
 	BOOL GetAt(int _iIndex, char* pszValue, int* _iValue );						// value를 가져온다
@@ -46,7 +47,6 @@ private:
 	Link_Item*	m_pLast;
 	Link_Item*	m_pRoot;
 
-	int* m_piBuff;
 	int	m_iItemType;				// 0 : int, 1: String
 	int m_iMaxSize;
 };

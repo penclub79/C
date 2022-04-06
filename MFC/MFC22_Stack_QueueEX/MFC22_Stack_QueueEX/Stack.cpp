@@ -5,26 +5,20 @@
 
 // 생성자
 CStack::CStack(int iItemType, int _iSize)
-: m_piBuff(NULL)
-, m_iMaxSize(0)
+: m_iMaxSize(0)
 , m_pRoot(NULL)
 , m_pLast(NULL)
 {
 //	m_piBuff = (int*) new char[sizeof(int)*_iSize]; 밑에 할당하는 코드와 같은 의미이다.
-	m_piBuff = new int[_iSize];
+	//m_piBuff = new int[_iSize];
 	m_iMaxSize = _iSize;
 	m_iItemType = iItemType;
-	int iTempSize = sizeof(Link_Item);
 }
 
 // 소멸자
 CStack::~CStack()
 {
-	if (NULL != m_piBuff)
-	{
-		delete [] m_piBuff;
-		m_piBuff = NULL;
-	}
+	DeleteAll();
 }
 
 void CStack::Push(int _iValue)
@@ -32,7 +26,6 @@ void CStack::Push(int _iValue)
 	// Int 일때
 	if (LINK_ITEM_TYPE_INT == m_iItemType)
 	{
-		
 /*		if (NULL == m_pRoot)
 		{
 			// POP할때 메모리 해제
@@ -74,7 +67,7 @@ void CStack::Push(int _iValue)
 			memset(pNode, 0, sizeof(Link_Item));
 
 			pNode->iItemLength = sizeof(int);
-			pNode->pszBuffer = (unsigned char*)new int;
+			pNode->pszBuffer = (unsigned char*)new unsigned char[sizeof(int)];
 			// 복사
 			memcpy(pNode->pszBuffer, &_iValue, sizeof(int));
 			pNode->pNext = NULL;
@@ -95,35 +88,6 @@ void CStack::Push(int _iValue)
 	}
 }
 
-void CStack::Push(char* _pszValue)
-{
-	// String 일때
-	if (LINK_ITEM_TYPE_STRING == m_iItemType)
-	{
-		Link_Item* pNode = NULL;
-
-		pNode = new Link_Item;
-		memset(pNode, 0, sizeof(Link_Item));
-
-		pNode->iItemLength = sizeof(char);
-		pNode->pszBuffer = (unsigned char*)new char;
-		// 복사
-		memcpy(pNode->pszBuffer, &_pszValue, sizeof(char));
-		pNode->pNext = NULL;
-
-		if (NULL == m_pRoot)
-		{
-			m_pRoot = pNode;
-			m_pLast = m_pRoot;
-		}
-		else
-		{
-			m_pLast->pNext = pNode;
-			m_pLast = pNode;
-		}
-	}
-}
-
 BOOL CStack::Pop(char* pszValue, int* _piValue)
 {
 	Link_Item* pNode = m_pRoot;
@@ -134,10 +98,14 @@ BOOL CStack::Pop(char* pszValue, int* _piValue)
 	{
 		if (NULL != _piValue)
 		{
-			
 			if (NULL == pNode->pNext)
 			{
+				delete [] pNode->pszBuffer;
+				pNode->pszBuffer = NULL;
+
+				delete pNode;
 				pNode = NULL;
+
 				m_pRoot = pNode;
 				m_pLast = pNode;
 			}
@@ -150,18 +118,30 @@ BOOL CStack::Pop(char* pszValue, int* _piValue)
 					pNode = pNode->pNext;
 					if (NULL == pNode->pNext)
 					{
+						if (NULL != pNode->pszBuffer)
+						{
+							delete[] pNode->pszBuffer;
+							pNode->pszBuffer = NULL;
+						}
+						
+						if (NULL != pNode)
+						{
+							delete pNode;
+							pNode = NULL;
+						}
+
 						pPrev->pNext = NULL;
 						m_pLast = pPrev;
+
+						break;
 					}
 				}
 			}
-
 			return TRUE;
 		}
 		else
 			return FALSE;
 	}
-	
 }
 
 // value count 체크
@@ -224,4 +204,46 @@ BOOL CStack::GetAt(int _iIndex, char* _pszValue, int* _piValue)
 
 
 	return bResult;
+}
+
+// 프로그램 종료시 메모리 해제 함수
+void CStack::DeleteAll()
+{
+	Link_Item* pNode = m_pRoot;
+	//Link_Item* pPrev = NULL;
+	Link_Item* pNext = NULL;
+
+	if (NULL != pNode)
+	{
+		while (NULL != pNode)
+		{
+			pNext = pNode->pNext;
+			
+			// 현재 노드 메모리를 해제한다.
+			if (NULL != pNode)
+			{
+				if (NULL != pNode->pszBuffer)
+				{
+					delete[] pNode->pszBuffer;
+					pNode->pszBuffer = NULL;
+				}
+				delete pNode;
+				pNode = NULL;
+			}
+
+			// 다음 노드로 이동한다.
+			pNode = pNext;
+
+			if (NULL == pNode->pNext)
+			{
+				if (NULL != pNode->pszBuffer)
+				{
+					delete[] pNode->pszBuffer;
+					pNode->pszBuffer = NULL;
+				}
+				delete pNode;
+				pNode = NULL;
+			}
+		}
+	}
 }
