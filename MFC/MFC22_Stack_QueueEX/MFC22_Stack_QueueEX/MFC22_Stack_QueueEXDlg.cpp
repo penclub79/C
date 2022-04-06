@@ -255,17 +255,19 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 	int		iPos = 0;
 	CString strValue;
 	
+
+
 	if (TRUE == m_bIsStack)
 	{
 		iCount = m_pStack->GetCount();
-		
+		iPos = m_pStack->GetAt(0, NULL, &iVal);
 		if (0 < iCount)
 		{
 			for (int i = 0; i < iCount; i++)
 			{
 				if (TRUE == m_pStack->GetAt(i, NULL, &iVal))
 				{	
-					strValue.Format(_T("주소:%d, 값:%d"), i, iVal);
+					strValue.Format(_T("인덱스:%d, 값:%d"), i, iVal);
 					m_ctlListBox.InsertString(i, strValue);
 				}
 			}

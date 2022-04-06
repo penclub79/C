@@ -134,19 +134,26 @@ BOOL CStack::Pop(char* pszValue, int* _piValue)
 	{
 		if (NULL != _piValue)
 		{
-			// while문으로 돌아야한다.
-			while (NULL != pNode->pNext)
-			{
-				pPrev = pNode;
-				pNode = pNode->pNext;
-				if (NULL == pNode->pNext)
-				{
-					pPrev->pNext = NULL;
-				}
-			}
+			
 			if (NULL == pNode->pNext)
 			{
 				pNode = NULL;
+				m_pRoot = pNode;
+				m_pLast = pNode;
+			}
+
+			if (NULL != pNode)
+			{
+				while (NULL != pNode->pNext)
+				{
+					pPrev = pNode;
+					pNode = pNode->pNext;
+					if (NULL == pNode->pNext)
+					{
+						pPrev->pNext = NULL;
+						m_pLast = pPrev;
+					}
+				}
 			}
 
 			return TRUE;
@@ -162,16 +169,15 @@ int CStack::GetCount()
 {
 	int iCount = 0;
 	Link_Item* pNode = m_pRoot;
-	
+
 	if (NULL != pNode)
 	{
 		do
 		{
 			iCount++;
-			// ** 
 			pNode = pNode->pNext;
-
 		} while (NULL != pNode);
+
 	}
 	return iCount;
 }
