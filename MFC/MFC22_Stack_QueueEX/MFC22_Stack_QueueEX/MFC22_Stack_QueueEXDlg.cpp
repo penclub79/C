@@ -219,10 +219,6 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	GetDlgItemText(IDC_EDIT_INPUT, strValue);
 	iValue = _ttoi(strValue);	// CString -> int로 변환
 	char szStr[10] = { 0 };
-	
-	/*memcpy(&strValue, szStr, sizeof(char));
-	m_pStack->Push(&szStr[0]);
-	ReDrawList();*/
 
 	if (TRUE == m_bIsStack)										
 	{
@@ -260,12 +256,12 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 	if (TRUE == m_bIsStack)
 	{
 		iCount = m_pStack->GetCount();
-		iPos = m_pStack->GetAt(0, NULL, &iVal);
+		iPos = m_pStack->GetAt(0, NULL, &iVal, NULL);
 		if (0 < iCount)
 		{
 			for (int i = 0; i < iCount; i++)
 			{
-				if (TRUE == m_pStack->GetAt(i, NULL, &iVal))
+				if (TRUE == m_pStack->GetAt(i, NULL, &iVal, NULL))
 				{	
 					strValue.Format(_T("인덱스:%d, 값:%d"), i, iVal);
 					m_ctlListBox.InsertString(i, strValue);
@@ -273,7 +269,7 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 			}
 		}
 	}
-	else
+	/*else
 	{
 		iCount = m_pQueue->GetCount();
 		for (int i = 0; i < iCount; i++)
@@ -282,7 +278,7 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 			strValue.Format(_T("Index:%d, 값:%d"), iPos, m_pQueue->GetAt(iPos));
 			m_ctlListBox.InsertString(i, strValue);
 		}
-	}
+	}*/
 	
 }
 
@@ -313,12 +309,12 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 			}
 		}
 	}
-	else
+	/*else
 	{
 		if (NULL != m_pQueue)
 		{
 			m_pQueue->DeQueue();
 			ReDrawList();
 		}
-	}
+	}*/
 }

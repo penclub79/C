@@ -46,7 +46,7 @@ public:
 	void DeleteAll();
 
 	BOOL Pop(char* pszValue, int* _iValue);		// 주소값을 참조한다
-	BOOL GetAt(int _iIndex, char* pszValue, int* _iValue );						// value를 가져온다
+	BOOL GetAt(int _iIndex, char* pszValue, int* _iValue, long long* _plValue);						// value를 가져온다
 
 	int GetCount();								// value count 체크
 	

@@ -3,39 +3,54 @@
 #include "MFC22_Stack_QueueEXDlg.h"
 
 CQueue::CQueue(int _iSize)
-: m_piBuff(NULL)
-, m_iRear(0)
-, m_iFront(0)
+: m_pRoot(NULL)
+, m_pLast(NULL)
 , m_iMaxSize(0)
-
 {
+
 	m_iMaxSize = _iSize;
-	m_piBuff = new int[m_iMaxSize];
-	
+
 }
 
 CQueue::~CQueue()
 {
-	if (NULL != m_piBuff)
-	{
-		delete[] m_piBuff;
-		m_piBuff = NULL;
-	}
+	//DeleteAll();
 }
 
 // 사이즈 체크 함수 만들기
 
 void CQueue::EnQueue(int _iValue)
 {
-	if ((m_iMaxSize - 1) <= GetCount()) // 포화 상태인지 체크
+	Link_Item2* pNode = NULL;
+	//if ((m_iMaxSize > GetCount()) // 포화 상태인지 체크
+	//{
+	pNode = new Link_Item2;
+	memset(pNode, 0, sizeof(Link_Item2));
+
+	pNode->iItemLenght = sizeof(int);
+	pNode->uBuf.iValue = _iValue;
+	pNode->pLeft = NULL;
+	pNode->pRight = NULL;
+	//}
+	
+	if (NULL == m_pRoot)
 	{
-		
+		Link_Item2* pHeader = NULL;
+
+
+
+		m_pRoot = pNode;
+		m_pLast = m_pRoot;
 	}
 	else
 	{
-		m_iRear = (m_iRear + 1) % m_iMaxSize;
-		m_piBuff[m_iRear] = _iValue;
+		
+		/*pNode->pRight = 
+
+		m_pLast = pNode;*/
 	}
+
+	GetCount();
 }
 
 int CQueue::DeQueue()
@@ -46,32 +61,46 @@ int CQueue::DeQueue()
 	}
 	else
 	{
-		m_iFront = (m_iFront + 1) % m_iMaxSize;
-		return m_piBuff[m_iFront];
+		return 0;
 	}
 }
 
-// value count 체크
+//// value count 체크
 int CQueue::GetCount()
 {
-	int iCount = m_iRear - m_iFront;
-	
-	// front가 rear 보다 클 경우
-	if (iCount < 0)
+	Link_Item2* pNode = m_pRoot;
+	int iCount = 0;	
+
+	if (NULL != pNode)
 	{
-		iCount = (m_iMaxSize + m_iRear) - m_iFront;
+		do
+		{
+			iCount++;
+			if (NULL != pNode->pRight)
+			{
+				pNode = pNode->pRight;
+			}
+		} while (NULL != pNode->pRight);
 	}
+	
+
 	return iCount;
 }
-
-// value를 가져온다
+//
+//// value를 가져온다
 int CQueue::GetAt(int _iIndex)
 {
-	return m_piBuff[_iIndex];
+	return _iIndex = 0;
+//	return m_piBuff[_iIndex];
 }
+//
+//// value를 가져온다
+//int CQueue::GetFront()
+//{
+//	return m_iFront;
+//}
 
-// value를 가져온다
-int CQueue::GetFront()
-{
-	return m_iFront;
-}
+//void CQueue::DeleteAll()
+//{
+//
+//}

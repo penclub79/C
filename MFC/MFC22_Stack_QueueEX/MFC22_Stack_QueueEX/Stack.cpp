@@ -97,49 +97,48 @@ BOOL CStack::Pop(char* pszValue, int* _piValue)
 	{
 		if (NULL != _piValue)
 		{
-			//if (NULL == pNode->pNext)
-			//{
-			//	delete [] pNode->uBuf.pszBuffer;
-			//	pNode->uBuf.pszBuffer = NULL;
+			/*if (NULL == pNode->pNext)
+			{
+				delete [] pNode->uBuf.pszBuffer;
+				pNode->uBuf.pszBuffer = NULL;
 
-			//	delete pNode;
-			//	pNode = NULL;
+				delete pNode;
+				pNode = NULL;
 
-			//	m_pRoot = pNode;
-			//	m_pLast = pNode;
-			//}
-			//else
-			//{
-				//if (NULL != pNode)
-				//{
-				//	while (NULL != pNode->pNext)
-				//	{
-				//		pPrev = pNode;
-				//		pNode = pNode->pNext;
-				//		if (NULL == pNode->pNext)
-				//		{
-				//			if (NULL != pNode->uBuf.pszBuffer)
-				//			{
-				//				delete[] pNode->uBuf.pszBuffer;
-				//				pNode->uBuf.pszBuffer = NULL;
-				//			}
-				//			
-				//			if (NULL != pNode)
-				//			{
-				//				delete pNode;
-				//				pNode = NULL;
-				//			}
+				m_pRoot = pNode;
+				m_pLast = pNode;
+			}
+			else
+			{
+				if (NULL != pNode)
+				{
+					while (NULL != pNode->pNext)
+					{
+						pPrev = pNode;
+						pNode = pNode->pNext;
+						if (NULL == pNode->pNext)
+						{
+							if (NULL != pNode->uBuf.pszBuffer)
+							{
+								delete[] pNode->uBuf.pszBuffer;
+								pNode->uBuf.pszBuffer = NULL;
+							}
+							
+							if (NULL != pNode)
+							{
+								delete pNode;
+								pNode = NULL;
+							}
 
-				//			pPrev->pNext = NULL;
-				//			m_pLast = pPrev;
+							pPrev->pNext = NULL;
+							m_pLast = pPrev;
 
-				//			break;
-				//		}
-				//	}
-				//}
-				//return TRUE;
-			//}
-
+							break;
+						}
+					}
+				}
+				return TRUE;
+			}*/
 			if (0 < GetCount())
 			{
 				do
@@ -151,13 +150,11 @@ BOOL CStack::Pop(char* pszValue, int* _piValue)
 							delete[] pCurr->uBuf.pszBuffer;
 							pCurr->uBuf.pszBuffer = NULL;
 						}
-
 						if (NULL != pCurr)
 						{
 							delete pCurr;
 							pCurr = NULL;
 						}
-
 						if (NULL != pPrev)
 						{
 							pPrev->pNext = NULL;
@@ -168,23 +165,18 @@ BOOL CStack::Pop(char* pszValue, int* _piValue)
 							m_pRoot = NULL;
 							m_pLast = NULL;
 						}
-
 						break;
 					}
-
 					pPrev = pCurr;
 					pCurr = pCurr->pNext;
-
-
 				} while (NULL != pCurr);
 			}
-
-
 			return TRUE;
 		}
 		else
 			return FALSE;
 	}
+	return FALSE;
 }
 
 // value count 체크
@@ -206,7 +198,7 @@ int CStack::GetCount()
 }
 
 // value를 가져온다
-BOOL CStack::GetAt(int _iIndex, char* _pszValue, int* _piValue)
+BOOL CStack::GetAt(int _iIndex, char* _pszValue, int* _piValue, long long* _plValue)
 {
 	int iIndex = 0;
 	BOOL bResult = TRUE;
@@ -222,10 +214,10 @@ BOOL CStack::GetAt(int _iIndex, char* _pszValue, int* _piValue)
 			{
 				if (LINK_ITEM_TYPE_INT == m_iItemType)
 				{
-					if (NULL != _piValue)
-						*_piValue = pNode->uBuf.iValue;
-					else
-						bResult = FALSE;
+					//if (NULL != _piValue)
+						//*_piValue = pNode->uBuf.iValue;
+					//else
+						//bResult = FALSE;
 
 				}
 				else if (LINK_ITEM_TYPE_STRING == m_iItemType)
@@ -238,7 +230,7 @@ BOOL CStack::GetAt(int _iIndex, char* _pszValue, int* _piValue)
 				else if (LINK_ITEM_TYPE_INT64 == m_iItemType)
 				{
 					if (NULL != _pszValue)
-						*_piValue = pNode->uBuf.llValue;
+						*_plValue = pNode->uBuf.llValue;
 					else
 						bResult = FALSE;
 				}
