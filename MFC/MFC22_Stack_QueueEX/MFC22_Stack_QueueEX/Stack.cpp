@@ -29,28 +29,28 @@ void CStack::Push(int _iValue)
 /*		if (NULL == m_pRoot)
 		{
 			// POP할때 메모리 해제
-			m_pRoot = new Link_Item; // 12바이트
-			memset(m_pRoot, 0, sizeof(Link_Item));
+			m_pRoot = new Link_Item1; // 12바이트
+			memset(m_pRoot, 0, sizeof(Link_Item1));
 
 			m_pRoot->iItemLength = sizeof(int);
-			m_pRoot->pszBuffer = (unsigned char*)new int;
+			m_pRoot->uBuf.pszBuffer = (unsigned char*)new int;
 			// 초기화
-			memset(m_pRoot->pszBuffer, 0, sizeof(int));
-			*m_pRoot->pszBuffer = _iValue;
+			memset(m_pRoot->uBuf.pszBuffer, 0, sizeof(int));
+			*m_pRoot->uBuf.pszBuffer = _iValue;
 
 			m_pRoot->pNext = NULL;
 			m_pLast = m_pRoot;
 		}
 		else
 		{
-			Link_Item* pNode = NULL;
-			pNode = new Link_Item;
-			memset(pNode, 0, sizeof(Link_Item));
+			Link_Item1* pNode = NULL;
+			pNode = new Link_Item1;
+			memset(pNode, 0, sizeof(Link_Item1));
 
 			pNode->iItemLength = sizeof(int);
-			pNode->pszBuffer = (unsigned char*)new int;
+			pNode->uBuf.pszBuffer = (unsigned char*)new int;
 			// 복사
-			memcpy(pNode->pszBuffer, &_iValue, sizeof(int));
+			memcpy(pNode->uBuf.pszBuffer, &_iValue, sizeof(int));
 			pNode->pNext = NULL;
 
 			m_pLast->pNext = pNode;
@@ -61,15 +61,14 @@ void CStack::Push(int _iValue)
 
 		if (m_iMaxSize > GetCount())
 		{
-			Link_Item* pNode = NULL;
-
-			pNode = new Link_Item;
-			memset(pNode, 0, sizeof(Link_Item));
+			Link_Item1* pNode = NULL;
+			
+			pNode = new Link_Item1;
+			memset(pNode, 0, sizeof(Link_Item1));
 
 			pNode->iItemLength = sizeof(int);
-			pNode->pszBuffer = (unsigned char*)new unsigned char[sizeof(int)];
-			// 복사
-			memcpy(pNode->pszBuffer, &_iValue, sizeof(int));
+			pNode->uBuf.iValue = _iValue;
+			
 			pNode->pNext = NULL;
 
 
@@ -90,53 +89,97 @@ void CStack::Push(int _iValue)
 
 BOOL CStack::Pop(char* pszValue, int* _piValue)
 {
-	Link_Item* pNode = m_pRoot;
-	Link_Item* pPrev = NULL;
+	Link_Item1* pCurr = m_pRoot;
+	Link_Item1* pPrev = NULL;
 
 	// Int 일때
 	if (LINK_ITEM_TYPE_INT == m_iItemType)
 	{
 		if (NULL != _piValue)
 		{
-			if (NULL == pNode->pNext)
+			//if (NULL == pNode->pNext)
+			//{
+			//	delete [] pNode->uBuf.pszBuffer;
+			//	pNode->uBuf.pszBuffer = NULL;
+
+			//	delete pNode;
+			//	pNode = NULL;
+
+			//	m_pRoot = pNode;
+			//	m_pLast = pNode;
+			//}
+			//else
+			//{
+				//if (NULL != pNode)
+				//{
+				//	while (NULL != pNode->pNext)
+				//	{
+				//		pPrev = pNode;
+				//		pNode = pNode->pNext;
+				//		if (NULL == pNode->pNext)
+				//		{
+				//			if (NULL != pNode->uBuf.pszBuffer)
+				//			{
+				//				delete[] pNode->uBuf.pszBuffer;
+				//				pNode->uBuf.pszBuffer = NULL;
+				//			}
+				//			
+				//			if (NULL != pNode)
+				//			{
+				//				delete pNode;
+				//				pNode = NULL;
+				//			}
+
+				//			pPrev->pNext = NULL;
+				//			m_pLast = pPrev;
+
+				//			break;
+				//		}
+				//	}
+				//}
+				//return TRUE;
+			//}
+
+			if (0 < GetCount())
 			{
-				delete [] pNode->pszBuffer;
-				pNode->pszBuffer = NULL;
-
-				delete pNode;
-				pNode = NULL;
-
-				m_pRoot = pNode;
-				m_pLast = pNode;
-			}
-
-			if (NULL != pNode)
-			{
-				while (NULL != pNode->pNext)
+				do
 				{
-					pPrev = pNode;
-					pNode = pNode->pNext;
-					if (NULL == pNode->pNext)
+					if (NULL == pCurr->pNext)
 					{
-						if (NULL != pNode->pszBuffer)
+						if (NULL != pCurr->uBuf.pszBuffer)
 						{
-							delete[] pNode->pszBuffer;
-							pNode->pszBuffer = NULL;
-						}
-						
-						if (NULL != pNode)
-						{
-							delete pNode;
-							pNode = NULL;
+							delete[] pCurr->uBuf.pszBuffer;
+							pCurr->uBuf.pszBuffer = NULL;
 						}
 
-						pPrev->pNext = NULL;
-						m_pLast = pPrev;
+						if (NULL != pCurr)
+						{
+							delete pCurr;
+							pCurr = NULL;
+						}
+
+						if (NULL != pPrev)
+						{
+							pPrev->pNext = NULL;
+							m_pLast = pPrev;
+						}
+						else
+						{
+							m_pRoot = NULL;
+							m_pLast = NULL;
+						}
 
 						break;
 					}
-				}
+
+					pPrev = pCurr;
+					pCurr = pCurr->pNext;
+
+
+				} while (NULL != pCurr);
 			}
+
+
 			return TRUE;
 		}
 		else
@@ -148,7 +191,7 @@ BOOL CStack::Pop(char* pszValue, int* _piValue)
 int CStack::GetCount()
 {
 	int iCount = 0;
-	Link_Item* pNode = m_pRoot;
+	Link_Item1* pNode = m_pRoot;
 
 	if (NULL != pNode)
 	{
@@ -168,7 +211,7 @@ BOOL CStack::GetAt(int _iIndex, char* _pszValue, int* _piValue)
 	int iIndex = 0;
 	BOOL bResult = TRUE;
 
-	Link_Item* pNode = m_pRoot;
+	Link_Item1* pNode = m_pRoot;
 
 	if (NULL != pNode)
 	{
@@ -180,7 +223,7 @@ BOOL CStack::GetAt(int _iIndex, char* _pszValue, int* _piValue)
 				if (LINK_ITEM_TYPE_INT == m_iItemType)
 				{
 					if (NULL != _piValue)
-						memcpy(_piValue, pNode->pszBuffer, sizeof(int));
+						*_piValue = pNode->uBuf.iValue;
 					else
 						bResult = FALSE;
 
@@ -188,7 +231,14 @@ BOOL CStack::GetAt(int _iIndex, char* _pszValue, int* _piValue)
 				else if (LINK_ITEM_TYPE_STRING == m_iItemType)
 				{
 					if (NULL != _pszValue)
-						_pszValue = (char*)pNode->pszBuffer;
+						memcpy(_pszValue, pNode->uBuf.pszBuffer, sizeof(char));
+					else
+						bResult = FALSE;
+				}
+				else if (LINK_ITEM_TYPE_INT64 == m_iItemType)
+				{
+					if (NULL != _pszValue)
+						*_piValue = pNode->uBuf.llValue;
 					else
 						bResult = FALSE;
 				}
@@ -209,9 +259,8 @@ BOOL CStack::GetAt(int _iIndex, char* _pszValue, int* _piValue)
 // 프로그램 종료시 메모리 해제 함수
 void CStack::DeleteAll()
 {
-	Link_Item* pNode = m_pRoot;
-	//Link_Item* pPrev = NULL;
-	Link_Item* pNext = NULL;
+	Link_Item1* pNode = m_pRoot;
+	Link_Item1* pNext = NULL;
 
 	if (NULL != pNode)
 	{
@@ -222,10 +271,10 @@ void CStack::DeleteAll()
 			// 현재 노드 메모리를 해제한다.
 			if (NULL != pNode)
 			{
-				if (NULL != pNode->pszBuffer)
+				if (NULL != pNode->uBuf.pszBuffer)
 				{
-					delete[] pNode->pszBuffer;
-					pNode->pszBuffer = NULL;
+					delete[] pNode->uBuf.pszBuffer;
+					pNode->uBuf.pszBuffer = NULL;
 				}
 				delete pNode;
 				pNode = NULL;
@@ -233,17 +282,6 @@ void CStack::DeleteAll()
 
 			// 다음 노드로 이동한다.
 			pNode = pNext;
-
-			if (NULL == pNode->pNext)
-			{
-				if (NULL != pNode->pszBuffer)
-				{
-					delete[] pNode->pszBuffer;
-					pNode->pszBuffer = NULL;
-				}
-				delete pNode;
-				pNode = NULL;
-			}
 		}
 	}
 }
