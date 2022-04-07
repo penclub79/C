@@ -127,7 +127,7 @@ BOOL CMFC22_Stack_QueueEXDlg::OnInitDialog()
 	m_bIsStack	= TRUE;
 
 	m_pStack = new CStack(CStack::LINK_ITEM_TYPE_INT, 10);
-	m_pQueue	= new CQueue(10);
+	m_pQueue = new CQueue(CQueue::LINK_ITEM_TYPE_INT, 10);
 
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
@@ -244,7 +244,6 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 void CMFC22_Stack_QueueEXDlg::ReDrawList()
 {
 	m_ctlListBox.ResetContent();
-	int iListIndex = 0;
 
 	int		iVal = 0;
 	int		iCount = 0;
@@ -269,16 +268,18 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 			}
 		}
 	}
-	/*else
+	else
 	{
 		iCount = m_pQueue->GetCount();
-		for (int i = 0; i < iCount; i++)
+		if (0 < iCount)
 		{
-			iPos = (m_pQueue->GetFront() + 1 + i) % 10;
-			strValue.Format(_T("Index:%d, 값:%d"), iPos, m_pQueue->GetAt(iPos));
-			m_ctlListBox.InsertString(i, strValue);
+			for (int i = 0; i < iCount; i++)
+			{
+				strValue.Format(_T("인덱스:%d, 값:%d"), i, m_pQueue->GetAt(i));
+				m_ctlListBox.InsertString(i, strValue);
+			}
 		}
-	}*/
+	}
 	
 }
 
@@ -309,12 +310,16 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 			}
 		}
 	}
-	/*else
+	else
 	{
-		if (NULL != m_pQueue)
+		iCount = m_pQueue->GetCount();
+		if (0 < iCount)
 		{
-			m_pQueue->DeQueue();
-			ReDrawList();
+			if (NULL != m_pQueue)
+			{
+				m_pQueue->DeQueue();
+				ReDrawList();
+			}
 		}
-	}*/
+	}
 }

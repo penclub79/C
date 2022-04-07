@@ -6,7 +6,7 @@ class CQueue
 {
 	
 public:
-	CQueue(int _iSize);
+	CQueue(int _iItemType, int _iSize);
 	~CQueue();
 
 	enum { LINK_ITEM_TYPE_INT, LINK_ITEM_TYPE_STRING, LINK_ITEM_TYPE_INT64 };
@@ -22,15 +22,14 @@ public:
 	{
 		int				iItemLenght;
 		UBuffer			uBuf;
-		Link_Item2*		pLeft;
-		Link_Item2*		pRight;
+		Link_Item2*		pPrev;
+		Link_Item2*		pNext;
 	};
 
 	void EnQueue(int _iValue);
 	int DeQueue();
 	int GetCount();
 	int GetAt(int _iIndex);
-	int GetFront();
 	void DeleteAll();
 
 protected:
@@ -41,4 +40,5 @@ private:
 	Link_Item2*	m_pRoot;
 
 	int m_iMaxSize;
+	int m_iItemType;
 };
