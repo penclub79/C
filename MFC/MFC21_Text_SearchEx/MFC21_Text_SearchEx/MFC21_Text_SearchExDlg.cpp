@@ -72,8 +72,6 @@ CMFC21_Text_SearchExDlg::CMFC21_Text_SearchExDlg(CWnd* pParent /*=NULL*/)
 	
 	char* bResult = 0;
 
-	char B[10] = { "Heelo" };
-	char* data = B;
 	////변수 선언 - End
 	////////////////////////////////////////////////////////////////
 

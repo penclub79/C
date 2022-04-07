@@ -126,8 +126,8 @@ BOOL CMFC22_Stack_QueueEXDlg::OnInitDialog()
 	m_pstrCheckRadio->SetCheck(TRUE);
 	m_bIsStack	= TRUE;
 
-	m_pStack = new CStack(CStack::LINK_ITEM_TYPE_INT, 10);
-	m_pQueue = new CQueue(CQueue::LINK_ITEM_TYPE_INT, 10);
+	m_pStack = new CStack(10);
+	m_pQueue = new CQueue(10);
 
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
@@ -216,30 +216,106 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	CString strValue;
 	int iValue = 0;
 	int iIndex = 0;
+	int	iItemType = LINK_ITEM_TYPE_INT;
+
 	GetDlgItemText(IDC_EDIT_INPUT, strValue);
-	iValue = _ttoi(strValue);	// CString -> int로 변환
-	char szStr[10] = { 0 };
+
+	// 입력 받은 Item 타입 체크
+	if (TRUE == IsNumeric(strValue))
+	{
+		// int 일때 
+		iItemType = LINK_ITEM_TYPE_INT;
+	}
+	else
+	{
+		// String 일때
+		iItemType = LINK_ITEM_TYPE_STRING;
+	}
+
 
 	if (TRUE == m_bIsStack)										
 	{
 		if (NULL != m_pStack)									
 		{
-			if (0 < iValue)
+			if (LINK_ITEM_TYPE_INT == iItemType)
 			{
-				m_pStack->Push(iValue);
-				ReDrawList();
+				iValue = _ttoi(strValue);	// CString -> int로 변환
+
+				if (0 < iValue)
+					m_pStack->Push(iValue);
 			}
+			else
+			{
+				int iStrLen = strValue.GetLength();
+				WCHAR* szBuff = NULL;
+
+				szBuff = strValue.GetBuffer(sizeof(WCHAR) * iStrLen + 1);
+				//strcpy((char*)szBuff, (char*)strValue.GetBuffer());
+
+				strValue.ReleaseBuffer();
+
+				m_pStack->Push((char*)szBuff, iStrLen);
+			}
+
+			ReDrawList();
 		}
 	}
 	else
 	{	
 		if (NULL != m_pQueue)
 		{
-			m_pQueue->EnQueue(iValue);	// 큐 삽입
+			if (LINK_ITEM_TYPE_INT == iItemType)
+				m_pQueue->EnQueue(iValue);
+			else
+				//m_pQueue->EnQueue(strValue.GetBuffer(), strValue.GetLength());
+
 			ReDrawList();
 		}
 	}
 }
+
+
+void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	int iCount = 0;
+	Link_Data	stLinkData = { 0 };
+
+	BOOL bResult = FALSE;
+
+	if (TRUE == m_bIsStack)
+	{
+		if (NULL != m_pStack)
+		{
+			iCount = m_pStack->GetCount();
+
+			if (iCount > 0)
+			{
+				//bResult = m_pStack->Pop(&stLinkData);
+
+				/*if (TRUE == bResult)
+					ReDrawList();*/
+			}
+			else
+			{
+				AfxMessageBox(_T("값이 없습니다."));
+			}
+		}
+	}
+	else
+	{
+		iCount = m_pQueue->GetCount();
+		if (0 < iCount)
+		{
+			if (NULL != m_pQueue)
+			{
+				//m_pQueue->DeQueue(&szValue[0], &iPos);
+				ReDrawList();
+			}
+		}
+	}
+}
+
 
 void CMFC22_Stack_QueueEXDlg::ReDrawList()
 {
@@ -255,16 +331,16 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 	if (TRUE == m_bIsStack)
 	{
 		iCount = m_pStack->GetCount();
-		iPos = m_pStack->GetAt(0, NULL, &iVal, NULL);
+		//iPos = m_pStack->GetAt(0, NULL, &iVal, NULL);
 		if (0 < iCount)
 		{
 			for (int i = 0; i < iCount; i++)
 			{
-				if (TRUE == m_pStack->GetAt(i, NULL, &iVal, NULL))
+				/*if (TRUE == m_pStack->GetAt(i, NULL, &iVal, NULL))
 				{	
 					strValue.Format(_T("인덱스:%d, 값:%d"), i, iVal);
 					m_ctlListBox.InsertString(i, strValue);
-				}
+				}*/
 			}
 		}
 	}
@@ -273,53 +349,46 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 		iCount = m_pQueue->GetCount();
 		if (0 < iCount)
 		{
-			for (int i = 0; i < iCount; i++)
+			/*for (int i = 0; i < iCount; i++)
 			{
 				strValue.Format(_T("인덱스:%d, 값:%d"), i, m_pQueue->GetAt(i));
 				m_ctlListBox.InsertString(i, strValue);
-			}
+			}*/
 		}
 	}
 	
 }
 
-void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
+// 
+BOOL CMFC22_Stack_QueueEXDlg::IsNumeric(CString _strValue)
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	int iCount = 0;
-	int iPos = 0;
+	// 유니코드는 한 글자에 2바이트이다.
+	
+	BOOL bResult = TRUE;
+	char* pszBuffer = NULL;
+	//memset(pszBuffer, 0, (sizeof(WCHAR)* iLen) + 1);
 
-	BOOL bResult = FALSE;
-	char szPos[MAX_PATH] = { 0 };
+	// CT2A는 class이며 UTF8로 한 글자만 변환한다.
+	CT2A ascii(_strValue, CP_UTF8);
+	pszBuffer = ascii.m_psz;
+	
+	int iStrSize = strlen(pszBuffer);
+	int iValueASC = 0;
 
-	if (TRUE == m_bIsStack)
+	for (int i = 0; i < iStrSize; i++)
 	{
-		if (NULL != m_pStack)
-		{
-			iCount = m_pStack->GetCount();
+		iValueASC = *pszBuffer;
 
-			if (iCount > 0)
-			{
-				bResult = m_pStack->Pop(NULL, &iPos);
-				if (TRUE == bResult)
-					ReDrawList();
-			}
-			else
-			{
-				AfxMessageBox(_T("값이 없습니다."));
-			}
+		// 0 ~ 9까지 ASCII코드 체크
+		if (48 > iValueASC || 57 < iValueASC)
+		{  
+			// 문자가 하나라도 있으면 IsNumeric은 FALSE이다.
+			bResult	= FALSE;
+			break;
 		}
+
+		pszBuffer++;
 	}
-	else
-	{
-		iCount = m_pQueue->GetCount();
-		if (0 < iCount)
-		{
-			if (NULL != m_pQueue)
-			{
-				m_pQueue->DeQueue();
-				ReDrawList();
-			}
-		}
-	}
+
+	return bResult;
 }

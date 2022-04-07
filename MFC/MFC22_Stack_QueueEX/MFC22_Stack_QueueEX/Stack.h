@@ -12,41 +12,22 @@ LastItem 주소값을 가진 변수를 통해 ROOT아이템까지 모두 POP을 해야한다.
 
 */
 
+#include "Common.h"
+
 class CStack 
 {
 
 public:
-	CStack(int iItemType, int _iSize);
+	CStack(int _iSize);
 	~CStack();
-	// String 인지 int인지 Item타입 설정하고 스택사용
 
-	enum { LINK_ITEM_TYPE_INT, LINK_ITEM_TYPE_STRING, LINK_ITEM_TYPE_INT64 };
-	
-	/*
-	구조체의 변수들은 4바이트 단위이다.
-	예를들어 구조체 안에서 char자료형도 4바이트이다.
-	*/
-
-	union UBuffer
-	{
-		int					iValue;
-		unsigned char*		pszBuffer;
-		long long			llValue;
-	};
-
-	struct Link_Item1
-	{
-		int				iItemLength	; 
-		UBuffer			uBuf;
-		Link_Item1*		pNext;
-	};
 
 	void Push(int _iValue);
-	void Push(char* _pszValue );
+	void Push(char* _pszValue, int iSize );
 	void DeleteAll();
 
-	BOOL Pop(char* pszValue, int* _iValue);		// 주소값을 참조한다
-	BOOL GetAt(int _iIndex, char* pszValue, int* _iValue, long long* _plValue);						// value를 가져온다
+	BOOL Pop(Link_Data* pLinkData);						// 주소값을 참조한다
+	BOOL GetAt(int _iIndex, Link_Data* pLinkData);		// value를 가져온다
 
 	int GetCount();								// value count 체크
 	

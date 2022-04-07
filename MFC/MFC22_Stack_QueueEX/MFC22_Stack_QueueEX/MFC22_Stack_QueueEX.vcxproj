@@ -99,6 +99,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common.h" />
     <ClInclude Include="MFC22_Stack_QueueEX.h" />
     <ClInclude Include="MFC22_Stack_QueueEXDlg.h" />
     <ClInclude Include="Queue.h" />

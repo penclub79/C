@@ -35,6 +35,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 	
 	void ReDrawList();
+	BOOL IsNumeric(CString _stValue);
 
 	bool m_bIsStack;	// Stack Check
 	CButton* m_pstrCheckRadio;  // 라디오 버튼 체크

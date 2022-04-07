@@ -1,35 +1,20 @@
-
-
 #pragma once
+
+#include "Common.h"
 
 class CQueue
 {
 	
 public:
-	CQueue(int _iItemType, int _iSize);
+	CQueue(int _iSize);
 	~CQueue();
 
-	enum { LINK_ITEM_TYPE_INT, LINK_ITEM_TYPE_STRING, LINK_ITEM_TYPE_INT64 };
-
-	union UBuffer
-	{
-		int				iValue;
-		unsigned char*	pszBuffer;
-		long long		lIValue;
-	};
-
-	struct Link_Item2
-	{
-		int				iItemLenght;
-		UBuffer			uBuf;
-		Link_Item2*		pPrev;
-		Link_Item2*		pNext;
-	};
-
 	void EnQueue(int _iValue);
-	int DeQueue();
+	void EnQueue(char* _pszValue, int iSize);
+	BOOL DeQueue(Link_Data* pLinkData);
+	BOOL GetAt(int _iIndex, Link_Data* pLinkData);
+
 	int GetCount();
-	int GetAt(int _iIndex);
 	void DeleteAll();
 
 protected:
