@@ -7,14 +7,12 @@ CQueue::CQueue(int _iSize)
 , m_pLast(NULL)
 , m_iMaxSize(0)
 {
-
 	m_iMaxSize = _iSize;
-
 }
 
 CQueue::~CQueue()
 {
-	//DeleteAll();
+	DeleteAll();
 }
 
 // 사이즈 체크 함수 만들기
@@ -25,30 +23,27 @@ void CQueue::EnQueue(int _iValue)
 	
 	if (m_iMaxSize > GetCount()) // 포화 상태인지 체크
 	{
+		Link_Item* pNode = NULL;
+
 		pNode = new Link_Item;
 		memset(pNode, 0, sizeof(Link_Item));
 
-		if (LINK_ITEM_TYPE_INT == m_iItemType)
-		{
-			pNode->stData.iItemLength = sizeof(int);
-			pNode->stData.uBuf.iValue = _iValue;
-		}
-		/*else if (LINK_ITEM_TYPE_STRING == m_iItemType)
-		{
+		pNode->stData.iItemLength = sizeof(int);
+		pNode->stData.uBuf.iValue = _iValue;
+		// itemtype 지정
+		pNode->stData.iItemType = LINK_ITEM_TYPE_INT;
 
-		}*/
-
-		pNode->pPrev = NULL;
 		pNode->pNext = NULL;
-		
+
 		// 생성된 노드는 이전 노드 주소를 가르킨다.
 		pNode->pPrev = m_pLast;
 
+		if (NULL == m_pRoot)
+			m_pRoot = pNode;
+
 		// 이전 노드는 다음 노드를 가르킨다.
 		if (NULL != m_pLast)
-		{
 			m_pLast->pNext = pNode;
-		}
 
 		// 새롭게 생성된 노드는 마지막 노드가 된다.
 		m_pLast = pNode;
@@ -56,27 +51,97 @@ void CQueue::EnQueue(int _iValue)
 
 }
 
-//int CQueue::DeQueue()
-//{
-//	if (GetCount() <= 0)
-//	{
-//		
-//
-//
-//
-//		return -1;
-//	}
-//	else
-//	{
-//		return 0;
-//	}
-//}
+void CQueue::EnQueue(char* _pszValue, int _iSize)
+{
+	// String 일때
+	WCHAR* pszBuff = NULL;
+	pszBuff = (WCHAR*)_pszValue;
+
+	if (m_iMaxSize > GetCount())
+	{
+		Link_Item* pNode = NULL;
+
+		pNode = new Link_Item;
+		memset(pNode, 0, sizeof(Link_Item));
+
+		// String을 받기 위한 버퍼 동적 할당
+		pNode->stData.uBuf.pszBuffer = new unsigned char[_iSize + 1];
+		// 해당 버퍼 초기화
+		memset(pNode->stData.uBuf.pszBuffer, 0, _iSize + 1);
+
+		pNode->stData.iItemLength = _iSize;
+
+		// WCHAR(유니코드) -> char(멀티바이트) 값 복사
+		WideCharToMultiByte(CP_ACP, 0, pszBuff, -1, (char*)pNode->stData.uBuf.pszBuffer, _iSize, 0, 0);
+
+		// itemtype 지정
+		pNode->stData.iItemType = LINK_ITEM_TYPE_STRING;
+
+		pNode->pNext = NULL;
+
+		// 생성된 노드는 이전 노드 주소를 가르킨다.
+		pNode->pPrev = m_pLast;
+
+		if (NULL == m_pRoot)
+			m_pRoot = pNode;
+
+		// 이전 노드는 다음 노드를 가르킨다.
+		if (NULL != m_pLast)
+			m_pLast->pNext = pNode;
+
+		// 새롭게 생성된 노드는 마지막 노드가 된다.
+		m_pLast = pNode;
+	}
+
+}
+
+BOOL CQueue::DeQueue(Link_Data* pLinkData)
+{
+	Link_Item* pNode = m_pRoot;
+	BOOL bResult = FALSE;
+	//Link_Data* pNodeData = &pNode->stData;
+
+	if (NULL != pNode)
+	{
+		// 노드의 처음을 POP한다.
+		memcpy(pLinkData, &pNode->stData, sizeof(Link_Data));
+
+		if (LINK_ITEM_TYPE_STRING == pNode->stData.iItemType)
+		{
+			if (NULL != pNode->stData.uBuf.pszBuffer)
+			{
+				delete[] pNode->stData.uBuf.pszBuffer;
+				pNode->stData.uBuf.pszBuffer = NULL;
+			}
+		}
+		if (NULL != m_pRoot->pNext)
+		{
+			m_pRoot = pNode->pNext;
+			delete pNode;
+			pNode = NULL;
+			m_pRoot->pPrev = NULL;
+
+			bResult = TRUE;
+		}
+		else
+		{
+			delete pNode;
+			pNode = NULL;
+			m_pRoot = NULL;
+			m_pLast = NULL;
+
+			bResult = TRUE;
+		}
+				
+	}
+	return bResult;
+}
 
 //// value count 체크
 int CQueue::GetCount()
 {
+	int iCount = 0;
 	Link_Item* pNode = m_pRoot;
-	int iCount = 0;	
 
 	if (NULL != pNode)
 	{
@@ -85,66 +150,74 @@ int CQueue::GetCount()
 			iCount++;
 			pNode = pNode->pNext;
 		} while (NULL != pNode);
+
 	}
-	
 	return iCount;
 }
 
 // 현재 Index의 값을 가져오는 함수
-//int CQueue::GetAt(int _iIndex)
-//{
-//	Link_Item2* pNode = m_pRoot;
-//	int iIndex = 0;
-//	int iVal = 0;
-//
-//	// 노드가 있는지 체크
-//	if (0 < GetCount())
-//	{
-//		do
-//		{
-//			// 매개변수 인덱스와 함수 인덱스가 일치하면 해당 노드의 값을 가지고 온다.
-//			if (iIndex == _iIndex)
-//			{
-//				return iVal = pNode->uBuf.iValue;
-//			}
-//			else
-//			{
-//				pNode = pNode->pNext;
-//				iIndex++;
-//			}
-//		} while (NULL != pNode);
-//	}
-//
-//	return iVal;
-//}
+int CQueue::GetAt(int _iIndex, Link_Data* pLinkData)
+{
+	int iIndex = 0;
 
-//void CQueue::DeleteAll()
-//{
-//	Link_Item* pNode = m_pRoot;
-//	Link_Item* pNext = NULL;
-//
-//	do
-//	{
-//		// 노드의 다음 주소를 담는다.
-//		pNext = pNode->pNext;
-//
-//		// 현재 노드가 마지막 노드인지 체크한다.
-//		if (NULL != pNode->pNext)
-//		{
-//			if (LINK_ITEM_TYPE_STRING == m_iItemType)
-//			{
-//				if (NULL != pNode->uBuf.pszBuffer)
-//				{
-//					delete[] pNode->uBuf.pszBuffer;
-//					pNode->uBuf.pszBuffer = NULL;
-//				}
-//			}
-//			delete pNode;
-//			pNode = NULL;
-//		}
-//
-//		// 현재 노드는 다음 노드의 주소를 담는다.
-//		pNode = pNext;
-//		
-//	} while (NULL != pNode);
-//}
+	BOOL bResult = FALSE;
+
+	Link_Item* pNode = m_pRoot;
+
+	if (NULL != pNode)
+	{
+		do
+		{
+			// 현재 인덱스의 데이터를 가지고 와야한다.
+			if (_iIndex == iIndex)
+			{
+				if (NULL != pNode->stData.uBuf.iValue || NULL != pNode->stData.uBuf.pszBuffer)
+					bResult = TRUE;
+				else
+					bResult = FALSE;
+				// 일반 변수는 값을 대입하지만 나머지는 memcpy를 사용한다.
+				memcpy(pLinkData, &pNode->stData, sizeof(Link_Data));
+
+				break;
+			}
+
+			pNode = pNode->pNext;
+			iIndex++;
+		} while (NULL != pNode);
+
+	}
+
+	return bResult;
+}
+
+void CQueue::DeleteAll()
+{
+	Link_Item* pNode = m_pRoot;
+	Link_Item* pNext = NULL;
+
+	if (NULL != pNode)
+	{
+		while (NULL != pNode)
+		{
+			pNext = pNode->pNext;
+
+			// 현재 노드 메모리를 해제한다.
+			if (NULL != pNode)
+			{
+				if (LINK_ITEM_TYPE_STRING == pNode->stData.iItemType)
+				{
+					if (NULL != pNode->stData.uBuf.pszBuffer)
+					{
+						delete[] pNode->stData.uBuf.pszBuffer;
+						pNode->stData.uBuf.pszBuffer = NULL;
+					}
+				}
+				delete pNode;
+				pNode = NULL;
+			}
+
+			// 다음 노드로 이동한다.
+			pNode = pNext;
+		}
+	}
+}

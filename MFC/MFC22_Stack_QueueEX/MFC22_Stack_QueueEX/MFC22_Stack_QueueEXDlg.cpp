@@ -250,9 +250,8 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 				WCHAR* szBuff = NULL;
 
 				szBuff = strValue.GetBuffer(sizeof(WCHAR) * iStrLen + 1);
-				//strcpy((char*)szBuff, (char*)strValue.GetBuffer());
 
-				m_pStack->Push((char*)szBuff, sizeof(WCHAR)*iStrLen);
+				m_pStack->Push((char*)szBuff, sizeof(WCHAR) * iStrLen);
 
 				strValue.ReleaseBuffer();
 			}
@@ -265,10 +264,20 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 		if (NULL != m_pQueue)
 		{
 			if (LINK_ITEM_TYPE_INT == iItemType)
+			{
+				iValue = _ttoi(strValue);
 				m_pQueue->EnQueue(iValue);
+			}
 			else
-				//m_pQueue->EnQueue(strValue.GetBuffer(), strValue.GetLength());
+			{
+				int iStrLen = strValue.GetLength();
+				WCHAR* szBuff = NULL;
+				szBuff = strValue.GetBuffer(sizeof(WCHAR)* iStrLen + 1);
 
+				m_pQueue->EnQueue((char*)szBuff, sizeof(WCHAR) * iStrLen);
+
+				strValue.ReleaseBuffer();
+			}
 			ReDrawList();
 		}
 	}
@@ -309,9 +318,15 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 		{
 			if (NULL != m_pQueue)
 			{
-				//m_pQueue->DeQueue(&szValue[0], &iPos);
-				ReDrawList();
+				bResult = m_pQueue->DeQueue(&stLinkData);
+				
+				if (TRUE == bResult)
+					ReDrawList();
 			}
+		}
+		else
+		{
+			AfxMessageBox(_T("값이 없습니다."));
 		}
 	}
 }
@@ -346,6 +361,7 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 					else
 					{
 						CString strString;
+
 						strString = stLinkData.uBuf.pszBuffer;
 						strValue.Format(_T("인덱스:%d, 값:%s"), i, strString);
 					}
@@ -361,11 +377,25 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 		iCount = m_pQueue->GetCount();
 		if (0 < iCount)
 		{
-			/*for (int i = 0; i < iCount; i++)
+			for (int i = 0; i < iCount; i++)
 			{
-				strValue.Format(_T("인덱스:%d, 값:%d"), i, m_pQueue->GetAt(i));
-				m_ctlListBox.InsertString(i, strValue);
-			}*/
+				if (TRUE == m_pQueue->GetAt(i, &stLinkData))
+				{
+					if (LINK_ITEM_TYPE_INT == stLinkData.iItemType)
+					{
+						iVal = stLinkData.uBuf.iValue;
+						strValue.Format(_T("인덱스:%d, 값:%d"), i, iVal);
+					}
+					else
+					{
+						CString strString;
+						strString = stLinkData.uBuf.pszBuffer;
+						strValue.Format(_T("인덱스:%d, 값:%s"), i, strString);
+					}
+
+					m_ctlListBox.InsertString(i, strValue);
+				}
+			}
 		}
 	}
 	

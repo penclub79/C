@@ -23,7 +23,7 @@ public:
 
 
 	void Push(int _iValue);
-	void Push(char* _pszValue, int iSize);
+	void Push(char* _pszValue, int _iSize);
 	void DeleteAll();
 
 	BOOL Pop(Link_Data* pLinkData);						// 주소값을 참조한다

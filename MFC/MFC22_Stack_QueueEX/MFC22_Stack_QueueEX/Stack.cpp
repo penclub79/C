@@ -56,11 +56,12 @@ void CStack::Push(int _iValue)
 	
 }
 
-void CStack::Push(char* _pszValue, int iSize)
+void CStack::Push(char* _pszValue, int _iSize)
 {
 	// String 일때
 	WCHAR* pszBuff = NULL;
 	pszBuff = (WCHAR*)_pszValue;
+
 	
 	if (m_iMaxSize > GetCount())
 	{
@@ -70,15 +71,14 @@ void CStack::Push(char* _pszValue, int iSize)
 		memset(pNode, 0, sizeof(Link_Item));
 
 		// String을 받기 위한 버퍼 동적 할당
-		pNode->stData.uBuf.pszBuffer = new unsigned char[iSize + 1];
-		// 해당 버퍼 초기화
-		memset(pNode->stData.uBuf.pszBuffer, 0, iSize + 1);
-		
-		pNode->stData.iItemLength = iSize;
+		pNode->stData.uBuf.pszBuffer = new unsigned char[_iSize + 1];
 
-		// 버퍼에 String값 넣기 memcpy()로 사용
-		/*memcpy(pNode->stData.uBuf.pszBuffer, pszBuff, iSize);*/
-		memcpy(pNode->stData.uBuf.pszBuffer, pszBuff, iSize);
+		// 해당 버퍼 초기화
+		memset(pNode->stData.uBuf.pszBuffer, 0, _iSize + 1);
+		
+		pNode->stData.iItemLength = _iSize;
+
+		WideCharToMultiByte(CP_ACP, 0, pszBuff, -1, (char*)pNode->stData.uBuf.pszBuffer, _iSize, 0, 0);
 
 		// itemtype 지정
 		pNode->stData.iItemType = LINK_ITEM_TYPE_STRING;
@@ -126,6 +126,7 @@ BOOL CStack::Pop(Link_Data* pLinkData)
 							pNode->stData.uBuf.pszBuffer = NULL;
 						}
 					}
+
 					if (NULL != m_pLast->pPrev)
 					{
 						m_pLast = pNode->pPrev;
@@ -193,8 +194,13 @@ BOOL CStack::GetAt(int _iIndex, Link_Data* pLinkData)
 					bResult = TRUE;
 				else
 					bResult = FALSE;
+
 				// 일반 변수는 값을 대입하지만 나머지는 memcpy를 사용한다.
 				memcpy(pLinkData, &pNode->stData, sizeof(Link_Data));
+	//			pLinkData->iItemType = pNode->stData.iItemType;
+	//			pLinkData->iItemLength = pNode->stData.iItemLength;
+	//			pLinkData->
+ //= pNode->stData.iItemType;
 
 				break;
 			}
@@ -223,11 +229,14 @@ void CStack::DeleteAll()
 			// 현재 노드 메모리를 해제한다.
 			if (NULL != pNode)
 			{
-				/*if (NULL != pNode->uBuf.pszBuffer)
+				if (LINK_ITEM_TYPE_STRING == pNode->stData.iItemType)
 				{
-					delete[] pNode->uBuf.pszBuffer;
-					pNode->uBuf.pszBuffer = NULL;
-				}*/
+					if (NULL != pNode->stData.uBuf.pszBuffer)
+					{
+						delete[] pNode->stData.uBuf.pszBuffer;
+						pNode->stData.uBuf.pszBuffer = NULL;
+					}
+				}
 				delete pNode;
 				pNode = NULL;
 			}
