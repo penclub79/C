@@ -27,16 +27,10 @@ struct Link_Data
 예를들어 구조체 안에서 char자료형도 4바이트이다.
 */
 
-struct Link_Item1
-{
-	Link_Data		stData;
-	Link_Item1*		pPrev;
-	Link_Item1*		pNext;
-};
 
-struct Link_Item2
+struct Link_Item
 {
 	Link_Data		stData;
-	Link_Item2*		pPrev;
-	Link_Item2*		pNext;
+	Link_Item*		pPrev;
+	Link_Item*		pNext;
 };

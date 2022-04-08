@@ -21,8 +21,8 @@ protected:
 
 
 private:
-	Link_Item2*	m_pLast;
-	Link_Item2*	m_pRoot;
+	Link_Item*	m_pLast;
+	Link_Item*	m_pRoot;
 
 	int m_iMaxSize;
 	int m_iItemType;

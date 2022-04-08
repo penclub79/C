@@ -21,12 +21,12 @@ CQueue::~CQueue()
 
 void CQueue::EnQueue(int _iValue)
 {
-	Link_Item2* pNode = NULL;
+	Link_Item* pNode = NULL;
 	
 	if (m_iMaxSize > GetCount()) // 포화 상태인지 체크
 	{
-		pNode = new Link_Item2;
-		memset(pNode, 0, sizeof(Link_Item2));
+		pNode = new Link_Item;
+		memset(pNode, 0, sizeof(Link_Item));
 
 		if (LINK_ITEM_TYPE_INT == m_iItemType)
 		{
@@ -75,7 +75,7 @@ void CQueue::EnQueue(int _iValue)
 //// value count 체크
 int CQueue::GetCount()
 {
-	Link_Item2* pNode = m_pRoot;
+	Link_Item* pNode = m_pRoot;
 	int iCount = 0;	
 
 	if (NULL != pNode)
@@ -120,8 +120,8 @@ int CQueue::GetCount()
 
 //void CQueue::DeleteAll()
 //{
-//	Link_Item2* pNode = m_pRoot;
-//	Link_Item2* pNext = NULL;
+//	Link_Item* pNode = m_pRoot;
+//	Link_Item* pNext = NULL;
 //
 //	do
 //	{

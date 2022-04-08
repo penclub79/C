@@ -51,6 +51,7 @@ CMFC22_Stack_QueueEXDlg::CMFC22_Stack_QueueEXDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC22_Stack_QueueEXDlg::IDD, pParent)
 	, m_pstrCheckRadio(NULL)
 	, m_bIsStack(TRUE)
+	, m_iItemType(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
@@ -214,9 +215,9 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	
 	CString strValue;
-	int iValue = 0;
-	int iIndex = 0;
-	int	iItemType = LINK_ITEM_TYPE_INT;
+	int iValue	= 0;
+	int iIndex	= 0;
+	m_iItemType = LINK_ITEM_TYPE_INT;
 
 	GetDlgItemText(IDC_EDIT_INPUT, strValue);
 
@@ -224,12 +225,13 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	if (TRUE == IsNumeric(strValue))
 	{
 		// int 일때 
-		iItemType = LINK_ITEM_TYPE_INT;
+		m_iItemType = LINK_ITEM_TYPE_INT;
+		
 	}
 	else
 	{
 		// String 일때
-		iItemType = LINK_ITEM_TYPE_STRING;
+		m_iItemType = LINK_ITEM_TYPE_STRING;
 	}
 
 
@@ -237,12 +239,12 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	{
 		if (NULL != m_pStack)									
 		{
-			if (LINK_ITEM_TYPE_INT == iItemType)
+			if (LINK_ITEM_TYPE_INT == m_iItemType)
 			{
 				iValue = _ttoi(strValue);	// CString -> int로 변환
 
 				if (0 < iValue)
-					m_pStack->Push(iValue);
+					m_pStack->Push(iValue, m_iItemType);
 			}
 			else
 			{
@@ -254,7 +256,7 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 
 				strValue.ReleaseBuffer();
 
-				m_pStack->Push((char*)szBuff, iStrLen);
+				m_pStack->Push((char*)szBuff, iStrLen, m_iItemType);
 			}
 
 			ReDrawList();
@@ -264,7 +266,7 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	{	
 		if (NULL != m_pQueue)
 		{
-			if (LINK_ITEM_TYPE_INT == iItemType)
+			if (LINK_ITEM_TYPE_INT == m_iItemType)
 				m_pQueue->EnQueue(iValue);
 			else
 				//m_pQueue->EnQueue(strValue.GetBuffer(), strValue.GetLength());
@@ -323,27 +325,39 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 
 	int		iVal = 0;
 	int		iCount = 0;
-	int		iPos = 0;
+	BOOL	bPos = FALSE;
 	CString strValue;
-	
+	Link_Data stLinkData = { 0 };
 
-
+	// 스택
 	if (TRUE == m_bIsStack)
 	{
 		iCount = m_pStack->GetCount();
-		//iPos = m_pStack->GetAt(0, NULL, &iVal, NULL);
+		
 		if (0 < iCount)
 		{
 			for (int i = 0; i < iCount; i++)
 			{
-				/*if (TRUE == m_pStack->GetAt(i, NULL, &iVal, NULL))
-				{	
-					strValue.Format(_T("인덱스:%d, 값:%d"), i, iVal);
+				if (TRUE == m_pStack->GetAt(i, &stLinkData))
+				{
+					if (LINK_ITEM_TYPE_INT == stLinkData.iItemType)
+					{
+						iVal = stLinkData.uBuf.iValue;
+						strValue.Format(_T("인덱스:%d, 값:%d"), i, iVal);
+					}
+					else
+					{
+						CString strString;
+						strString = stLinkData.uBuf.pszBuffer;
+						strValue.Format(_T("인덱스:%d, 값:%s"), i, strString);
+					}
+					
 					m_ctlListBox.InsertString(i, strValue);
-				}*/
+				}
 			}
 		}
 	}
+	// 큐
 	else
 	{
 		iCount = m_pQueue->GetCount();

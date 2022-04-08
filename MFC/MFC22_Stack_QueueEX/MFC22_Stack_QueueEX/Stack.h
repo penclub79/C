@@ -22,8 +22,8 @@ public:
 	~CStack();
 
 
-	void Push(int _iValue);
-	void Push(char* _pszValue, int iSize );
+	void Push(int _iValue, int _iItemType);
+	void Push(char* _pszValue, int iSize, int _iItemType);
 	void DeleteAll();
 
 	BOOL Pop(Link_Data* pLinkData);						// 주소값을 참조한다
@@ -33,8 +33,8 @@ public:
 	
 								
 private:
-	Link_Item1*	m_pLast;
-	Link_Item1*	m_pRoot;
+	Link_Item*	m_pLast;
+	Link_Item*	m_pRoot;
 
 	int	m_iItemType;				// 0 : int, 1: String
 	int m_iMaxSize;
