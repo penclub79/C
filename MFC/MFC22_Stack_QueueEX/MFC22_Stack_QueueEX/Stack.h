@@ -22,8 +22,8 @@ public:
 	~CStack();
 
 
-	void Push(int _iValue, int _iItemType);
-	void Push(char* _pszValue, int iSize, int _iItemType);
+	void Push(int _iValue);
+	void Push(char* _pszValue, int iSize);
 	void DeleteAll();
 
 	BOOL Pop(Link_Data* pLinkData);						// 주소값을 참조한다

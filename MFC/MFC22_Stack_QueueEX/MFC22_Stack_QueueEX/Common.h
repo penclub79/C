@@ -17,8 +17,8 @@ union UBuffer
 
 struct Link_Data
 {
-	int				iItemType : 8;
-	int				iItemLength : 24;
+	int				iItemType;
+	int				iItemLength;
 	UBuffer			uBuf;
 };
 

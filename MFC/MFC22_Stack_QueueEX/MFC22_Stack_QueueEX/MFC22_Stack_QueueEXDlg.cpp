@@ -51,7 +51,6 @@ CMFC22_Stack_QueueEXDlg::CMFC22_Stack_QueueEXDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC22_Stack_QueueEXDlg::IDD, pParent)
 	, m_pstrCheckRadio(NULL)
 	, m_bIsStack(TRUE)
-	, m_iItemType(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
@@ -217,7 +216,7 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	CString strValue;
 	int iValue	= 0;
 	int iIndex	= 0;
-	m_iItemType = LINK_ITEM_TYPE_INT;
+	int iItemType = LINK_ITEM_TYPE_INT;
 
 	GetDlgItemText(IDC_EDIT_INPUT, strValue);
 
@@ -225,26 +224,25 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	if (TRUE == IsNumeric(strValue))
 	{
 		// int 일때 
-		m_iItemType = LINK_ITEM_TYPE_INT;
+		iItemType = LINK_ITEM_TYPE_INT;
 		
 	}
 	else
 	{
 		// String 일때
-		m_iItemType = LINK_ITEM_TYPE_STRING;
+		iItemType = LINK_ITEM_TYPE_STRING;
 	}
-
 
 	if (TRUE == m_bIsStack)										
 	{
 		if (NULL != m_pStack)									
 		{
-			if (LINK_ITEM_TYPE_INT == m_iItemType)
+			if (LINK_ITEM_TYPE_INT == iItemType)
 			{
 				iValue = _ttoi(strValue);	// CString -> int로 변환
 
 				if (0 < iValue)
-					m_pStack->Push(iValue, m_iItemType);
+					m_pStack->Push(iValue);
 			}
 			else
 			{
@@ -254,9 +252,9 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 				szBuff = strValue.GetBuffer(sizeof(WCHAR) * iStrLen + 1);
 				//strcpy((char*)szBuff, (char*)strValue.GetBuffer());
 
-				strValue.ReleaseBuffer();
+				m_pStack->Push((char*)szBuff, sizeof(WCHAR)*iStrLen);
 
-				m_pStack->Push((char*)szBuff, iStrLen, m_iItemType);
+				strValue.ReleaseBuffer();
 			}
 
 			ReDrawList();
@@ -266,7 +264,7 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	{	
 		if (NULL != m_pQueue)
 		{
-			if (LINK_ITEM_TYPE_INT == m_iItemType)
+			if (LINK_ITEM_TYPE_INT == iItemType)
 				m_pQueue->EnQueue(iValue);
 			else
 				//m_pQueue->EnQueue(strValue.GetBuffer(), strValue.GetLength());
@@ -293,10 +291,10 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 
 			if (iCount > 0)
 			{
-				//bResult = m_pStack->Pop(&stLinkData);
+				bResult = m_pStack->Pop(&stLinkData);
 
-				/*if (TRUE == bResult)
-					ReDrawList();*/
+				if (TRUE == bResult)
+					ReDrawList();
 			}
 			else
 			{
@@ -373,7 +371,6 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 	
 }
 
-// 
 BOOL CMFC22_Stack_QueueEXDlg::IsNumeric(CString _strValue)
 {
 	// 유니코드는 한 글자에 2바이트이다.

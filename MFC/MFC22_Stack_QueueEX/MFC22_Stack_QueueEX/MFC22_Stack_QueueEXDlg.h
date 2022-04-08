@@ -22,8 +22,6 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
-private:
-	int m_iItemType;
 
 // 구현입니다.
 protected:
