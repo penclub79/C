@@ -21,8 +21,6 @@ public:
 	CStack(int _iSize);
 	~CStack();
 
-
-	void Push(int _iValue);
 	void Push(char* _pszValue, int _iSize);
 	void DeleteAll();
 
@@ -36,6 +34,5 @@ private:
 	Link_Item*	m_pLast;
 	Link_Item*	m_pRoot;
 
-	int	m_iItemType;				// 0 : int, 1: String
 	int m_iMaxSize;
 };

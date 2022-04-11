@@ -20,48 +20,11 @@ CStack::~CStack()
 	DeleteAll();
 }
 
-void CStack::Push(int _iValue)
-{
-	// Int 일때
-
-	if (m_iMaxSize > GetCount())
-	{
-		Link_Item* pNode = NULL;
-			
-		pNode = new Link_Item;
-		memset(pNode, 0, sizeof(Link_Item));
-
-		pNode->stData.iItemLength = sizeof(int);
-		pNode->stData.uBuf.iValue = _iValue;
-		// itemtype 지정
-		pNode->stData.iItemType = LINK_ITEM_TYPE_INT;		
-
-		pNode->pNext = NULL;
-
-
-		// 생성된 노드는 이전 노드 주소를 가르킨다.
-		pNode->pPrev = m_pLast;
-
-		if (NULL == m_pRoot)
-			m_pRoot = pNode;
-
-		// 이전 노드는 다음 노드를 가르킨다.
-		if (NULL != m_pLast)
-			m_pLast->pNext = pNode;
-
-		// 새롭게 생성된 노드는 마지막 노드가 된다.
-		m_pLast = pNode;
-	}
-		
-	
-}
-
 void CStack::Push(char* _pszValue, int _iSize)
 {
 	// String 일때
 	WCHAR* pszBuff = NULL;
 	pszBuff = (WCHAR*)_pszValue;
-
 	
 	if (m_iMaxSize > GetCount())
 	{
@@ -71,18 +34,14 @@ void CStack::Push(char* _pszValue, int _iSize)
 		memset(pNode, 0, sizeof(Link_Item));
 
 		// String을 받기 위한 버퍼 동적 할당
-		pNode->stData.uBuf.pszBuffer = new unsigned char[_iSize + 1];
+		pNode->stData.pszBuffer = new unsigned char[_iSize + 1];
 
 		// 해당 버퍼 초기화
-		memset(pNode->stData.uBuf.pszBuffer, 0, _iSize + 1);
+		memset(pNode->stData.pszBuffer, 0, _iSize + 1);
 		
 		pNode->stData.iItemLength = _iSize;
 
-		WideCharToMultiByte(CP_ACP, 0, pszBuff, -1, (char*)pNode->stData.uBuf.pszBuffer, _iSize, 0, 0);
-
-		// itemtype 지정
-		pNode->stData.iItemType = LINK_ITEM_TYPE_STRING;
-
+		WideCharToMultiByte(CP_ACP, 0, pszBuff, -1, (char*)pNode->stData.pszBuffer, _iSize, 0, 0);
 
 		pNode->pNext = NULL;	
 
@@ -105,7 +64,6 @@ BOOL CStack::Pop(Link_Data* pLinkData)
 {
 	Link_Item* pNode = m_pRoot;
 	BOOL bResult = FALSE;
-	//Link_Data* pNodeData = &pNode->stData;
 
 	if (NULL != pNode)
 	{
@@ -118,15 +76,13 @@ BOOL CStack::Pop(Link_Data* pLinkData)
 
 				if (NULL != pNode)
 				{
-					if (LINK_ITEM_TYPE_STRING == pNode->stData.iItemType)
+					
+					if (NULL != pNode->stData.pszBuffer)
 					{
-						if (NULL != pNode->stData.uBuf.pszBuffer)
-						{
-							delete[] pNode->stData.uBuf.pszBuffer;
-							pNode->stData.uBuf.pszBuffer = NULL;
-						}
+						delete[] pNode->stData.pszBuffer;
+						pNode->stData.pszBuffer = NULL;
 					}
-
+					
 					if (NULL != m_pLast->pPrev)
 					{
 						m_pLast = pNode->pPrev;
@@ -190,17 +146,13 @@ BOOL CStack::GetAt(int _iIndex, Link_Data* pLinkData)
 			// 현재 인덱스의 데이터를 가지고 와야한다.
 			if (_iIndex == iIndex)
 			{
-				if (NULL != pNode->stData.uBuf.iValue || NULL != pNode->stData.uBuf.pszBuffer)
+				if (NULL != pNode->stData.pszBuffer)
 					bResult = TRUE;
 				else
 					bResult = FALSE;
 
 				// 일반 변수는 값을 대입하지만 나머지는 memcpy를 사용한다.
 				memcpy(pLinkData, &pNode->stData, sizeof(Link_Data));
-	//			pLinkData->iItemType = pNode->stData.iItemType;
-	//			pLinkData->iItemLength = pNode->stData.iItemLength;
-	//			pLinkData->
- //= pNode->stData.iItemType;
 
 				break;
 			}
@@ -229,14 +181,12 @@ void CStack::DeleteAll()
 			// 현재 노드 메모리를 해제한다.
 			if (NULL != pNode)
 			{
-				if (LINK_ITEM_TYPE_STRING == pNode->stData.iItemType)
+				if (NULL != pNode->stData.pszBuffer)
 				{
-					if (NULL != pNode->stData.uBuf.pszBuffer)
-					{
-						delete[] pNode->stData.uBuf.pszBuffer;
-						pNode->stData.uBuf.pszBuffer = NULL;
-					}
+					delete[] pNode->stData.pszBuffer;
+					pNode->stData.pszBuffer = NULL;
 				}
+				
 				delete pNode;
 				pNode = NULL;
 			}

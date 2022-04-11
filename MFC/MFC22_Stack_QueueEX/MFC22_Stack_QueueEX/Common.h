@@ -3,23 +3,10 @@
 // String 인지 int인지 Item타입 설정하고 스택사용
 
 
-enum {
-	LINK_ITEM_TYPE_INT, 
-	LINK_ITEM_TYPE_STRING 
-};
-
-union UBuffer
-{
-	int				iValue;
-	unsigned char*	pszBuffer;
-};
-
-
 struct Link_Data
 {
-	int				iItemType;
+	unsigned char*	pszBuffer;
 	int				iItemLength;
-	UBuffer			uBuf;
 };
 
 /*

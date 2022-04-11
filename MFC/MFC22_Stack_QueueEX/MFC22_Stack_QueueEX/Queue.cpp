@@ -15,42 +15,6 @@ CQueue::~CQueue()
 	DeleteAll();
 }
 
-// 사이즈 체크 함수 만들기
-
-void CQueue::EnQueue(int _iValue)
-{
-	Link_Item* pNode = NULL;
-	
-	if (m_iMaxSize > GetCount()) // 포화 상태인지 체크
-	{
-		Link_Item* pNode = NULL;
-
-		pNode = new Link_Item;
-		memset(pNode, 0, sizeof(Link_Item));
-
-		pNode->stData.iItemLength = sizeof(int);
-		pNode->stData.uBuf.iValue = _iValue;
-		// itemtype 지정
-		pNode->stData.iItemType = LINK_ITEM_TYPE_INT;
-
-		pNode->pNext = NULL;
-
-		// 생성된 노드는 이전 노드 주소를 가르킨다.
-		pNode->pPrev = m_pLast;
-
-		if (NULL == m_pRoot)
-			m_pRoot = pNode;
-
-		// 이전 노드는 다음 노드를 가르킨다.
-		if (NULL != m_pLast)
-			m_pLast->pNext = pNode;
-
-		// 새롭게 생성된 노드는 마지막 노드가 된다.
-		m_pLast = pNode;
-	}
-
-}
-
 void CQueue::EnQueue(char* _pszValue, int _iSize)
 {
 	// String 일때
@@ -65,17 +29,15 @@ void CQueue::EnQueue(char* _pszValue, int _iSize)
 		memset(pNode, 0, sizeof(Link_Item));
 
 		// String을 받기 위한 버퍼 동적 할당
-		pNode->stData.uBuf.pszBuffer = new unsigned char[_iSize + 1];
+		pNode->stData.pszBuffer = new unsigned char[_iSize + 1];
 		// 해당 버퍼 초기화
-		memset(pNode->stData.uBuf.pszBuffer, 0, _iSize + 1);
+		memset(pNode->stData.pszBuffer, 0, _iSize + 1);
 
 		pNode->stData.iItemLength = _iSize;
 
 		// WCHAR(유니코드) -> char(멀티바이트) 값 복사
-		WideCharToMultiByte(CP_ACP, 0, pszBuff, -1, (char*)pNode->stData.uBuf.pszBuffer, _iSize, 0, 0);
+		WideCharToMultiByte(CP_ACP, 0, pszBuff, -1, (char*)pNode->stData.pszBuffer, _iSize, 0, 0);
 
-		// itemtype 지정
-		pNode->stData.iItemType = LINK_ITEM_TYPE_STRING;
 
 		pNode->pNext = NULL;
 
@@ -106,14 +68,12 @@ BOOL CQueue::DeQueue(Link_Data* pLinkData)
 		// 노드의 처음을 POP한다.
 		memcpy(pLinkData, &pNode->stData, sizeof(Link_Data));
 
-		if (LINK_ITEM_TYPE_STRING == pNode->stData.iItemType)
+		if (NULL != pNode->stData.pszBuffer)
 		{
-			if (NULL != pNode->stData.uBuf.pszBuffer)
-			{
-				delete[] pNode->stData.uBuf.pszBuffer;
-				pNode->stData.uBuf.pszBuffer = NULL;
-			}
+			delete[] pNode->stData.pszBuffer;
+			pNode->stData.pszBuffer = NULL;
 		}
+
 		if (NULL != m_pRoot->pNext)
 		{
 			m_pRoot = pNode->pNext;
@@ -171,7 +131,7 @@ int CQueue::GetAt(int _iIndex, Link_Data* pLinkData)
 			// 현재 인덱스의 데이터를 가지고 와야한다.
 			if (_iIndex == iIndex)
 			{
-				if (NULL != pNode->stData.uBuf.iValue || NULL != pNode->stData.uBuf.pszBuffer)
+				if (NULL != pNode->stData.pszBuffer)
 					bResult = TRUE;
 				else
 					bResult = FALSE;
@@ -204,14 +164,13 @@ void CQueue::DeleteAll()
 			// 현재 노드 메모리를 해제한다.
 			if (NULL != pNode)
 			{
-				if (LINK_ITEM_TYPE_STRING == pNode->stData.iItemType)
+				
+				if (NULL != pNode->stData.pszBuffer)
 				{
-					if (NULL != pNode->stData.uBuf.pszBuffer)
-					{
-						delete[] pNode->stData.uBuf.pszBuffer;
-						pNode->stData.uBuf.pszBuffer = NULL;
-					}
+					delete[] pNode->stData.pszBuffer;
+					pNode->stData.pszBuffer = NULL;
 				}
+				
 				delete pNode;
 				pNode = NULL;
 			}

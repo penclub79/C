@@ -216,45 +216,22 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	CString strValue;
 	int iValue	= 0;
 	int iIndex	= 0;
-	int iItemType = LINK_ITEM_TYPE_INT;
 
 	GetDlgItemText(IDC_EDIT_INPUT, strValue);
 
-	// 입력 받은 Item 타입 체크
-	if (TRUE == IsNumeric(strValue))
-	{
-		// int 일때 
-		iItemType = LINK_ITEM_TYPE_INT;
-		
-	}
-	else
-	{
-		// String 일때
-		iItemType = LINK_ITEM_TYPE_STRING;
-	}
 
 	if (TRUE == m_bIsStack)										
 	{
 		if (NULL != m_pStack)									
 		{
-			if (LINK_ITEM_TYPE_INT == iItemType)
-			{
-				iValue = _ttoi(strValue);	// CString -> int로 변환
+			int iStrLen = strValue.GetLength();
+			WCHAR* szBuff = NULL;
 
-				if (0 < iValue)
-					m_pStack->Push(iValue);
-			}
-			else
-			{
-				int iStrLen = strValue.GetLength();
-				WCHAR* szBuff = NULL;
+			szBuff = strValue.GetBuffer(sizeof(WCHAR) * iStrLen + 1);
 
-				szBuff = strValue.GetBuffer(sizeof(WCHAR) * iStrLen + 1);
+			m_pStack->Push((char*)szBuff, sizeof(WCHAR) * iStrLen);
 
-				m_pStack->Push((char*)szBuff, sizeof(WCHAR) * iStrLen);
-
-				strValue.ReleaseBuffer();
-			}
+			strValue.ReleaseBuffer();
 
 			ReDrawList();
 		}
@@ -263,21 +240,14 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	{	
 		if (NULL != m_pQueue)
 		{
-			if (LINK_ITEM_TYPE_INT == iItemType)
-			{
-				iValue = _ttoi(strValue);
-				m_pQueue->EnQueue(iValue);
-			}
-			else
-			{
-				int iStrLen = strValue.GetLength();
-				WCHAR* szBuff = NULL;
-				szBuff = strValue.GetBuffer(sizeof(WCHAR)* iStrLen + 1);
+			int iStrLen = strValue.GetLength();
+			WCHAR* szBuff = NULL;
+			szBuff = strValue.GetBuffer(sizeof(WCHAR)* iStrLen + 1);
 
-				m_pQueue->EnQueue((char*)szBuff, sizeof(WCHAR) * iStrLen);
+			m_pQueue->EnQueue((char*)szBuff, sizeof(WCHAR) * iStrLen);
 
-				strValue.ReleaseBuffer();
-			}
+			strValue.ReleaseBuffer();
+
 			ReDrawList();
 		}
 	}
@@ -353,18 +323,10 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 			{
 				if (TRUE == m_pStack->GetAt(i, &stLinkData))
 				{
-					if (LINK_ITEM_TYPE_INT == stLinkData.iItemType)
-					{
-						iVal = stLinkData.uBuf.iValue;
-						strValue.Format(_T("인덱스:%d, 값:%d"), i, iVal);
-					}
-					else
-					{
-						CString strString;
+					CString strString;
 
-						strString = stLinkData.uBuf.pszBuffer;
-						strValue.Format(_T("인덱스:%d, 값:%s"), i, strString);
-					}
+					strString = stLinkData.pszBuffer;
+					strValue.Format(_T("인덱스:%d, 값:%s"), i, strString);
 					
 					m_ctlListBox.InsertString(i, strValue);
 				}
@@ -381,55 +343,14 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 			{
 				if (TRUE == m_pQueue->GetAt(i, &stLinkData))
 				{
-					if (LINK_ITEM_TYPE_INT == stLinkData.iItemType)
-					{
-						iVal = stLinkData.uBuf.iValue;
-						strValue.Format(_T("인덱스:%d, 값:%d"), i, iVal);
-					}
-					else
-					{
-						CString strString;
-						strString = stLinkData.uBuf.pszBuffer;
-						strValue.Format(_T("인덱스:%d, 값:%s"), i, strString);
-					}
-
+					CString strString;
+					strString = stLinkData.pszBuffer;
+					strValue.Format(_T("인덱스:%d, 값:%s"), i, strString);
+					
 					m_ctlListBox.InsertString(i, strValue);
 				}
 			}
 		}
 	}
 	
-}
-
-BOOL CMFC22_Stack_QueueEXDlg::IsNumeric(CString _strValue)
-{
-	// 유니코드는 한 글자에 2바이트이다.
-	
-	BOOL bResult = TRUE;
-	char* pszBuffer = NULL;
-	//memset(pszBuffer, 0, (sizeof(WCHAR)* iLen) + 1);
-
-	// CT2A는 class이며 UTF8로 한 글자만 변환한다.
-	CT2A ascii(_strValue, CP_UTF8);
-	pszBuffer = ascii.m_psz;
-	
-	int iStrSize = strlen(pszBuffer);
-	int iValueASC = 0;
-
-	for (int i = 0; i < iStrSize; i++)
-	{
-		iValueASC = *pszBuffer;
-
-		// 0 ~ 9까지 ASCII코드 체크
-		if (48 > iValueASC || 57 < iValueASC)
-		{  
-			// 문자가 하나라도 있으면 IsNumeric은 FALSE이다.
-			bResult	= FALSE;
-			break;
-		}
-
-		pszBuffer++;
-	}
-
-	return bResult;
 }
