@@ -1,10 +1,10 @@
 #pragma once
-#include "afxsock.h"
+#include "SyncSocket.h"
 #include "BasicDefine.h"
 
 
 class CBasicSock :
-	public CAsyncSocket
+	public CSyncSocket
 {
 public:
 	CBasicSock();

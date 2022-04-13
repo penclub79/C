@@ -1,5 +1,4 @@
 #pragma once
-#include "afxsock.h"
 #include "BasicSock.h"
 
 class CAcceptSock :

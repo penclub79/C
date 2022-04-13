@@ -38,7 +38,6 @@ void CQueue::EnQueue(char* _pszValue, int _iSize)
 
 		pNode->stData.iItemLength = _iSize;
 
-
 		pNode->pNext = NULL;
 
 		// 생성된 노드는 이전 노드 주소를 가르킨다.
@@ -117,7 +116,6 @@ int CQueue::GetCount()
 			iCount++;
 			pNode = pNode->pNext;
 		} while (NULL != pNode);
-
 	}
 	return iCount;
 }
@@ -126,9 +124,7 @@ int CQueue::GetCount()
 int CQueue::GetAt(int _iIndex, Link_Data* pLinkData)
 {
 	int iIndex = 0;
-
 	BOOL bResult = FALSE;
-
 	Link_Item* pNode = m_pRoot;
 
 	if (NULL != pNode)
@@ -149,13 +145,11 @@ int CQueue::GetAt(int _iIndex, Link_Data* pLinkData)
 					memcpy(pLinkData->pszBuffer, &pNode->stData.pszBuffer[0], pNode->stData.iItemLength);
 					pLinkData->iItemLength = pNode->stData.iItemLength;
 				}
-
 				break;
 			}
 			pNode = pNode->pNext;
 			iIndex++;
 		} while (NULL != pNode);
-
 	}
 
 	return bResult;
@@ -180,7 +174,6 @@ void CQueue::DeleteAll()
 					delete[] pNode->stData.pszBuffer;
 					pNode->stData.pszBuffer = NULL;
 				}
-				
 				delete pNode;
 				pNode = NULL;
 			}

@@ -182,7 +182,6 @@ HCURSOR CMFC22_Stack_QueueEXDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
 // Stack 라디오 버튼 활성화
 void CMFC22_Stack_QueueEXDlg::OnRadioStack()
 {
@@ -212,13 +211,11 @@ void CMFC22_Stack_QueueEXDlg::OnRadioQueue()
 void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	
 	CString strValue;
 	int iValue	= 0;
 	int iIndex	= 0;
 
 	GetDlgItemText(IDC_EDIT_INPUT, strValue);
-
 
 	if (TRUE == m_bIsStack)										
 	{
@@ -326,12 +323,12 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 {
 	m_ctlListBox.ResetContent();
 
-	int		iVal = 0;
-	int		iCount = 0;
-	BOOL	bPos = FALSE;
-	CString strValue;
-	Link_Data stLinkData = { 0 };
-	CString strString;
+	int			iVal		= 0;
+	int			iCount		= 0;
+	BOOL		bPos		= FALSE;
+	Link_Data	stLinkData	= { 0 };
+	CString		strValue;
+	CString		strString;
 
 	// 스택
 	if (TRUE == m_bIsStack)

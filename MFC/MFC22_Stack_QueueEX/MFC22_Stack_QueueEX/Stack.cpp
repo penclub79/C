@@ -107,10 +107,8 @@ BOOL CStack::Pop(Link_Data* pLinkData)
 						m_pLast = NULL;
 					}
 				}
-
 				bResult = TRUE;
 				break;
-
 			}
 
 			pNode = pNode->pNext;
@@ -142,9 +140,7 @@ int CStack::GetCount()
 BOOL CStack::GetAt(int _iIndex, Link_Data* pLinkData)
 {
 	int iIndex = 0;
-	
 	BOOL bResult = FALSE;
-
 	Link_Item* pNode = m_pRoot;
 
 	if (NULL != pNode)
@@ -165,16 +161,12 @@ BOOL CStack::GetAt(int _iIndex, Link_Data* pLinkData)
 					memcpy(pLinkData->pszBuffer, &pNode->stData.pszBuffer[0], pNode->stData.iItemLength);
 					pLinkData->iItemLength = pNode->stData.iItemLength;
 				}
-
 				break;
 			}
-
 			pNode = pNode->pNext;
 			iIndex++;
 		} while (NULL != pNode);
-
 	}
-
 	return bResult;
 }
 
@@ -198,7 +190,6 @@ void CStack::DeleteAll()
 					delete[] pNode->stData.pszBuffer;
 					pNode->stData.pszBuffer = NULL;
 				}
-				
 				delete pNode;
 				pNode = NULL;
 			}

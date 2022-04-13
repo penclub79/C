@@ -4,13 +4,11 @@
 
 
 
-class CBasicSock :
-	public CAsyncSocket
+class CBasicSock
 {
 public:
 	CBasicSock();
 	~CBasicSock();
-
 	
 	virtual void OnReceive(int nErrorCode);
 	virtual void OnClose(int nErrorCode);

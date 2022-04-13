@@ -3,8 +3,6 @@
 // #은 컴파일되기 전에 처리하는 선행처리 과정을 거친다.
 #define _BASIC_DEFINE
 
-
-
 #define	VERSION_PACKET_CLIENT_1	1
 #define MAX_LENGTH_USERID		16
 #define	MARKER_CLIENT			0xffff1234
@@ -57,7 +55,6 @@ typedef struct _tagPACKET_RSP_TEXT{
 	TCHAR			wszPacketText[64];
 	TCHAR			wszSendUserID[MAX_LENGTH_USERID];
 }PACKET_RSP_TEXT;
-
 
 // 클라이언트 구조체
 typedef struct _tagCLIENT_INFO

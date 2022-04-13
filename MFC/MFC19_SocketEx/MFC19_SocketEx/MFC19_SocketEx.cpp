@@ -122,20 +122,21 @@ void CMFC19_SocketExApp::CleanUp()
 // Connect 연결 (IP, Port)
 void CMFC19_SocketExApp::Connect(CString strIP, int iPort)
 {
-	if (strIP && iPort)
+	
+	/*if (strIP && iPort)
 	{
 		m_pClient = new CBasicSock;
 		m_pClient->Create();
 		m_pClient->Connect(strIP, iPort);
 		
-	}
+	}*/
 	
 }
 
 // Connect 끊기
 void CMFC19_SocketExApp::Close()
 {
-	m_pClient->Close();
+	//m_pClient->Close();
 }
 
 // Connect 성공/실패 여부 Error Code 리턴
@@ -149,17 +150,17 @@ void CMFC19_SocketExApp::SetConnectStatus(int iErrorCode)
 {
 	CString strConnectMessage;
 
-	m_iConnectCode = iErrorCode;
+	//m_iConnectCode = iErrorCode;
 
-	// connect는 성공했다면 다음으로 클라이언트 패킷을 체크
-	if (0 == iErrorCode)
-	{
-		SendReqLoginPacket();
-	}
-	else  // connect가 실패면 연결 실패 박스를 띄움
-	{
-		((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(iErrorCode);
-	}
+	//// connect는 성공했다면 다음으로 클라이언트 패킷을 체크
+	//if (0 == iErrorCode)
+	//{
+	//	SendReqLoginPacket();
+	//}
+	//else  // connect가 실패면 연결 실패 박스를 띄움
+	//{
+	//	((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(iErrorCode);
+	//}
 }
 
 void CMFC19_SocketExApp::SendReqLoginPacket()
@@ -224,59 +225,59 @@ void CMFC19_SocketExApp::ReceiveData()
 	//PACKET_REQ_TEXT*		pstResponseTextPacket		= NULL;
 	CString					strOtherUserID				= _T("");
 
-	// 메모리 초기화: memset(초기화할 변수(포인터), Value, Size)
-	memset(pBuffer, 0, 1024);
+	//// 메모리 초기화: memset(초기화할 변수(포인터), Value, Size)
+	//memset(pBuffer, 0, 1024);
 
-	// 헤더 부분
-	m_pClient->Receive(&pBuffer[0], sizeof(PACKET_HEADER));
+	//// 헤더 부분
+	//m_pClient->Receive(&pBuffer[0], sizeof(PACKET_HEADER));
 
-	// 헤더 페이로드(?) 부분
-	m_pClient->Receive(&pBuffer[sizeof(PACKET_HEADER)], pstHeader->iPacketSize - sizeof(PACKET_HEADER));
+	//// 헤더 페이로드(?) 부분
+	//m_pClient->Receive(&pBuffer[sizeof(PACKET_HEADER)], pstHeader->iPacketSize - sizeof(PACKET_HEADER));
 
-	// 받은 패킷 체크
-	// 1. Header Marker Check
-	if (MARKER_CLIENT == pstHeader->iMarker)
-	{
-		// 2. Packet ID Check
-		switch (pstHeader->iPacketID)
-		{
-			case PACKET_ID_RSP_LOGIN:
-			{
-				pstResponseLoginPacket = (PACKET_RSP_LOGIN*)pBuffer;
-				((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(pstResponseLoginPacket->iResultCode);
-				break;
-			}
+	//// 받은 패킷 체크
+	//// 1. Header Marker Check
+	//if (MARKER_CLIENT == pstHeader->iMarker)
+	//{
+	//	// 2. Packet ID Check
+	//	switch (pstHeader->iPacketID)
+	//	{
+	//		case PACKET_ID_RSP_LOGIN:
+	//		{
+	//			pstResponseLoginPacket = (PACKET_RSP_LOGIN*)pBuffer;
+	//			((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(pstResponseLoginPacket->iResultCode);
+	//			break;
+	//		}
 
-			case PACKET_ID_RSP_TEXT:
-			{
-				// Text 응답 패킷 받기
-				pstResponseTextIDPacket = (PACKET_RSP_TEXT*)pBuffer;
+	//		case PACKET_ID_RSP_TEXT:
+	//		{
+	//			// Text 응답 패킷 받기
+	//			pstResponseTextIDPacket = (PACKET_RSP_TEXT*)pBuffer;
 
-				// 보낸 UserID 받기
-				/*pstRequestLoginPacket = (PACKET_REQ_LOGIN*)pBuffer;
-				strOtherUserID.Format(_T("%s"), pstRequestLoginPacket->wszUserID);*/
+	//			// 보낸 UserID 받기
+	//			/*pstRequestLoginPacket = (PACKET_REQ_LOGIN*)pBuffer;
+	//			strOtherUserID.Format(_T("%s"), pstRequestLoginPacket->wszUserID);*/
 
-				((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(pstResponseTextIDPacket->iResultCode);
-				((CMFC19_SocketExDlg*)AfxGetMainWnd())->ReceiveMessage(pstResponseTextIDPacket->wszPacketText, pstResponseTextIDPacket->wszSendUserID);
-				break;
-			}
-		}
-	}
+	//			((CMFC19_SocketExDlg*)AfxGetMainWnd())->SetConnectStatus(pstResponseTextIDPacket->iResultCode);
+	//			((CMFC19_SocketExDlg*)AfxGetMainWnd())->ReceiveMessage(pstResponseTextIDPacket->wszPacketText, pstResponseTextIDPacket->wszSendUserID);
+	//			break;
+	//		}
+	//	}
+	//}
 
-	// 버퍼 메모리 해제
-	if (pBuffer)
-	{
-		delete[] pBuffer;
-		pBuffer = NULL;
-	}
+	//// 버퍼 메모리 해제
+	//if (pBuffer)
+	//{
+	//	delete[] pBuffer;
+	//	pBuffer = NULL;
+	//}
 
 }
 
 
 void CMFC19_SocketExApp::CloseChild()
 {
-	AfxMessageBox(_T("서버 연결 끊김"));
+	/*AfxMessageBox(_T("서버 연결 끊김"));
 	
 	delete m_pClient;
-	m_pClient = NULL;
+	m_pClient = NULL;*/
 }
