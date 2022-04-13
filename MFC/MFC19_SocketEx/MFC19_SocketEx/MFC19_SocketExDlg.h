@@ -5,7 +5,7 @@
 #pragma once
 #include "afxcmn.h"
 #include "afxwin.h"
-
+#include "BasicSock.h"
 
 // CMFC19_SocketExDlg 대화 상자
 class CMFC19_SocketExDlg : public CDialogEx
@@ -41,6 +41,7 @@ public:
 	void ResizeControl(int cx, int cy);
 	void SetConnectStatus(int iErrorCode);
 
+	CBasicSock* m_pClient;
 
 	CIPAddressCtrl m_IPAddress;
 	CListBox m_listChat;
@@ -51,6 +52,6 @@ public:
 	afx_msg void OnBnClickedRadioServer();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
-	afx_msg void OnClickedButtonClose();
-	afx_msg void OnClickedButtonDisconnect();
+	//afx_msg void OnClickedButtonClose();
+	//afx_msg void OnClickedButtonDisconnect();
 };

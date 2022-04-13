@@ -56,7 +56,7 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 , m_strOtherIP(_T(""))
 , m_strInitLoc(0)
 , m_rectDlg(0)
-
+, m_pClient(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -78,8 +78,8 @@ BEGIN_MESSAGE_MAP(CMFC19_SocketExDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CMFC19_SocketExDlg::OnClickedButtonSend)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-	ON_BN_CLICKED(IDC_BUTTON_CLOSE, &CMFC19_SocketExDlg::OnClickedButtonClose)
-	ON_BN_CLICKED(IDC_BUTTON_DISCONNECT, &CMFC19_SocketExDlg::OnClickedButtonDisconnect)
+	//ON_BN_CLICKED(IDC_BUTTON_CLOSE, &CMFC19_SocketExDlg::OnClickedButtonClose)
+	//ON_BN_CLICKED(IDC_BUTTON_DISCONNECT, &CMFC19_SocketExDlg::OnClickedButtonDisconnect)
 END_MESSAGE_MAP()
 
 
@@ -125,6 +125,7 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 			m_strMyIP = inet_ntoa(*(struct in_addr*)*stHostinfo->h_addr_list);
 		}
 	}
+
 	/*컨트롤 초기화*/
 	m_IPAddress.SetWindowText(m_strMyIP);
 	m_IPAddress.EnableWindow(FALSE);
@@ -141,17 +142,11 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	GetDlgItem(IDC_STATIC_SERVER_IP)->GetWindowRect(&m_strInitLoc);
 	// 다이얼로그 내에 상대적 좌표로 변환
 	ScreenToClient(&m_strInitLoc);
-
-	/* 클라이언트 구조체 초기화 */
-	/*struct Client stClient;
-	stClient.iPort = 7777;
-	stClient.szUserId = "";*/
 	
 	CLIENT_INFO stClient = { 0 };
 	stClient.iPort = 7777;
 	// 포트 적용
 	SetDlgItemInt(IDC_EDIT_PORT, stClient.iPort);
-	
 
 	//GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
 	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
@@ -159,9 +154,6 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	/*다이얼로그 사이즈 초기화*/
 	RECT stDlgLoc = { 0 };
 	GetClientRect(&stDlgLoc);
-	/*RECT stIpAdrEditLoc = { 0 };
-	GetDlgItem(IDC_IPADDRESS_SERVER)->GetWindowRect(&stIpAdrEditLoc)*/
-	//MoveWindow(stDlgLoc.left, stDlgLoc.right, (stDlgLoc.right - stDlgLoc.left) + 20, (stDlgLoc.bottom - stDlgLoc.top) - 50);
 
 	ResizeControl((stDlgLoc.right - stDlgLoc.left) - 2, (stDlgLoc.bottom - stDlgLoc.top) + 50);
 
@@ -224,45 +216,28 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	UpdateData();
 	
 	CString strIP;
-	CLIENT_INFO stClient;
-	stClient.iPort = 7777;
-	// 구조체 -> 포트를 CString으로 변환
-	/*CString strPort;
-	strPort.Format(_T("%d"), stClient.iPort);*/
-	
-	// 다이얼로그에 데이터 담기
+	strIP = m_strMyIP;
 
-	// IP 담기
-	GetDlgItemText(IDC_IPADDRESS_SERVER, strIP);
-	// USER ID 담기
-	GetDlgItemText(IDC_EDIT_USERID, stClient.szUserId, MAX_LENGTH_USERID);
+	CLIENT_INFO stClient = { 0 };
+	stClient.iPort = 7777;
+
+	CString strUserID;
+	SetDlgItemText(IDC_EDIT_USERID, strUserID);
+
+	((CBasicSock*)AfxGetMainWnd())->Connect(strIP, strUserID, stClient.iPort);
+	//((CBasicSock*)AfxGetMainWnd())->MainThread();
 	
-	// IP가 입력이 되어 있을 때
-	if (strIP != _T("0.0.0.0"))
-	{
-		((CMFC19_SocketExApp*)AfxGetApp())->Connect(strIP, stClient.iPort);
-		((CMFC19_SocketExApp*)AfxGetApp())->SetUserID(stClient.szUserId);
-			m_strOtherIP = strIP;
-	}
-	else
-	{
-		AfxMessageBox(_T("접속할 서버의 IP주소를 입력하세요"));
-	}
 }
 
 // 메시지 Send 버튼
 void CMFC19_SocketExDlg::OnClickedButtonSend()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString strSend, strInsert;
-	CString strUserID = ((CMFC19_SocketExApp*)AfxGetApp())->GetUserID();
-	GetDlgItemText(IDC_EDIT_SEND, strSend);
-	strInsert.Format(_T("[%s]:%s"), strUserID, strSend);
-	((CMFC19_SocketExApp*)AfxGetApp())->SendReqMessagePacket(strSend);
-
-	int sel = m_listChat.InsertString(-1, strInsert);
-	//m_listChat.SetCurSel(sel);
-	SetDlgItemText(IDC_EDIT_SEND, _T(""));
+	CString strSend;
+	CString	strInsert;
+	CString strUserID;
+	//CString strUserID = ((CMFC19_SocketExApp*)AfxGetApp())->GetUserID();
+	
 }
 
 
@@ -271,10 +246,6 @@ void CMFC19_SocketExDlg::ReceiveMessage(CString strReceive, CString strOtherUser
 	
 	CString strInsert;
 	
-	strInsert.Format(_T("다른-클라이언트[%s]:%s"), strOtherUserID, strReceive);
-
-	int sel = m_listChat.InsertString(-1, strInsert);
-	m_listChat.SetCurSel(sel);
 }
 
 
@@ -364,64 +335,26 @@ void CMFC19_SocketExDlg::ResizeControl(int cx, int cy)
 }
 
 
-void CMFC19_SocketExDlg::OnClickedButtonClose()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	AfxGetMainWnd()->PostMessageW(WM_CLOSE);
-}
-
-void CMFC19_SocketExDlg::SetConnectStatus(int iErrorCode)
-{
-	CString strMessage;
-
-	switch (iErrorCode)
-	{
-		// UserID 패킷 검증
-		case 0:
-		{
-			  strMessage.Format(_T("연결 성공"));
-			  AfxMessageBox(strMessage);
-			  // DisConnect 활성화
-			  GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(TRUE);
-			  // Send 활성화
-			  GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(TRUE);
-			  // Connect 비활성화
-			  GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
-			  // USER ID 비활성화
-			  GetDlgItem(IDC_EDIT_USERID)->EnableWindow(FALSE);
-			  break;
-		}
-		// Message 패킷 검증
-		case 10:
-		{
-			   break;
-		}
-
-		// Error 처리
-		default:
-		{
-			   strMessage.Format(_T("ErrorCode : %d\n 연결 실패"), iErrorCode);
-			   AfxMessageBox(strMessage);
-			   break;
-		}
-	}
-
-}
-
-// DISConnect
-void CMFC19_SocketExDlg::OnClickedButtonDisconnect()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString strMessage;
-
-	((CMFC19_SocketExApp*)AfxGetApp())->Close();
-
-	strMessage.Format(_T("연결을 끊었습니다."));
-	AfxMessageBox(strMessage);
-
-	GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
-	GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(FALSE);
-	GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
-	GetDlgItem(IDC_EDIT_USERID)->EnableWindow(TRUE);
-
-}
+//void CMFC19_SocketExDlg::OnClickedButtonClose()
+//{
+//	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+//	//AfxGetMainWnd()->PostMessageW(WM_CLOSE);
+//}
+//
+//void CMFC19_SocketExDlg::SetConnectStatus(int iErrorCode)
+//{
+//	CString strMessage;
+//
+//	
+//
+//}
+//
+//// DISConnect
+//void CMFC19_SocketExDlg::OnClickedButtonDisconnect()
+//{
+//	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+//	CString strMessage;
+//
+//	
+//
+//}

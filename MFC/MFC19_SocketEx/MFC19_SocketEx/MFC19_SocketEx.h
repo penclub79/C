@@ -9,7 +9,6 @@
 #endif
 
 #include "resource.h"		// 주 기호입니다.
-#include "BasicSock.h"
 
 // CMFC19_SocketExApp:
 // 이 클래스의 구현에 대해서는 MFC19_SocketEx.cpp을 참조하십시오.
@@ -29,42 +28,10 @@ public:
 
 private:
 	// 클래스
-	CBasicSock* m_pClient;
-	CString m_strUserID;
-
-	// 자료형
-	int m_iConnectCode;
-
 
 public:
-	// 함수
-	void CleanUp(void);
 
-	// 연결
-	void Connect(CString strIP, int iPort);
-
-	// 연결 끊기
-	void Close();
-
-	// 연결 상태
-	int GetConnectStatus();
-	void SetConnectStatus(int iErrorCode);
-
-	// 사용자ID 받기
-	void SetUserID(CString strUserID);
-	CString GetUserID();
-
-	// 데이터 받기
-	void ReceiveData();
-
-	// 데이터 보내기
-		// 클라이언트 데이터
-	void SendReqLoginPacket();
-		// 메시지 데이터
-	void SendReqMessagePacket(CString strData);
-
-	// 서버가 끊겼을 때
-	void CloseChild();
+	
 };
 
 extern CMFC19_SocketExApp theApp;

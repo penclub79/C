@@ -159,6 +159,7 @@ void CMFC20_Nvs1_ChattingExDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	{
 		CAboutDlg dlgAbout;
 		dlgAbout.DoModal();
+		SendMessage(1000);
 	}
 	else
 	{

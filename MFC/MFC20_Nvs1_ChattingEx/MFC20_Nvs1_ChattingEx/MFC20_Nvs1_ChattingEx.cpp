@@ -23,6 +23,8 @@ END_MESSAGE_MAP()
 CMFC20_Nvs1_ChattingExApp::CMFC20_Nvs1_ChattingExApp()
 : m_pServer(NULL)
 
+
+
 {
 	// 다시 시작 관리자 지원
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -112,53 +114,53 @@ BOOL CMFC20_Nvs1_ChattingExApp::InitInstance()
 // 서버 생성
 void CMFC20_Nvs1_ChattingExApp::InitServer()
 {
-	/*m_pServer = new CServerSock;
+	m_pServer = new CServerSock;
 	m_pServer->Create(7777);
-	m_pServer->Listen();*/
+	m_pServer->Listen();
 }
 
 
 void CMFC20_Nvs1_ChattingExApp::Accept()
 {
 
-//#if (0)
-//
-//	if (m_pAccept == NULL)
-//	{
-//		m_pAccept = new CClientSock;
-//		m_pServer->Accept(*m_pAccept);
-//		CString strSock;
-//		UINT nPort;
-//		m_pAccept->GetPeerName(strSock, nPort);
-//		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
-//	}
-//
-//#else
-//
-//	CAcceptSock* pAccept = new CAcceptSock;
-//	
-//	if (m_pServer->Accept(*pAccept))
-//	{
-//		CString strSock;
-//		UINT nPort;
-//		pAccept->GetPeerName(strSock, nPort);
-//		
-//		m_AcceptSocketList.AddTail(pAccept);
-//
-//		//pAccept->SendWhoAreYou();
-//		/*pAccept->Receive(&stRecvHeader, sizeof(stRecvHeader));*/
-//		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
-//
-//	}
-//
-//#endif
+#if (0)
+
+	if (m_pAccept == NULL)
+	{
+		m_pAccept = new CClientSock;
+		m_pServer->Accept(*m_pAccept);
+		CString strSock;
+		UINT nPort;
+		m_pAccept->GetPeerName(strSock, nPort);
+		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
+	}
+
+#else
+
+	CAcceptSock* pAccept = new CAcceptSock;
+	
+	if (m_pServer->Accept(*pAccept))
+	{
+		CString strSock;
+		UINT nPort;
+		pAccept->GetPeerName(strSock, nPort);
+		
+		m_AcceptSocketList.AddTail(pAccept);
+
+		//pAccept->SendWhoAreYou();
+		/*pAccept->Receive(&stRecvHeader, sizeof(stRecvHeader));*/
+		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
+
+	}
+
+#endif
 
 }
 
 
 void CMFC20_Nvs1_ChattingExApp::CleanUp()
 {
-	/*if (m_pServer)
+	if (m_pServer)
 	{
 		delete m_pServer;
 		m_pServer = NULL;
@@ -173,7 +175,7 @@ void CMFC20_Nvs1_ChattingExApp::CleanUp()
 		pAccept = NULL;
 	}
 
-	m_AcceptSocketList.RemoveAll();*/
+	m_AcceptSocketList.RemoveAll();
 	
 	
 }
@@ -189,90 +191,99 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 	PACKET_RSP_TEXT			stRSPText = { 0 };
 	PACKET_RSP_LOGIN		stRSPLogin = { 0 };
 
-
-	//memset(pBuffer, 0, 1024);
+	memset(pBuffer, 0, 1024);
 
 	/////////////////////////////////////////////////////////////////
 	// Receive //////////////////////////////////////////////////////
 	//wchar_t temp[MAX_PATH];
 	// 클라이언트로 부터 받은 메시지
-	//pAcceptSock->Receive(&pBuffer[0], sizeof(PACKET_HEADER)); // 헤더사이즈를 버퍼에 Receive한다.
-	//pAcceptSock->Receive(&pBuffer[sizeof(PACKET_HEADER)], pstHeader->iPacketSize - sizeof(PACKET_HEADER));// 헤더사이즈 만큼 버퍼에서 건너뛰고 페이로드를 Receive한다.
+	pAcceptSock->Receive(&pBuffer[0], sizeof(PACKET_HEADER)); // 헤더사이즈를 버퍼에 Receive한다.
+	pAcceptSock->Receive(&pBuffer[sizeof(PACKET_HEADER)], pstHeader->iPacketSize - sizeof(PACKET_HEADER));// 헤더사이즈 만큼 버퍼에서 건너뛰고 페이로드를 Receive한다.
 	/////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////
 	// Parsing //////////////////////////////////////////////////////
 	// Parsing : 패킷 데이터를 열어 본다. ///////////////////////////
-	//if (MARKER_CLIENT == pstHeader->iMarker)
-	//{
-	//	switch (pstHeader->iPacketID)
-	//	{
-	//		case PACKET_ID_REQ_LOGIN:
-	//		{
-	//			pstReceiveUserHeader = (PACKET_REQ_LOGIN*)pBuffer;
+	if (MARKER_CLIENT == pstHeader->iMarker)
+	{
+		switch (pstHeader->iPacketID)
+		{
+			case PACKET_ID_REQ_LOGIN:
+			{
+				pstReceiveUserHeader = (PACKET_REQ_LOGIN*)pBuffer;
 
-	//			// UserID 부여
-	//			pAcceptSock->SetUserID(pstReceiveUserHeader->wszUserID);
+				// UserID 부여
+				pAcceptSock->SetUserID(pstReceiveUserHeader->wszUserID);
 
-	//			// UserHeader Send to Client
-	//			// Code 
-	//			stRSPLogin.stHeader.iMarker = MARKER_CLIENT;
-	//			stRSPLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
-	//			stRSPLogin.stHeader.iPacketID = PACKET_ID_RSP_LOGIN;
-	//			stRSPLogin.stHeader.iPacketSize = sizeof(PACKET_RSP_LOGIN);
-	//			// sizeof는 구조체를 넣는 걸로 규칙을 정함 -> 변수랑 포인터 변수랑 헤깔린다.
-	//			stRSPLogin.iResultCode = LOGIN_SUCCESS;
+				// UserHeader Send to Client
+				// Code 
+				stRSPLogin.stHeader.iMarker = MARKER_CLIENT;
+				stRSPLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
+				stRSPLogin.stHeader.iPacketID = PACKET_ID_RSP_LOGIN;
+				stRSPLogin.stHeader.iPacketSize = sizeof(PACKET_RSP_LOGIN);
+				// sizeof는 구조체를 넣는 걸로 규칙을 정함 -> 변수랑 포인터 변수랑 헤깔린다.
+				stRSPLogin.iResultCode = LOGIN_SUCCESS;
 
 
-	//			pAcceptSock->Send(&stRSPLogin, sizeof(PACKET_RSP_LOGIN));
+				pAcceptSock->Send(&stRSPLogin, sizeof(PACKET_RSP_LOGIN));
 
-	//			// 클라이언트 검증 후 방에 들어왔다는 것을 표시
-	//			((CMFC20_Nvs1_ChattingExDlg*)AfxGetMainWnd())->EntryClient(pAcceptSock);
-	//			//((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->ReceiveData(pClientSock, stRSPLogin.wszPacketText);
-	//			break;
-	//		}
+				// 클라이언트 검증 후 방에 들어왔다는 것을 표시
+				((CMFC20_Nvs1_ChattingExDlg*)AfxGetMainWnd())->EntryClient(pAcceptSock);
+				//((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->ReceiveData(pClientSock, stRSPLogin.wszPacketText);
+				break;
+			}
 
-	//		case PACKET_ID_REQ_TEXT:
-	//		{
-	//			POSITION pos;
-	//			CString strOtherUserID;
-	//			strOtherUserID = pAcceptSock->GetUserID();
-	//			pstReceiveTextHeader = (PACKET_REQ_TEXT*)pBuffer;
-	//			
-	//			stRSPText.stHeader.iMarker = MARKER_CLIENT;
-	//			stRSPText.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
-	//			stRSPText.stHeader.iPacketID = PACKET_ID_RSP_TEXT;
-	//			stRSPText.stHeader.iPacketSize = sizeof(PACKET_RSP_TEXT);
-	//			stRSPText.iResultCode = TEXT_SUCCESS;
-	//			wsprintf(stRSPText.wszPacketText, _T("%s"), pstReceiveTextHeader->wszPacketText);
-	//			wsprintf(stRSPText.wszSendUserID, _T("%s"), strOtherUserID);
+			case PACKET_ID_REQ_TEXT:
+			{
+				POSITION pos;
+				CString strOtherUserID;
+				strOtherUserID = pAcceptSock->GetUserID();
+				pstReceiveTextHeader = (PACKET_REQ_TEXT*)pBuffer;
+				
+				stRSPText.stHeader.iMarker = MARKER_CLIENT;
+				stRSPText.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
+				stRSPText.stHeader.iPacketID = PACKET_ID_RSP_TEXT;
+				stRSPText.stHeader.iPacketSize = sizeof(PACKET_RSP_TEXT);
+				stRSPText.iResultCode = TEXT_SUCCESS;
+				wsprintf(stRSPText.wszPacketText, _T("%s"), pstReceiveTextHeader->wszPacketText);
+				wsprintf(stRSPText.wszSendUserID, _T("%s"), strOtherUserID);
 
-	//			//wsprintf(stRSPText.wszSendUserID, _T("%s"), ((CAcceptSock*)AfxGetMainWnd())->GetUserID());
-	//			
-	//			pos = m_AcceptSocketList.GetHeadPosition();
-	//			CAcceptSock* pAcceptSockTemp = NULL;
-	//			while (pos != NULL)
-	//			{
-	//				// pAccept소켓을 담아야한다.
-	//				pAcceptSockTemp = (CAcceptSock*)m_AcceptSocketList.GetAt(pos);
-	//				
-	//				if (pAcceptSockTemp != pAcceptSock)
-	//					pAcceptSockTemp->Send(&stRSPText, sizeof(PACKET_RSP_TEXT));
+				//wsprintf(stRSPText.wszSendUserID, _T("%s"), ((CAcceptSock*)AfxGetMainWnd())->GetUserID());
+				
+				pos = m_AcceptSocketList.GetHeadPosition();
+				CAcceptSock* pAcceptSockTemp = NULL;
+				while (pos != NULL)
+				{
+					// pAccept소켓을 담아야한다.
+					pAcceptSockTemp = (CAcceptSock*)m_AcceptSocketList.GetAt(pos);
+					
+					if (pAcceptSockTemp != pAcceptSock)
+						pAcceptSockTemp->Send(&stRSPText, sizeof(PACKET_RSP_TEXT));
 
-	//				(CAcceptSock*)m_AcceptSocketList.GetNext(pos);
-	//			}
-	//			break;
-	//		}
-	//	}
-	//}
+					(CAcceptSock*)m_AcceptSocketList.GetNext(pos);
+				}
+				break;
+			}
+		}
+	}
 
-	//// 메모리 해제
-	//if (pBuffer)
-	//{
-	//	delete [] pBuffer;
-	//	pBuffer = NULL;
-	//}
+	// 메모리 해제
+	if (pBuffer)
+	{
+		delete [] pBuffer;
+		pBuffer = NULL;
+	}
 }
+
+// 메세지 데이터 처리
+//void CMFC20_Nvs1_ChattingExApp::SendDataAll(CAcceptSock* pAccept, CString strData)
+//{
+//	//CAcceptSock* pAccept;
+//	
+//	
+//
+//	
+//}
 
 
 void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
@@ -284,13 +295,13 @@ void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
 	CString strUserID = pClientSock->GetUserID();*/
 
 
-	//if (pos != NULL)
-	//{
-	//	((CMFC20_Nvs1_ChattingExDlg*)AfxGetMainWnd())->onClose(pClientSock);
-	//	pClientSock = (CAcceptSock*)m_AcceptSocketList.GetAt(pos);
-	//	m_AcceptSocketList.RemoveAt(pos);
-	//	delete pClientSock;
-	//	pClientSock = NULL;
-	//}
+	if (pos != NULL)
+	{
+		((CMFC20_Nvs1_ChattingExDlg*)AfxGetMainWnd())->onClose(pClientSock);
+		pClientSock = (CAcceptSock*)m_AcceptSocketList.GetAt(pos);
+		m_AcceptSocketList.RemoveAt(pos);
+		delete pClientSock;
+		pClientSock = NULL;
+	}
 	
 }
