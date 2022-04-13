@@ -58,6 +58,10 @@ void CStack::Push(char* _pszValue, int _iSize)
 		// 새롭게 생성된 노드는 마지막 노드가 된다.
 		m_pLast = pNode;
 	}
+	else
+	{
+		AfxMessageBox(_T("MAX SIZE 초과"));
+	}
 }
 
 BOOL CStack::Pop(Link_Data* pLinkData)
@@ -72,17 +76,21 @@ BOOL CStack::Pop(Link_Data* pLinkData)
 			// 노드의 끝을 POP한다.
 			if (NULL == pNode->pNext)
 			{
-				memcpy(pLinkData, &pNode->stData, sizeof(Link_Data));
+				if (NULL != pLinkData->pszBuffer)
+				{
+					memcpy(pLinkData->pszBuffer, &pNode->stData.pszBuffer[0], pNode->stData.iItemLength);
+					pLinkData->iItemLength = pNode->stData.iItemLength;
+				}
 
 				if (NULL != pNode)
 				{
-					
 					if (NULL != pNode->stData.pszBuffer)
 					{
 						delete[] pNode->stData.pszBuffer;
 						pNode->stData.pszBuffer = NULL;
 					}
-					
+
+					// 노드가 2개 이상일 때
 					if (NULL != m_pLast->pPrev)
 					{
 						m_pLast = pNode->pPrev;
@@ -90,19 +98,19 @@ BOOL CStack::Pop(Link_Data* pLinkData)
 						pNode = NULL;
 						m_pLast->pNext = NULL;
 
-						bResult = TRUE;
-						break;
 					}
-					else
+					else // 노드가 하나 일때
 					{
 						delete pNode;
 						pNode = NULL;
 						m_pRoot = NULL;
-
-						bResult = TRUE;
-						break;
+						m_pLast = NULL;
 					}
 				}
+
+				bResult = TRUE;
+				break;
+
 			}
 
 			pNode = pNode->pNext;
@@ -152,7 +160,11 @@ BOOL CStack::GetAt(int _iIndex, Link_Data* pLinkData)
 					bResult = FALSE;
 
 				// 일반 변수는 값을 대입하지만 나머지는 memcpy를 사용한다.
-				memcpy(pLinkData, &pNode->stData, sizeof(Link_Data));
+				if (NULL != pLinkData->pszBuffer)
+				{
+					memcpy(pLinkData->pszBuffer, &pNode->stData.pszBuffer[0], pNode->stData.iItemLength);
+					pLinkData->iItemLength = pNode->stData.iItemLength;
+				}
 
 				break;
 			}

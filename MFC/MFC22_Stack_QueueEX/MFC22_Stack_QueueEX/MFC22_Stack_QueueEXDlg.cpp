@@ -126,7 +126,7 @@ BOOL CMFC22_Stack_QueueEXDlg::OnInitDialog()
 	m_pstrCheckRadio->SetCheck(TRUE);
 	m_bIsStack	= TRUE;
 
-	m_pStack = new CStack(10);
+	m_pStack = new CStack(5);
 	m_pQueue = new CQueue(10);
 
 
@@ -270,7 +270,18 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 
 			if (iCount > 0)
 			{
+				stLinkData.pszBuffer = new unsigned char[MAX_PATH];
+				memset(stLinkData.pszBuffer, 0, sizeof(unsigned char)*MAX_PATH);
+
 				bResult = m_pStack->Pop(&stLinkData);
+
+				// stLinkData.pszBuffer 데이터 사용
+
+				if (NULL != stLinkData.pszBuffer)
+				{
+					delete[] stLinkData.pszBuffer;
+					stLinkData.pszBuffer = NULL;
+				}
 
 				if (TRUE == bResult)
 					ReDrawList();
@@ -288,10 +299,19 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 		{
 			if (NULL != m_pQueue)
 			{
+				stLinkData.pszBuffer = new unsigned char[MAX_PATH];
+				memset(stLinkData.pszBuffer, 0, sizeof(unsigned char)*MAX_PATH);
+
 				bResult = m_pQueue->DeQueue(&stLinkData);
 				
 				if (TRUE == bResult)
 					ReDrawList();
+
+				if (NULL != stLinkData.pszBuffer)
+				{
+					delete[] stLinkData.pszBuffer;
+					stLinkData.pszBuffer = NULL;
+				}
 			}
 		}
 		else
@@ -311,6 +331,7 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 	BOOL	bPos = FALSE;
 	CString strValue;
 	Link_Data stLinkData = { 0 };
+	CString strString;
 
 	// 스택
 	if (TRUE == m_bIsStack)
@@ -319,17 +340,32 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 		
 		if (0 < iCount)
 		{
+			/* 
+			1. 매우 중요 ★★★
+			구조체 버퍼에 메모리 할당하는데 다른 클래스에서 값을 넣기 때문에
+			꼭 해당 클래스에서 해제를 해야한다. 다른 클래스에서 할당하게 되면 
+			해당 클래스에서 해제를 해야하므로 여기서 할당하고 -> 값을 받아와서 해제까지 한다.
+			문제점은 구조체 문자로 받을 char 버퍼의 사이즈를 문자 길이만큼 받아오지 못하기 
+			때문에 MAX_PATH만큼 받아온다.
+			*/
+			stLinkData.pszBuffer = new unsigned char[MAX_PATH];
+			memset(stLinkData.pszBuffer, 0, sizeof(unsigned char)*MAX_PATH);
+
 			for (int i = 0; i < iCount; i++)
 			{
 				if (TRUE == m_pStack->GetAt(i, &stLinkData))
 				{
-					CString strString;
-
 					strString = stLinkData.pszBuffer;
 					strValue.Format(_T("인덱스:%d, 값:%s"), i, strString);
 					
 					m_ctlListBox.InsertString(i, strValue);
 				}
+			}
+
+			if (NULL != stLinkData.pszBuffer)
+			{
+				delete[] stLinkData.pszBuffer;
+				stLinkData.pszBuffer = NULL;
 			}
 		}
 	}
@@ -339,16 +375,27 @@ void CMFC22_Stack_QueueEXDlg::ReDrawList()
 		iCount = m_pQueue->GetCount();
 		if (0 < iCount)
 		{
+			stLinkData.pszBuffer = new unsigned char[MAX_PATH];
+
 			for (int i = 0; i < iCount; i++)
 			{
+				stLinkData.iItemLength = 0;
+				memset(stLinkData.pszBuffer, 0, sizeof(unsigned char) * MAX_PATH);
+
 				if (TRUE == m_pQueue->GetAt(i, &stLinkData))
 				{
-					CString strString;
 					strString = stLinkData.pszBuffer;
 					strValue.Format(_T("인덱스:%d, 값:%s"), i, strString);
 					
 					m_ctlListBox.InsertString(i, strValue);
 				}
+			}
+
+			if (NULL != stLinkData.pszBuffer)
+			{
+				delete[] stLinkData.pszBuffer;
+				stLinkData.pszBuffer = NULL;
+
 			}
 		}
 	}

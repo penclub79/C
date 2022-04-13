@@ -33,10 +33,10 @@ void CQueue::EnQueue(char* _pszValue, int _iSize)
 		// 해당 버퍼 초기화
 		memset(pNode->stData.pszBuffer, 0, _iSize + 1);
 
-		pNode->stData.iItemLength = _iSize;
-
 		// WCHAR(유니코드) -> char(멀티바이트) 값 복사
 		WideCharToMultiByte(CP_ACP, 0, pszBuff, -1, (char*)pNode->stData.pszBuffer, _iSize, 0, 0);
+
+		pNode->stData.iItemLength = _iSize;
 
 
 		pNode->pNext = NULL;
@@ -54,19 +54,26 @@ void CQueue::EnQueue(char* _pszValue, int _iSize)
 		// 새롭게 생성된 노드는 마지막 노드가 된다.
 		m_pLast = pNode;
 	}
+	else
+	{
+		AfxMessageBox(_T("MAX SIZE 초과"));
+	}
 
 }
-
+// value
 BOOL CQueue::DeQueue(Link_Data* pLinkData)
 {
 	Link_Item* pNode = m_pRoot;
 	BOOL bResult = FALSE;
-	//Link_Data* pNodeData = &pNode->stData;
 
 	if (NULL != pNode)
 	{
 		// 노드의 처음을 POP한다.
-		memcpy(pLinkData, &pNode->stData, sizeof(Link_Data));
+		if (NULL != pLinkData->pszBuffer)
+		{
+			memcpy(pLinkData->pszBuffer, &pNode->stData.pszBuffer[0], pNode->stData.iItemLength);
+			pLinkData->iItemLength = pNode->stData.iItemLength;
+		}
 
 		if (NULL != pNode->stData.pszBuffer)
 		{
@@ -97,7 +104,7 @@ BOOL CQueue::DeQueue(Link_Data* pLinkData)
 	return bResult;
 }
 
-//// value count 체크
+// value count 체크
 int CQueue::GetCount()
 {
 	int iCount = 0;
@@ -135,12 +142,16 @@ int CQueue::GetAt(int _iIndex, Link_Data* pLinkData)
 					bResult = TRUE;
 				else
 					bResult = FALSE;
+
 				// 일반 변수는 값을 대입하지만 나머지는 memcpy를 사용한다.
-				memcpy(pLinkData, &pNode->stData, sizeof(Link_Data));
+				if (NULL != pLinkData->pszBuffer)
+				{
+					memcpy(pLinkData->pszBuffer, &pNode->stData.pszBuffer[0], pNode->stData.iItemLength);
+					pLinkData->iItemLength = pNode->stData.iItemLength;
+				}
 
 				break;
 			}
-
 			pNode = pNode->pNext;
 			iIndex++;
 		} while (NULL != pNode);
@@ -164,7 +175,6 @@ void CQueue::DeleteAll()
 			// 현재 노드 메모리를 해제한다.
 			if (NULL != pNode)
 			{
-				
 				if (NULL != pNode->stData.pszBuffer)
 				{
 					delete[] pNode->stData.pszBuffer;
