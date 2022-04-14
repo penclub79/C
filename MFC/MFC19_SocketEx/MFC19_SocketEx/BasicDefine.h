@@ -60,7 +60,6 @@ typedef struct _tagPACKET_RSP_TEXT{
 typedef struct _tagCLIENT_INFO
 {
 	int iPort;
-
 	// 구조체에 클래스는 추천 하지 않음.
 	TCHAR szUserId[MAX_LENGTH_USERID];
 }CLIENT_INFO;

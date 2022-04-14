@@ -53,6 +53,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	CBasicSock*		pBasicSock; 
 	DWORD			dwEventCheck	= 0;
 	int				iCheckSocket	= 0;
+	int				iClientVal		= 0;
 
 	pBasicSock = (CBasicSock*)_lpParam;
 	
@@ -62,8 +63,17 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	// 이벤트 객체를 생성함.
 	pBasicSock->m_wsaEvent = WSACreateEvent();
 	
+	 
 	SOCKADDR_IN stClientInfo = { 0 };
-	stClientInfo.sin_addr;
+	memset(&stClientInfo, 0, sizeof(stClientInfo));
+
+	// IPv4 인터넷 프로토콜
+	stClientInfo.sin_family = AF_INET;
+	// htons()함수는 short int(2byte)데이터를 네트워크 byte order로 변경.
+
+	/*stClientInfo.sin_port = htons(m_iPort);
+	inet_pton(stClientInfo.sin_family, (PCSTR)m_iPort, &stClientInfo.sin_addr);
+	iClientVal = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));*/
 
 
 	while (true)
@@ -79,7 +89,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 
 		// 소켓 상태 체크
 		iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
-		
+
 		/*
 		인자값
 		DWORD cEvents : 확인할 이벤트의 개수

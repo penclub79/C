@@ -50,7 +50,7 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	m_pClient = new CBasicSock();
+	CBasicSock* m_pClient = new CBasicSock();
 
 	// 멤버변수 초기화
 	m_nChatMode = 1;
@@ -214,17 +214,20 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateData();
-	
+	CString strUserID;
 	CString strIP;
+
 	strIP = m_strMyIP;
 
 	CLIENT_INFO stClient = { 0 };
 	stClient.iPort = 7777;
 
-	CString strUserID;
 	SetDlgItemText(IDC_EDIT_USERID, strUserID);
+	stClient.szUserId = (TCHAR*)(LPCTSTR)strUserID;
 
-	if (m_pClient )
+
+
+	if (NULL != m_pClient)
 		m_pClient->Connect(strIP, strUserID, stClient.iPort);
 
 	

@@ -8,6 +8,8 @@ public:
 	~CBasicSock();
 	
 	static DWORD WINAPI ThreadProc(LPVOID _lpParam);
+	
+
 	void Connect(CString _strIP, CString _strUserID, int _iPort);
 	void Write(char* _pData, int _iLength);
 	void Close();
