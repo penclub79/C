@@ -42,23 +42,22 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
-
 // CMFC19_SocketExDlg 대화 상자
-
 
 
 CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 : CDialogEx(CMFC19_SocketExDlg::IDD, pParent)
-// 멤버변수 초기화
-, m_nChatMode(1)
-, m_strMyIP(_T(""))
-, m_nOtherIP(_T(""))
-, m_strOtherIP(_T(""))
-, m_strInitLoc(0)
-, m_rectDlg(0)
-, m_pClient(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_pClient = new CBasicSock();
+
+	// 멤버변수 초기화
+	m_nChatMode = 1;
+	m_strInitLoc = 0;
+	m_rectDlg = 0;
+	m_pClient = NULL;
+
 }
 
 void CMFC19_SocketExDlg::DoDataExchange(CDataExchange* pDX)
@@ -225,8 +224,9 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	CString strUserID;
 	SetDlgItemText(IDC_EDIT_USERID, strUserID);
 
-	((CBasicSock*)AfxGetMainWnd())->Connect(strIP, strUserID, stClient.iPort);
-	//((CBasicSock*)AfxGetMainWnd())->MainThread();
+	if (m_pClient )
+		m_pClient->Connect(strIP, strUserID, stClient.iPort);
+
 	
 }
 
