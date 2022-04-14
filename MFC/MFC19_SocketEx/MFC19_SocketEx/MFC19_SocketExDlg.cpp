@@ -145,6 +145,7 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	
 	CLIENT_INFO stClient = { 0 };
 	stClient.iPort = 7777;
+
 	// 포트 적용
 	SetDlgItemInt(IDC_EDIT_PORT, stClient.iPort);
 
