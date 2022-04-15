@@ -217,15 +217,18 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	m_pClient = new CBasicSock();
 	CString strUserID;
 	CString strIP;
+	
 
 	strIP = m_strMyIP;
+	CStringA straIP(strIP);
+
 
 	m_iPort = 7777;
 	GetDlgItemText(IDC_EDIT_USERID, strUserID);
 	//wsprintf(stClient.szUserId, _T("%s"), strUserID);
 
 	if (NULL != m_pClient)
-		m_pClient->Connect(strIP, strUserID, m_iPort);
+		m_pClient->Connect(straIP, strUserID, m_iPort);
 
 	
 }

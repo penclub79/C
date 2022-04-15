@@ -57,12 +57,13 @@ typedef struct _tagPACKET_RSP_TEXT{
 }PACKET_RSP_TEXT;
 
 // 클라이언트 구조체
-//typedef struct _tagCLIENT_INFO
-//{
-//	int iPort;
-//	// 구조체에 클래스는 추천 하지 않음.
-//	TCHAR szUserId[MAX_LENGTH_USERID];
-//}CLIENT_INFO;
+typedef struct _tagCLIENT_INFO
+{
+	int iPort;
+	PCSTR szServerIP;
+	// 구조체에 클래스는 추천 하지 않음.
+	TCHAR szUserId[MAX_LENGTH_USERID];
+}CLIENT_INFO;
 //
 //typedef struct _tagERRORCODE
 //{

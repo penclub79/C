@@ -5,7 +5,9 @@
 #pragma once
 #include "afxcmn.h"
 #include "afxwin.h"
+#include "resource.h"
 #include "BasicSock.h"
+
 
 // CMFC19_SocketExDlg 대화 상자
 class CMFC19_SocketExDlg : public CDialogEx

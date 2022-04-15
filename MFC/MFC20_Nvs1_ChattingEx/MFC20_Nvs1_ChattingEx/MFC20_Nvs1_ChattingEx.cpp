@@ -195,7 +195,7 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 
 	/////////////////////////////////////////////////////////////////
 	// Receive //////////////////////////////////////////////////////
-	//wchar_t temp[MAX_PATH];
+	// wchar_t temp[MAX_PATH];
 	// 클라이언트로 부터 받은 메시지
 	pAcceptSock->Receive(&pBuffer[0], sizeof(PACKET_HEADER)); // 헤더사이즈를 버퍼에 Receive한다.
 	pAcceptSock->Receive(&pBuffer[sizeof(PACKET_HEADER)], pstHeader->iPacketSize - sizeof(PACKET_HEADER));// 헤더사이즈 만큼 버퍼에서 건너뛰고 페이로드를 Receive한다.
@@ -203,7 +203,7 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 
 	/////////////////////////////////////////////////////////////////
 	// Parsing //////////////////////////////////////////////////////
-	// Parsing : 패킷 데이터를 열어 본다. ///////////////////////////
+	// Parsing : 패킷 데이터를 열어 본다. ////////////////////////////
 	if (MARKER_CLIENT == pstHeader->iMarker)
 	{
 		switch (pstHeader->iPacketID)
@@ -223,7 +223,6 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 				stRSPLogin.stHeader.iPacketSize = sizeof(PACKET_RSP_LOGIN);
 				// sizeof는 구조체를 넣는 걸로 규칙을 정함 -> 변수랑 포인터 변수랑 헤깔린다.
 				stRSPLogin.iResultCode = LOGIN_SUCCESS;
-
 
 				pAcceptSock->Send(&stRSPLogin, sizeof(PACKET_RSP_LOGIN));
 

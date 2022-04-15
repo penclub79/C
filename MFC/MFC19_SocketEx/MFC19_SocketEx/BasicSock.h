@@ -10,15 +10,16 @@ public:
 	static DWORD WINAPI ThreadProc(LPVOID _lpParam);
 	
 
-	void Connect(CString _strIP, CString _strUserID, int _iPort);
+	void Connect(PCSTR _strIP, CString _strUserID, int _iPort);
 	void Write(char* _pData, int _iLength);
 	void Close();
 	
 private:
-	CString m_strIP;
+	PCSTR m_strIP;
 	CString m_strUserID;
 	int m_iPort;
 
+	int GetPort();
 	int MainThread();
 	SOCKET	m_uiSocket;
 	WSAEVENT m_wsaEvent;

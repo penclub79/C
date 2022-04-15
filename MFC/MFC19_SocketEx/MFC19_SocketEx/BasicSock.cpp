@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "BasicSock.h"
+#include "MFC19_SocketExDlg.h"
 
 #define NUM_THREAD 1
 #define CLIENTPORT
@@ -50,20 +51,22 @@ int CBasicSock::MainThread()
 DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 {
 	// Sync : 동기는 작업이 완료될 때까지 스레드가 멈춘다. 그래서 Blocking소켓이라 불린다.
+	
 	CBasicSock*		pBasicSock		= NULL; 
 	DWORD			dwEventCheck	= 0;
 	int				iCheckSocket	= 0;
 	int				iConnResult		= 0;
+	PCSTR			IpAddr = "192.168.0.90";
+	//PACKET_HEADER	pHeader = { 0 };
 	
-	int				iPort			= 0x1E61;
-	PCSTR			iServerIP		= "192.168.0.90";
-
 	pBasicSock = (CBasicSock*)_lpParam;
+	int iPort = pBasicSock->m_iPort;
+
 	
 	// Socket 생성
 	pBasicSock->m_uiSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	// 이벤트 객체를 생성함.
+	// 이벤트 객체 생성
 	pBasicSock->m_wsaEvent = WSACreateEvent();
 	
 	SOCKADDR_IN stClientInfo = { 0 };
@@ -72,7 +75,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	stClientInfo.sin_family = AF_INET;
 	// htons()함수는 리틀 엔디안에서 빅 엔디안 방식으로 net_port에 저장
 
-	stClientInfo.sin_port = htons(iPort);
+	stClientInfo.sin_port = htons(pBasicSock->m_iPort);
 	/*
 	af : AF_INET 또는 AF_INET6
 	src : IPv4 또는 IPv6
@@ -80,53 +83,76 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	문자열을 프로토콜(IPv4, IPv6 등)에 해당하는 네트워크 데이터(빅엔디언 방식의 2진데이터)로 변경
 	※inet_ntoa는 IPv4만 지원
 	*/
-	inet_pton(stClientInfo.sin_family, iServerIP, &stClientInfo.sin_addr);
+	inet_pton(stClientInfo.sin_family, IpAddr, &stClientInfo.sin_addr);
 	iConnResult = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));
 
 	// 연결 성공
-	if (SOCKET_ERROR == iConnResult)
+	if (SOCKET_ERROR != iConnResult)
 	{
-		AfxMessageBox(_T("Error Connect"));
-	}
+		PACKET_REQ_LOGIN stReqLogin = { 0 };
+		int iLength = 0;
+		//AfxMessageBox(_T("Connect"));
 
-	
-	while (pBasicSock->m_dwThreadID)
+		stReqLogin.stHeader.iMarker = MARKER_CLIENT;
+		stReqLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
+		stReqLogin.stHeader.iPacketID = PACKET_ID_REQ_LOGIN;
+		stReqLogin.stHeader.iPacketSize = sizeof(PACKET_REQ_LOGIN);
+		
+		iLength = pBasicSock->m_strUserID.GetLength();
+		wsprintf(stReqLogin.wszUserID, pBasicSock->m_strUserID);
+
+		iCheckSocket = send(pBasicSock->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
+		if (SOCKET_ERROR == iCheckSocket)
+		{
+			//AfxMessageBox(_T("Send Success"));
+		}
+
+		//iCheckSocket = recv(pBasicSock->m_uiSocket, (char*)&)
+
+
+		while (pBasicSock->m_dwThreadID)
+		{
+			/*
+			FD_ACCEPT	:접속한 클라이언트가 있다
+			FD_READ	    :데이터 수신이 가능하다
+			FD_WRITE	:데이터 송신이 가능하다
+			FD_CLOSE	:상대가 접속을 종료했다
+			FD_CONNECT	:통신을 위한 연결 절차가 끝났다
+			FD_OOB	    :OOB 데이터가 도착했다
+			*/
+
+			// 소켓 상태 체크
+			iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
+
+			/*
+			인자값
+			DWORD cEvents : 확인할 이벤트의 개수
+			const WSAEVENT FAR* IphEvents : 확인할 이벤트가 담긴 배열(시작 주소)
+			BOOL fWaitAll : 배열의 모든 이벤트 객체에 대해 모두 이벤트가 발생했는지 확인할 것인지
+			DWORD dwTimeout : 이벤트 발생이 없을
+			*/
+
+			// WSAWaitForMultipleEvents
+			// 이벤트가 발생했는지 확인
+			dwEventCheck = WSAWaitForMultipleEvents(1, &pBasicSock->m_wsaEvent, TRUE, 1000, TRUE);
+		}
+
+		closesocket(pBasicSock->m_uiSocket);
+		WSACleanup();
+	}
+	else
 	{
-		/*
-		FD_ACCEPT	:접속한 클라이언트가 있다
-		FD_READ	    :데이터 수신이 가능하다
-		FD_WRITE	:데이터 송신이 가능하다
-		FD_CLOSE	:상대가 접속을 종료했다
-		FD_CONNECT	:통신을 위한 연결 절차가 끝났다
-		FD_OOB	    :OOB 데이터가 도착했다
-		*/
-
-		// 소켓 상태 체크
-		iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
-
-		/*
-		인자값
-		DWORD cEvents : 확인할 이벤트의 개수
-		const WSAEVENT FAR* IphEvents : 확인할 이벤트가 담긴 배열(시작 주소)
-		BOOL fWaitAll : 배열의 모든 이벤트 객체에 대해 모두 이벤트가 발생했는지 확인할 것인지
-		DWORD dwTimeout : 이벤트 발생이 없을
-		*/
-
-		// WSAWaitForMultipleEvents
-		// 이벤트가 발생했는지 확인
-		dwEventCheck = WSAWaitForMultipleEvents(1, &pBasicSock->m_wsaEvent, TRUE, 1000, TRUE);
+		AfxMessageBox(_T("Connect Fail"));
 	}
-	
 
 	return 0xffffffff;
 }
 
-void CBasicSock::Connect(CString _strIP, CString _strUserID, int _iPort)
-{
+void CBasicSock::Connect(PCSTR _strIP, CString _strUserID, int _iPort)
+{	
 	m_strIP = _strIP;
+	m_iPort = 7777;
 	m_strUserID = _strUserID;
-	m_iPort = _iPort;
-	//CString _strIP, CString _strUserID, int _iPort
 
 	MainThread();
 	
@@ -157,6 +183,7 @@ void CBasicSock::Close()
 		m_dwThreadID = 0;
 		if (WAIT_TIMEOUT == WaitForSingleObject(m_hThread, 30000))
 		{
+			// 강제 종료 함수
 			TerminateThread(m_hThread, 0xffffffff);
 		}
 
@@ -172,6 +199,5 @@ void CBasicSock::Close()
 		m_wsaEvent = NULL;
 	}
 }
-
 
 
