@@ -50,13 +50,13 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	CBasicSock* m_pClient = new CBasicSock();
+	//CBasicSock* m_pClient = new CBasicSock();
 
 	// 멤버변수 초기화
 	m_nChatMode = 1;
 	m_strInitLoc = 0;
 	m_rectDlg = 0;
-	m_pClient = NULL;
+	m_iPort = 0;
 
 }
 
@@ -142,11 +142,10 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	// 다이얼로그 내에 상대적 좌표로 변환
 	ScreenToClient(&m_strInitLoc);
 	
-	CLIENT_INFO stClient = { 0 };
-	stClient.iPort = 7777;
+	m_iPort = 7777;
 
 	// 포트 적용
-	SetDlgItemInt(IDC_EDIT_PORT, stClient.iPort);
+	SetDlgItemInt(IDC_EDIT_PORT, m_iPort);
 
 	//GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
 	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
@@ -213,22 +212,20 @@ HCURSOR CMFC19_SocketExDlg::OnQueryDragIcon()
 void CMFC19_SocketExDlg::OnClickedButtonConnect()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	UpdateData();
+	//UpdateData();
+
+	m_pClient = new CBasicSock();
 	CString strUserID;
 	CString strIP;
 
 	strIP = m_strMyIP;
 
-	CLIENT_INFO stClient = { 0 };
-	stClient.iPort = 7777;
-
-	SetDlgItemText(IDC_EDIT_USERID, strUserID);
-	stClient.szUserId = (TCHAR*)(LPCTSTR)strUserID;
-
-
+	m_iPort = 7777;
+	GetDlgItemText(IDC_EDIT_USERID, strUserID);
+	//wsprintf(stClient.szUserId, _T("%s"), strUserID);
 
 	if (NULL != m_pClient)
-		m_pClient->Connect(strIP, strUserID, stClient.iPort);
+		m_pClient->Connect(strIP, strUserID, m_iPort);
 
 	
 }

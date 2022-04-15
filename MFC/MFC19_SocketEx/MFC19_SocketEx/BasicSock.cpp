@@ -2,6 +2,7 @@
 #include "BasicSock.h"
 
 #define NUM_THREAD 1
+#define CLIENTPORT
 
 CBasicSock::CBasicSock()
 {
@@ -49,11 +50,13 @@ int CBasicSock::MainThread()
 DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 {
 	// Sync : 동기는 작업이 완료될 때까지 스레드가 멈춘다. 그래서 Blocking소켓이라 불린다.
-	//CBasicSock* pBasicSock = _lpParam;
-	CBasicSock*		pBasicSock; 
+	CBasicSock*		pBasicSock		= NULL; 
 	DWORD			dwEventCheck	= 0;
 	int				iCheckSocket	= 0;
-	int				iClientVal		= 0;
+	int				iConnResult		= 0;
+	
+	int				iPort			= 0x1E61;
+	PCSTR			iServerIP		= "192.168.0.90";
 
 	pBasicSock = (CBasicSock*)_lpParam;
 	
@@ -63,20 +66,31 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	// 이벤트 객체를 생성함.
 	pBasicSock->m_wsaEvent = WSACreateEvent();
 	
-	 
 	SOCKADDR_IN stClientInfo = { 0 };
-	memset(&stClientInfo, 0, sizeof(stClientInfo));
 
 	// IPv4 인터넷 프로토콜
 	stClientInfo.sin_family = AF_INET;
-	// htons()함수는 short int(2byte)데이터를 네트워크 byte order로 변경.
+	// htons()함수는 리틀 엔디안에서 빅 엔디안 방식으로 net_port에 저장
 
-	/*stClientInfo.sin_port = htons(m_iPort);
-	inet_pton(stClientInfo.sin_family, (PCSTR)m_iPort, &stClientInfo.sin_addr);
-	iClientVal = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));*/
+	stClientInfo.sin_port = htons(iPort);
+	/*
+	af : AF_INET 또는 AF_INET6
+	src : IPv4 또는 IPv6
 
+	문자열을 프로토콜(IPv4, IPv6 등)에 해당하는 네트워크 데이터(빅엔디언 방식의 2진데이터)로 변경
+	※inet_ntoa는 IPv4만 지원
+	*/
+	inet_pton(stClientInfo.sin_family, iServerIP, &stClientInfo.sin_addr);
+	iConnResult = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));
 
-	while (true)
+	// 연결 성공
+	if (SOCKET_ERROR == iConnResult)
+	{
+		AfxMessageBox(_T("Error Connect"));
+	}
+
+	
+	while (pBasicSock->m_dwThreadID)
 	{
 		/*
 		FD_ACCEPT	:접속한 클라이언트가 있다
@@ -104,9 +118,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	}
 	
 
-
-
-	return 0;
+	return 0xffffffff;
 }
 
 void CBasicSock::Connect(CString _strIP, CString _strUserID, int _iPort)
@@ -142,21 +154,15 @@ void CBasicSock::Close()
 		*/
 
 		// 쓰레드 실행이 완료될 때까지 대기한다.
-		DWORD dwResult = WaitForSingleObject(m_hThread, INFINITE);
-
-		// 스레드 정상 종료시 해제
-		if (WAIT_OBJECT_0 == dwResult)
+		m_dwThreadID = 0;
+		if (WAIT_TIMEOUT == WaitForSingleObject(m_hThread, 30000))
 		{
-			CloseHandle(m_hThread);
-			m_hThread = NULL;
+			TerminateThread(m_hThread, 0xffffffff);
 		}
 
-		// 스레드 타임아웃시 해제
-		if (WAIT_TIMEOUT == dwResult)
-		{
-			CloseHandle(m_hThread);
-			m_hThread = NULL;
-		}
+		CloseHandle(m_hThread);
+		m_hThread = NULL;
+
 	}
 
 	// 이벤트 객체 해제
