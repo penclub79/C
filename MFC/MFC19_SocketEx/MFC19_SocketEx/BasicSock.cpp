@@ -57,7 +57,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	int				iCheckSocket	= 0;
 	int				iConnResult		= 0;
 	PCSTR			IpAddr = "192.168.0.90";
-	//PACKET_HEADER	pHeader = { 0 };
+	PACKET_HEADER	pHeader = { 0 };
 	
 	pBasicSock = (CBasicSock*)_lpParam;
 	int iPort = pBasicSock->m_iPort;
@@ -89,9 +89,11 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	// 연결 성공
 	if (SOCKET_ERROR != iConnResult)
 	{
-		PACKET_REQ_LOGIN stReqLogin = { 0 };
-		int iLength = 0;
+		char*				pszBuff		= new char[1024];
+		PACKET_REQ_LOGIN	stReqLogin	= { 0 };
+		int					iLength		= 0;
 		//AfxMessageBox(_T("Connect"));
+		memset(pszBuff, 0, 1024);
 
 		stReqLogin.stHeader.iMarker = MARKER_CLIENT;
 		stReqLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
