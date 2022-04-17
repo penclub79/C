@@ -111,7 +111,6 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 
 		//iCheckSocket = recv(pBasicSock->m_uiSocket, (char*)&)
 
-
 		while (pBasicSock->m_dwThreadID)
 		{
 			/*
@@ -137,6 +136,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			// WSAWaitForMultipleEvents
 			// 이벤트가 발생했는지 확인
 			dwEventCheck = WSAWaitForMultipleEvents(1, &pBasicSock->m_wsaEvent, TRUE, 1000, TRUE);
+
 		}
 
 		closesocket(pBasicSock->m_uiSocket);
