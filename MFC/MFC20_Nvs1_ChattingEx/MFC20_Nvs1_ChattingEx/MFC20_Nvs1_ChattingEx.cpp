@@ -22,9 +22,6 @@ END_MESSAGE_MAP()
 
 CMFC20_Nvs1_ChattingExApp::CMFC20_Nvs1_ChattingExApp()
 : m_pServer(NULL)
-
-
-
 {
 	// 다시 시작 관리자 지원
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -172,7 +169,6 @@ void CMFC20_Nvs1_ChattingExApp::CleanUp()
 
 	m_AcceptSocketList.RemoveAll();
 	
-	
 }
 
 
@@ -268,17 +264,6 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 		pBuffer = NULL;
 	}
 }
-
-// 메세지 데이터 처리
-//void CMFC20_Nvs1_ChattingExApp::SendDataAll(CAcceptSock* pAccept, CString strData)
-//{
-//	//CAcceptSock* pAccept;
-//	
-//	
-//
-//	
-//}
-
 
 void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
 {

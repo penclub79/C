@@ -18,6 +18,12 @@ typedef enum{
 	PACKET_ID_RSP_TEXT		,
 };
 
+// Success Code
+typedef enum{
+	LOGIN_SUCCESS = 0,
+	TEXT_SUCCESS = 10,
+};
+
 typedef struct _tagPACKET_HEADER{
 	/*
 	추후 유지보수를 위해서 Marker와 Version을 헤더에서 관리한다.
@@ -64,11 +70,5 @@ typedef struct _tagCLIENT_INFO
 	// 구조체에 클래스는 추천 하지 않음.
 	TCHAR szUserId[MAX_LENGTH_USERID];
 }CLIENT_INFO;
-//
-//typedef struct _tagERRORCODE
-//{
-//	int iErrorCode;
-//}ERRORCODE;
-
 
 #endif

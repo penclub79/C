@@ -10,6 +10,7 @@ CBasicSock::CBasicSock()
 	m_dwThreadID = 0;
 	m_hThread = 0;
 	m_iPort = 0;
+	m_pszBuff = NULL;
 }
 
 
@@ -62,10 +63,11 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	BOOL				bCheckPack		= FALSE;
 
 	PCSTR				IpAddr			= "192.168.0.90";
-	PACKET_HEADER		pHeader			= { 0 };
+	PACKET_RSP_LOGIN*	pstResLogin		= NULL;
 	WSANETWORKEVENTS	stNetWorkEvents	= { 0 };
 	char*				pszBuff			= new char[1024];
 	int					iPort			= pBasicSock->m_iPort;
+	int					iCheckPack		= 0;
 
 	memset(pszBuff, 0, 1024);
 
@@ -114,7 +116,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			}
 			else
 			{
-				pBasicSock->SendPacket(NULL, 0, PACKET_ID_REQ_LOGIN);
+				pBasicSock->SendPacket(PACKET_ID_REQ_LOGIN);
 			}
 		}
 		
@@ -123,14 +125,14 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			if (stNetWorkEvents.iErrorCode[FD_READ_BIT] != 0)
 			{
 				AfxMessageBox(_T("읽기가 원활하지 않다."));
-				closesocket(pBasicSock->m_uiSocket);
+				pBasicSock->Close();
 			}
 			else
-			{	
+			{
+				iCheckPack = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
+				pstResLogin = (PACKET_RSP_LOGIN*)pszBuff;
 				// 데이터를 받아서 읽었을 때
-				iCheckSocket = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
-
-
+				pBasicSock->ReceivePacket(pstResLogin->stHeader.iPacketID, pstResLogin);
 			}
 		}
 		//iCheckSocket = send(pBasicSock->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
@@ -142,7 +144,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			}
 			else
 			{
-				//pBasicSock->SendPacket(pszBuff, );
+				pBasicSock->SendPacket(PACKET_ID_REQ_TEXT);
 			}
 		}
 		
@@ -179,6 +181,7 @@ void CBasicSock::Connect(PCSTR _strIP, CString _strUserID, int _iPort)
 	m_iPort = 7777;
 	m_strUserID = _strUserID;
 
+	// 스레드 생성
 	MainThread();
 }
 
@@ -219,41 +222,30 @@ void CBasicSock::Connect(PCSTR _strIP, CString _strUserID, int _iPort)
 //	return TRUE;
 //}
 
-//void CBasicSock::Write(char* _pData, int _iLength)
-//{
-//	PACKET_HEADER		stHeader	= { 0 };
-//	char*				pszBuff		= new char[1024];
-//	PACKET_REQ_LOGIN	stReqLogin	= { 0 };
-//	int					iLength		= 0;
-//
-//	memset(pszBuff, 0, 1024);
-//
-//	stReqLogin.stHeader.iMarker = MARKER_CLIENT;
-//	stReqLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
-//	stReqLogin.stHeader.iPacketID = PACKET_ID_REQ_TEXT;
-//	stReqLogin.stHeader.iPacketSize = sizeof(PACKET_REQ_LOGIN);
-//
-//	iLength = _iLength;
-//	wsprintf(stReqLogin.wszUserID, m_strUserID);
-//
-//	if (NULL != pszBuff)
-//	{
-//		delete[] pszBuff;
-//		pszBuff = NULL;
-//	}
-//}
+void CBasicSock::Write(char* _pData, int _iLength)
+{
+	m_pszBuff = _pData;
+	m_iLength = _iLength;
+	PACKET_REQ_TEXT stReqText = { 0 };
+	
+	wsprintf(stReqText.wszPacketText, _T("%s"), _pData);
 
-void CBasicSock::SendPacket(char* _pData, int _iLength, int _iPacketCode)
+}
+
+void CBasicSock::SendPacket(int _iPacketID)
 {
 	PACKET_HEADER		stHeader		= { 0 };
-	char*				pszBuff			= new char[1024];
 	PACKET_REQ_LOGIN	stReqLogin		= { 0 };
+	PACKET_REQ_TEXT		stReqText		= { 0 };
+	PACKET_REQ_TEXT*	pstReqText		= NULL;
+	char*				pszBuff			= NULL;
 	int					iLength			= 0;
 	int					iCheckPack		= 0;
 
+	pszBuff = new char[1024];
 	memset(pszBuff, 0, 1024);
 
-	switch (_iPacketCode)
+	switch (_iPacketID)
 	{
 	case PACKET_ID_REQ_LOGIN:
 		stReqLogin.stHeader.iMarker = MARKER_CLIENT;
@@ -265,11 +257,45 @@ void CBasicSock::SendPacket(char* _pData, int _iLength, int _iPacketCode)
 		break;
 
 	case PACKET_ID_REQ_TEXT:
+		pstReqText = (PACKET_REQ_TEXT*)pszBuff;
+
+		pstReqText->stHeader.iMarker = MARKER_CLIENT;
+		pstReqText->stHeader.iVersion = VERSION_PACKET_CLIENT_1;
+		pstReqText->stHeader.iPacketID = PACKET_ID_REQ_TEXT;
+		pstReqText->stHeader.iPacketSize = sizeof(PACKET_REQ_TEXT);
 		break;
 
 	default:
 		break;
 	}
+}
+
+void CBasicSock::ReceivePacket(int _iPacketID, PACKET_RSP_LOGIN* pszPacket)
+{
+	char*				pszBuff			= NULL;
+	PACKET_RSP_LOGIN*	pstResLogin		= NULL;
+	PACKET_RSP_TEXT*	pstResText		= NULL;
+	int					iCheckSocket	= 0;
+	int					iCode			= 0;
+	pszBuff = new char[1024];
+	memset(pszBuff, 0, 1024);
+
+	switch (_iPacketID)
+	{
+	case PACKET_ID_RSP_LOGIN:
+
+		pstResLogin = pszPacket;
+		if (iCode = pstResLogin->iResultCode)
+			iCode = LOGIN_SUCCESS;
+
+
+	case PACKET_ID_RSP_TEXT:
+
+	default:
+		break;
+	}
+
+
 }
 
 void CBasicSock::Close()
@@ -288,10 +314,8 @@ void CBasicSock::Close()
 			// 강제 종료 함수
 			TerminateThread(m_hThread, 0xffffffff);
 		}
-
 		CloseHandle(m_hThread);
 		m_hThread = NULL;
-
 	}
 
 	// 이벤트 객체 해제

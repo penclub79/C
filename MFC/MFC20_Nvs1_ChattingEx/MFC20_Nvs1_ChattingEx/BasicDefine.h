@@ -21,7 +21,7 @@ typedef enum{
 
 
 typedef struct _tagPACKET_HEADER{
-	int		iMarker;
+	int					iMarker;
 	unsigned int		iVersion;
 	unsigned int		iPacketID;
 	unsigned int		iPacketSize;

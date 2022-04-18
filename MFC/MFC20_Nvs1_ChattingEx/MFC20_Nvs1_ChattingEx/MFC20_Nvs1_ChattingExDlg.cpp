@@ -59,19 +59,14 @@ CMFC20_Nvs1_ChattingExDlg::CMFC20_Nvs1_ChattingExDlg(CWnd* pParent /*=NULL*/)
 void CMFC20_Nvs1_ChattingExDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	//  DDX_IPAddress(pDX, IDC_IPADDRESS_SERVER, m_nChat);
-	//  DDX_IPAddress(pDX, IDC_IPADDRESS_SERVER, m_nChatMode);
 	DDX_Control(pDX, IDC_LIST_CHAT, m_listChat);
 	DDX_Control(pDX, IDC_IPADDRESS_SERVER, m_IPAddress);
-	//DDX_Radio(pDX, IDC_RADIO_SERVER, m_nChatMode);
 }
 
 BEGIN_MESSAGE_MAP(CMFC20_Nvs1_ChattingExDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	//ON_BN_CLICKED(IDC_RADIO_SERVER, &CMFC20_Nvs1_ChattingExDlg::OnClickedRadioServer)
-	//ON_COMMAND(IDC_RADIO_CLIENT, &CMFC20_Nvs1_ChattingExDlg::OnRadioClient)
 	ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CMFC20_Nvs1_ChattingExDlg::OnClickedButtonConnect)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CMFC20_Nvs1_ChattingExDlg::OnClickedButtonSend)
 	ON_WM_SIZE()
@@ -133,13 +128,10 @@ BOOL CMFC20_Nvs1_ChattingExDlg::OnInitDialog()
 	// 다이얼로그 내에 상대적 좌표로 변환
 	ScreenToClient(&m_strInitLoc);
 
-
-
 	// 다이얼로그 초기화
 	RECT stDlgLoc = { 0 };
 	this->GetClientRect(&stDlgLoc);
 	ResizeControl(stDlgLoc.right - stDlgLoc.left, stDlgLoc.bottom - stDlgLoc.top);
-
 
 	::GetClientRect(::GetDlgItem(this->GetSafeHwnd(), IDC_EDIT_SEND), &stDlgLoc);
 
@@ -211,9 +203,6 @@ void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonConnect()
 	
 	((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->InitServer();
 
-
-	//GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_RADIO_CLIENT)->EnableWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
 	
 	CString strIP;
@@ -229,8 +218,7 @@ void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonSend()
 	CString strSend, strInsert;
 	
 	strInsert.Format(_T("클라이언트[%s]:%s"), m_strMyIP, strSend);
-	//((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendData(strSend);
-	//((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->SendDataAll(NULL, strSend);
+
 	int sel = m_listChat.InsertString(-1, strInsert);
 	m_listChat.SetCurSel(sel);
 	

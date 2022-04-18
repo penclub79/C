@@ -65,8 +65,7 @@ void CMFC19_SocketExDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_IPADDRESS_SERVER, m_IPAddress);
 	DDX_Control(pDX, IDC_LIST_CHAT, m_listChat);
-	//  DDX_Control(pDX, IDC_RADIO_SERVER, m_nChatMode);
-	//DDX_Radio(pDX, IDC_RADIO_SERVER, m_nChatMode);
+	
 }
 
 BEGIN_MESSAGE_MAP(CMFC19_SocketExDlg, CDialogEx)
@@ -77,8 +76,6 @@ BEGIN_MESSAGE_MAP(CMFC19_SocketExDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CMFC19_SocketExDlg::OnClickedButtonSend)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-	//ON_BN_CLICKED(IDC_BUTTON_CLOSE, &CMFC19_SocketExDlg::OnClickedButtonClose)
-	//ON_BN_CLICKED(IDC_BUTTON_DISCONNECT, &CMFC19_SocketExDlg::OnClickedButtonDisconnect)
 END_MESSAGE_MAP()
 
 
@@ -128,17 +125,22 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	/*컨트롤 초기화*/
 	m_IPAddress.SetWindowText(m_strMyIP);
 	m_IPAddress.EnableWindow(FALSE);
+
 	// 포트 상자 비활성화
 	GetDlgItem(IDC_EDIT_PORT)->EnableWindow(FALSE);
+
 	// DisConnect 비활성화
 	GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
+
 	// Send 비활성화
 	GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(FALSE);
+
 	// Connect 활성화
 	GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
 
 	// Text Static ServerIP초기 좌표가져오기
 	GetDlgItem(IDC_STATIC_SERVER_IP)->GetWindowRect(&m_strInitLoc);
+
 	// 다이얼로그 내에 상대적 좌표로 변환
 	ScreenToClient(&m_strInitLoc);
 	
@@ -212,50 +214,61 @@ HCURSOR CMFC19_SocketExDlg::OnQueryDragIcon()
 void CMFC19_SocketExDlg::OnClickedButtonConnect()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	//UpdateData();
+	UpdateData();
 
 	m_pClient = new CBasicSock();
 	CString strUserID;
 	CString strIP;
-	
 
 	strIP = m_strMyIP;
 	CStringA straIP(strIP);
-
+	BOOL bResult = 0;
 
 	m_iPort = 7777;
 	GetDlgItemText(IDC_EDIT_USERID, strUserID);
-	//wsprintf(stClient.szUserId, _T("%s"), strUserID);
 
 	if (NULL != m_pClient)
 		m_pClient->Connect(straIP, strUserID, m_iPort);
-
-	
 }
 
 // 메시지 Send 버튼
 void CMFC19_SocketExDlg::OnClickedButtonSend()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString strSend;
+	CString strMessage;
+	CString	strInsert;
 	CString strUserID;
-	
-	//CString strUserID = ((CMFC19_SocketExApp*)AfxGetApp())->GetUserID();
-	
+	int sel = 0;
+	int iLength = 0;
+	char* pszBuff = NULL;
 
-	m_pClient->SendPacket();
-	
+	GetDlgItemText(IDC_EDIT_SEND, strMessage);
+	iLength = strMessage.GetLength();
+
+	pszBuff = new char[iLength + 1];
+	memset(pszBuff, 0, iLength);
+
+	wsprintf((LPWSTR)pszBuff, strMessage);
+
+	m_pClient->Write(pszBuff, iLength);
+
+	strInsert.Format(_T("클라이언트[%s]:%s"), strUserID, strMessage);
+	sel = m_listChat.InsertString(-1, strInsert);
+	m_listChat.SetCurSel(sel);
+
+	SetDlgItemText(IDC_EDIT_SEND, _T(""));
+
+	if (NULL != pszBuff)
+	{
+		delete[] pszBuff;
+		pszBuff = NULL;
+	}
 }
-
 
 void CMFC19_SocketExDlg::ReceiveMessage(CString strReceive, CString strOtherUserID)
 {
-	
 	CString strInsert;
-	
 }
-
-
 
 void CMFC19_SocketExDlg::OnSize(UINT nType, int cx, int cy)
 {
@@ -348,13 +361,6 @@ void CMFC19_SocketExDlg::ResizeControl(int cx, int cy)
 //	//AfxGetMainWnd()->PostMessageW(WM_CLOSE);
 //}
 //
-//void CMFC19_SocketExDlg::SetConnectStatus(int iErrorCode)
-//{
-//	CString strMessage;
-//
-//	
-//
-//}
 //
 //// DISConnect
 //void CMFC19_SocketExDlg::OnClickedButtonDisconnect()

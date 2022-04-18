@@ -41,7 +41,6 @@ public:
 	afx_msg void OnClickedButtonSend();
 	void ReceiveMessage(CString strReceive, CString strOtherUserID);
 	void ResizeControl(int cx, int cy);
-	void SetConnectStatus(int iErrorCode);
 
 	CBasicSock* m_pClient;
 
@@ -51,9 +50,11 @@ public:
 	CString m_strMyIP;
 	CString m_nOtherIP;
 	CString m_strOtherIP;
+	
 	afx_msg void OnBnClickedRadioServer();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
+
 	//afx_msg void OnClickedButtonClose();
 	//afx_msg void OnClickedButtonDisconnect();
 };
