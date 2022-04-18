@@ -136,7 +136,6 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 	}
 
 #else
-
 	CAcceptSock* pAccept = new CAcceptSock;
 	
 	if (m_pServer->Accept(*pAccept))
@@ -147,12 +146,8 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 		
 		m_AcceptSocketList.AddTail(pAccept);
 
-		//pAccept->SendWhoAreYou();
-		/*pAccept->Receive(&stRecvHeader, sizeof(stRecvHeader));*/
 		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
-
 	}
-
 #endif
 
 }

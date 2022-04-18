@@ -238,9 +238,12 @@ void CMFC19_SocketExDlg::OnClickedButtonSend()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString strSend;
-	CString	strInsert;
 	CString strUserID;
+	
 	//CString strUserID = ((CMFC19_SocketExApp*)AfxGetApp())->GetUserID();
+	
+
+	m_pClient->SendPacket();
 	
 }
 

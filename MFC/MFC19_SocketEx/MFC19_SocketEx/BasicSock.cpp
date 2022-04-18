@@ -52,17 +52,23 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 {
 	// Sync : 동기는 작업이 완료될 때까지 스레드가 멈춘다. 그래서 Blocking소켓이라 불린다.
 	
-	CBasicSock*		pBasicSock		= NULL; 
-	DWORD			dwEventCheck	= 0;
-	int				iCheckSocket	= 0;
-	int				iConnResult		= 0;
-	PCSTR			IpAddr = "192.168.0.90";
-	PACKET_HEADER	pHeader = { 0 };
-	
+	CBasicSock*			pBasicSock		= NULL; 
 	pBasicSock = (CBasicSock*)_lpParam;
-	int iPort = pBasicSock->m_iPort;
 
-	
+	DWORD				dwEventCheck	= 0;
+	int					iCheckSocket	= 0;
+	int					iConnResult		= 0;
+	int					iEventID		= 0;
+	BOOL				bCheckPack		= FALSE;
+
+	PCSTR				IpAddr			= "192.168.0.90";
+	PACKET_HEADER		pHeader			= { 0 };
+	WSANETWORKEVENTS	stNetWorkEvents	= { 0 };
+	char*				pszBuff			= new char[1024];
+	int					iPort			= pBasicSock->m_iPort;
+
+	memset(pszBuff, 0, 1024);
+
 	// Socket 생성
 	pBasicSock->m_uiSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -79,73 +85,90 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	/*
 	af : AF_INET 또는 AF_INET6
 	src : IPv4 또는 IPv6
-
 	문자열을 프로토콜(IPv4, IPv6 등)에 해당하는 네트워크 데이터(빅엔디언 방식의 2진데이터)로 변경
 	※inet_ntoa는 IPv4만 지원
 	*/
 	inet_pton(stClientInfo.sin_family, IpAddr, &stClientInfo.sin_addr);
 	iConnResult = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));
-
-	// 연결 성공
-	if (SOCKET_ERROR != iConnResult)
+	
+	// 소켓 상태 체크
+	iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
+	
+	while (pBasicSock->m_dwThreadID)
 	{
-		char*				pszBuff		= new char[1024];
-		PACKET_REQ_LOGIN	stReqLogin	= { 0 };
-		int					iLength		= 0;
-		//AfxMessageBox(_T("Connect"));
-		memset(pszBuff, 0, 1024);
-
-		stReqLogin.stHeader.iMarker = MARKER_CLIENT;
-		stReqLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
-		stReqLogin.stHeader.iPacketID = PACKET_ID_REQ_LOGIN;
-		stReqLogin.stHeader.iPacketSize = sizeof(PACKET_REQ_LOGIN);
+		/*
+		FD_ACCEPT	:접속한 클라이언트가 있다
+		FD_READ	    :데이터 수신이 가능하다
+		FD_WRITE	:데이터 송신이 가능하다
+		FD_CLOSE	:상대가 접속을 종료했다
+		FD_CONNECT	:통신을 위한 연결 절차가 끝났다
+		FD_OOB	    :OOB 데이터가 도착했다
+		*/
+		iEventID = WSAEnumNetworkEvents(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, &stNetWorkEvents);
+		if (stNetWorkEvents.lNetworkEvents & FD_CONNECT)
+		{
+			if (stNetWorkEvents.iErrorCode[FD_CONNECT_BIT] != 0)
+			{
+				AfxMessageBox(_T("연결이 원활하지 않다."));
+				pBasicSock->Close();
+			}
+			else
+			{
+				pBasicSock->SendPacket(NULL, 0, PACKET_ID_REQ_LOGIN);
+			}
+		}
 		
-		iLength = pBasicSock->m_strUserID.GetLength();
-		wsprintf(stReqLogin.wszUserID, pBasicSock->m_strUserID);
-
-		iCheckSocket = send(pBasicSock->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
-		if (SOCKET_ERROR == iCheckSocket)
+		if (stNetWorkEvents.lNetworkEvents & FD_READ)
 		{
-			//AfxMessageBox(_T("Send Success"));
+			if (stNetWorkEvents.iErrorCode[FD_READ_BIT] != 0)
+			{
+				AfxMessageBox(_T("읽기가 원활하지 않다."));
+				closesocket(pBasicSock->m_uiSocket);
+			}
+			else
+			{	
+				// 데이터를 받아서 읽었을 때
+				iCheckSocket = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
+
+
+			}
+		}
+		//iCheckSocket = send(pBasicSock->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
+		if (stNetWorkEvents.lNetworkEvents & FD_WRITE)
+		{
+			if (stNetWorkEvents.iErrorCode[FD_WRITE_BIT] != 0)
+			{
+				closesocket(pBasicSock->m_uiSocket);
+			}
+			else
+			{
+				//pBasicSock->SendPacket(pszBuff, );
+			}
+		}
+		
+		if (stNetWorkEvents.lNetworkEvents & FD_CLOSE)
+		{
+			if (stNetWorkEvents.iErrorCode[FD_CLOSE_BIT] != 0)
+			{
+				closesocket(pBasicSock->m_uiSocket);
+			}
 		}
 
-		//iCheckSocket = recv(pBasicSock->m_uiSocket, (char*)&)
+		/*
+		인자값
+		DWORD cEvents : 확인할 이벤트의 개수
+		const WSAEVENT FAR* IphEvents : 확인할 이벤트가 담긴 배열(시작 주소)
+		BOOL fWaitAll : 배열의 모든 이벤트 객체에 대해 모두 이벤트가 발생했는지 확인할 것인지
+		DWORD dwTimeout : 이벤트 발생이 없을
+		*/
 
-		while (pBasicSock->m_dwThreadID)
-		{
-			/*
-			FD_ACCEPT	:접속한 클라이언트가 있다
-			FD_READ	    :데이터 수신이 가능하다
-			FD_WRITE	:데이터 송신이 가능하다
-			FD_CLOSE	:상대가 접속을 종료했다
-			FD_CONNECT	:통신을 위한 연결 절차가 끝났다
-			FD_OOB	    :OOB 데이터가 도착했다
-			*/
+		// WSAWaitForMultipleEvents
+		// 이벤트가 발생했는지 확인
+		dwEventCheck = WSAWaitForMultipleEvents(1, &pBasicSock->m_wsaEvent, TRUE, 1000, TRUE);
 
-			// 소켓 상태 체크
-			iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
-
-			/*
-			인자값
-			DWORD cEvents : 확인할 이벤트의 개수
-			const WSAEVENT FAR* IphEvents : 확인할 이벤트가 담긴 배열(시작 주소)
-			BOOL fWaitAll : 배열의 모든 이벤트 객체에 대해 모두 이벤트가 발생했는지 확인할 것인지
-			DWORD dwTimeout : 이벤트 발생이 없을
-			*/
-
-			// WSAWaitForMultipleEvents
-			// 이벤트가 발생했는지 확인
-			dwEventCheck = WSAWaitForMultipleEvents(1, &pBasicSock->m_wsaEvent, TRUE, 1000, TRUE);
-
-		}
-
-		closesocket(pBasicSock->m_uiSocket);
-		WSACleanup();
 	}
-	else
-	{
-		AfxMessageBox(_T("Connect Fail"));
-	}
+	closesocket(pBasicSock->m_uiSocket);
+	WSACleanup();
 
 	return 0xffffffff;
 }
@@ -157,19 +180,96 @@ void CBasicSock::Connect(PCSTR _strIP, CString _strUserID, int _iPort)
 	m_strUserID = _strUserID;
 
 	MainThread();
-	
-
 }
 
-void CBasicSock::Write(char* _pData, int _iLength)
+//BOOL CBasicSock::IsLogin()
+//{
+//	// 헤더와 패킷을 서버로 보낸다.
+//	PACKET_HEADER		stHeader	= { 0 };
+//	char*				pszBuff		= new char[1024];
+//	PACKET_REQ_LOGIN	stReqLogin	= { 0 };
+//	PACKET_RSP_LOGIN*	pRspLogin	= NULL;
+//	int					iCheckPack	= 0;
+//	memset(pszBuff, 0, 1024);
+//
+//	stReqLogin.stHeader.iMarker = MARKER_CLIENT;
+//	stReqLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
+//	stReqLogin.stHeader.iPacketID = PACKET_ID_REQ_LOGIN;
+//	stReqLogin.stHeader.iPacketSize = sizeof(PACKET_REQ_LOGIN);
+//
+//	wsprintf(stReqLogin.wszUserID, m_strUserID);
+//
+//	iCheckPack = send(this->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
+//	iCheckPack = recv(this->m_uiSocket, pszBuff, 1024, 0);
+//	
+//	if (0 != iCheckPack)
+//	{
+//		// 서버에서 받아온 iResultCode를 받아온다.
+//		pRspLogin = (PACKET_RSP_LOGIN*)pszBuff;
+//		
+//		if (0 != pRspLogin->iResultCode)
+//			return FALSE;
+//	}
+//
+//	if (NULL != pszBuff)
+//	{
+//		delete[] pszBuff;
+//		pszBuff = NULL;
+//	}
+//	return TRUE;
+//}
+
+//void CBasicSock::Write(char* _pData, int _iLength)
+//{
+//	PACKET_HEADER		stHeader	= { 0 };
+//	char*				pszBuff		= new char[1024];
+//	PACKET_REQ_LOGIN	stReqLogin	= { 0 };
+//	int					iLength		= 0;
+//
+//	memset(pszBuff, 0, 1024);
+//
+//	stReqLogin.stHeader.iMarker = MARKER_CLIENT;
+//	stReqLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
+//	stReqLogin.stHeader.iPacketID = PACKET_ID_REQ_TEXT;
+//	stReqLogin.stHeader.iPacketSize = sizeof(PACKET_REQ_LOGIN);
+//
+//	iLength = _iLength;
+//	wsprintf(stReqLogin.wszUserID, m_strUserID);
+//
+//	if (NULL != pszBuff)
+//	{
+//		delete[] pszBuff;
+//		pszBuff = NULL;
+//	}
+//}
+
+void CBasicSock::SendPacket(char* _pData, int _iLength, int _iPacketCode)
 {
-	PACKET_HEADER stHeader = { 0 };
+	PACKET_HEADER		stHeader		= { 0 };
+	char*				pszBuff			= new char[1024];
+	PACKET_REQ_LOGIN	stReqLogin		= { 0 };
+	int					iLength			= 0;
+	int					iCheckPack		= 0;
 
-	stHeader.iMarker = MARKER_CLIENT;
-	stHeader.iVersion = VERSION_PACKET_CLIENT_1;
-	stHeader.iPacketSize = sizeof(PACKET_REQ_LOGIN);
-	stHeader.iPacketID = PACKET_ID_REQ_LOGIN;
+	memset(pszBuff, 0, 1024);
 
+	switch (_iPacketCode)
+	{
+	case PACKET_ID_REQ_LOGIN:
+		stReqLogin.stHeader.iMarker = MARKER_CLIENT;
+		stReqLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
+		stReqLogin.stHeader.iPacketID = PACKET_ID_REQ_LOGIN;
+		stReqLogin.stHeader.iPacketSize = sizeof(PACKET_REQ_LOGIN);
+		wsprintf(stReqLogin.wszUserID, m_strUserID);
+		iCheckPack = send(this->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
+		break;
+
+	case PACKET_ID_REQ_TEXT:
+		break;
+
+	default:
+		break;
+	}
 }
 
 void CBasicSock::Close()
