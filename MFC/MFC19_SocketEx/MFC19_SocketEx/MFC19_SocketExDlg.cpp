@@ -226,13 +226,10 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 
 	m_iPort = 7777;
 	GetDlgItemText(IDC_EDIT_USERID, strUserID);
+	SetUserID(strUserID);
 
 	if (NULL != m_pClient)
 		m_pClient->Connect(straIP, strUserID, m_iPort);
-
-	GetDlgItem(IDC_EDIT_SEND)->EnableWindow(TRUE);
-	GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(TRUE);
-	GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
 }
 
 void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
@@ -240,15 +237,18 @@ void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 	if (LOGIN_SUCCESS == _iResult)
 	{
 		m_bIsConnect = TRUE;
-		AfxMessageBox(_T("연결 완료."));
+		//AfxMessageBox(_T("연결 완료."));
+
+		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(TRUE);
+		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(TRUE);
+		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
 	}
 	else
 	{
 		m_bIsConnect = FALSE;
-		AfxMessageBox(_T("연결이 원활하지 않다."));
+		AfxMessageBox(_T("연결이 원활하지 않음."));
 	}
 		
-	
 }
 
 // 메시지 Send 버튼
@@ -258,20 +258,20 @@ void CMFC19_SocketExDlg::OnClickedButtonSend()
 	CString strMessage;
 	CString	strInsert;
 	CString strUserID;
-	int sel = 0;
-	int iLength = 0;
-	char* pszBuff = NULL;
+	int		sel			= 0;
+	int		iLength		= 0;
+	TCHAR*	pszBuff		= NULL;
 
 	GetDlgItemText(IDC_EDIT_SEND, strMessage);
 	iLength = strMessage.GetLength();
 
-	pszBuff = new char[iLength + 1];
+	pszBuff = new TCHAR[iLength + 1];
 	memset(pszBuff, 0, iLength);
+	
+	wsprintf(pszBuff, _T("%s"), strMessage);
+	m_pClient->SendPacket(PACKET_ID_REQ_TEXT, pszBuff, iLength);
 
-	wsprintf((LPWSTR)pszBuff, strMessage);
-
-	m_pClient->Write(pszBuff, iLength);
-
+	strUserID = GetUserID();
 	strInsert.Format(_T("클라이언트[%s]:%s"), strUserID, strMessage);
 	sel = m_listChat.InsertString(-1, strInsert);
 	m_listChat.SetCurSel(sel);
@@ -290,6 +290,16 @@ void CMFC19_SocketExDlg::ReceiveMessage(CString strReceive, CString strOtherUser
 	CString strInsert;
 }
 
+void CMFC19_SocketExDlg::SetUserID(CString _strUserID)
+{
+	m_strUserID = _strUserID;
+}
+
+CString CMFC19_SocketExDlg::GetUserID()
+{
+	return m_strUserID;
+}
+
 void CMFC19_SocketExDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
@@ -297,7 +307,6 @@ void CMFC19_SocketExDlg::OnSize(UINT nType, int cx, int cy)
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 	ResizeControl(cx, cy);
 }
-
 
 void CMFC19_SocketExDlg::OnSizing(UINT fwSide, LPRECT pRect)
 {

@@ -43,6 +43,8 @@ public:
 	void ReceiveMessage(CString strReceive, CString strOtherUserID);
 	void ResizeControl(int cx, int cy);
 	void ConnectStatus(int _iResult);
+	void SetUserID(CString _strUserID);
+	CString GetUserID();
 
 	CBasicSock* m_pClient;
 
@@ -50,8 +52,7 @@ public:
 	CListBox m_listChat;
 	int m_nChatMode;
 	CString m_strMyIP;
-	CString m_nOtherIP;
-	CString m_strOtherIP;
+	CString m_strUserID;
 	
 	afx_msg void OnBnClickedRadioServer();
 	afx_msg void OnSize(UINT nType, int cx, int cy);

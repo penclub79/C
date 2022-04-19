@@ -10,13 +10,13 @@ public:
 	
 	static DWORD WINAPI ThreadProc(LPVOID _lpParam);
 	void Connect(PCSTR _strIP, CString _strUserID, int _iPort);
-	void Write(char* _pData, int _iLength);
-	void SendPacket(int _iPacketID);
-	void ReceivePacket(int _iPacketID, PACKET_RSP_LOGIN* pszPacket);
+	//void Write(TCHAR* _pData, int _iLength);
+	void SendPacket(int _iPacketID, TCHAR* _pData, int _iLength);
+	void ReceivePacket(LPVOID _pDlg);
 	void Close();
-	
+	LPVOID m_pDlg;
+
 private:
-	
 	PCSTR m_strIP;
 	CString m_strUserID;
 	int m_iPort;
@@ -24,9 +24,10 @@ private:
 	WSAEVENT m_wsaEvent;
 	DWORD m_dwThreadID;
 	HANDLE m_hThread;
-	char* m_pszBuff;
-	int   m_iLength;
 
+	/*char* m_pszBuff;
+	int   m_iLength;*/
+	
 	int MainThread();
 	
 
