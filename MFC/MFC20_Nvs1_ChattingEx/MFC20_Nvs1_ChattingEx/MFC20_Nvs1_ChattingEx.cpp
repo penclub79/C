@@ -166,11 +166,8 @@ void CMFC20_Nvs1_ChattingExApp::CleanUp()
 		delete pAccept;
 		pAccept = NULL;
 	}
-
 	m_AcceptSocketList.RemoveAll();
-	
 }
-
 
 void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 {

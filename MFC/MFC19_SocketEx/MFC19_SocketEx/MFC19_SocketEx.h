@@ -25,13 +25,6 @@ public:
 
 // 구현입니다.
 	DECLARE_MESSAGE_MAP()
-
-private:
-	// 클래스
-
-public:
-
-	
 };
 
 extern CMFC19_SocketExApp theApp;

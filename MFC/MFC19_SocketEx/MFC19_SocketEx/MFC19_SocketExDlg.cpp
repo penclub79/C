@@ -57,7 +57,7 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 	m_strInitLoc = 0;
 	m_rectDlg = 0;
 	m_iPort = 0;
-
+	m_bIsConnect = FALSE;
 }
 
 void CMFC19_SocketExDlg::DoDataExchange(CDataExchange* pDX)
@@ -137,6 +137,7 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 
 	// Connect 활성화
 	GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
+	
 
 	// Text Static ServerIP초기 좌표가져오기
 	GetDlgItem(IDC_STATIC_SERVER_IP)->GetWindowRect(&m_strInitLoc);
@@ -149,7 +150,6 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	// 포트 적용
 	SetDlgItemInt(IDC_EDIT_PORT, m_iPort);
 
-	//GetDlgItem(IDC_RADIO_SERVER)->EnableWindow(FALSE);
 	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Connect"));
 
 	/*다이얼로그 사이즈 초기화*/
@@ -229,6 +229,26 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 
 	if (NULL != m_pClient)
 		m_pClient->Connect(straIP, strUserID, m_iPort);
+
+	GetDlgItem(IDC_EDIT_SEND)->EnableWindow(TRUE);
+	GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(TRUE);
+	GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
+}
+
+void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
+{
+	if (LOGIN_SUCCESS == _iResult)
+	{
+		m_bIsConnect = TRUE;
+		AfxMessageBox(_T("연결 완료."));
+	}
+	else
+	{
+		m_bIsConnect = FALSE;
+		AfxMessageBox(_T("연결이 원활하지 않다."));
+	}
+		
+	
 }
 
 // 메시지 Send 버튼

@@ -9,7 +9,6 @@ public:
 	~CBasicSock();
 	
 	static DWORD WINAPI ThreadProc(LPVOID _lpParam);
-	
 	void Connect(PCSTR _strIP, CString _strUserID, int _iPort);
 	void Write(char* _pData, int _iLength);
 	void SendPacket(int _iPacketID);
@@ -17,6 +16,7 @@ public:
 	void Close();
 	
 private:
+	
 	PCSTR m_strIP;
 	CString m_strUserID;
 	int m_iPort;

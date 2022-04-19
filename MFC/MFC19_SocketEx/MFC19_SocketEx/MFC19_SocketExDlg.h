@@ -30,6 +30,7 @@ private:
 protected:
 	HICON m_hIcon;
 	int m_iPort;
+	BOOL m_bIsConnect;
 	// 생성된 메시지 맵 함수
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -41,6 +42,7 @@ public:
 	afx_msg void OnClickedButtonSend();
 	void ReceiveMessage(CString strReceive, CString strOtherUserID);
 	void ResizeControl(int cx, int cy);
+	void ConnectStatus(int _iResult);
 
 	CBasicSock* m_pClient;
 

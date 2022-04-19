@@ -37,8 +37,13 @@ int CBasicSock::MainThread()
 	신경써야할 부분은 IpStartAddress 와 IpParameter 두가지 뿐인다.
 	*/
 
+	CMFC19_SocketExDlg*	pDlg = (CMFC19_SocketExDlg*)AfxGetMainWnd();
+
 	// this로 주고 쓰레드 생성하면 LPVOID로 전달된 것을 생성시 사용 함수가 포함된 클래스형 포인터로 변경되며 비static 함수처럼 사용하면서 스레드 함수로 사용가능
 	m_hThread = CreateThread(nullptr, 0, this->ThreadProc, this, 0, &m_dwThreadID);
+
+
+	
 
 	// 생성시 에러
 	if (NULL == m_hThread)
@@ -111,7 +116,6 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_CONNECT_BIT] != 0)
 			{
-				AfxMessageBox(_T("연결이 원활하지 않다."));
 				pBasicSock->Close();
 			}
 			else
@@ -268,10 +272,19 @@ void CBasicSock::SendPacket(int _iPacketID)
 	default:
 		break;
 	}
+	
+	if (NULL != pszBuff)
+	{
+		delete[] pszBuff;
+		pszBuff = NULL;
+	}
 }
 
 void CBasicSock::ReceivePacket(int _iPacketID, PACKET_RSP_LOGIN* pszPacket)
 {
+
+	CMFC19_SocketExDlg*	pDlg = (CMFC19_SocketExDlg*)AfxGetMainWnd();
+
 	char*				pszBuff			= NULL;
 	PACKET_RSP_LOGIN*	pstResLogin		= NULL;
 	PACKET_RSP_TEXT*	pstResText		= NULL;
@@ -287,15 +300,26 @@ void CBasicSock::ReceivePacket(int _iPacketID, PACKET_RSP_LOGIN* pszPacket)
 		pstResLogin = pszPacket;
 		if (iCode = pstResLogin->iResultCode)
 			iCode = LOGIN_SUCCESS;
-
+		//pBasicSock->((CMFC19_SocketExDlg*)AfxGetMainWnd())->ConnectStatus(iCode);
+		break;
 
 	case PACKET_ID_RSP_TEXT:
+		break;
 
 	default:
 		break;
 	}
 
+	if (NULL != pszBuff)
+	{
+		delete[] pszBuff;
+		pszBuff = NULL;
+	}
+}
 
+void CBasicSock::OnConnect(int _iResultCode)
+{
+	
 }
 
 void CBasicSock::Close()
