@@ -241,7 +241,6 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader)
 {
 	int					iCheckPack		= 0;
-	int					iCode			= 0;
 	char*				pszBuff			= NULL;
 
 	iCheckPack = recv(m_uiSocket, pszBuff, 1024, 0);
@@ -251,16 +250,10 @@ void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader)
 	switch (_pstHeader->iPacketID)
 	{
 	case PACKET_ID_RSP_LOGIN:
-		//if (iCode = pstResLogin->iResultCode)
-			iCode = LOGIN_SUCCESS;
-
-		::PostMessage(GetParent(), WM_MESSAGE_SOCKET, iCode, NULL);
-		//pDlg->ConnectStatus(iCode);
+			::PostMessage(GetParent(), WM_MESSAGE_SOCKET, LOGIN_SUCCESS, NULL);
 		break;
 
 	case PACKET_ID_RSP_TEXT:
-	
-		//pDlg->ReceiveMessage(pstResText->wszPacketText, pstResText->wszSendUserID);
 		break;
 
 	default:

@@ -233,9 +233,8 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 
 void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 {
-	if (LOGIN_SUCCESS == _iResult)
+	if (TRUE == m_bIsConnect)
 	{
-		m_bIsConnect = TRUE;
 		//AfxMessageBox(_T("연결 완료."));
 
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(TRUE);
@@ -318,7 +317,6 @@ void CMFC19_SocketExDlg::OnSizing(UINT fwSide, LPRECT pRect)
 	CDialogEx::OnSizing(fwSide, pRect);
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
-	
 }
 
 void CMFC19_SocketExDlg::ResizeControl(int cx, int cy)
@@ -406,7 +404,6 @@ void CMFC19_SocketExDlg::ResizeControl(int cx, int cy)
 //
 //}
 
-
 // 데이터를 받을때 WindowProc에서 처리한다.
 LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -415,9 +412,12 @@ LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 	switch (message)
 	{
 	case WM_MESSAGE_SOCKET:
+		if (LOGIN_SUCCESS == wParam)
 		{
-			
+			m_bIsConnect = TRUE;
+			ConnectStatus(wParam);
 		}
+		
 		break;
 	}
 
