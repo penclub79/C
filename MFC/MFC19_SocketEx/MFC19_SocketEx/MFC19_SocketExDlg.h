@@ -60,4 +60,5 @@ public:
 
 	//afx_msg void OnClickedButtonClose();
 	//afx_msg void OnClickedButtonDisconnect();
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };

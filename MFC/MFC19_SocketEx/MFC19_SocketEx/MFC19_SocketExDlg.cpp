@@ -11,7 +11,6 @@
 #define new DEBUG_NEW
 #endif
 
-
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
 class CAboutDlg : public CDialogEx
@@ -216,7 +215,7 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateData();
 
-	m_pClient = new CBasicSock();
+	m_pClient = new CBasicSock(this->GetSafeHwnd());
 	CString strUserID;
 	CString strIP;
 
@@ -288,6 +287,12 @@ void CMFC19_SocketExDlg::OnClickedButtonSend()
 void CMFC19_SocketExDlg::ReceiveMessage(CString strReceive, CString strOtherUserID)
 {
 	CString strInsert;
+	int sel = 0;
+	int iLength = 0;
+
+	strInsert.Format(_T("클라이언트[%s]:%s"), strOtherUserID, strReceive);
+	sel = m_listChat.InsertString(-1, strInsert);
+	m_listChat.SetCurSel(sel);
 }
 
 void CMFC19_SocketExDlg::SetUserID(CString _strUserID)
@@ -400,3 +405,21 @@ void CMFC19_SocketExDlg::ResizeControl(int cx, int cy)
 //	
 //
 //}
+
+
+// 데이터를 받을때 WindowProc에서 처리한다.
+LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+
+	switch (message)
+	{
+	case WM_MESSAGE_SOCKET:
+		{
+			
+		}
+		break;
+	}
+
+	return CDialogEx::WindowProc(message, wParam, lParam);
+}

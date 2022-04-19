@@ -1,16 +1,15 @@
 #include "stdafx.h"
 #include "BasicSock.h"
-#include "MFC19_SocketExDlg.h"
 
-#define NUM_THREAD 1
-#define CLIENTPORT
 
-CBasicSock::CBasicSock()
+
+CBasicSock::CBasicSock(HWND hParent)
 {
 	m_dwThreadID = 0;
 	m_hThread = 0;
 	m_iPort = 0;
 	//m_pszBuff = NULL;
+	m_hParentHandle = hParent;
 	
 }
 
@@ -38,8 +37,6 @@ int CBasicSock::MainThread()
 	신경써야할 부분은 IpStartAddress 와 IpParameter 두가지 뿐인다.
 	*/
 
-	CMFC19_SocketExDlg* pDlg = (CMFC19_SocketExDlg*)AfxGetMainWnd();
-	m_pDlg = pDlg;
 	// this로 주고 쓰레드 생성하면 LPVOID로 전달된 것을 생성시 사용 함수가 포함된 클래스형 포인터로 변경되며 비static 함수처럼 사용하면서 스레드 함수로 사용가능
 	m_hThread = CreateThread(nullptr, 0, this->ThreadProc, this, 0, &m_dwThreadID);
 
@@ -52,6 +49,12 @@ int CBasicSock::MainThread()
 	}
 	return 0;
 }
+
+HWND CBasicSock::GetParent()
+{
+	return m_hParentHandle;
+}
+
 
 DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 {
@@ -67,6 +70,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	BOOL				bCheckPack		= FALSE;
 
 	PCSTR				IpAddr			= "192.168.0.90";
+	PACKET_HEADER*		pstHeader		= NULL;
 	PACKET_RSP_LOGIN*	pstResLogin		= NULL;
 	PACKET_RSP_TEXT*	pstResText		= NULL;
 	WSANETWORKEVENTS	stNetWorkEvents	= { 0 };
@@ -133,12 +137,23 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 				AfxMessageBox(_T("읽기가 원활하지 않다."));
 				pBasicSock->Close();
 			}
-			//else
-			//{
+			else
+			{
 			//	//iCheckPack = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
-			//	//// 데이터를 받아서 읽었을 때
-			//	//pBasicSock->ReceivePacket(pstResLogin->stHeader.iPacketID, pstResLogin, pBasicSock->m_pDlg);
-			//}
+				//// 데이터를 받아서 읽었을 때
+				iCheckPack = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
+				pstHeader = (PACKET_HEADER*)pszBuff;
+				if (PACKET_ID_RSP_LOGIN == pstHeader->iPacketID)
+				{
+					pstResLogin = (PACKET_RSP_LOGIN*)pszBuff;
+					pBasicSock->ReceivePacket(pstHeader);
+				}
+				
+				if (PACKET_ID_RSP_TEXT == pstHeader->iPacketID)
+				{
+					//pBasicSock->ReceivePacket(pstHeader, pBasicSock->m_pDlg);
+				}
+			}
 		}
 		//iCheckSocket = send(pBasicSock->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
 		if (stNetWorkEvents.lNetworkEvents & FD_WRITE)
@@ -189,12 +204,6 @@ void CBasicSock::Connect(PCSTR _strIP, CString _strUserID, int _iPort)
 	MainThread();
 }
 
-//void CBasicSock::Write(TCHAR* _pData, int _iLength)
-//{
-//	
-//
-//}
-
 void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 {
 	PACKET_HEADER		stHeader		= { 0 };
@@ -229,32 +238,39 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 	}
 }
 
-void CBasicSock::ReceivePacket(LPVOID _pDlg)
+void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader)
 {
-	CMFC19_SocketExDlg*	pDlg			= (CMFC19_SocketExDlg*)_pDlg;
-	PACKET_RSP_LOGIN*	pstResLogin		= NULL;
-	PACKET_RSP_TEXT*	pstResText		= NULL;
 	int					iCheckPack		= 0;
 	int					iCode			= 0;
+	char*				pszBuff			= NULL;
 
 	iCheckPack = recv(m_uiSocket, pszBuff, 1024, 0);
+	pszBuff = new char[1024];
+	memset(pszBuff, 0, 1024);
 
-	/*switch (_iPacketID)
+	switch (_pstHeader->iPacketID)
 	{
 	case PACKET_ID_RSP_LOGIN:
-
-		pstResLogin = _pszPacket;
-		
-		if (iCode = pstResLogin->iResultCode)
+		//if (iCode = pstResLogin->iResultCode)
 			iCode = LOGIN_SUCCESS;
-		pDlg->ConnectStatus(iCode);
+
+		::PostMessage(GetParent(), WM_MESSAGE_SOCKET, iCode, NULL);
+		//pDlg->ConnectStatus(iCode);
 		break;
 
 	case PACKET_ID_RSP_TEXT:
+	
+		//pDlg->ReceiveMessage(pstResText->wszPacketText, pstResText->wszSendUserID);
 		break;
 
 	default:
-		break;*/
+		break;
+	}
+
+	if (NULL != pszBuff)
+	{
+		delete[] pszBuff;
+		pszBuff = NULL;
 	}
 }
 
