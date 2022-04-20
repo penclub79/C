@@ -242,14 +242,12 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 		stReqLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
 		stReqLogin.stHeader.iPacketID = PACKET_ID_REQ_LOGIN;
 		stReqLogin.stHeader.iPacketSize = sizeof(PACKET_REQ_LOGIN);
-		// 수정
-		//wsprintf(stReqLogin.wszUserID, m_strUserID);
-		//stReqLogin.wszUserID = (TCHAR*)(LPCTSTR)m_strUserID;
 
 		// CString->TCHAR으로 형변환
 		pszUserID = m_strUserID.GetBuffer(m_strUserID.GetLength());
 		m_strUserID.ReleaseBuffer();
-
+		
+		// TCHAR <-> TCHAR
 		wsprintf(stReqLogin.wszUserID, pszUserID);
 
 		iCheckPack = send(this->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
@@ -261,6 +259,7 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 		stReqText.stHeader.iPacketID = PACKET_ID_REQ_TEXT;
 		stReqText.stHeader.iPacketSize = sizeof(PACKET_REQ_TEXT);
 
+		// TCHAR <-> TCHAR
 		wsprintf(stReqText.wszPacketText, _T("%s"), _pData);
 		iCheckPack = send(this->m_uiSocket, (char*)&stReqText, sizeof(PACKET_REQ_TEXT), 0);
 		break;
