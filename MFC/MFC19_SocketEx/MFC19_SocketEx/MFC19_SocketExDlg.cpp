@@ -59,6 +59,15 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 	m_bIsConnect = FALSE;
 }
 
+CMFC19_SocketExDlg::~CMFC19_SocketExDlg()
+{
+	if (NULL != m_pClient)
+	{
+		delete m_pClient;
+		m_pClient = NULL;
+	}
+}
+
 void CMFC19_SocketExDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
@@ -401,7 +410,6 @@ void CMFC19_SocketExDlg::OnClickedButtonClose()
 	AfxGetMainWnd()->PostMessage(WM_CLOSE);
 	m_pClient->Close();
 }
-
 
 // DISConnect
 void CMFC19_SocketExDlg::OnClickedButtonDisconnect()

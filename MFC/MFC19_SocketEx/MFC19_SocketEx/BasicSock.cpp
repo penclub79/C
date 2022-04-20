@@ -9,7 +9,6 @@ CBasicSock::CBasicSock(HWND hParent)
 	m_hThread = 0;
 	m_iPort = 0;
 	m_hParentHandle = hParent;
-	
 }
 
 
@@ -64,12 +63,10 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	int					iCheckSocket	= 0;
 	int					iConnResult		= 0;
 	int					iEventID		= 0;
-	BOOL				bCheckPack		= FALSE;
 
 	PCSTR				IpAddr			= "192.168.0.90";
 	PACKET_HEADER*		pstHeader		= NULL;
-	PACKET_RSP_LOGIN*	pstResLogin		= NULL;
-	PACKET_RSP_TEXT*	pstResText		= NULL;
+	
 	WSANETWORKEVENTS	stNetWorkEvents	= { 0 };
 
 	char*				pszBuff			= new char[1024];
@@ -99,10 +96,16 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	*/
 	inet_pton(stClientInfo.sin_family, IpAddr, &stClientInfo.sin_addr);
 	iConnResult = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));
-	
+
 	// 소켓 상태 체크
 	iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
 	
+	if (SOCKET_ERROR == iCheckSocket)
+	{
+		closesocket(pBasicSock->m_uiSocket);
+		WSACleanup();
+	}
+
 	while (pBasicSock->m_dwThreadID)
 	{
 		/*
@@ -131,15 +134,14 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_READ_BIT] != 0)
 			{
-				AfxMessageBox(_T("읽기가 원활하지 않다."));
-				pBasicSock->Close();
+				closesocket(pBasicSock->m_uiSocket);
 			}
 			else
 			{
 				//// 데이터를 받아서 읽었을 때
 				iCheckPack = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
 				pstHeader = (PACKET_HEADER*)pszBuff;
-				//pBasicSock->ReceivePacket(pstHeader, pszBuff);
+	
 				if (PACKET_ID_RSP_LOGIN == pstHeader->iPacketID)
 				{
 					pBasicSock->ReceivePacket(pstHeader, pszBuff);
@@ -264,6 +266,7 @@ void CBasicSock::DisConnect()
 	int iCheckSocket = 0;
 	iCheckSocket = shutdown(this->m_uiSocket, SD_SEND);
 	::PostMessage(GetParent(), WM_MESSAGE_SOCKET, LOGIN_DISCONNECT, NULL);
+	
 	if (SOCKET_ERROR == iCheckSocket)
 	{
 		closesocket(this->m_uiSocket);

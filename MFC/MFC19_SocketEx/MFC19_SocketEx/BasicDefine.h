@@ -24,6 +24,11 @@ typedef enum{
 	TEXT_SUCCESS = 10,
 };
 
+// Throw Code
+typedef enum{
+	LOGIN_DISCONNECT = 100
+};
+
 typedef struct _tagPACKET_HEADER{
 	/*
 	추후 유지보수를 위해서 Marker와 Version을 헤더에서 관리한다.
