@@ -48,8 +48,8 @@ public:
 
 	CBasicSock* m_pClient;
 
-	CIPAddressCtrl m_IPAddress;
-	CListBox m_listChat;
+	CIPAddressCtrl m_ctlIPAddress;
+	CListBox m_ctlListChat;
 	int m_nChatMode;
 	CString m_strMyIP;
 	CString m_strUserID;

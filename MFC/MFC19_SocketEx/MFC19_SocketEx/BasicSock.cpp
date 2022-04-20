@@ -59,21 +59,26 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	CBasicSock*			pBasicSock		= NULL; 
 	pBasicSock = (CBasicSock*)_lpParam;
 
-	DWORD				dwEventCheck	= 0;
+	//DWORD				dwEventCheck	= 0;
 	int					iCheckSocket	= 0;
 	int					iConnResult		= 0;
 	int					iEventID		= 0;
+	char*				pszIPAddress	= NULL;
 
-	PCSTR				IpAddr			= "192.168.0.90";
 	PACKET_HEADER*		pstHeader		= NULL;
 	
 	WSANETWORKEVENTS	stNetWorkEvents	= { 0 };
-
-	char*				pszBuff			= new char[1024];
+	
+	char*				pszBuff			= NULL;
 	int					iPort			= pBasicSock->m_iPort;
 	int					iCheckPack		= 0;
-
+	
+	pszBuff = new char[1024];
 	memset(pszBuff, 0, 1024);
+
+	pszIPAddress = new char[pBasicSock->m_strIP.GetLength() + 1];
+	memset(pszIPAddress, 0, pBasicSock->m_strIP.GetLength());
+	strcpy(pszIPAddress, CT2A(pBasicSock->m_strIP));
 
 	// Socket 생성
 	pBasicSock->m_uiSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -87,6 +92,11 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	stClientInfo.sin_family = AF_INET;
 	// htons()함수는 리틀 엔디안에서 빅 엔디안 방식으로 net_port에 저장
 
+
+	// 소켓 상태 체크
+	iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
+
+
 	stClientInfo.sin_port = htons(pBasicSock->m_iPort);
 	/*
 	af : AF_INET 또는 AF_INET6
@@ -94,12 +104,9 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	문자열을 프로토콜(IPv4, IPv6 등)에 해당하는 네트워크 데이터(빅엔디언 방식의 2진데이터)로 변경
 	※inet_ntoa는 IPv4만 지원
 	*/
-	inet_pton(stClientInfo.sin_family, IpAddr, &stClientInfo.sin_addr);
+	inet_pton(stClientInfo.sin_family, (PCSTR)pszIPAddress, &stClientInfo.sin_addr);
 	iConnResult = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));
 
-	// 소켓 상태 체크
-	iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
-	
 	if (SOCKET_ERROR == iCheckSocket)
 	{
 		closesocket(pBasicSock->m_uiSocket);
@@ -123,6 +130,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			{
 				AfxMessageBox(_T("연결이 원활하지 않다."));
 				pBasicSock->Close();
+				WSACleanup();
 			}
 			else
 			{
@@ -135,6 +143,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			if (stNetWorkEvents.iErrorCode[FD_READ_BIT] != 0)
 			{
 				closesocket(pBasicSock->m_uiSocket);
+				WSACleanup();
 			}
 			else
 			{
@@ -153,11 +162,13 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 				}
 			}
 		}
+
 		if (stNetWorkEvents.lNetworkEvents & FD_WRITE)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_WRITE_BIT] != 0)
 			{
 				closesocket(pBasicSock->m_uiSocket);
+				WSACleanup();
 			}
 		}
 		
@@ -166,8 +177,25 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			if (stNetWorkEvents.iErrorCode[FD_CLOSE_BIT] != 0)
 			{
 				closesocket(pBasicSock->m_uiSocket);
+				WSACleanup();
+			}
+			else
+			{
+				if (NULL != pszBuff)
+				{
+					delete[] pszBuff;
+					pszBuff = NULL;
+				}
+
+				if (NULL != pszIPAddress)
+				{
+					delete[] pszIPAddress;
+					pszIPAddress = NULL;
+				}
 			}
 		}
+
+		Sleep(1);
 
 		/*
 		인자값
@@ -179,25 +207,20 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 
 		// WSAWaitForMultipleEvents
 		// 이벤트가 발생했는지 확인
-		dwEventCheck = WSAWaitForMultipleEvents(1, &pBasicSock->m_wsaEvent, TRUE, 1000, TRUE);
+		//dwEventCheck = WSAWaitForMultipleEvents(1, &pBasicSock->m_wsaEvent, TRUE, 1000, TRUE);
 	}
 	closesocket(pBasicSock->m_uiSocket);
 	WSACleanup();
 
-	if (NULL != pszBuff)
-	{
-		delete[] pszBuff;
-		pszBuff = NULL;
-	}
-
 	return 0xffffffff;
+
 }
 
-void CBasicSock::Connect(PCSTR _strIP, CString _strUserID, int _iPort)
+void CBasicSock::Connect(TCHAR* _pszIP, TCHAR* _pszUserID, int _iPort)
 {	
-	m_strIP = _strIP;
+	m_strIP.Format(_T("%s"), _pszIP);
+	m_strUserID.Format(_T("%s"), _pszUserID);
 	m_iPort = 7777;
-	m_strUserID = _strUserID;
 
 	// 스레드 생성
 	MainThread();
@@ -208,6 +231,7 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 	PACKET_HEADER		stHeader		= { 0 };
 	PACKET_REQ_LOGIN	stReqLogin		= { 0 };
 	PACKET_REQ_TEXT		stReqText		= { 0 };
+	TCHAR* pszUserID = NULL;
 
 	int					iCheckPack		= 0;
 
@@ -218,7 +242,16 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 		stReqLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
 		stReqLogin.stHeader.iPacketID = PACKET_ID_REQ_LOGIN;
 		stReqLogin.stHeader.iPacketSize = sizeof(PACKET_REQ_LOGIN);
-		wsprintf(stReqLogin.wszUserID, m_strUserID);
+		// 수정
+		//wsprintf(stReqLogin.wszUserID, m_strUserID);
+		//stReqLogin.wszUserID = (TCHAR*)(LPCTSTR)m_strUserID;
+
+		// CString->TCHAR으로 형변환
+		pszUserID = m_strUserID.GetBuffer(m_strUserID.GetLength());
+		m_strUserID.ReleaseBuffer();
+
+		wsprintf(stReqLogin.wszUserID, pszUserID);
+
 		iCheckPack = send(this->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
 		break;
 
@@ -272,6 +305,7 @@ void CBasicSock::DisConnect()
 		closesocket(this->m_uiSocket);
 		WSACleanup();
 	}
+
 }
 
 void CBasicSock::Close()

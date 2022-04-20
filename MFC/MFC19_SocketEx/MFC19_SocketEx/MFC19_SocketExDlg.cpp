@@ -52,11 +52,10 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 	//CBasicSock* m_pClient = new CBasicSock();
 
 	// 멤버변수 초기화
-	m_nChatMode = 1;
-	m_strInitLoc = 0;
-	m_rectDlg = 0;
-	m_iPort = 0;
-	m_bIsConnect = FALSE;
+	m_strInitLoc	= 0;
+	m_rectDlg		= 0;
+	m_iPort			= 0;
+	m_bIsConnect	= FALSE;
 }
 
 CMFC19_SocketExDlg::~CMFC19_SocketExDlg()
@@ -71,8 +70,8 @@ CMFC19_SocketExDlg::~CMFC19_SocketExDlg()
 void CMFC19_SocketExDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_IPADDRESS_SERVER, m_IPAddress);
-	DDX_Control(pDX, IDC_LIST_CHAT, m_listChat);
+	DDX_Control(pDX, IDC_IPADDRESS_SERVER, m_ctlIPAddress);
+	DDX_Control(pDX, IDC_LIST_CHAT, m_ctlListChat);
 	
 }
 
@@ -133,11 +132,7 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 	}
 
 	/*컨트롤 초기화*/
-	m_IPAddress.SetWindowText(m_strMyIP);
-	m_IPAddress.EnableWindow(FALSE);
-
-	// 포트 상자 비활성화
-	GetDlgItem(IDC_EDIT_PORT)->EnableWindow(FALSE);
+	m_ctlIPAddress.SetWindowText(m_strMyIP);
 
 	// DisConnect 비활성화
 	GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
@@ -228,28 +223,51 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	m_pClient = new CBasicSock(this->GetSafeHwnd());
 	CString strUserID;
 	CString strIP;
-
-	strIP = m_strMyIP;
-	CStringA straIP(strIP);
 	BOOL bResult = 0;
+	TCHAR* pszIPBuff = NULL;
+	TCHAR* pszUserIdBuff = NULL;
 
 	m_iPort = 7777;
 	GetDlgItemText(IDC_EDIT_USERID, strUserID);
+	GetDlgItemText(IDC_IPADDRESS_SERVER, strIP);
+
 	SetUserID(strUserID);
 
+	pszIPBuff = new TCHAR[strIP.GetLength() + 1];
+	memset(pszIPBuff, 0, strIP.GetLength());
+	_tcscpy(pszIPBuff, strIP.GetBuffer(0));
+
+	pszUserIdBuff = new TCHAR[strUserID.GetLength() + 1];
+	memset(pszUserIdBuff, 0, strUserID.GetLength());
+	_tcscpy(pszUserIdBuff, strUserID.GetBuffer(0));
+
 	if (NULL != m_pClient)
-		m_pClient->Connect(straIP, strUserID, m_iPort);
+		m_pClient->Connect(pszIPBuff, pszUserIdBuff, m_iPort);
+
+
+	if (NULL != pszIPBuff)
+	{
+		delete[] pszIPBuff;
+		pszIPBuff = NULL;
+	}
+
+	if (NULL != pszUserIdBuff)
+	{
+		delete[] pszUserIdBuff;
+		pszUserIdBuff = NULL;
+	}
 }
 
 void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 {
 	if (LOGIN_SUCCESS == _iResult)
 	{
-		//AfxMessageBox(_T("연결 완료."));
-
+		AfxMessageBox(_T("연결 완료."));
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(TRUE);
 		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_EDIT_PORT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_IPADDRESS_SERVER)->EnableWindow(FALSE);
 	}
 	else if (LOGIN_DISCONNECT == _iResult)
 	{
@@ -257,6 +275,8 @@ void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
+		GetDlgItem(IDC_EDIT_PORT)->EnableWindow(TRUE);
+		GetDlgItem(IDC_IPADDRESS_SERVER)->EnableWindow(TRUE);
 	}
 	else
 	{
@@ -288,8 +308,8 @@ void CMFC19_SocketExDlg::OnClickedButtonSend()
 
 	strUserID = GetUserID();
 	strInsert.Format(_T("클라이언트[%s]:%s"), strUserID, strMessage);
-	sel = m_listChat.InsertString(-1, strInsert);
-	m_listChat.SetCurSel(sel);
+	sel = m_ctlListChat.InsertString(-1, strInsert);
+	m_ctlListChat.SetCurSel(sel);
 
 	SetDlgItemText(IDC_EDIT_SEND, _T(""));
 
@@ -307,8 +327,8 @@ void CMFC19_SocketExDlg::ReceiveMessage(CString strReceive, CString strOtherUser
 	int iLength = 0;
 
 	strInsert.Format(_T("클라이언트[%s]:%s"), strOtherUserID, strReceive);
-	sel = m_listChat.InsertString(-1, strInsert);
-	m_listChat.SetCurSel(sel);
+	sel = m_ctlListChat.InsertString(-1, strInsert);
+	m_ctlListChat.SetCurSel(sel);
 }
 
 void CMFC19_SocketExDlg::SetUserID(CString _strUserID)
@@ -408,7 +428,8 @@ void CMFC19_SocketExDlg::OnClickedButtonClose()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	AfxGetMainWnd()->PostMessage(WM_CLOSE);
-	m_pClient->Close();
+	if (m_pClient )
+		m_pClient->Close();
 }
 
 // DISConnect
@@ -416,7 +437,8 @@ void CMFC19_SocketExDlg::OnClickedButtonDisconnect()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString strMessage;
-	m_pClient->DisConnect();
+	if (m_pClient)
+		m_pClient->DisConnect();
 }
 
 // 데이터를 받을때 WindowProc에서 처리한다.
@@ -440,6 +462,7 @@ LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 			ConnectStatus(wParam);
 		}
 		break;
+
 	case WM_USER:
 		if (TEXT_SUCCESS == wParam)
 		{
