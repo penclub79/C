@@ -17,7 +17,8 @@ public:
 	void Connect(PCSTR _strIP, CString _strUserID, int _iPort);
 	//void Write(TCHAR* _pData, int _iLength);
 	void SendPacket(int _iPacketID, TCHAR* _pData, int _iLength);
-	void ReceivePacket(PACKET_HEADER* _pstHeader);
+	void ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket);
+	void DisConnect();
 	void Close();
 	HWND		GetParent();
 	

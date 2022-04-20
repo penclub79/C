@@ -73,6 +73,8 @@ BEGIN_MESSAGE_MAP(CMFC19_SocketExDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CMFC19_SocketExDlg::OnClickedButtonConnect)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CMFC19_SocketExDlg::OnClickedButtonSend)
+	ON_BN_CLICKED(IDC_BUTTON_CLOSE, &CMFC19_SocketExDlg::OnClickedButtonClose)
+	ON_BN_CLICKED(IDC_BUTTON_DISCONNECT, &CMFC19_SocketExDlg::OnClickedButtonDisconnect)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 END_MESSAGE_MAP()
@@ -136,7 +138,6 @@ BOOL CMFC19_SocketExDlg::OnInitDialog()
 
 	// Connect 활성화
 	GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
-	
 
 	// Text Static ServerIP초기 좌표가져오기
 	GetDlgItem(IDC_STATIC_SERVER_IP)->GetWindowRect(&m_strInitLoc);
@@ -233,13 +234,20 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 
 void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 {
-	if (TRUE == m_bIsConnect)
+	if (LOGIN_SUCCESS == _iResult)
 	{
 		//AfxMessageBox(_T("연결 완료."));
 
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(TRUE);
 		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
+	}
+	else if (LOGIN_DISCONNECT == _iResult)
+	{
+		AfxMessageBox(_T("연결을 끊었습니다."));
+		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(FALSE);
+		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
 	}
 	else
 	{
@@ -387,27 +395,28 @@ void CMFC19_SocketExDlg::ResizeControl(int cx, int cy)
 }
 
 
-//void CMFC19_SocketExDlg::OnClickedButtonClose()
-//{
-//	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-//	//AfxGetMainWnd()->PostMessageW(WM_CLOSE);
-//}
-//
-//
-//// DISConnect
-//void CMFC19_SocketExDlg::OnClickedButtonDisconnect()
-//{
-//	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-//	CString strMessage;
-//
-//	
-//
-//}
+void CMFC19_SocketExDlg::OnClickedButtonClose()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	AfxGetMainWnd()->PostMessage(WM_CLOSE);
+	m_pClient->Close();
+}
+
+
+// DISConnect
+void CMFC19_SocketExDlg::OnClickedButtonDisconnect()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString strMessage;
+	m_pClient->DisConnect();
+}
 
 // 데이터를 받을때 WindowProc에서 처리한다.
 LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+
+	PACKET_RSP_TEXT* pstRspText = NULL;
 
 	switch (message)
 	{
@@ -417,9 +426,20 @@ LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 			m_bIsConnect = TRUE;
 			ConnectStatus(wParam);
 		}
-		
+		else
+		{
+			m_bIsConnect = FALSE;
+			ConnectStatus(wParam);
+		}
+		break;
+	case WM_USER:
+		if (TEXT_SUCCESS == wParam)
+		{
+			pstRspText = (PACKET_RSP_TEXT*)lParam;
+			ReceiveMessage(pstRspText->wszPacketText, pstRspText->wszSendUserID);
+		}
 		break;
 	}
-
+	
 	return CDialogEx::WindowProc(message, wParam, lParam);
 }

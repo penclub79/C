@@ -131,7 +131,6 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 		m_pAccept->GetPeerName(strSock, nPort);
 		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
 	}
-
 #else
 	CAcceptSock* pAccept = new CAcceptSock;
 	

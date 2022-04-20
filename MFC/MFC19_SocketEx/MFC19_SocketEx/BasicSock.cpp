@@ -8,7 +8,6 @@ CBasicSock::CBasicSock(HWND hParent)
 	m_dwThreadID = 0;
 	m_hThread = 0;
 	m_iPort = 0;
-	//m_pszBuff = NULL;
 	m_hParentHandle = hParent;
 	
 }
@@ -39,8 +38,6 @@ int CBasicSock::MainThread()
 
 	// this로 주고 쓰레드 생성하면 LPVOID로 전달된 것을 생성시 사용 함수가 포함된 클래스형 포인터로 변경되며 비static 함수처럼 사용하면서 스레드 함수로 사용가능
 	m_hThread = CreateThread(nullptr, 0, this->ThreadProc, this, 0, &m_dwThreadID);
-
-	
 
 	// 생성시 에러
 	if (NULL == m_hThread)
@@ -121,6 +118,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_CONNECT_BIT] != 0)
 			{
+				AfxMessageBox(_T("연결이 원활하지 않다."));
 				pBasicSock->Close();
 			}
 			else
@@ -129,7 +127,6 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 				pBasicSock->SendPacket(PACKET_ID_REQ_LOGIN, NULL, 0);
 			}
 		}
-		
 		if (stNetWorkEvents.lNetworkEvents & FD_READ)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_READ_BIT] != 0)
@@ -139,32 +136,26 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			}
 			else
 			{
-			//	//iCheckPack = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
 				//// 데이터를 받아서 읽었을 때
 				iCheckPack = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
 				pstHeader = (PACKET_HEADER*)pszBuff;
+				//pBasicSock->ReceivePacket(pstHeader, pszBuff);
 				if (PACKET_ID_RSP_LOGIN == pstHeader->iPacketID)
 				{
-					pstResLogin = (PACKET_RSP_LOGIN*)pszBuff;
-					pBasicSock->ReceivePacket(pstHeader);
+					pBasicSock->ReceivePacket(pstHeader, pszBuff);
 				}
 				
 				if (PACKET_ID_RSP_TEXT == pstHeader->iPacketID)
 				{
-					//pBasicSock->ReceivePacket(pstHeader, pBasicSock->m_pDlg);
+					pBasicSock->ReceivePacket(pstHeader, pszBuff);
 				}
 			}
 		}
-		//iCheckSocket = send(pBasicSock->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
 		if (stNetWorkEvents.lNetworkEvents & FD_WRITE)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_WRITE_BIT] != 0)
 			{
 				closesocket(pBasicSock->m_uiSocket);
-			}
-			else
-			{
-				//pBasicSock->SendPacket(PACKET_ID_REQ_TEXT, NULL, 0);
 			}
 		}
 		
@@ -190,6 +181,12 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	}
 	closesocket(pBasicSock->m_uiSocket);
 	WSACleanup();
+
+	if (NULL != pszBuff)
+	{
+		delete[] pszBuff;
+		pszBuff = NULL;
+	}
 
 	return 0xffffffff;
 }
@@ -238,32 +235,39 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 	}
 }
 
-void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader)
+void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket)
 {
 	int					iCheckPack		= 0;
-	char*				pszBuff			= NULL;
 
-	iCheckPack = recv(m_uiSocket, pszBuff, 1024, 0);
-	pszBuff = new char[1024];
-	memset(pszBuff, 0, 1024);
+	PACKET_RSP_LOGIN*	pstRspLogin		= NULL;
+	PACKET_RSP_TEXT*	pstRspText		= NULL;
 
 	switch (_pstHeader->iPacketID)
 	{
 	case PACKET_ID_RSP_LOGIN:
-			::PostMessage(GetParent(), WM_MESSAGE_SOCKET, LOGIN_SUCCESS, NULL);
+		pstRspLogin = (PACKET_RSP_LOGIN*)_pszPacket;
+		::PostMessage(GetParent(), WM_MESSAGE_SOCKET, LOGIN_SUCCESS, NULL);
 		break;
 
 	case PACKET_ID_RSP_TEXT:
+		pstRspText = (PACKET_RSP_TEXT*)_pszPacket;
+		::PostMessage(GetParent(), WM_USER, TEXT_SUCCESS, (LPARAM)pstRspText);
 		break;
 
 	default:
 		break;
 	}
+}
 
-	if (NULL != pszBuff)
+void CBasicSock::DisConnect()
+{
+	int iCheckSocket = 0;
+	iCheckSocket = shutdown(this->m_uiSocket, SD_SEND);
+	::PostMessage(GetParent(), WM_MESSAGE_SOCKET, LOGIN_DISCONNECT, NULL);
+	if (SOCKET_ERROR == iCheckSocket)
 	{
-		delete[] pszBuff;
-		pszBuff = NULL;
+		closesocket(this->m_uiSocket);
+		WSACleanup();
 	}
 }
 
