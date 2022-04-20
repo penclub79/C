@@ -195,7 +195,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			}
 		}
 
-		Sleep(1);
+		Sleep(0);
 
 		/*
 		ÀÎÀÚ°ª
