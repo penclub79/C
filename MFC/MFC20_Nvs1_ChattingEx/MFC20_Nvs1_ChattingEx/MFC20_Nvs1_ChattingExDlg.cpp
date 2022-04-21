@@ -72,6 +72,7 @@ BEGIN_MESSAGE_MAP(CMFC20_Nvs1_ChattingExDlg, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_BN_CLICKED(IDC_BUTTON_CLOSE, &CMFC20_Nvs1_ChattingExDlg::OnClickedButtonClose)
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
@@ -326,5 +327,13 @@ void CMFC20_Nvs1_ChattingExDlg::ResizeControl(int cx, int cy)
 void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonClose()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	AfxGetMainWnd()->PostMessageW(WM_CLOSE);
+	PostMessage(WM_CLOSE);
+}
+
+
+void CMFC20_Nvs1_ChattingExDlg::OnClose()
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CDialogEx::OnClose();
 }

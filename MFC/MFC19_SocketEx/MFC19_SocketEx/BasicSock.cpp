@@ -91,13 +91,11 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 
 	// IPv4 인터넷 프로토콜
 	stClientInfo.sin_family = AF_INET;
-	// htons()함수는 리틀 엔디안에서 빅 엔디안 방식으로 net_port에 저장
-
-
+	
 	// 소켓 상태 체크
 	iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
 
-
+	// htons()함수는 리틀 엔디안에서 빅 엔디안 방식으로 net_port에 저장
 	stClientInfo.sin_port = htons(pBasicSock->m_iPort);
 	/*
 	af : AF_INET 또는 AF_INET6

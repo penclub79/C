@@ -56,4 +56,5 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnClickedButtonClose();
+	afx_msg void OnClose();
 };
