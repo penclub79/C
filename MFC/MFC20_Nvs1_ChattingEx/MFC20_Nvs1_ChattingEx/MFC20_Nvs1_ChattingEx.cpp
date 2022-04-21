@@ -263,12 +263,7 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 
 void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
 {
-
 	POSITION pos = m_AcceptSocketList.Find(pClientSock);
-	/*CString strInsert;
-	CString strDisplayUser;
-	CString strUserID = pClientSock->GetUserID();*/
-
 
 	if (pos != NULL)
 	{

@@ -244,7 +244,6 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	if (NULL != m_pClient)
 		m_pClient->Connect(pszIPBuff, pszUserIdBuff, m_iPort);
 
-
 	if (NULL != pszIPBuff)
 	{
 		delete[] pszIPBuff;
@@ -262,7 +261,7 @@ void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 {
 	if (LOGIN_SUCCESS == _iResult)
 	{
-		AfxMessageBox(_T("연결 완료."));
+		//AfxMessageBox(_T("연결 완료."));
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(TRUE);
 		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
@@ -271,7 +270,7 @@ void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 	}
 	else if (LOGIN_DISCONNECT == _iResult)
 	{
-		AfxMessageBox(_T("연결을 끊었습니다."));
+		//AfxMessageBox(_T("연결을 끊었습니다."));
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
@@ -302,8 +301,8 @@ void CMFC19_SocketExDlg::OnClickedButtonSend()
 
 	pszBuff = new TCHAR[iLength + 1];
 	memset(pszBuff, 0, iLength);
-	
-	wsprintf(pszBuff, _T("%s"), strMessage);
+	_tcscpy(pszBuff, strMessage.GetBuffer(0));
+
 	m_pClient->SendPacket(PACKET_ID_REQ_TEXT, pszBuff, iLength);
 
 	strUserID = GetUserID();

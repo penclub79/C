@@ -61,7 +61,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 
 	//DWORD				dwEventCheck	= 0;
 	int					iCheckSocket	= 0;
-	int					iConnResult		= 0;
+	//int					iConnResult		= 0;
 	int					iEventID		= 0;
 	char*				pszIPAddress	= NULL;
 
@@ -71,13 +71,14 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	
 	char*				pszBuff			= NULL;
 	int					iPort			= pBasicSock->m_iPort;
-	int					iCheckPack		= 0;
+	//int					iCheckPack		= 0;
 	
 	pszBuff = new char[1024];
 	memset(pszBuff, 0, 1024);
 
 	pszIPAddress = new char[pBasicSock->m_strIP.GetLength() + 1];
 	memset(pszIPAddress, 0, pBasicSock->m_strIP.GetLength());
+	// MBCS->CP_UTF8
 	strcpy(pszIPAddress, CT2A(pBasicSock->m_strIP));
 
 	// Socket 생성
@@ -105,7 +106,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	※inet_ntoa는 IPv4만 지원
 	*/
 	inet_pton(stClientInfo.sin_family, (PCSTR)pszIPAddress, &stClientInfo.sin_addr);
-	iConnResult = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));
+	pBasicSock->m_iConnResult = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));
 
 	if (SOCKET_ERROR == iCheckSocket)
 	{
@@ -148,7 +149,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			else
 			{
 				//// 데이터를 받아서 읽었을 때
-				iCheckPack = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
+				pBasicSock->m_iConnResult = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
 				pstHeader = (PACKET_HEADER*)pszBuff;
 	
 				if (PACKET_ID_RSP_LOGIN == pstHeader->iPacketID)
@@ -181,18 +182,32 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			}
 			else
 			{
-				if (NULL != pszBuff)
-				{
-					delete[] pszBuff;
-					pszBuff = NULL;
-				}
-
-				if (NULL != pszIPAddress)
-				{
-					delete[] pszIPAddress;
-					pszIPAddress = NULL;
-				}
+				AfxMessageBox(_T("CLOSE"));
 			}
+		}
+
+		if (LOGIN_DISCONNECT == pBasicSock->m_iConnResult)
+		{
+			pBasicSock->m_iConnResult = shutdown(pBasicSock->m_uiSocket, SD_SEND);
+			
+			if (SOCKET_ERROR == pBasicSock->m_iConnResult)
+			{
+				closesocket(pBasicSock->m_uiSocket);
+				WSACleanup();
+			}
+
+			if (NULL != pszBuff)
+			{
+				delete[] pszBuff;
+				pszBuff = NULL;
+			}
+
+			if (NULL != pszIPAddress)
+			{
+				delete[] pszIPAddress;
+				pszIPAddress = NULL;
+			}
+
 		}
 
 		Sleep(0);
@@ -211,6 +226,18 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	}
 	closesocket(pBasicSock->m_uiSocket);
 	WSACleanup();
+
+	if (NULL != pszBuff)
+	{
+		delete[] pszBuff;
+		pszBuff = NULL;
+	}
+
+	if (NULL != pszIPAddress)
+	{
+		delete[] pszIPAddress;
+		pszIPAddress = NULL;
+	}
 
 	return 0xffffffff;
 
@@ -233,7 +260,7 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 	PACKET_REQ_TEXT		stReqText		= { 0 };
 	TCHAR* pszUserID = NULL;
 
-	int					iCheckPack		= 0;
+	//int					iCheckPack		= 0;
 
 	switch (_iPacketID)
 	{
@@ -250,7 +277,7 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 		// TCHAR <-> TCHAR
 		wsprintf(stReqLogin.wszUserID, pszUserID);
 
-		iCheckPack = send(this->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
+		m_iConnResult = send(this->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
 		break;
 
 	case PACKET_ID_REQ_TEXT:
@@ -260,8 +287,8 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 		stReqText.stHeader.iPacketSize = sizeof(PACKET_REQ_TEXT);
 
 		// TCHAR <-> TCHAR
-		wsprintf(stReqText.wszPacketText, _T("%s"), _pData);
-		iCheckPack = send(this->m_uiSocket, (char*)&stReqText, sizeof(PACKET_REQ_TEXT), 0);
+		wsprintf(stReqText.wszPacketText, _pData);
+		m_iConnResult = send(this->m_uiSocket, (char*)&stReqText, sizeof(PACKET_REQ_TEXT), 0);
 		break;
 
 	default:
@@ -295,15 +322,9 @@ void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket)
 
 void CBasicSock::DisConnect()
 {
-	int iCheckSocket = 0;
-	iCheckSocket = shutdown(this->m_uiSocket, SD_SEND);
+
+	m_iConnResult = LOGIN_DISCONNECT;
 	::PostMessage(GetParent(), WM_MESSAGE_SOCKET, LOGIN_DISCONNECT, NULL);
-	
-	if (SOCKET_ERROR == iCheckSocket)
-	{
-		closesocket(this->m_uiSocket);
-		WSACleanup();
-	}
 
 }
 
@@ -333,6 +354,7 @@ void CBasicSock::Close()
 		WSACloseEvent(m_wsaEvent);
 		m_wsaEvent = NULL;
 	}
+
 }
 
 
