@@ -145,7 +145,6 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 #endif
 }
 
-
 void CMFC20_Nvs1_ChattingExApp::CleanUp()
 {
 	if (m_pServer)
@@ -272,7 +271,16 @@ void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
 	}
 }
 
-void CMFC20_Nvs1_ChattingExApp::CloseServer(CAcceptSock* pClientSock)
-{
-
-}
+//void CMFC20_Nvs1_ChattingExApp::CloseServer(CAcceptSock* pClientSock)
+//{
+//	PACKET_RSP_LOGIN		stRSPLogin = { 0 };
+//
+//	stRSPLogin.stHeader.iMarker = MARKER_CLIENT;
+//	stRSPLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
+//	stRSPLogin.stHeader.iPacketID = PACKET_ID_RSP_LOGIN;
+//	stRSPLogin.stHeader.iPacketSize = sizeof(PACKET_RSP_LOGIN);
+//	stRSPLogin.iResultCode = SERVER_DISCONNECT;
+//
+//	pClientSock->Send(&stRSPLogin, sizeof(PACKET_RSP_LOGIN));
+//
+//}

@@ -59,9 +59,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	CBasicSock*			pBasicSock		= NULL; 
 	pBasicSock = (CBasicSock*)_lpParam;
 
-	//DWORD				dwEventCheck	= 0;
 	int					iCheckSocket	= 0;
-	//int					iConnResult		= 0;
 	int					iEventID		= 0;
 	char*				pszIPAddress	= NULL;
 
@@ -71,7 +69,6 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	
 	char*				pszBuff			= NULL;
 	int					iPort			= pBasicSock->m_iPort;
-	//int					iCheckPack		= 0;
 	
 	pszBuff = new char[1024];
 	memset(pszBuff, 0, 1024);
@@ -180,32 +177,9 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			}
 			else
 			{
-				AfxMessageBox(_T("CLOSE"));
-			}
-		}
 
-		if (LOGIN_DISCONNECT == pBasicSock->m_iConnResult)
-		{
-			pBasicSock->m_iConnResult = shutdown(pBasicSock->m_uiSocket, SD_SEND);
-			
-			if (SOCKET_ERROR == pBasicSock->m_iConnResult)
-			{
-				closesocket(pBasicSock->m_uiSocket);
-				WSACleanup();
+				break;
 			}
-
-			if (NULL != pszBuff)
-			{
-				delete[] pszBuff;
-				pszBuff = NULL;
-			}
-
-			if (NULL != pszIPAddress)
-			{
-				delete[] pszIPAddress;
-				pszIPAddress = NULL;
-			}
-
 		}
 
 		Sleep(0);
@@ -318,10 +292,14 @@ void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket)
 
 void CBasicSock::DisConnect()
 {
+	//m_iConnResult = shutdown(m_uiSocket, SD_SEND);
+	Close();
+	m_iConnResult = closesocket(m_uiSocket);
+	WSACleanup();
 
-	m_iConnResult = LOGIN_DISCONNECT;
-	::PostMessage(GetParent(), WM_MESSAGE_SOCKET, LOGIN_DISCONNECT, NULL);
-
+	//m_iConnResult = DISCONNECT;
+	::PostMessage(GetParent(), WM_MESSAGE_SOCKET, DISCONNECT, NULL);
+	
 }
 
 void CBasicSock::Close()

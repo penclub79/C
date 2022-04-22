@@ -218,40 +218,43 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateData();
 
-	m_pClient = new CBasicSock(this->GetSafeHwnd());
-	CString strUserID;
-	CString strIP;
-	BOOL bResult = 0;
-	TCHAR* pszIPBuff = NULL;
-	TCHAR* pszUserIdBuff = NULL;
-
-	m_iPort = 7777;
-	GetDlgItemText(IDC_EDIT_USERID, strUserID);
-	GetDlgItemText(IDC_IPADDRESS_SERVER, strIP);
-
-	SetUserID(strUserID);
-
-	pszIPBuff = new TCHAR[strIP.GetLength() + 1];
-	memset(pszIPBuff, 0, strIP.GetLength());
-	_tcscpy(pszIPBuff, strIP.GetBuffer(0));
-
-	pszUserIdBuff = new TCHAR[strUserID.GetLength() + 1];
-	memset(pszUserIdBuff, 0, strUserID.GetLength());
-	_tcscpy(pszUserIdBuff, strUserID.GetBuffer(0));
-
-	if (NULL != m_pClient)
-		m_pClient->Connect(pszIPBuff, pszUserIdBuff, m_iPort);
-
-	if (NULL != pszIPBuff)
+	if (NULL == m_pClient)
 	{
-		delete[] pszIPBuff;
-		pszIPBuff = NULL;
-	}
+		m_pClient = new CBasicSock(this->GetSafeHwnd());
+		CString strUserID;
+		CString strIP;
+		BOOL bResult = 0;
+		TCHAR* pszIPBuff = NULL;
+		TCHAR* pszUserIdBuff = NULL;
 
-	if (NULL != pszUserIdBuff)
-	{
-		delete[] pszUserIdBuff;
-		pszUserIdBuff = NULL;
+		m_iPort = 7777;
+		GetDlgItemText(IDC_EDIT_USERID, strUserID);
+		GetDlgItemText(IDC_IPADDRESS_SERVER, strIP);
+
+		SetUserID(strUserID);
+
+		pszIPBuff = new TCHAR[strIP.GetLength() + 1];
+		memset(pszIPBuff, 0, strIP.GetLength());
+		_tcscpy(pszIPBuff, strIP.GetBuffer(0));
+
+		pszUserIdBuff = new TCHAR[strUserID.GetLength() + 1];
+		memset(pszUserIdBuff, 0, strUserID.GetLength());
+		_tcscpy(pszUserIdBuff, strUserID.GetBuffer(0));
+
+		if (NULL != m_pClient)
+			m_pClient->Connect(pszIPBuff, pszUserIdBuff, m_iPort);
+
+		if (NULL != pszIPBuff)
+		{
+			delete[] pszIPBuff;
+			pszIPBuff = NULL;
+		}
+
+		if (NULL != pszUserIdBuff)
+		{
+			delete[] pszUserIdBuff;
+			pszUserIdBuff = NULL;
+		}
 	}
 }
 
@@ -266,9 +269,10 @@ void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 		GetDlgItem(IDC_EDIT_PORT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_IPADDRESS_SERVER)->EnableWindow(FALSE);
 	}
-	else if (LOGIN_DISCONNECT == _iResult)
+	else if (DISCONNECT == _iResult)
 	{
-		//AfxMessageBox(_T("연결을 끊었습니다."));
+		AfxMessageBox(_T("연결이 끊겼습니다."));
+
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);

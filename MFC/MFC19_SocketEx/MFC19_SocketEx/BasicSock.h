@@ -19,6 +19,7 @@ public:
 	void SendPacket(int _iPacketID, TCHAR* _pData, int _iLength);
 	void ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket);
 	void DisConnect();
+	void ServerExit();
 	void Close();
 	HWND		GetParent();
 	

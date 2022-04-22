@@ -19,6 +19,11 @@ typedef enum{
 	TEXT_SUCCESS = 10,
 };
 
+typedef enum{
+	DISCONNECT = 100,
+	
+};
+
 typedef struct _tagPACKET_HEADER{
 	int					iMarker;
 	unsigned int		iVersion;

@@ -336,8 +336,7 @@ LRESULT CMFC20_Nvs1_ChattingExDlg::WindowProc(UINT message, WPARAM wParam, LPARA
 	switch (message)
 	{
 	case WM_CLOSE:
-		((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->CloseServer();
-		
+		((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->CleanUp();
 		break;
 
 	default:

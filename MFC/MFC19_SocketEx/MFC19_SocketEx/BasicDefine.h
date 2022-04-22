@@ -26,7 +26,7 @@ typedef enum{
 
 // Throw Code
 typedef enum{
-	LOGIN_DISCONNECT = 100
+	DISCONNECT = 100,
 };
 
 typedef struct _tagPACKET_HEADER{

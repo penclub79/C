@@ -29,5 +29,3 @@ void CBasicSock::OnClose(int nErrorCode)
 
 	CAsyncSocket::OnClose(nErrorCode);
 }
-
-
