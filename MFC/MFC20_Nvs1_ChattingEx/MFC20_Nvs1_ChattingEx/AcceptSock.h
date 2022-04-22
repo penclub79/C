@@ -9,9 +9,6 @@ public:
 	CAcceptSock();
 	~CAcceptSock();
 
-	//int iIndex;
-	//void OnReceive(int nErrorCode);
-	//virtual void OnClose(int nErrorCode);
 protected:
 	CString m_strUserID;
 

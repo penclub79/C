@@ -36,18 +36,18 @@ public:
 
 private:
 	CServerSock* m_pServer;
-	//CAcceptSock* m_pAccept;
+	
 	CObList m_AcceptSocketList;
 	void CleanUp();
 	
 public:
 	void ReceiveData(CAcceptSock* pClientSock);
 	void CloseChild(CAcceptSock* pClientSock);
+	void CloseServer(CAcceptSock* pClientSock);
 
 	void Accept();
-	//void SendDataAll(CAcceptSock* pAccept, CString strData);
 	void InitServer();
-	//void OnSend(CString strData);
+	
 
 protected:
 	

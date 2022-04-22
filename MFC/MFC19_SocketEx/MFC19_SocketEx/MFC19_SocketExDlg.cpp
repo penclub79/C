@@ -49,8 +49,6 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	//CBasicSock* m_pClient = new CBasicSock();
-
 	// 멤버변수 초기화
 	m_strInitLoc	= 0;
 	m_rectDlg		= 0;

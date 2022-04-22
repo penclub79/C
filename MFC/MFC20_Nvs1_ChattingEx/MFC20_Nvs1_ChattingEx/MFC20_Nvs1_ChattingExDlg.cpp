@@ -46,7 +46,6 @@ END_MESSAGE_MAP()
 // CMFC20_Nvs1_ChattingExDlg 대화 상자
 
 
-
 CMFC20_Nvs1_ChattingExDlg::CMFC20_Nvs1_ChattingExDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC20_Nvs1_ChattingExDlg::IDD, pParent)
 	, m_strMyIP(_T(""))
@@ -72,7 +71,6 @@ BEGIN_MESSAGE_MAP(CMFC20_Nvs1_ChattingExDlg, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_BN_CLICKED(IDC_BUTTON_CLOSE, &CMFC20_Nvs1_ChattingExDlg::OnClickedButtonClose)
-	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
@@ -331,9 +329,21 @@ void CMFC20_Nvs1_ChattingExDlg::OnClickedButtonClose()
 }
 
 
-void CMFC20_Nvs1_ChattingExDlg::OnClose()
+LRESULT CMFC20_Nvs1_ChattingExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
 
-	CDialogEx::OnClose();
+	switch (message)
+	{
+	case WM_CLOSE:
+		((CMFC20_Nvs1_ChattingExApp*)AfxGetApp())->CloseServer();
+		
+		break;
+
+	default:
+		break;
+	}
+
+	return CDialogEx::WindowProc(message, wParam, lParam);
 }
+

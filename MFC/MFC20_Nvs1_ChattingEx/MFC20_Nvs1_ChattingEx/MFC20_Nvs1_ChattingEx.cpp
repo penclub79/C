@@ -58,7 +58,6 @@ BOOL CMFC20_Nvs1_ChattingExApp::InitInstance()
 		return FALSE;
 	}
 
-
 	AfxEnableControlContainer();
 
 	// 대화 상자에 셸 트리 뷰 또는
@@ -107,7 +106,6 @@ BOOL CMFC20_Nvs1_ChattingExApp::InitInstance()
 	return FALSE;
 }
 
-
 // 서버 생성
 void CMFC20_Nvs1_ChattingExApp::InitServer()
 {
@@ -145,7 +143,6 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
 	}
 #endif
-
 }
 
 
@@ -273,5 +270,9 @@ void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
 		delete pClientSock;
 		pClientSock = NULL;
 	}
-	
+}
+
+void CMFC20_Nvs1_ChattingExApp::CloseServer(CAcceptSock* pClientSock)
+{
+
 }

@@ -5,7 +5,6 @@
 
 CAcceptSock::CAcceptSock()
 {
-
 }
 
 
@@ -21,6 +20,5 @@ void CAcceptSock::SetUserID(CString strID)
 CString CAcceptSock::GetUserID()
 {
 	return m_strUserID;
-	//((CMFC20_Nvs1_ChattingExApp*)AfxGetApp)->ReceiveData();
 }
 

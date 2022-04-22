@@ -52,9 +52,9 @@ public:
 	CString m_strMyIP;
 	CString m_strOtherIP;
 	
-	
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnClickedButtonClose();
-	afx_msg void OnClose();
+
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };

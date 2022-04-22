@@ -258,8 +258,6 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 	PACKET_REQ_TEXT		stReqText		= { 0 };
 	TCHAR* pszUserID = NULL;
 
-	//int					iCheckPack		= 0;
-
 	switch (_iPacketID)
 	{
 	case PACKET_ID_REQ_LOGIN:

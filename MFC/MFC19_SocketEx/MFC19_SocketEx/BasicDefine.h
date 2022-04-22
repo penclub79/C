@@ -13,7 +13,7 @@ typedef enum{
 
 typedef enum{
 	PACKET_ID_REQ_LOGIN	 = 1,
-	PACKET_ID_RSP_LOGIN		,	
+	PACKET_ID_RSP_LOGIN		,
 	PACKET_ID_REQ_TEXT		,
 	PACKET_ID_RSP_TEXT		,
 };
