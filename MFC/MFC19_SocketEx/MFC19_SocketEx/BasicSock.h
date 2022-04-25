@@ -20,7 +20,6 @@ public:
 	void ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket);
 	void DisConnect();
 	void ServerExit();
-	void NetWorkError(int _iErrorCode);
 	void Close();
 	HWND		GetParent();
 	

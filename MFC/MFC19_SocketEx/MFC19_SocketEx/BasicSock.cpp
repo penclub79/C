@@ -126,7 +126,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_CONNECT_BIT] != 0)
 			{
-				pBasicSock->NetWorkError(DISCONNECT);
+				pBasicSock->DisConnect();
 				break;
 			}
 			else
@@ -139,7 +139,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_READ_BIT] != 0)
 			{
-				pBasicSock->NetWorkError(DISCONNECT);
+				pBasicSock->DisConnect();
 				break;
 			}
 			else
@@ -164,7 +164,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_WRITE_BIT] != 0)
 			{
-				pBasicSock->NetWorkError(DISCONNECT);
+				pBasicSock->DisConnect();
 				break;
 			}
 		}
@@ -173,12 +173,12 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_CLOSE_BIT] != 0)
 			{
-				pBasicSock->NetWorkError(DISCONNECT);
+				pBasicSock->DisConnect();
 				break;
 			}
 			else
 			{
-				pBasicSock->NetWorkError(DISCONNECT);
+				closesocket(pBasicSock->m_uiSocket);
 				break;
 			}
 		}
@@ -291,12 +291,8 @@ void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket)
 
 void CBasicSock::DisConnect()
 {
+	shutdown(m_uiSocket, SD_SEND);
 	::PostMessage(GetParent(), WM_MESSAGE_SOCKET, DISCONNECT, NULL);
-}
-
-void CBasicSock::NetWorkError(int _iErrorCode)
-{
-	::PostMessage(GetParent(), WM_MESSAGE_SOCKET, _iErrorCode, NULL);
 }
 
 void CBasicSock::Close()
