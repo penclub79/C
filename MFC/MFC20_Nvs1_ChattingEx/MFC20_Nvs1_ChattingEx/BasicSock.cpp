@@ -5,7 +5,6 @@
 
 CBasicSock::CBasicSock()
 {
-
 }
 
 

@@ -14,7 +14,7 @@ CBasicSock::CBasicSock(HWND hParent)
 
 CBasicSock::~CBasicSock()
 {
-	Close();	
+	//Close();	
 }
 
 int CBasicSock::MainThread()
@@ -66,7 +66,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	PACKET_HEADER*		pstHeader		= NULL;
 	
 	WSANETWORKEVENTS	stNetWorkEvents	= { 0 };
-	
+
 	char*				pszBuff			= NULL;
 	int					iPort			= pBasicSock->m_iPort;
 	
@@ -84,13 +84,11 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	// 이벤트 객체 생성
 	pBasicSock->m_wsaEvent = WSACreateEvent();
 	
-	SOCKADDR_IN stClientInfo = { 0 };
+	SOCKADDR_IN stClientInfo;
+	memset(&stClientInfo, 0, sizeof(SOCKADDR_IN));
 
 	// IPv4 인터넷 프로토콜
 	stClientInfo.sin_family = AF_INET;
-	
-	// 소켓 상태 체크
-	iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
 
 	// htons()함수는 리틀 엔디안에서 빅 엔디안 방식으로 net_port에 저장
 	stClientInfo.sin_port = htons(pBasicSock->m_iPort);
@@ -101,13 +99,17 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	※inet_ntoa는 IPv4만 지원
 	*/
 	inet_pton(stClientInfo.sin_family, (PCSTR)pszIPAddress, &stClientInfo.sin_addr);
+
+	// 소켓 상태 체크
+	iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
+
 	pBasicSock->m_iConnResult = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));
 
-	if (SOCKET_ERROR == iCheckSocket)
+	/*if (SOCKET_ERROR == iCheckSocket)
 	{
 		closesocket(pBasicSock->m_uiSocket);
 		WSACleanup();
-	}
+	}*/
 
 	while (pBasicSock->m_dwThreadID)
 	{
@@ -124,9 +126,8 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_CONNECT_BIT] != 0)
 			{
-				AfxMessageBox(_T("연결이 원활하지 않다."));
-				pBasicSock->Close();
-				WSACleanup();
+				pBasicSock->NetWorkError(DISCONNECT);
+				break;
 			}
 			else
 			{
@@ -138,8 +139,8 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_READ_BIT] != 0)
 			{
-				closesocket(pBasicSock->m_uiSocket);
-				WSACleanup();
+				pBasicSock->NetWorkError(DISCONNECT);
+				break;
 			}
 			else
 			{
@@ -163,8 +164,8 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_WRITE_BIT] != 0)
 			{
-				closesocket(pBasicSock->m_uiSocket);
-				WSACleanup();
+				pBasicSock->NetWorkError(DISCONNECT);
+				break;
 			}
 		}
 		
@@ -172,12 +173,12 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_CLOSE_BIT] != 0)
 			{
-				closesocket(pBasicSock->m_uiSocket);
-				WSACleanup();
+				pBasicSock->NetWorkError(DISCONNECT);
+				break;
 			}
 			else
 			{
-
+				pBasicSock->NetWorkError(DISCONNECT);
 				break;
 			}
 		}
@@ -194,10 +195,8 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 
 		// WSAWaitForMultipleEvents
 		// 이벤트가 발생했는지 확인
-		//dwEventCheck = WSAWaitForMultipleEvents(1, &pBasicSock->m_wsaEvent, TRUE, 1000, TRUE);
+		//iEventID = WSAWaitForMultipleEvents(1, &pBasicSock->m_wsaEvent, TRUE, 1000, TRUE);
 	}
-	closesocket(pBasicSock->m_uiSocket);
-	WSACleanup();
 
 	if (NULL != pszBuff)
 	{
@@ -211,8 +210,8 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		pszIPAddress = NULL;
 	}
 
+	ExitThread(0);
 	return 0xffffffff;
-
 }
 
 void CBasicSock::Connect(TCHAR* _pszIP, TCHAR* _pszUserID, int _iPort)
@@ -292,14 +291,12 @@ void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket)
 
 void CBasicSock::DisConnect()
 {
-	//m_iConnResult = shutdown(m_uiSocket, SD_SEND);
-	Close();
-	m_iConnResult = closesocket(m_uiSocket);
-	WSACleanup();
-
-	//m_iConnResult = DISCONNECT;
 	::PostMessage(GetParent(), WM_MESSAGE_SOCKET, DISCONNECT, NULL);
-	
+}
+
+void CBasicSock::NetWorkError(int _iErrorCode)
+{
+	::PostMessage(GetParent(), WM_MESSAGE_SOCKET, _iErrorCode, NULL);
 }
 
 void CBasicSock::Close()
@@ -313,6 +310,7 @@ void CBasicSock::Close()
 
 		// 쓰레드 실행이 완료될 때까지 대기한다.
 		m_dwThreadID = 0;
+		
 		if (WAIT_TIMEOUT == WaitForSingleObject(m_hThread, 30000))
 		{
 			// 강제 종료 함수

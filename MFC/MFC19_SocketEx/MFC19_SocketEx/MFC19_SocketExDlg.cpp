@@ -461,6 +461,12 @@ LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 		{
 			m_bIsConnect = FALSE;
 			ConnectStatus(wParam);
+			
+			if (NULL != m_pClient)
+			{
+				delete m_pClient;
+				m_pClient = NULL;
+			}
 		}
 		break;
 

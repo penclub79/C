@@ -134,7 +134,6 @@ BOOL CMFC20_Nvs1_ChattingExDlg::OnInitDialog()
 
 	::GetClientRect(::GetDlgItem(this->GetSafeHwnd(), IDC_EDIT_SEND), &stDlgLoc);
 
-
 	//// SetWindowPos() ÇÔ¼ö
 	//::SetWindowPos(this->GetSafeHwnd(), HWND_TOPMOST, 0, 0, 900, 900, SWP_NOZORDER | SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW);
 
