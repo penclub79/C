@@ -21,7 +21,7 @@ public:
 	void DisConnect();
 	void ServerExit();
 	void Close();
-	HWND		GetParent();
+	HWND GetParent();
 	
 
 private:

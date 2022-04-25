@@ -8,7 +8,10 @@ CBasicSock::CBasicSock(HWND hParent)
 	m_dwThreadID = 0;
 	m_hThread = 0;
 	m_iPort = 0;
+	m_iConnResult = 0;
 	m_hParentHandle = hParent;
+	m_uiSocket = { 0 };
+	m_wsaEvent = NULL;
 }
 
 
@@ -79,10 +82,12 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	strcpy(pszIPAddress, CT2A(pBasicSock->m_strIP));
 
 	// Socket 생성
-	pBasicSock->m_uiSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
+	if (NULL == pBasicSock->m_uiSocket)
+		pBasicSock->m_uiSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	
 	// 이벤트 객체 생성
-	pBasicSock->m_wsaEvent = WSACreateEvent();
+	if (NULL == pBasicSock->m_wsaEvent)
+		pBasicSock->m_wsaEvent = WSACreateEvent();
 	
 	SOCKADDR_IN stClientInfo;
 	memset(&stClientInfo, 0, sizeof(SOCKADDR_IN));
@@ -104,12 +109,6 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	iCheckSocket = WSAEventSelect(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE);
 
 	pBasicSock->m_iConnResult = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));
-
-	/*if (SOCKET_ERROR == iCheckSocket)
-	{
-		closesocket(pBasicSock->m_uiSocket);
-		WSACleanup();
-	}*/
 
 	while (pBasicSock->m_dwThreadID)
 	{
@@ -178,24 +177,11 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			}
 			else
 			{
-				closesocket(pBasicSock->m_uiSocket);
 				break;
 			}
 		}
 
 		Sleep(0);
-
-		/*
-		인자값
-		DWORD cEvents : 확인할 이벤트의 개수
-		const WSAEVENT FAR* IphEvents : 확인할 이벤트가 담긴 배열(시작 주소)
-		BOOL fWaitAll : 배열의 모든 이벤트 객체에 대해 모두 이벤트가 발생했는지 확인할 것인지
-		DWORD dwTimeout : 이벤트 발생이 없을
-		*/
-
-		// WSAWaitForMultipleEvents
-		// 이벤트가 발생했는지 확인
-		//iEventID = WSAWaitForMultipleEvents(1, &pBasicSock->m_wsaEvent, TRUE, 1000, TRUE);
 	}
 
 	if (NULL != pszBuff)
@@ -209,8 +195,21 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		delete[] pszIPAddress;
 		pszIPAddress = NULL;
 	}
+	
+	if (NULL != pBasicSock->m_uiSocket)
+	{
+		closesocket(pBasicSock->m_uiSocket);
+		pBasicSock->m_uiSocket = { 0 };
+	}
 
-	ExitThread(0);
+	// 이벤트 객체 해제
+	if (NULL != pBasicSock->m_wsaEvent)
+	{
+		WSACloseEvent(pBasicSock->m_wsaEvent);
+		pBasicSock->m_wsaEvent = NULL;
+	}
+
+	// 밑에 코드는 ExitThread(0xffffffff)와 같다
 	return 0xffffffff;
 }
 
@@ -312,8 +311,15 @@ void CBasicSock::Close()
 			// 강제 종료 함수
 			TerminateThread(m_hThread, 0xffffffff);
 		}
+		
 		CloseHandle(m_hThread);
 		m_hThread = NULL;
+	}
+
+	if (NULL != m_uiSocket)
+	{
+		closesocket(m_uiSocket);
+		m_uiSocket = { 0 };
 	}
 
 	// 이벤트 객체 해제

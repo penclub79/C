@@ -44,6 +44,7 @@ END_MESSAGE_MAP()
 // CMFC19_SocketExDlg 대화 상자
 
 
+// 생성자
 CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 : CDialogEx(CMFC19_SocketExDlg::IDD, pParent)
 {
@@ -56,6 +57,7 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 	m_bIsConnect	= FALSE;
 }
 
+// 소멸자
 CMFC19_SocketExDlg::~CMFC19_SocketExDlg()
 {
 	if (NULL != m_pClient)
@@ -169,6 +171,12 @@ void CMFC19_SocketExDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	{
 		CAboutDlg dlgAbout;
 		dlgAbout.DoModal();
+	}
+	else if (nID == SC_CLOSE)
+	{
+		AfxGetMainWnd()->PostMessage(WM_CLOSE);
+		if (m_pClient)
+			m_pClient->Close();
 	}
 	else
 	{
