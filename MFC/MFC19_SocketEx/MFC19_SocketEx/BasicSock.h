@@ -13,18 +13,19 @@ public:
 	CBasicSock(HWND hParent);
 	~CBasicSock();
 	
-	static DWORD WINAPI ThreadProc(LPVOID _lpParam);
 	void Connect(TCHAR* _pszIP, TCHAR* _pszUserID, int _iPort);
-	
 	void SendPacket(int _iPacketID, TCHAR* _pData, int _iLength);
-	void ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket);
-	void DisConnect();
-	void ServerExit();
 	void Close();
-	HWND GetParent();
-	
+
 
 private:
+	static DWORD WINAPI ThreadProc(LPVOID _lpParam);
+
+	void ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket);
+	void ServerExit();
+	HWND GetParent();
+	int MainThread();
+
 	HWND		m_hParentHandle;
 
 	CString		m_strIP;
@@ -36,7 +37,6 @@ private:
 	int			m_iPort;
 	int			m_iConnResult;
 
-	int MainThread();
 	
 
 };

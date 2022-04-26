@@ -22,13 +22,10 @@ typedef enum{
 typedef enum{
 	LOGIN_SUCCESS = 0,
 	TEXT_SUCCESS = 10,
+	DISCONNECTED = 100,
+	EXIT,
 };
 
-// Throw Code
-typedef enum{
-	DISCONNECT	= 100,
-	EXIT		= 110,
-};
 
 typedef struct _tagPACKET_HEADER{
 	/*

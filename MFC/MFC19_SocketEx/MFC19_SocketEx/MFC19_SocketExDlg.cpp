@@ -174,9 +174,10 @@ void CMFC19_SocketExDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 	else if (nID == SC_CLOSE)
 	{
-		AfxGetMainWnd()->PostMessage(WM_CLOSE);
 		if (m_pClient)
 			m_pClient->Close();
+
+		PostMessage(WM_CLOSE);
 	}
 	else
 	{
@@ -277,7 +278,7 @@ void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 		GetDlgItem(IDC_EDIT_PORT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_IPADDRESS_SERVER)->EnableWindow(FALSE);
 	}
-	else if (DISCONNECT == _iResult)
+	else if (DISCONNECTED == _iResult)
 	{
 		AfxMessageBox(_T("연결이 끊겼습니다."));
 
@@ -436,9 +437,10 @@ void CMFC19_SocketExDlg::ResizeControl(int cx, int cy)
 void CMFC19_SocketExDlg::OnClickedButtonClose()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	AfxGetMainWnd()->PostMessage(WM_CLOSE);
 	if (m_pClient )
 		m_pClient->Close();
+
+	PostMessage(WM_CLOSE);
 }
 
 // DISConnect
@@ -447,7 +449,7 @@ void CMFC19_SocketExDlg::OnClickedButtonDisconnect()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString strMessage;
 	if (m_pClient)
-		m_pClient->DisConnect();
+		m_pClient->Close();
 }
 
 // 데이터를 받을때 WindowProc에서 처리한다.
@@ -465,7 +467,12 @@ LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 			m_bIsConnect = TRUE;
 			ConnectStatus(wParam);
 		}
-		else
+		else if (TEXT_SUCCESS == wParam)
+		{
+			pstRspText = (PACKET_RSP_TEXT*)lParam;
+			ReceiveMessage(pstRspText->wszPacketText, pstRspText->wszSendUserID);
+		}
+		else if (DISCONNECTED == wParam)
 		{
 			m_bIsConnect = FALSE;
 			ConnectStatus(wParam);
@@ -476,14 +483,7 @@ LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 				m_pClient = NULL;
 			}
 		}
-		break;
 
-	case WM_USER:
-		if (TEXT_SUCCESS == wParam)
-		{
-			pstRspText = (PACKET_RSP_TEXT*)lParam;
-			ReceiveMessage(pstRspText->wszPacketText, pstRspText->wszSendUserID);
-		}
 		break;
 	}
 	
