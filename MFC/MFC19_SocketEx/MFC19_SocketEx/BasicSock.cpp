@@ -17,7 +17,18 @@ CBasicSock::CBasicSock(HWND hParent)
 
 CBasicSock::~CBasicSock()
 {
-	//Close();	
+	if (NULL != m_uiSocket)
+	{
+		closesocket(m_uiSocket);
+		m_uiSocket = { 0 };
+	}
+
+	// 이벤트 객체 해제
+	if (NULL != m_wsaEvent)
+	{
+		WSACloseEvent(m_wsaEvent);
+		m_wsaEvent = NULL;
+	}
 }
 
 int CBasicSock::MainThread()
@@ -125,7 +136,8 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_CONNECT_BIT] != 0)
 			{
-				pBasicSock->DisConnect();
+				pBasicSock->m_iConnResult = DISCONNECT;
+				pBasicSock->Close();
 				break;
 			}
 			else
@@ -138,7 +150,8 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_READ_BIT] != 0)
 			{
-				pBasicSock->DisConnect();
+				pBasicSock->m_iConnResult = DISCONNECT;
+				pBasicSock->Close();
 				break;
 			}
 			else
@@ -163,7 +176,8 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_WRITE_BIT] != 0)
 			{
-				pBasicSock->DisConnect();
+				pBasicSock->m_iConnResult = DISCONNECT;
+				pBasicSock->Close();
 				break;
 			}
 		}
@@ -172,15 +186,17 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_CLOSE_BIT] != 0)
 			{
-				pBasicSock->DisConnect();
+				pBasicSock->m_iConnResult = DISCONNECT;
+				pBasicSock->Close();
 				break;
 			}
 			else
 			{
+				pBasicSock->m_iConnResult = DISCONNECT;
+				pBasicSock->Close();
 				break;
 			}
 		}
-
 		Sleep(0);
 	}
 
@@ -206,7 +222,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	if (NULL != pBasicSock->m_wsaEvent)
 	{
 		WSACloseEvent(pBasicSock->m_wsaEvent);
-		pBasicSock->m_wsaEvent = NULL;
+ 		pBasicSock->m_wsaEvent = NULL;
 	}
 
 	// 밑에 코드는 ExitThread(0xffffffff)와 같다
@@ -289,44 +305,51 @@ void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket)
 }
 
 void CBasicSock::DisConnect()
-{
+{	
+	// 이벤트 메세지 보내기
 	shutdown(m_uiSocket, SD_SEND);
-	::PostMessage(GetParent(), WM_MESSAGE_SOCKET, DISCONNECT, NULL);
 }
 
 void CBasicSock::Close()
 {
-	if (NULL != m_hThread)
+	if (EXIT == m_iConnResult)
 	{
-		/*
-		WaitForSingleObject 함수는 정상 종료되었을시 리턴 값을 WAIT_OBJECT_0을 리턴하고
-		타임아웃 되어서 리턴하는 경우에는 WAIT_TIMEOUT을 리턴한다.
-		*/
-
-		// 쓰레드 실행이 완료될 때까지 대기한다.
-		m_dwThreadID = 0;
-		
-		if (WAIT_TIMEOUT == WaitForSingleObject(m_hThread, 30000))
+		if (NULL != m_hThread)
 		{
-			// 강제 종료 함수
-			TerminateThread(m_hThread, 0xffffffff);
+			/*
+			WaitForSingleObject 함수는 정상 종료되었을시 리턴 값을 WAIT_OBJECT_0을 리턴하고
+			타임아웃 되어서 리턴하는 경우에는 WAIT_TIMEOUT을 리턴한다.
+			*/
+
+			// 쓰레드 실행이 완료될 때까지 대기한다.
+			m_dwThreadID = 0;
+
+			if (WAIT_TIMEOUT == WaitForSingleObject(m_hThread, 30000))
+			{
+				// 강제 종료 함수
+				TerminateThread(m_hThread, 0xffffffff);
+			}
+
+			CloseHandle(m_hThread);
+			m_hThread = NULL;
 		}
-		
-		CloseHandle(m_hThread);
-		m_hThread = NULL;
-	}
 
-	if (NULL != m_uiSocket)
-	{
-		closesocket(m_uiSocket);
-		m_uiSocket = { 0 };
-	}
+		if (NULL != m_uiSocket)
+		{
+			closesocket(m_uiSocket);
+			m_uiSocket = { 0 };
+		}
 
-	// 이벤트 객체 해제
-	if (NULL != m_wsaEvent)
+		// 이벤트 객체 해제
+		if (NULL != m_wsaEvent)
+		{
+			WSACloseEvent(m_wsaEvent);
+			m_wsaEvent = NULL;
+		}
+	}
+	else // DISCONNECT
 	{
-		WSACloseEvent(m_wsaEvent);
-		m_wsaEvent = NULL;
+		::PostMessage(GetParent(), WM_MESSAGE_SOCKET, DISCONNECT, NULL);
 	}
 
 }
