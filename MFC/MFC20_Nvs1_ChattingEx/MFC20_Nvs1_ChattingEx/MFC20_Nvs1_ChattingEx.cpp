@@ -141,7 +141,11 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 		m_AcceptSocketList.AddTail(pAccept);
 
 		((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->Accept(strSock);
+
+		KeepAlive(pAccept);
 	}
+	
+
 #endif
 }
 
@@ -257,6 +261,20 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 	}
 }
 
+void CMFC20_Nvs1_ChattingExApp::KeepAlive(CAcceptSock* pClientSock)
+{
+	char*					pBuffer			= new char[1024];
+	PACKET_HEADER*			pstHeader		= (PACKET_HEADER*)pBuffer;
+	PACKET_KEEPALIVE		stAlPack		= { 0 };
+	int						iKeepAliveTime	= 0;
+
+	iKeepAliveTime = 3000; // 3ÃÊ
+
+	BOOL bStatus = TRUE;
+	//pClientSock->SetSockOpt(SO_KEEPALIVE, &bStatus, sizeof(BOOL));
+
+}
+
 void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
 {
 	POSITION pos = m_AcceptSocketList.Find(pClientSock);
@@ -271,16 +289,4 @@ void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
 	}
 }
 
-//void CMFC20_Nvs1_ChattingExApp::CloseServer(CAcceptSock* pClientSock)
-//{
-//	PACKET_RSP_LOGIN		stRSPLogin = { 0 };
-//
-//	stRSPLogin.stHeader.iMarker = MARKER_CLIENT;
-//	stRSPLogin.stHeader.iVersion = VERSION_PACKET_CLIENT_1;
-//	stRSPLogin.stHeader.iPacketID = PACKET_ID_RSP_LOGIN;
-//	stRSPLogin.stHeader.iPacketSize = sizeof(PACKET_RSP_LOGIN);
-//	stRSPLogin.iResultCode = SERVER_DISCONNECT;
-//
-//	pClientSock->Send(&stRSPLogin, sizeof(PACKET_RSP_LOGIN));
-//
-//}
+

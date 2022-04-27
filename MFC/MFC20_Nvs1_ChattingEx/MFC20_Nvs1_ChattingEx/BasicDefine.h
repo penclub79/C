@@ -14,44 +14,56 @@ typedef enum{
 };
 
 // Success Code
-typedef enum{
+typedef enum
+{
 	LOGIN_SUCCESS = 0,
 	TEXT_SUCCESS = 10,
 };
 
-typedef enum{
-	DISCONNECT = 100,
-	
+typedef enum
+{
+	DISCONNECT = 100,	
 };
 
-typedef struct _tagPACKET_HEADER{
+typedef struct _tagPACKET_HEADER
+{
 	int					iMarker;
 	unsigned int		iVersion;
 	unsigned int		iPacketID;
 	unsigned int		iPacketSize;
 }PACKET_HEADER;
 
-typedef struct _tagPACKET_REQ_LOGIN{
+typedef struct _tagPACKET_REQ_LOGIN
+{
 	PACKET_HEADER	stHeader;
 	TCHAR			wszUserID[MAX_LENGTH_USERID];
 }PACKET_REQ_LOGIN;
 
-typedef struct _tagPACKET_RSP_LOGIN{
+typedef struct _tagPACKET_RSP_LOGIN
+{
 	PACKET_HEADER	stHeader;
 	int				iResultCode;
 }PACKET_RSP_LOGIN;
 
-typedef struct _tagPACKET_REQ_TEXT{
+typedef struct _tagPACKET_REQ_TEXT
+{
 	PACKET_HEADER	stHeader;
 	TCHAR			wszPacketText[64];
 }PACKET_REQ_TEXT;
 
-typedef struct _tagPACKET_RSP_TEXT{
+typedef struct _tagPACKET_RSP_TEXT
+{
 	PACKET_HEADER	stHeader;
 	int				iResultCode;
 	TCHAR			wszPacketText[64];
 	TCHAR			wszSendUserID[MAX_LENGTH_USERID];
 }PACKET_RSP_TEXT;
+
+typedef struct _tagPACKET_KEEPALIVE
+{
+	PACKET_HEADER	stHeader;
+	BOOL			bIsAlive;
+}PACKET_REQ_KEEPALIVE;
 
 typedef struct _tagERRORCODE
 {

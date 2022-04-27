@@ -32,19 +32,21 @@ public:
 
 	DECLARE_MESSAGE_MAP()
 
+private:
+	CServerSock* m_pServer;
+	CObList m_AcceptSocketList;
+
+
 public:
 	void ReceiveData(CAcceptSock* pClientSock);
-	void CloseChild(CAcceptSock* pClientSock);
 	void CloseServer(CAcceptSock* pClientSock);
-
 	void CleanUp();
 	void Accept();
 	void InitServer();
+	void KeepAlive();
+	void CloseChild(CAcceptSock* pClientSock);
+	
 
-private:
-	CServerSock* m_pServer;
-
-	CObList m_AcceptSocketList;
 };
 
 extern CMFC20_Nvs1_ChattingExApp theApp;

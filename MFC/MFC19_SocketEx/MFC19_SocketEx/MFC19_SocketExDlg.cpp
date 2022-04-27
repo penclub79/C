@@ -54,7 +54,8 @@ CMFC19_SocketExDlg::CMFC19_SocketExDlg(CWnd* pParent /*=NULL*/)
 	m_strInitLoc	= 0;
 	m_rectDlg		= 0;
 	m_iPort			= 0;
-	m_bIsConnect	= FALSE;
+	m_iConnResult	= 0;
+	
 }
 
 // 소멸자
@@ -174,8 +175,11 @@ void CMFC19_SocketExDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 	else if (nID == SC_CLOSE)
 	{
-		if (m_pClient)
-			m_pClient->Close();
+		if (NULL != m_pClient)
+		{
+			delete m_pClient;
+			m_pClient = NULL;
+		}
 
 		PostMessage(WM_CLOSE);
 	}
@@ -250,8 +254,15 @@ void CMFC19_SocketExDlg::OnClickedButtonConnect()
 		memset(pszUserIdBuff, 0, strUserID.GetLength());
 		_tcscpy(pszUserIdBuff, strUserID.GetBuffer(0));
 
-		if (NULL != m_pClient)
-			m_pClient->Connect(pszIPBuff, pszUserIdBuff, m_iPort);
+		if (0 == pszUserIdBuff[0])
+		{
+			AfxMessageBox(_T("사용자 ID를 입력해주세요."));
+		}
+		else
+		{
+			if (NULL != m_pClient)
+				m_pClient->Connect(pszIPBuff, pszUserIdBuff, m_iPort);
+		}
 
 		if (NULL != pszIPBuff)
 		{
@@ -278,20 +289,35 @@ void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 		GetDlgItem(IDC_EDIT_PORT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_IPADDRESS_SERVER)->EnableWindow(FALSE);
 	}
-	else if (DISCONNECTED == _iResult)
+	else
 	{
-		AfxMessageBox(_T("연결이 끊겼습니다."));
-
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT_PORT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_IPADDRESS_SERVER)->EnableWindow(TRUE);
-	}
-	else
-	{
-		m_bIsConnect = FALSE;
-		AfxMessageBox(_T("연결이 원활하지 않음."));
+
+		switch (_iResult)
+		{
+		case CONNECTED_ERROR:
+			AfxMessageBox(_T("Connect Error 발생"));
+			break;
+		case READ_ERROR:
+			AfxMessageBox(_T("Read Error 발생"));
+			break;
+		case WRITE_ERROR:
+			AfxMessageBox(_T("Write Error 발생"));
+			break;
+		case CLOSED_ERROR:
+			AfxMessageBox(_T("Close Error 발생"));
+			break;
+		case SERVER_CLOSE:
+			AfxMessageBox(_T("서버에서 연결을 끊었습니다."));
+			break;
+		default:
+			AfxMessageBox(_T("연결이 끊겼습니다."));
+			break;
+		}
 	}
 		
 }
@@ -437,8 +463,11 @@ void CMFC19_SocketExDlg::ResizeControl(int cx, int cy)
 void CMFC19_SocketExDlg::OnClickedButtonClose()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	if (m_pClient )
-		m_pClient->Close();
+	if (NULL != m_pClient)
+	{
+		delete m_pClient;
+		m_pClient = NULL;
+	}
 
 	PostMessage(WM_CLOSE);
 }
@@ -447,9 +476,11 @@ void CMFC19_SocketExDlg::OnClickedButtonClose()
 void CMFC19_SocketExDlg::OnClickedButtonDisconnect()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString strMessage;
-	if (m_pClient)
-		m_pClient->Close();
+	if (NULL != m_pClient)
+	{
+		delete m_pClient;
+		m_pClient = NULL;
+	}
 }
 
 // 데이터를 받을때 WindowProc에서 처리한다.
@@ -464,7 +495,6 @@ LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 	case WM_MESSAGE_SOCKET:
 		if (LOGIN_SUCCESS == wParam)
 		{
-			m_bIsConnect = TRUE;
 			ConnectStatus(wParam);
 		}
 		else if (TEXT_SUCCESS == wParam)
@@ -472,9 +502,20 @@ LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 			pstRspText = (PACKET_RSP_TEXT*)lParam;
 			ReceiveMessage(pstRspText->wszPacketText, pstRspText->wszSendUserID);
 		}
-		else if (DISCONNECTED == wParam)
+		else
 		{
-			m_bIsConnect = FALSE;
+			ConnectStatus(wParam);
+
+			if (NULL != m_pClient)
+			{
+				delete m_pClient;
+				m_pClient = NULL;
+			}
+
+			break;
+		}
+		/*else if (DISCONNECTED == wParam)
+		{	
 			ConnectStatus(wParam);
 			
 			if (NULL != m_pClient)
@@ -482,9 +523,7 @@ LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 				delete m_pClient;
 				m_pClient = NULL;
 			}
-		}
-
-		break;
+		}*/
 	}
 	
 	return CDialogEx::WindowProc(message, wParam, lParam);

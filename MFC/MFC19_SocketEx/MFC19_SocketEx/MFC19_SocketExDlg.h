@@ -24,12 +24,13 @@ public:
 private:
 	CRect m_strInitLoc; // 다이얼로그 화면 server ip static 위치
 	CRect m_rectDlg; // 다이얼로그 크기
+	int m_iConnResult;
 
 // 구현입니다.
 protected:
 	HICON m_hIcon;
 	int m_iPort;
-	BOOL m_bIsConnect;
+	
 	// 생성된 메시지 맵 함수
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
