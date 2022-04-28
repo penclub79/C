@@ -173,9 +173,11 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 	PACKET_HEADER*			pstHeader				= (PACKET_HEADER*)pBuffer;
 	PACKET_REQ_LOGIN*		pstReceiveUserHeader	= NULL;
 	PACKET_REQ_TEXT*		pstReceiveTextHeader	= NULL;
+	
 
-	PACKET_RSP_TEXT			stRSPText = { 0 };
-	PACKET_RSP_LOGIN		stRSPLogin = { 0 };
+	PACKET_RSP_TEXT			stRSPText				= { 0 };
+	PACKET_RSP_LOGIN		stRSPLogin				= { 0 };
+	PACKET_RSP_KEEPALIVE	stRSPKeepAlive			= { 0 };
 
 	memset(pBuffer, 0, 1024);
 
@@ -216,7 +218,6 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 				((CMFC20_Nvs1_ChattingExDlg*)AfxGetMainWnd())->EntryClient(pAcceptSock);
 				//((CMFC20_Nvs1_ChattingExDlg*)m_pMainWnd)->ReceiveData(pClientSock, stRSPLogin.wszPacketText);
 
-				KeepAlive(pAcceptSock);
 				break;
 			}
 
@@ -251,6 +252,20 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 				}
 				break;
 			}
+
+			case PACKET_ID_REQ_ALIVE:
+			{
+				stRSPKeepAlive.stHeader.iMarker			= MARKER_CLIENT;
+				stRSPKeepAlive.stHeader.iVersion		= VERSION_PACKET_CLIENT_1;
+				stRSPKeepAlive.stHeader.iPacketID		= PACKET_ID_RSP_ALIVE;
+				stRSPKeepAlive.stHeader.iPacketSize		= sizeof(PACKET_RSP_KEEPALIVE);
+				
+				pAcceptSock->Send(&stRSPKeepAlive, sizeof(PACKET_RSP_KEEPALIVE));
+				break;
+			}
+			
+			default:
+				break;
 		}
 	}
 
@@ -261,66 +276,6 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 		pBuffer = NULL;
 	}
 }
-
-//void CMFC20_Nvs1_ChattingExApp::KeepAlive(CAcceptSock* pClientSock)
-//{
-//	char*					pszBuffer			= new char[1024];
-//	PACKET_HEADER*			pstHeader			= (PACKET_HEADER*)pszBuffer;
-//	PACKET_REQ_KEEPALIVE	stAlPack			= { 0 };
-//	int						iKeepAliveTime		= 0;
-//	int						iCheckTime			= 0;
-//	int						iResultCode			= 0;
-//	clock_t					lStartTime			= clock();
-//	
-//	iKeepAliveTime = 3000; // 3초
-//	iCheckTime = 10000;
-//
-//	memset(pszBuffer, 0, 1024);
-//	stAlPack.stHeader.iMarker		= MARKER_CLIENT;
-//	stAlPack.stHeader.iPacketID		= PACKET_ID_REQ_ALIVE;
-//	stAlPack.stHeader.iPacketSize	= sizeof(PACKET_REQ_KEEPALIVE);
-//	stAlPack.stHeader.iVersion		= VERSION_PACKET_CLIENT_1;
-//
-//	stAlPack.uiOn					= 1;				// 활성
-//	stAlPack.uiTime					= iKeepAliveTime;	// 시간 간격 
-//	stAlPack.uiInterval				= iCheckTime;		// 지연 시간
-//
-//	iResultCode = pClientSock->SetSockOpt(SO_KEEPALIVE, &stAlPack.uiOn, sizeof(PACKET_REQ_KEEPALIVE), SOL_SOCKET); // 활성화
-//	if (SOCKET_ERROR == iResultCode)
-//	{
-//		AfxMessageBox(_T("Alive Packet Invalid Active"));
-//	}
-//
-//	iResultCode = pClientSock->SetSockOpt(TCP_KEEPALIVE, &stAlPack.uiTime, sizeof(PACKET_REQ_KEEPALIVE), IPPROTO_TCP); // 시간 간격
-//	if (SOCKET_ERROR == iResultCode)
-//	{
-//		AfxMessageBox(_T("Alive Packet Time Error"));
-//	}
-//
-//	iResultCode = pClientSock->SetSockOpt(TCP_NODELAY, &stAlPack.uiInterval, sizeof(PACKET_REQ_KEEPALIVE), IPPROTO_TCP); // 지연 시간
-//	if (SOCKET_ERROR == iResultCode)
-//	{
-//		AfxMessageBox(_T("Alive Packet Interval Error"));
-//	}
-//
-//
-//	// 현재 시간 - 시작 시간 ?? 
-//	while (clock() - lStartTime)
-//	{
-//		
-//
-//		pClientSock->Send(&stAlPack, sizeof(PACKET_REQ_KEEPALIVE));
-//
-//		Sleep(3000);
-//	}
-//
-//	if (NULL != pszBuffer)
-//	{
-//		delete[] pszBuffer;
-//		pszBuffer = NULL;
-//	}
-//
-//}
 
 void CMFC20_Nvs1_ChattingExApp::CloseChild(CAcceptSock* pClientSock)
 {

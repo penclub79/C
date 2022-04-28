@@ -26,6 +26,7 @@ private:
 	HWND GetParent();
 	int MainThread();
 	void SendAliveSignal();
+	void KeepAlive();
 
 	HWND		m_hParentHandle;
 
