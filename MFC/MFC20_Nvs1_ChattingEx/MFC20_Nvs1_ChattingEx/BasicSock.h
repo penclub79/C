@@ -13,6 +13,5 @@ public:
 	virtual void OnReceive(int nErrorCode);
 	virtual void OnClose(int nErrorCode);
 
-//	virtual void OnSend(int nErrorCode);
 };
 

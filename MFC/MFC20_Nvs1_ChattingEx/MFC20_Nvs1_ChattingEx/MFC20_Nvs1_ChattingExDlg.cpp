@@ -256,7 +256,6 @@ void CMFC20_Nvs1_ChattingExDlg::Accept(CString strSock)
 	m_strOtherIP = strSock;
 }
 
-
 void CMFC20_Nvs1_ChattingExDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);

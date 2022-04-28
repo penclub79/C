@@ -11,19 +11,24 @@ typedef enum{
 	PACKET_ID_RSP_LOGIN,
 	PACKET_ID_REQ_TEXT,
 	PACKET_ID_RSP_TEXT,
+	PACKET_ID_REQ_ALIVE,
+	PACKET_ID_RSP_ALIVE,
 };
 
 // Success Code
 typedef enum
 {
-	LOGIN_SUCCESS = 0,
-	TEXT_SUCCESS = 10,
+	LOGIN_SUCCESS	= 0,
+	TEXT_SUCCESS	= 10,
+	ALIVE_SUCCESS, 
+	DISCONNECTED	= 100,
+	CONNECTED_ERROR,
+	READ_ERROR,
+	WRITE_ERROR,
+	CLOSED_ERROR,
+	SERVER_CLOSE,
 };
 
-typedef enum
-{
-	DISCONNECT = 100,	
-};
 
 typedef struct _tagPACKET_HEADER
 {
@@ -59,11 +64,15 @@ typedef struct _tagPACKET_RSP_TEXT
 	TCHAR			wszSendUserID[MAX_LENGTH_USERID];
 }PACKET_RSP_TEXT;
 
-typedef struct _tagPACKET_KEEPALIVE
+typedef struct _tagPACKET_REQ_KEEPALIVE
 {
 	PACKET_HEADER	stHeader;
-	BOOL			bIsAlive;
 }PACKET_REQ_KEEPALIVE;
+
+typedef struct _tagPACKET_RSP_KEEPALIVE
+{
+	PACKET_HEADER	stHeader;
+}PACKET_RSP_KEEPALIVE;
 
 typedef struct _tagERRORCODE
 {

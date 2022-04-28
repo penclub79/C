@@ -59,22 +59,28 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 {
 	// Sync : 동기는 작업이 완료될 때까지 스레드가 멈춘다. 그래서 Blocking소켓이라 불린다.
 	
-	CBasicSock*			pBasicSock		= NULL; 
-	pBasicSock			= (CBasicSock*)_lpParam;
+	CBasicSock*				pBasicSock		= NULL; 
+	pBasicSock	= (CBasicSock*)_lpParam;
 
-	int					iCheckSocket	= 0;
-	int					iEventID		= 0;
-	char*				pszIPAddress	= NULL;
+	int						iCheckSocket	= 0;
+	int						iEventID		= 0;
+	char*					pszIPAddress	= NULL;
 
-	PACKET_HEADER*		pstHeader		= NULL;
-	
-	WSANETWORKEVENTS	stNetWorkEvents	= { 0 };
+	PACKET_HEADER*			pstHeader		= NULL;
+	PACKET_REQ_KEEPALIVE*	pstKeepAlive	= { 0 };
+	PACKET_RSP_KEEPALIVE	stSnedKeepAlive = { 0 };
 
-	char*				pszBuff			= NULL;
-	int					iPort			= pBasicSock->m_iPort;
+	WSANETWORKEVENTS		stNetWorkEvents	= { 0 };
+
+	char*					pszBuff			= NULL;
+	char*					pszAliveBuff	= NULL;
+	int						iPort			= pBasicSock->m_iPort;
 	
 	pszBuff = new char[1024];
 	memset(pszBuff, 0, 1024);
+
+	pszAliveBuff = new char[1024];
+	memset(pszAliveBuff, 0, 1024);
 
 	pszIPAddress = new char[pBasicSock->m_strIP.GetLength() + 1];
 	memset(pszIPAddress, 0, pBasicSock->m_strIP.GetLength());
@@ -112,6 +118,17 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 
 	while (pBasicSock->m_dwThreadID)
 	{
+		// 로그인 성공시
+		// 시간 관련 getTickCount 이런거 밀리세컨드로 현재 시간 알려줌. 변수 만들어서 현재 시간 - 시작 시간 5초마다 한번씩 send로 패킷 살아있는지 통신 확인 , 서버에서 바로 응답 처리하고 
+		
+		// 로그인 성공시
+		// 라스트 리시브 데이터 타임 비교 - 예를들어 마지막으로 받은 데이터 시간과 10초 동안 아무일이 없으면 끊으면 된다.
+		
+
+
+
+		
+		
 		/*
 		FD_ACCEPT	:접속한 클라이언트가 있다
 		FD_READ	    :데이터 수신이 가능하다
@@ -121,6 +138,10 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		FD_OOB	    :OOB 데이터가 도착했다
 		*/
 		iEventID = WSAEnumNetworkEvents(pBasicSock->m_uiSocket, pBasicSock->m_wsaEvent, &stNetWorkEvents);
+		
+
+
+
 		if (stNetWorkEvents.lNetworkEvents & FD_CONNECT)
 		{
 			if (stNetWorkEvents.iErrorCode[FD_CONNECT_BIT] != 0)
@@ -147,16 +168,34 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 				//// 데이터를 받아서 읽었을 때
 				pBasicSock->m_iConnResult = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
 				pstHeader = (PACKET_HEADER*)pszBuff;
-	
-				if (PACKET_ID_RSP_LOGIN == pstHeader->iPacketID)
-				{
-					pBasicSock->ReceivePacket(pstHeader, pszBuff);
-				}
+
+				/*int iRcvBuffSize = sizeof(PACKET_REQ_KEEPALIVE);
+				getsockopt(pBasicSock->m_uiSocket, SOL_SOCKET, SO_RCVBUF, (char*)pstKeepAlive, &iRcvBuffSize);
+				pstKeepAlive = (PACKET_REQ_KEEPALIVE*)pszAliveBuff;*/
 				
-				if (PACKET_ID_RSP_TEXT == pstHeader->iPacketID)
-				{
+				if (PACKET_ID_RSP_LOGIN == pstHeader->iPacketID)
+				{	
 					pBasicSock->ReceivePacket(pstHeader, pszBuff);
+					pBasicSock->m_iConnResult = LOGIN_SUCCESS;
 				}
+
+				if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
+				{
+					// 메시지
+					if (PACKET_ID_RSP_TEXT == pstHeader->iPacketID)
+					{
+						pBasicSock->ReceivePacket(pstHeader, pszBuff);
+					}
+
+					// KEEP ALIVE 확인
+					if (PACKET_ID_REQ_ALIVE == pstKeepAlive->stHeader.iPacketID)
+					{
+						//getsockopt(pBasicSock->m_uiSocket, SOL_SOCKET, SO_RCVBUF, (char*)pstKeepAlive, &iRcvBuffSize);
+						pBasicSock->ReceivePacket(pstHeader, pszBuff);
+					}
+				}
+
+				// 라스트 리시브 데이터 시간과 현재 시간의 차를 이용
 			}
 		}
 
@@ -204,6 +243,12 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		pszBuff = NULL;
 	}
 
+	if (NULL != pszAliveBuff)
+	{
+		delete[] pszAliveBuff;
+		pszAliveBuff = NULL;
+	}
+
 	if (NULL != pszIPAddress)
 	{
 		delete[] pszIPAddress;
@@ -231,7 +276,7 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 	PACKET_HEADER		stHeader		= { 0 };
 	PACKET_REQ_LOGIN	stReqLogin		= { 0 };
 	PACKET_REQ_TEXT		stReqText		= { 0 };
-	TCHAR* pszUserID = NULL;
+	TCHAR*				pszUserID		= NULL;
 
 	switch (_iPacketID)
 	{
@@ -271,8 +316,9 @@ void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket)
 {
 	int					iCheckPack		= 0;
 
-	PACKET_RSP_LOGIN*	pstRspLogin		= NULL;
-	PACKET_RSP_TEXT*	pstRspText		= NULL;
+	PACKET_RSP_LOGIN*		pstRspLogin		= NULL;
+	PACKET_RSP_TEXT*		pstRspText		= NULL;
+	PACKET_REQ_KEEPALIVE*	pstReqAlive		= NULL;
 
 	switch (_pstHeader->iPacketID)
 	{
@@ -286,11 +332,18 @@ void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket)
 		// 해당 Message는 SendMessage로 처리하는 것이 좋은 설계이다.
 		::PostMessage(GetParent(), WM_MESSAGE_SOCKET, TEXT_SUCCESS, (LPARAM)pstRspText);
 		break;
-
+	case PACKET_ID_REQ_ALIVE:
+		pstReqAlive = (PACKET_REQ_KEEPALIVE*)_pszPacket;
+		::PostMessage(GetParent(), WM_MESSAGE_SOCKET, ALIVE_SUCCESS, NULL);
+		SendAliveSignal();
+		break;
 	default:
 		break;
 	}
+}
 
+void CBasicSock::SendAliveSignal()
+{
 
 }
 

@@ -43,7 +43,7 @@ public:
 	void CleanUp();
 	void Accept();
 	void InitServer();
-	void KeepAlive();
+	void KeepAlive(CAcceptSock* pClientSock);
 	void CloseChild(CAcceptSock* pClientSock);
 	
 

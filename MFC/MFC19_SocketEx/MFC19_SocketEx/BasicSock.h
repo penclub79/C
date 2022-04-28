@@ -25,6 +25,7 @@ private:
 	void ServerExit();
 	HWND GetParent();
 	int MainThread();
+	void SendAliveSignal();
 
 	HWND		m_hParentHandle;
 

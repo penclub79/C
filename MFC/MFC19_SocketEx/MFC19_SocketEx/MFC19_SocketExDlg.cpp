@@ -496,11 +496,17 @@ LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 		if (LOGIN_SUCCESS == wParam)
 		{
 			ConnectStatus(wParam);
+			break;
 		}
 		else if (TEXT_SUCCESS == wParam)
 		{
 			pstRspText = (PACKET_RSP_TEXT*)lParam;
 			ReceiveMessage(pstRspText->wszPacketText, pstRspText->wszSendUserID);
+			break;
+		}
+		else if (ALIVE_SUCCESS == wParam) // KeepAlive ½Ã±×³Î
+		{
+			break;
 		}
 		else
 		{
@@ -514,16 +520,6 @@ LRESULT CMFC19_SocketExDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 
 			break;
 		}
-		/*else if (DISCONNECTED == wParam)
-		{	
-			ConnectStatus(wParam);
-			
-			if (NULL != m_pClient)
-			{
-				delete m_pClient;
-				m_pClient = NULL;
-			}
-		}*/
 	}
 	
 	return CDialogEx::WindowProc(message, wParam, lParam);
