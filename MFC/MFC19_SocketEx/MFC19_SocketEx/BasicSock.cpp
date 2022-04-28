@@ -71,8 +71,8 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	PACKET_REQ_KEEPALIVE	pstReqKeepAlive		= { 0 };
 
 	WSANETWORKEVENTS		stNetWorkEvents		= { 0 };
-	DWORD					ulStartTime			= GetTickCount();
-	DWORD					ulLastTime			= GetTickCount();
+	DWORD					ulStartTime			= 0;
+	DWORD					ulLastTime			= 0;
 	DWORD					ulDiffTime			= 0; 
 	char*					pszBuff				= NULL;
 	char*					pszAliveBuff		= NULL;
@@ -118,17 +118,20 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 
 	pBasicSock->m_iConnResult = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));
 
+	ulStartTime = GetTickCount();
 	while (pBasicSock->m_dwThreadID)
 	{
 		
+		
 		// 로그인 성공시
-		if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
-		{
+		/*if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
+		{*/
 			if (GetTickCount() - ulStartTime >= 5000)
 			{
 				pBasicSock->SendPacket(PACKET_ID_REQ_ALIVE, NULL, sizeof(PACKET_REQ_KEEPALIVE));
+				AfxMessageBox(_T("5초 "));
 			}
-		}
+		//}
 		// 시간 관련 getTickCount 이런거 밀리세컨드로 현재 시간 알려줌. 변수 만들어서 현재 시간 - 시작 시간 5초마다 한번씩 send로 패킷 살아있는지 통신 확인 , 서버에서 바로 응답 처리하고 
 		
 		// 로그인 성공시
@@ -186,23 +189,22 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 					if (PACKET_ID_RSP_TEXT == pstHeader->iPacketID)
 					{
 						pBasicSock->ReceivePacket(pstHeader, pszBuff);
-						ulLastTime = GetTickCount();
 					}
 
 					// KEEP ALIVE 확인
 					if (PACKET_ID_RSP_ALIVE == pstHeader->iPacketID)
 					{
 						pBasicSock->m_iConnResult = ALIVE_SUCCESS;
-						ulLastTime = GetTickCount();
 					}
 				}
+				ulLastTime = GetTickCount();
 
 				// 라스트리시브 데이터 시간과 현재 시간의 차를 이용
 				// 시간을 넘기면 해제
 				ulDiffTime = GetTickCount() - ulLastTime;
 				if (ulDiffTime >= 10000)
 				{
-					pBasicSock->Close();
+					break;
 				}
 				
 			}
