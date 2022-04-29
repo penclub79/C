@@ -22,7 +22,7 @@ typedef enum{
 
 // Success Code
 typedef enum{
-	LOGIN_SUCCESS	= 0,
+	LOGIN_SUCCESS	= 1,
 	TEXT_SUCCESS	= 10,
 	ALIVE_SUCCESS,
 	DISCONNECTED	= 100,

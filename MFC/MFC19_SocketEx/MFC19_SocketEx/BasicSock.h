@@ -38,6 +38,7 @@ private:
 	HANDLE		m_hThread;
 	int			m_iPort;
 	int			m_iConnResult;
+	int			m_iAliveStatus;
 
 	
 

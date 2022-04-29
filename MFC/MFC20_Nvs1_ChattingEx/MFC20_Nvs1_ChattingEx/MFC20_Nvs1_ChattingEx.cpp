@@ -261,6 +261,8 @@ void CMFC20_Nvs1_ChattingExApp::ReceiveData(CAcceptSock* pAcceptSock)
 				stRSPKeepAlive.stHeader.iPacketSize		= sizeof(PACKET_RSP_KEEPALIVE);
 				
 				pAcceptSock->Send(&stRSPKeepAlive, sizeof(PACKET_RSP_KEEPALIVE));
+
+				TRACE(_T("Send PACKET_RSP_KEEPALIVE \n"));
 				break;
 			}
 			

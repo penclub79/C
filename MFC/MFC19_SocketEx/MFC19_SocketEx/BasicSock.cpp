@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "BasicSock.h"
-
+#include "WinInet.h"
 
 
 CBasicSock::CBasicSock(HWND hParent)
@@ -9,6 +9,7 @@ CBasicSock::CBasicSock(HWND hParent)
 	m_hThread = 0;
 	m_iPort = 0;
 	m_iConnResult = 0;
+	m_iAliveStatus = 0;
 	m_hParentHandle = hParent;
 	m_uiSocket = 0;
 	m_wsaEvent = NULL;
@@ -71,13 +72,17 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	PACKET_REQ_KEEPALIVE	pstReqKeepAlive		= { 0 };
 
 	WSANETWORKEVENTS		stNetWorkEvents		= { 0 };
-	DWORD					ulStartTime			= 0;
-	DWORD					ulLastTime			= 0;
-	DWORD					ulDiffTime			= 0; 
+	DWORD					ulStartTime			= GetTickCount();
+	DWORD					ulLastTime			= GetTickCount();
 	char*					pszBuff				= NULL;
 	char*					pszAliveBuff		= NULL;
 	int						iPort				= pBasicSock->m_iPort;
 	
+	DWORD dwFlag;
+	TCHAR szName[256];
+	BOOL					bInternet			= FALSE;
+
+
 	pszBuff = new char[1024];
 	memset(pszBuff, 0, 1024);
 
@@ -118,26 +123,29 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 
 	pBasicSock->m_iConnResult = connect(pBasicSock->m_uiSocket, (SOCKADDR*)&stClientInfo, sizeof(stClientInfo));
 
-	ulStartTime = GetTickCount();
 	while (pBasicSock->m_dwThreadID)
-	{
-		
-		
+	{	
 		// 로그인 성공시
-		/*if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
-		{*/
+		if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
+		{
 			if (GetTickCount() - ulStartTime >= 5000)
 			{
 				pBasicSock->SendPacket(PACKET_ID_REQ_ALIVE, NULL, sizeof(PACKET_REQ_KEEPALIVE));
-				AfxMessageBox(_T("5초 "));
+				ulStartTime = GetTickCount();
 			}
-		//}
+
+			/*if (GetTickCount() - ulLastTime >= 3000)
+			{
+				pBasicSock->m_iConnResult = SERVER_CLOSE;
+				break;
+			}*/
+		}
 		// 시간 관련 getTickCount 이런거 밀리세컨드로 현재 시간 알려줌. 변수 만들어서 현재 시간 - 시작 시간 5초마다 한번씩 send로 패킷 살아있는지 통신 확인 , 서버에서 바로 응답 처리하고 
 		
 		// 로그인 성공시
 		// 라스트 리시브 데이터 타임 비교 - 예를들어 마지막으로 받은 데이터 시간과 10초 동안 아무일이 없으면 끊으면 된다.
 		
-
+		
 
 		
 		/*
@@ -174,13 +182,14 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 			else
 			{
 				//// 데이터를 받아서 읽었을 때
-				pBasicSock->m_iConnResult = recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
+				recv(pBasicSock->m_uiSocket, pszBuff, 1024, 0);
 				pstHeader = (PACKET_HEADER*)pszBuff;
 				
 				if (PACKET_ID_RSP_LOGIN == pstHeader->iPacketID)
 				{	
 					pBasicSock->ReceivePacket(pstHeader, pszBuff);
 					pBasicSock->m_iConnResult = LOGIN_SUCCESS;
+					ulLastTime = GetTickCount();
 				}
 
 				if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
@@ -189,24 +198,17 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 					if (PACKET_ID_RSP_TEXT == pstHeader->iPacketID)
 					{
 						pBasicSock->ReceivePacket(pstHeader, pszBuff);
+						ulLastTime = GetTickCount();
 					}
 
 					// KEEP ALIVE 확인
 					if (PACKET_ID_RSP_ALIVE == pstHeader->iPacketID)
 					{
-						pBasicSock->m_iConnResult = ALIVE_SUCCESS;
+						pBasicSock->m_iAliveStatus = ALIVE_SUCCESS;
+						ulLastTime = GetTickCount();
 					}
 				}
-				ulLastTime = GetTickCount();
-
-				// 라스트리시브 데이터 시간과 현재 시간의 차를 이용
-				// 시간을 넘기면 해제
-				ulDiffTime = GetTickCount() - ulLastTime;
-				if (ulDiffTime >= 10000)
-				{
-					break;
-				}
-				
+								
 			}
 		}
 
@@ -266,8 +268,11 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		pszIPAddress = NULL;
 	}
 
-	::PostMessage(pBasicSock->GetParent(), WM_MESSAGE_SOCKET, pBasicSock->m_iConnResult, NULL);
-
+	if (LOGIN_SUCCESS != pBasicSock->m_iConnResult)
+	{
+		::PostMessage(pBasicSock->GetParent(), WM_MESSAGE_SOCKET, pBasicSock->m_iConnResult, NULL);
+	}
+	
 	// 밑에 코드는 ExitThread(0xffffffff)와 같다
 	return 0xffffffff;
 }
@@ -305,7 +310,7 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 		// TCHAR <-> TCHAR
 		wsprintf(stReqLogin.wszUserID, pszUserID);
 
-		m_iConnResult = send(this->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
+		send(this->m_uiSocket, (char*)&stReqLogin, sizeof(PACKET_REQ_LOGIN), 0);
 		break;
 
 	case PACKET_ID_REQ_TEXT:
@@ -316,7 +321,7 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 
 		// TCHAR <-> TCHAR
 		wsprintf(stReqText.wszPacketText, _pData);
-		m_iConnResult = send(this->m_uiSocket, (char*)&stReqText, sizeof(PACKET_REQ_TEXT), 0);
+		send(this->m_uiSocket, (char*)&stReqText, sizeof(PACKET_REQ_TEXT), 0);
 		break;
 
 	case PACKET_ID_REQ_ALIVE:
@@ -325,7 +330,7 @@ void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 		stReqKeepAlive.stHeader.iPacketID = PACKET_ID_REQ_ALIVE;
 		stReqKeepAlive.stHeader.iPacketSize = sizeof(PACKET_REQ_KEEPALIVE);
 		
-		m_iConnResult = send(this->m_uiSocket, (char*)&stReqKeepAlive, sizeof(PACKET_REQ_KEEPALIVE), 0);
+		send(this->m_uiSocket, (char*)&stReqKeepAlive, sizeof(PACKET_REQ_KEEPALIVE), 0);
 	default:
 		break;
 	}
@@ -354,11 +359,6 @@ void CBasicSock::ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket)
 	default:
 		break;
 	}
-}
-
-void CBasicSock::SendAliveSignal()
-{
-
 }
 
 void CBasicSock::Close()

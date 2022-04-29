@@ -119,7 +119,7 @@ BOOL CMFC20_Nvs1_ChattingExDlg::OnInitDialog()
 
 	// 컨트롤 초기화
 	m_IPAddress.SetWindowTextW(m_strMyIP);	// ipaddress 상자에 ip 값을 넣어준다.
-	m_IPAddress.EnableWindow(FALSE);  // ipaddress 상자를 비활성화 시킨다.
+	//m_IPAddress.EnableWindow(FALSE);  // ipaddress 상자를 비활성화 시킨다.
 	SetDlgItemText(IDC_BUTTON_CONNECT, _T("Open"));
 
 	// Text Static ServerIP초기 좌표가져오기

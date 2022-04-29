@@ -286,6 +286,7 @@ void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(TRUE);
 		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_EDIT_USERID)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_PORT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_IPADDRESS_SERVER)->EnableWindow(FALSE);
 	}
@@ -294,6 +295,7 @@ void CMFC19_SocketExDlg::ConnectStatus(int _iResult)
 		GetDlgItem(IDC_BUTTON_SEND)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_DISCONNECT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_CONNECT)->EnableWindow(TRUE);
+		GetDlgItem(IDC_EDIT_USERID)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT_PORT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_IPADDRESS_SERVER)->EnableWindow(TRUE);
 
@@ -481,6 +483,8 @@ void CMFC19_SocketExDlg::OnClickedButtonDisconnect()
 		delete m_pClient;
 		m_pClient = NULL;
 	}
+
+	PostMessage(WM_MESSAGE_SOCKET, DISCONNECTED, NULL);
 }
 
 // 데이터를 받을때 WindowProc에서 처리한다.
