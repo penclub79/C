@@ -134,11 +134,11 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 				ulStartTime = GetTickCount();
 			}
 
-			/*if (GetTickCount() - ulLastTime >= 3000)
+			if (GetTickCount() - ulLastTime >= 10000)
 			{
 				pBasicSock->m_iConnResult = SERVER_CLOSE;
 				break;
-			}*/
+			}
 		}
 		// 시간 관련 getTickCount 이런거 밀리세컨드로 현재 시간 알려줌. 변수 만들어서 현재 시간 - 시작 시간 5초마다 한번씩 send로 패킷 살아있는지 통신 확인 , 서버에서 바로 응답 처리하고 
 		
