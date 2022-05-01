@@ -287,13 +287,13 @@ void CBasicSock::Connect(TCHAR* _pszIP, TCHAR* _pszUserID, int _iPort)
 	MainThread();
 
 	// settimer 함수 호출 
-	SetTimer(GetParent(), m_dwThreadID, 3000, TimerProc);
+	SetTimer(GetParent(), m_dwThreadID, 3000, NULL);
 }
 
-void CALLBACK CBasicSock::TimerProc(HWND _hWnd, UINT _iMessage, UINT_PTR _IDEvent, DWORD _dwTime)
-{
-
-}
+//void CALLBACK CBasicSock::TimerProc(HWND _hWnd, UINT _iMessage, UINT_PTR _IDEvent, DWORD _dwTime)
+//{
+//
+//}
 
 void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 {
