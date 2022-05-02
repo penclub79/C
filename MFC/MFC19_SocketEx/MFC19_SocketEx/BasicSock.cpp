@@ -5,14 +5,16 @@
 
 CBasicSock::CBasicSock(HWND hParent)
 {
-	m_dwThreadID = 0;
-	m_hThread = 0;
-	m_iPort = 0;
-	m_iConnResult = 0;
-	m_iAliveStatus = 0;
+	m_dwThreadID	= 0;
+	m_hThread		= 0;
+	m_iPort			= 0;
+	m_iConnResult	= 0;
+	m_iAliveStatus	= 0;
 	m_hParentHandle = hParent;
-	m_uiSocket = 0;
-	m_wsaEvent = NULL;
+	m_uiSocket		= 0;
+	m_wsaEvent		= NULL;
+	m_ulStartTime	= 0;
+	m_ulLastTime	= 0;
 }
 
 
@@ -72,15 +74,15 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	PACKET_REQ_KEEPALIVE	pstReqKeepAlive		= { 0 };
 
 	WSANETWORKEVENTS		stNetWorkEvents		= { 0 };
-	DWORD					ulStartTime			= GetTickCount();
-	DWORD					ulLastTime			= GetTickCount();
+	pBasicSock->m_ulStartTime = GetTickCount();
+	pBasicSock->m_ulLastTime = GetTickCount();
 	char*					pszBuff				= NULL;
 	char*					pszAliveBuff		= NULL;
 	int						iPort				= pBasicSock->m_iPort;
 	
-	DWORD dwFlag;
-	TCHAR szName[256];
-	BOOL					bInternet			= FALSE;
+	//DWORD dwFlag;
+	//TCHAR szName[256];
+	//BOOL					bInternet			= FALSE;
 
 
 	pszBuff = new char[1024];
@@ -189,7 +191,7 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 				{	
 					pBasicSock->ReceivePacket(pstHeader, pszBuff);
 					pBasicSock->m_iConnResult = LOGIN_SUCCESS;
-					ulLastTime = GetTickCount();
+					pBasicSock->m_ulLastTime = GetTickCount();
 				}
 
 				if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
@@ -198,14 +200,14 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 					if (PACKET_ID_RSP_TEXT == pstHeader->iPacketID)
 					{
 						pBasicSock->ReceivePacket(pstHeader, pszBuff);
-						ulLastTime = GetTickCount();
+						pBasicSock->m_ulLastTime = GetTickCount();
 					}
 
 					// KEEP ALIVE 확인
 					if (PACKET_ID_RSP_ALIVE == pstHeader->iPacketID)
 					{
 						pBasicSock->m_iAliveStatus = ALIVE_SUCCESS;
-						ulLastTime = GetTickCount();
+						pBasicSock->m_ulLastTime = GetTickCount();
 					}
 				}
 								
@@ -287,13 +289,22 @@ void CBasicSock::Connect(TCHAR* _pszIP, TCHAR* _pszUserID, int _iPort)
 	MainThread();
 
 	// settimer 함수 호출 
-	SetTimer(GetParent(), m_dwThreadID, 3000, NULL);
+	SetTimer(GetParent(), m_dwThreadID, 3000, TimerProc);
 }
 
-//void CALLBACK CBasicSock::TimerProc(HWND _hWnd, UINT _iMessage, UINT_PTR _IDEvent, DWORD _dwTime)
-//{
-//
-//}
+void CALLBACK CBasicSock::TimerProc(HWND _hWnd, UINT _uiMessage, UINT _uiIDEvent, DWORD _ulTime)
+{
+	TRACE(_T("1 \n"));
+	
+	if (LOGIN_SUCCESS == m_iConnResult)
+		{
+			if (GetTickCount() - ulStartTime >= 5000)
+			{
+				SendPacket(PACKET_ID_REQ_ALIVE, NULL, sizeof(PACKET_REQ_KEEPALIVE));
+				ulStartTime = GetTickCount();
+			}
+		}
+}
 
 void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 {

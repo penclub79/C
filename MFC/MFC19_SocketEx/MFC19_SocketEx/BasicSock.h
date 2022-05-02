@@ -20,6 +20,7 @@ public:
 
 private:
 	static DWORD WINAPI ThreadProc(LPVOID _lpParam);
+	static void CALLBACK TimerProc(HWND _hWnd, UINT _uiMessage, UINT _uiIDEvent, DWORD _ulTime);
 
 	void ReceivePacket(PACKET_HEADER* _pstHeader, char* _pszPacket);
 	void ServerExit();
@@ -36,6 +37,8 @@ private:
 	WSAEVENT	m_wsaEvent;
 	DWORD		m_dwThreadID;
 	HANDLE		m_hThread;
+	DWORD		m_ulStartTime;
+	DWORD		m_ulLastTime;
 	int			m_iPort;
 	int			m_iConnResult;
 	int			m_iAliveStatus;
