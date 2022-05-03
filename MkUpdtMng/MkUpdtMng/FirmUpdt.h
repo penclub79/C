@@ -32,15 +32,15 @@
 
 #define	E_FirmUpEntityNone			0
 #define	E_FirmUpEntityLoader		1
-#define	E_FirmUpEntityFdt				2
+#define	E_FirmUpEntityFdt			2
 #define	E_FirmUpEntityUboot			3
 #define	E_FirmUpEntityKernel		4
 #define	E_FirmUpEntityLogo			5
 #define	E_FirmUpEntityRootfs		6
 
-#define E_FirmUpErrCode					-1
+#define E_FirmUpErrCode				-1
 #define E_FirmUpErrExistType		-2
-#define E_FirmUpErrExistEntity	-3
+#define E_FirmUpErrExistEntity		-3
 #define E_FirmUpErrExistData		-4
 
 //====================================================================
@@ -63,7 +63,7 @@ typedef struct St_FirmUpInfo
 
 typedef struct St_FirmUpHd
 {
-	__u32		Fcc;
+	__u32		Fcc; // 파일 맞는지 아닌지.(1)
 	__u32		UpgdVer;
 	__u32		Size;
 	St_FirmUpInfo FirmInfo[E_FirmUpInfoCnt];
@@ -71,7 +71,7 @@ typedef struct St_FirmUpHd
 
 typedef struct St_FirmUpEd
 {
-	__u32		Fcc;
+	__u32		Fcc; // 파일 맞는지 아닌지.(2)
 } *Ptr_FirmUpEd;
 
 //====================================================================

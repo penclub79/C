@@ -88,7 +88,7 @@ void DlgAddEntity::SetModelType(__u32 A_ModelType)
 void DlgAddEntity::OnBnClickedBtnSelfile()
 {
 	// local -------------------
-		CFileDialog*		Tv_FileDlg;
+		CFileDialog*			Tv_FileDlg;
 		CString					Tv_StrPath;
 		CString					Tv_StrFile;
 	// code --------------------

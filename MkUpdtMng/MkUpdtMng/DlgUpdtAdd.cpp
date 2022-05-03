@@ -80,7 +80,6 @@ void DlgUpdtAdd::OnBnClickedOk()
 		break;
 	}
 	
-
 	CDialogEx::OnOK();
 }
 
