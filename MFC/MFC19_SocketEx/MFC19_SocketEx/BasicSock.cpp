@@ -289,21 +289,35 @@ void CBasicSock::Connect(TCHAR* _pszIP, TCHAR* _pszUserID, int _iPort)
 	MainThread();
 
 	// settimer 함수 호출 
-	SetTimer(GetParent(), m_dwThreadID, 3000, TimerProc);
+	SetTimer(GetParent(), m_dwThreadID, 5000, TimerProc);
+	//SetTimer(GetParent(), m_dwThreadID, 10000, (TIMERPROC)&TimerProc);
 }
 
 void CALLBACK CBasicSock::TimerProc(HWND _hWnd, UINT _uiMessage, UINT _uiIDEvent, DWORD _ulTime)
 {
-	TRACE(_T("1 \n"));
 	
-	if (LOGIN_SUCCESS == m_iConnResult)
+	TRACE(_T("1 \n"));
+	//CBasicSock* pBasicSock = (CBasicSock*)_hWnd;
+	CWnd* pWnd = AfxGetMainWnd();
+	CBasicSock* pBasicSock = (CBasicSock*)pWnd;
+	
+	
+	if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
 		{
-			if (GetTickCount() - ulStartTime >= 5000)
+			if (GetTickCount() - pBasicSock->m_ulStartTime >= 5000)
 			{
-				SendPacket(PACKET_ID_REQ_ALIVE, NULL, sizeof(PACKET_REQ_KEEPALIVE));
-				ulStartTime = GetTickCount();
+				pBasicSock->SendPacket(PACKET_ID_REQ_ALIVE, NULL, sizeof(PACKET_REQ_KEEPALIVE));
+				pBasicSock->m_ulStartTime = GetTickCount();
+			}
+
+			if (GetTickCount() - pBasicSock->m_ulLastTime >= 10000)
+			{
+				pBasicSock->m_iConnResult = SERVER_CLOSE;
+				pBasicSock->Close();
 			}
 		}
+
+	//KillTimer(_hWnd, _uiIDEvent);
 }
 
 void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)

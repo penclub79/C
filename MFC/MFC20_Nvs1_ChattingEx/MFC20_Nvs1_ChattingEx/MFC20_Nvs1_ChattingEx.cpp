@@ -119,7 +119,6 @@ void CMFC20_Nvs1_ChattingExApp::Accept()
 {
 
 #if (0)
-
 	if (m_pAccept == NULL)
 	{
 		m_pAccept = new CClientSock;

@@ -17,6 +17,8 @@ public:
 	void SendPacket(int _iPacketID, TCHAR* _pData, int _iLength);
 	void Close();
 
+	CBasicSock* m_pBasicSock;
+	
 
 private:
 	static DWORD WINAPI ThreadProc(LPVOID _lpParam);
