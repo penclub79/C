@@ -17,9 +17,8 @@ public:
 	void SendPacket(int _iPacketID, TCHAR* _pData, int _iLength);
 	void Close();
 
+	int			m_iConnResult;
 	CBasicSock* m_pBasicSock;
-	
-
 private:
 	static DWORD WINAPI ThreadProc(LPVOID _lpParam);
 	static void CALLBACK TimerProc(HWND _hWnd, UINT _uiMessage, UINT _uiIDEvent, DWORD _ulTime);
@@ -42,7 +41,7 @@ private:
 	DWORD		m_ulStartTime;
 	DWORD		m_ulLastTime;
 	int			m_iPort;
-	int			m_iConnResult;
+	
 	int			m_iAliveStatus;
 
 	

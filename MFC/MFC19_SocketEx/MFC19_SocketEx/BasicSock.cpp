@@ -128,20 +128,20 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	while (pBasicSock->m_dwThreadID)
 	{	
 		//// 로그인 성공시
-		//if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
-		//{
-		//	if (GetTickCount() - ulStartTime >= 5000)
-		//	{
-		//		pBasicSock->SendPacket(PACKET_ID_REQ_ALIVE, NULL, sizeof(PACKET_REQ_KEEPALIVE));
-		//		ulStartTime = GetTickCount();
-		//	}
+		if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
+		{
+			if (GetTickCount() - pBasicSock->m_ulStartTime >= 5000)
+			{
+				pBasicSock->SendPacket(PACKET_ID_REQ_ALIVE, NULL, sizeof(PACKET_REQ_KEEPALIVE));
+				pBasicSock->m_ulStartTime = GetTickCount();
+			}
 
-		//	if (GetTickCount() - ulLastTime >= 10000)
-		//	{
-		//		pBasicSock->m_iConnResult = SERVER_CLOSE;
-		//		break;
-		//	}
-		//}
+			if (GetTickCount() - pBasicSock->m_ulLastTime >= 10000)
+			{
+				pBasicSock->m_iConnResult = SERVER_CLOSE;
+				break;
+			}
+		}
 		// 시간 관련 getTickCount 이런거 밀리세컨드로 현재 시간 알려줌. 변수 만들어서 현재 시간 - 시작 시간 5초마다 한번씩 send로 패킷 살아있는지 통신 확인 , 서버에서 바로 응답 처리하고 
 		
 		// 로그인 성공시
@@ -281,6 +281,8 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 
 void CBasicSock::Connect(TCHAR* _pszIP, TCHAR* _pszUserID, int _iPort)
 {	
+	
+
 	m_strIP.Format(_T("%s"), _pszIP);
 	m_strUserID.Format(_T("%s"), _pszUserID);
 	m_iPort = 7777;
@@ -289,36 +291,27 @@ void CBasicSock::Connect(TCHAR* _pszIP, TCHAR* _pszUserID, int _iPort)
 	MainThread();
 
 	// settimer 함수 호출 
-	SetTimer(GetParent(), m_dwThreadID, 5000, TimerProc);
+	//SetTimer(GetParent(), m_dwThreadID, 5000, TimerProc);
 	//SetTimer(GetParent(), m_dwThreadID, 10000, (TIMERPROC)&TimerProc);
+
+	//KillTimer(GetParent(), m_dwThreadID);
 }
 
-void CALLBACK CBasicSock::TimerProc(HWND _hWnd, UINT _uiMessage, UINT _uiIDEvent, DWORD _ulTime)
-{
-	
-	TRACE(_T("1 \n"));
-	//CBasicSock* pBasicSock = (CBasicSock*)_hWnd;
-	CWnd* pWnd = AfxGetMainWnd();
-	CBasicSock* pBasicSock = (CBasicSock*)pWnd;
-	
-	
-	if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
-		{
-			if (GetTickCount() - pBasicSock->m_ulStartTime >= 5000)
-			{
-				pBasicSock->SendPacket(PACKET_ID_REQ_ALIVE, NULL, sizeof(PACKET_REQ_KEEPALIVE));
-				pBasicSock->m_ulStartTime = GetTickCount();
-			}
-
-			if (GetTickCount() - pBasicSock->m_ulLastTime >= 10000)
-			{
-				pBasicSock->m_iConnResult = SERVER_CLOSE;
-				pBasicSock->Close();
-			}
-		}
-
-	//KillTimer(_hWnd, _uiIDEvent);
-}
+// 추후에 할 예정이라 남겨둠
+//void CALLBACK CBasicSock::TimerProc(HWND _hWnd, UINT _uiMessage, UINT _uiIDEvent, DWORD _ulTime)
+//{
+//
+//	TRACE(_T("1 \n"));
+//
+//	/*if (LOGIN_SUCCESS == pBasicSock->m_iConnResult)
+//		{
+//			if (GetTickCount() - pBasicSock->m_ulStartTime >= 5000)
+//			{
+//				pBasicSock->SendPacket(PACKET_ID_REQ_ALIVE, NULL, sizeof(PACKET_REQ_KEEPALIVE));
+//				pBasicSock->m_ulStartTime = GetTickCount();
+//			}
+//		}*/
+//}
 
 void CBasicSock::SendPacket(int _iPacketID, TCHAR* _pData, int _iLength)
 {
