@@ -11,6 +11,37 @@
 
 #define	E_MkUpdt_IniFcc			0x55696E69
 
+// ---------------------------------------------------- struct 
+typedef struct _stUpdateTreeNode
+{
+	unsigned int	uiType;
+	HTREEITEM		stNode;
+	CHAR			szaNode[16];
+} *pUpdateTreeNode;
+
+typedef struct _stUpdateInfo
+{
+	unsigned int			uiFcc;
+	unsigned int			uiUpgdVersion;
+	_stUpdateInfoModel		staModelInfo[16];
+	WCHAR					szaUpgdFileName[1024];
+} *pUpdateInfo;
+
+typedef struct _stUpdateInfoModel
+{
+	unsigned int			uiType;
+	_stUpdateInfoEntity		staEntity[16];
+} *pUpdateInfoModel;
+
+typedef struct _stUpdateInfoEntity
+{
+	unsigned int	uiType;
+	CHAR			szaFile[256];
+} *pUpdateInfoEntity;
+// ---------------------------------------------------- struct 
+
+
+
 // CUpdateManagerDlg 대화 상자
 class CUpdateManagerDlg : public CDialogEx
 {
@@ -35,4 +66,22 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+
+public:
+	CTreeCtrl	m_TreeCtrl;
+	CEdit		m_EditPath;
+	CEdit		m_EditVer1;
+	CEdit		m_EditVer2;
+	CEdit		m_EditVer3;
+	CEdit		m_EditVer4;
+	CButton		m_BtnPath;
+	CButton		m_BtnMake;
+
+private:
+	CFirmUpdate*		m_pObjFwUp;
+	_stUpdateTreeNode	m_staTreeNode[E_FirmUpInfoTypeMaxIdx];  // 24
+	WCHAR				m_szaMkFileName[1024];
+	WCHAR				m_szaNowPath[2048];
+	_stUpdateInfo		m_stUpdateInfo;
+
 };

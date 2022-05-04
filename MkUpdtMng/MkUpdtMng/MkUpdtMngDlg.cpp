@@ -3,9 +3,9 @@
 //
 
 #include "stdafx.h"
+#include "afxdialogex.h"
 #include "MkUpdtMng.h"
 #include "MkUpdtMngDlg.h"
-#include "afxdialogex.h"
 #include "FirmUpdt.h"
 #include "DlgUpdtAdd.h"
 #include <GrDumyTool.h>

@@ -48,31 +48,31 @@ firmware upgrade
 
 //====================================================================
 //global type
-typedef struct FirmUpEntity
+typedef struct _stFirmUpEntity
 {
 	unsigned int		Type;
 	unsigned int		Offset;
 	unsigned int		Size;
-} *pstFirmUpEntity;
+} *pFirmUpEntity;
 
-typedef struct FirmUpInfo
+typedef struct _stFirmUpInfo
 {
 	unsigned int		ModelType;
-	FirmUpEntity		Entity[E_FirmUpEntityCnt];
-} *pstFirmUpInfo;
+	_stFirmUpEntity		Entity[E_FirmUpEntityCnt];
+} *pFirmUpInfo;
 
-typedef struct FirmUpHeader
+typedef struct _stFirmUpHeader
 {
 	unsigned int		Fcc; // 파일 맞는지 아닌지.(1)
 	unsigned int		UpgdVer;
 	unsigned int		Size;
-	FirmUpInfo			FirmInfo[E_FirmUpInfoCnt];
-} *pstFirmUpHeader;
+	_stFirmUpInfo		FirmInfo[E_FirmUpInfoCnt];
+} *pFirmUpHeader;
 
-typedef struct FirmUpEnd
+typedef struct _stFirmUpEnd
 {
 	unsigned int		Fcc; // 파일 맞는지 아닌지.(2)
-} *pstFirmUpEnd;
+} *pFirmUpEnd;
 
 //====================================================================
 //class
@@ -101,11 +101,11 @@ public:
 
 protected:
 	int		LcChkModelType(unsigned int _uiModelType);
-	int		LcChkEntityType(unsigned int _uiVersionType, pstFirmUpEntity _stEntity);
+	int		LcChkEntityType(unsigned int _uiVersionType, pFirmUpEntity _stEntity);
 
 private:
-	FirmUpHeader		m_stFirmHeader;
-	FirmUpEnd			m_stFirmEd;
+	_stFirmUpHeader		m_stFirmHeader;
+	_stFirmUpEnd		m_stFirmEd;
 	void*				m_pData[E_FirmUpInfoCnt][E_FirmUpEntityCnt];
 	void*				m_pMkUpdt;
 };
