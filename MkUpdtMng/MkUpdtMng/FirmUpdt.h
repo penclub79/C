@@ -78,28 +78,30 @@ typedef struct St_FirmUpEd
 //class
 class Cls_FirmUpdt
 {
-	private:
-		St_FirmUpHd		m_FirmHd;
-		St_FirmUpEd		m_FirmEd;
-		void*					m_PtrData[E_FirmUpInfoCnt][E_FirmUpEntityCnt];
-		void*					m_PtrMkUpdt;
-	protected:
-		__s32		LcChkModelType(__u32 A_ModelType);
-		__s32		LcChkEntityType(__u32 A_EntityType, Ptr_FirmUpEntity A_PtrEntity);
-	public:
-		Cls_FirmUpdt();
-		virtual	~Cls_FirmUpdt();
+public:
+	Cls_FirmUpdt();
+	virtual	~Cls_FirmUpdt();
 
-		void	Init();
-		__s32	AddType(__u32 A_ModelType);
-		__s32	AddEntity(__u32 A_ModelType, __u32 A_EntityType, void* A_PtrSrc, __u32 A_Size);
-		void	DelType(__u32 A_ModelType);
-		void	DelEntity(__u32 A_ModelType, __u32 A_EntityType);
+	void	Init();
+	__s32	AddType(__u32 A_ModelType);
+	__s32	AddEntity(__u32 A_ModelType, __u32 A_EntityType, void* A_PtrSrc, __u32 A_Size);
+	void	DelType(__u32 A_ModelType);
+	void	DelEntity(__u32 A_ModelType, __u32 A_EntityType);
 
-		void* GetMkUpdt(__u32* A_PtrSize);
-		void	SetUpdtVer(__u32 A_Ver);
+	void* GetMkUpdt(__u32* A_PtrSize);
+	void	SetUpdtVer(__u32 A_Ver);
 
-		__s32 GetModelTblIdx(__u32 A_ModelType);
+	__s32 GetModelTblIdx(__u32 A_ModelType);
+
+protected:
+	__s32		LcChkModelType(__u32 A_ModelType);
+	__s32		LcChkEntityType(__u32 A_EntityType, Ptr_FirmUpEntity A_PtrEntity);
+
+private:
+	St_FirmUpHd		m_FirmHd;
+	St_FirmUpEd		m_FirmEd;
+	void*			m_PtrData[E_FirmUpInfoCnt][E_FirmUpEntityCnt];
+	void*			m_PtrMkUpdt;
 };
 
 //====================================================================

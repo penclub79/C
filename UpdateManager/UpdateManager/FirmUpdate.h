@@ -89,7 +89,6 @@ public:
 	int		AddModelType(unsigned int _uiModelType);
 	// 모델 삭제
 	void	DelModelType(unsigned int _uiModelType);
-
 	// 버전 파일 선택
 	int		AddVerFile(unsigned int _uiModelType, unsigned int _uiVersionType, void* _pSrc, unsigned int _uiSize);
 	// 버전 파일 삭제

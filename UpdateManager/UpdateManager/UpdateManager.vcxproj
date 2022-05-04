@@ -49,15 +49,19 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\C\UpdateManager\GrInc;D:\C\UpdateManager\GrLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_WIN32_WINNT=0x0600
+;_CRT_SECURE_NO_DEPRECATE
+;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\C\UpdateManager\UpdateManager\GrInc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -97,6 +101,50 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FirmUpdate.h" />
+    <ClInclude Include="GrInc\GrAdpcm.h" />
+    <ClInclude Include="GrInc\GrAES128.h" />
+    <ClInclude Include="GrInc\GrArchiv.h" />
+    <ClInclude Include="GrInc\GrAviTool.h" />
+    <ClInclude Include="GrInc\GrBmpTool.h" />
+    <ClInclude Include="GrInc\GrBufTool.h" />
+    <ClInclude Include="GrInc\GrCrc32.h" />
+    <ClInclude Include="GrInc\GrDebug.h" />
+    <ClInclude Include="GrInc\GrDibCvt.h" />
+    <ClInclude Include="GrInc\GrDrawTool.h" />
+    <ClInclude Include="GrInc\GrDumyTool.h" />
+    <ClInclude Include="GrInc\GrError.h" />
+    <ClInclude Include="GrInc\GrFileCtrl.h" />
+    <ClInclude Include="GrInc\GrFileTool.h" />
+    <ClInclude Include="GrInc\GrGdibBase.h" />
+    <ClInclude Include="GrInc\GrGdibBb2.h" />
+    <ClInclude Include="GrInc\GrGdibByt.h" />
+    <ClInclude Include="GrInc\GrGdibObj.h" />
+    <ClInclude Include="GrInc\GrGdibPk4.h" />
+    <ClInclude Include="GrInc\GrGdibPk4a.h" />
+    <ClInclude Include="GrInc\GrGdibPlt8.h" />
+    <ClInclude Include="GrInc\GrGdibRgb32.h" />
+    <ClInclude Include="GrInc\GrGdibTool.h" />
+    <ClInclude Include="GrInc\GrGdibUyvy.h" />
+    <ClInclude Include="GrInc\GrI2c.h" />
+    <ClInclude Include="GrInc\GrImgBase.h" />
+    <ClInclude Include="GrInc\GrImgProc.h" />
+    <ClInclude Include="GrInc\GrLayerData.h" />
+    <ClInclude Include="GrInc\GrLayerFile.h" />
+    <ClInclude Include="GrInc\GrLnxApp.h" />
+    <ClInclude Include="GrInc\GrMath.h" />
+    <ClInclude Include="GrInc\GrMtdTool.h" />
+    <ClInclude Include="GrInc\GrProcess.h" />
+    <ClInclude Include="GrInc\GrSockHd.h" />
+    <ClInclude Include="GrInc\GrSockV2.h" />
+    <ClInclude Include="GrInc\GrStrTool.h" />
+    <ClInclude Include="GrInc\GrTaskBase.h" />
+    <ClInclude Include="GrInc\GrTaskCli.h" />
+    <ClInclude Include="GrInc\GrTaskSvr.h" />
+    <ClInclude Include="GrInc\GrTimeTool.h" />
+    <ClInclude Include="GrInc\GrTypeBase.h" />
+    <ClInclude Include="GrInc\GrUart.h" />
+    <ClInclude Include="GrInc\GrVerFile.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -104,6 +152,45 @@
     <ClInclude Include="UpdateManagerDlg.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FirmUpdate.cpp" />
+    <ClCompile Include="GrLib\GrAdpcm.cpp" />
+    <ClCompile Include="GrLib\GrAES128.cpp" />
+    <ClCompile Include="GrLib\GrArchiv.cpp" />
+    <ClCompile Include="GrLib\GrAviTool.cpp" />
+    <ClCompile Include="GrLib\GrBmpTool.cpp" />
+    <ClCompile Include="GrLib\GrBufTool.cpp" />
+    <ClCompile Include="GrLib\GrCrc32.cpp" />
+    <ClCompile Include="GrLib\GrDebug.cpp" />
+    <ClCompile Include="GrLib\GrDibCvt.cpp" />
+    <ClCompile Include="GrLib\GrDrawTool.cpp" />
+    <ClCompile Include="GrLib\GrDumyTool.cpp" />
+    <ClCompile Include="GrLib\GrFileCtrl.cpp" />
+    <ClCompile Include="GrLib\GrFileTool.cpp" />
+    <ClCompile Include="GrLib\GrGdibBase.cpp" />
+    <ClCompile Include="GrLib\GrGdibBb2.cpp" />
+    <ClCompile Include="GrLib\GrGdibByt.cpp" />
+    <ClCompile Include="GrLib\GrGdibObj.cpp" />
+    <ClCompile Include="GrLib\GrGdibPk4.cpp" />
+    <ClCompile Include="GrLib\GrGdibPk4a.cpp" />
+    <ClCompile Include="GrLib\GrGdibPlt8.cpp" />
+    <ClCompile Include="GrLib\GrGdibRgb32.cpp" />
+    <ClCompile Include="GrLib\GrGdibTool.cpp" />
+    <ClCompile Include="GrLib\GrGdibUyvy.cpp" />
+    <ClCompile Include="GrLib\GrI2c.cpp" />
+    <ClCompile Include="GrLib\GrImgProc.cpp" />
+    <ClCompile Include="GrLib\GrLayerData.cpp" />
+    <ClCompile Include="GrLib\GrLayerFile.cpp" />
+    <ClCompile Include="GrLib\GrMath.cpp" />
+    <ClCompile Include="GrLib\GrMtdTool.cpp" />
+    <ClCompile Include="GrLib\GrProcess.cpp" />
+    <ClCompile Include="GrLib\GrSockV2.cpp" />
+    <ClCompile Include="GrLib\GrStrTool.cpp" />
+    <ClCompile Include="GrLib\GrTaskBase.cpp" />
+    <ClCompile Include="GrLib\GrTaskCli.cpp" />
+    <ClCompile Include="GrLib\GrTaskSvr.cpp" />
+    <ClCompile Include="GrLib\GrTimeTool.cpp" />
+    <ClCompile Include="GrLib\GrUart.cpp" />
+    <ClCompile Include="GrLib\GrVerFile.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -123,4 +210,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="UpdateManager.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

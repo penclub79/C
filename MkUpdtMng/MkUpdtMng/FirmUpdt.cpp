@@ -68,20 +68,23 @@ Cls_FirmUpdt::~Cls_FirmUpdt()
 void Cls_FirmUpdt::Init()
 {
 	// local -------------------
-		__s32		Tv_Result;
-		Ptr_FirmUpInfo Tv_PtrInfo;
-		BOOL8		Tv_IsExist;
-		__s32		Tv_WkIdx;
-		__s32		Tv_WkCnt;
+		__s32			Tv_Result;
+		Ptr_FirmUpInfo	Tv_PtrInfo;
+		BOOL8			Tv_IsExist;
+		__s32			Tv_WkIdx;
+		__s32			Tv_WkCnt;
 	// code --------------------
 		GrDumyZeroMem(&m_FirmHd, sizeof(St_FirmUpHd));
 		GrDumyZeroMem(&m_FirmEd, sizeof(St_FirmUpEd));
 
 		m_FirmHd.Fcc			= E_FirmUpHdFcc;
-		m_FirmHd.UpgdVer	= E_FirmUpVer;
+		m_FirmHd.UpgdVer		= E_FirmUpVer;
 		m_FirmEd.Fcc			= E_FirmUpEdFcc;
 		m_FirmHd.Size			= sizeof(St_FirmUpHd) + sizeof(St_FirmUpEd);
 
+
+
+		// 이미 m_PtrData는 초기화가 되었다. 생성자에서
 		for(Tv_WkCnt = 0;Tv_WkCnt < E_FirmUpInfoCnt;Tv_WkCnt++)
 		{
 			for(Tv_WkIdx = 0;Tv_WkIdx < E_FirmUpEntityCnt;Tv_WkIdx++)

@@ -16,6 +16,18 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="GrLib">
+      <UniqueIdentifier>{c2d6e8bf-f831-446a-b205-4f8ba38a242f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GrLib\Common">
+      <UniqueIdentifier>{1f874e1d-2bd5-4cf7-903f-f4408abf2f66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GrLib\Common\Header">
+      <UniqueIdentifier>{3eff8466-167d-477f-b964-db8f146cb9ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GrLib\Common\Source">
+      <UniqueIdentifier>{c22a6f4d-c309-46bf-af5a-a67c218b3762}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UpdateManager.h">
@@ -33,6 +45,138 @@
     <ClInclude Include="Resource.h">
       <Filter>APP\헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="GrInc\GrAdpcm.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrAES128.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrArchiv.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrAviTool.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrBmpTool.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrBufTool.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrCrc32.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrDebug.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrDibCvt.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrDrawTool.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrDumyTool.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrError.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrFileCtrl.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrFileTool.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrGdibBase.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrGdibBb2.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrGdibByt.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrGdibObj.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrGdibPk4.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrGdibPk4a.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrGdibPlt8.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrGdibRgb32.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrGdibTool.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrGdibUyvy.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrI2c.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrImgBase.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrImgProc.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrLayerData.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrLayerFile.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrLnxApp.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrMath.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrMtdTool.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrProcess.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrSockHd.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrSockV2.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrStrTool.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrTaskBase.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrTaskCli.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrTaskSvr.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrTimeTool.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrUart.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrVerFile.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="FirmUpdate.h">
+      <Filter>APP\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GrInc\GrTypeBase.h">
+      <Filter>GrLib\Common\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UpdateManager.cpp">
@@ -42,6 +186,123 @@
       <Filter>APP\소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
+      <Filter>APP\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrAdpcm.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrAES128.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrArchiv.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrAviTool.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrBmpTool.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrBufTool.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrCrc32.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrDebug.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrDibCvt.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrDrawTool.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrDumyTool.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrFileCtrl.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrFileTool.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrGdibBase.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrGdibBb2.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrGdibByt.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrGdibObj.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrGdibPk4.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrGdibPk4a.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrGdibPlt8.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrGdibRgb32.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrGdibTool.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrGdibUyvy.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrI2c.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrImgProc.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrLayerData.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrLayerFile.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrMath.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrMtdTool.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrProcess.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrSockV2.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrStrTool.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrTaskBase.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrTaskCli.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrTaskSvr.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrTimeTool.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrUart.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GrLib\GrVerFile.cpp">
+      <Filter>GrLib\Common\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="FirmUpdate.cpp">
       <Filter>APP\소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

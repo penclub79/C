@@ -4,6 +4,12 @@
 
 #pragma once
 
+#include <GrTypeBase.h>
+#include "FirmUpdate.h"
+#include "afxcmn.h"
+#include "afxwin.h"
+
+#define	E_MkUpdt_IniFcc			0x55696E69
 
 // CUpdateManagerDlg 대화 상자
 class CUpdateManagerDlg : public CDialogEx

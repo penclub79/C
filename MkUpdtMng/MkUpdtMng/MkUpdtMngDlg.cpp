@@ -177,7 +177,7 @@ HCURSOR CMkUpdtMngDlg::OnQueryDragIcon()
 void CMkUpdtMngDlg::OnBnClickedBtnAddmodel()
 {
 	// local -------------------
-		DlgUpdtAdd* Tv_DlgAdd;
+		DlgUpdtAdd*		Tv_DlgAdd;
 		__u32			Tv_ModelType;
 		__s32			Tv_Result;
 	// code --------------------
@@ -226,8 +226,8 @@ void CMkUpdtMngDlg::LcProcErrCode(__s32 A_ErrCode)
 void CMkUpdtMngDlg::OnBnClickedBtnAddentity()
 {
 	// local -------------------
-		DlgAddEntity* Tv_DlgEntity;
-		CString		Tv_StrItm;
+		DlgAddEntity*	Tv_DlgEntity;
+		CString			Tv_StrItm;
 		__u8			Tv_WkCnt;
 		__s32			Tv_StrLen;
 		CHAR			Tv_StrModel[16];
@@ -461,7 +461,7 @@ void CMkUpdtMngDlg::OnBnClickedBtnMake()
 				Tv_WriteSize		= Tv_FileLen;
 				while(1)
 				{
-					Tv_Result			= Tv_ObjFile->Write(Tv_PtrFile, Tv_WriteSize);
+					Tv_Result		= Tv_ObjFile->Write(Tv_PtrFile, Tv_WriteSize);
 					Tv_WroteSize	= Tv_WroteSize + Tv_Result;
 					Tv_WriteSize	= Tv_WriteSize - Tv_Result;
 
@@ -496,7 +496,7 @@ void CMkUpdtMngDlg::LcInit()
 {
 	// local -------------------
 		WCHAR				Tv_StrIniFile[2048];
-		Cls_GrFileCtrl* Tv_ObjFile;
+		Cls_GrFileCtrl*		Tv_ObjFile;
 		__u32				Tv_FileSize;
 	// code --------------------
 		::GetModuleFileName(NULL, m_NowPath, 2048);
@@ -508,15 +508,16 @@ void CMkUpdtMngDlg::LcInit()
 
 		GrDumyZeroMem(&m_UpdtInfo, sizeof(St_UpdtInfo));
 		GrStrWcopy(Tv_StrIniFile, m_NowPath);
-		GrStrWcat(Tv_StrIniFile, _T("\\MkUpdt.init"));
-		if(GrFileIsExist(Tv_StrIniFile))
+		GrStrWcat(Tv_StrIniFile, _T("\\MkUpdt.init")); // init파일 경로
+
+		if(GrFileIsExist(Tv_StrIniFile)) // init 파일 존재하는지 체크
 		{
 			//exist
 			Tv_ObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(Tv_StrIniFile, FALSE, FALSE);
 
 			if(Tv_ObjFile->IsOpened())
 			{
-				Tv_FileSize = (__u32)Tv_ObjFile->GetSize();
+				Tv_FileSize = (__u32)Tv_ObjFile->GetSize(); // init파일 사이즈 가져오기
 				if(Tv_FileSize == sizeof(St_UpdtInfo))
 				{
 					Tv_ObjFile->Read(&m_UpdtInfo, Tv_FileSize);
