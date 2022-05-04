@@ -421,19 +421,19 @@ void CMkUpdtMngDlg::OnBnClickedBtnPath()
 void CMkUpdtMngDlg::OnBnClickedBtnMake()
 {
 	// local -------------------
-		__u32		Tv_FileLen;
-		void*		Tv_PtrFile;
+		__u32			Tv_FileLen;
+		void*			Tv_PtrFile;
 		Cls_GrFileCtrl* Tv_ObjFile;
-		__u32		Tv_WroteSize;
-		__u32		Tv_WriteSize;
-		__u32		Tv_Result;
-		CString Tv_StrVer1;
-		CString Tv_StrVer2;
-		CString Tv_StrVer3;
-		CString Tv_StrVer4;
-		BOOL8		Tv_IsSuccess;
-		__u8		Tv_Ver[4];
-		__u32		Tv_Version;
+		__u32			Tv_WroteSize;
+		__u32			Tv_WriteSize;
+		__u32			Tv_Result;
+		CString			Tv_StrVer1;
+		CString			Tv_StrVer2;
+		CString			Tv_StrVer3;
+		CString			Tv_StrVer4;
+		BOOL8			Tv_IsSuccess;
+		__u8			Tv_Ver[4];
+		__u32			Tv_Version;
 	// code --------------------
 		Tv_IsSuccess	= FALSE;
 

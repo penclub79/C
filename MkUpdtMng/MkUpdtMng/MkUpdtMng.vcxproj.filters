@@ -48,6 +48,15 @@
     <ClInclude Include="Resource.h">
       <Filter>App\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FirmUpdt.h">
+      <Filter>App\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgUpdtAdd.h">
+      <Filter>App\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgAddEntity.h">
+      <Filter>App\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\GrInc\GrAdpcm.h">
       <Filter>GrLib\Common\Header</Filter>
     </ClInclude>
@@ -179,15 +188,6 @@
     </ClInclude>
     <ClInclude Include="..\..\GrInc\GrVerFile.h">
       <Filter>GrLib\Common\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="FirmUpdt.h">
-      <Filter>App\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgUpdtAdd.h">
-      <Filter>App\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgAddEntity.h">
-      <Filter>App\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
