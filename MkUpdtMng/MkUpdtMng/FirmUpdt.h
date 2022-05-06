@@ -50,28 +50,28 @@
 //global type
 typedef struct St_FirmUpEntity
 {
-	__u32		Type;
-	__u32		Offset;
-	__u32		Size;
+	__u32			Type;
+	__u32			Offset;
+	__u32			Size;
 } *Ptr_FirmUpEntity;
 
 typedef struct St_FirmUpInfo
 {
-	__u32		ModelType;
+	__u32			ModelType;
 	St_FirmUpEntity Entity[E_FirmUpEntityCnt];
 } *Ptr_FirmUpInfo;
 
 typedef struct St_FirmUpHd
 {
-	__u32		Fcc; // 파일 맞는지 아닌지.(1)
-	__u32		UpgdVer;
-	__u32		Size;
-	St_FirmUpInfo FirmInfo[E_FirmUpInfoCnt];
+	__u32			Fcc; // 파일 맞는지 아닌지.(1)
+	__u32			UpgdVer;
+	__u32			Size;
+	St_FirmUpInfo	FirmInfo[E_FirmUpInfoCnt];
 } *Ptr_FirmUpHd;
 
 typedef struct St_FirmUpEd
 {
-	__u32		Fcc; // 파일 맞는지 아닌지.(2)
+	__u32			Fcc; // 파일 맞는지 아닌지.(2)
 } *Ptr_FirmUpEd;
 
 //====================================================================
@@ -82,20 +82,20 @@ public:
 	Cls_FirmUpdt();
 	virtual	~Cls_FirmUpdt();
 
-	void	Init();
-	__s32	AddType(__u32 A_ModelType);
-	__s32	AddEntity(__u32 A_ModelType, __u32 A_EntityType, void* A_PtrSrc, __u32 A_Size);
-	void	DelType(__u32 A_ModelType);
-	void	DelEntity(__u32 A_ModelType, __u32 A_EntityType);
+	void			Init();
+	__s32			AddType(__u32 A_ModelType);
+	__s32			AddEntity(__u32 A_ModelType, __u32 A_EntityType, void* A_PtrSrc, __u32 A_Size);
+	void			DelType(__u32 A_ModelType);
+	void			DelEntity(__u32 A_ModelType, __u32 A_EntityType);
 
-	void* GetMkUpdt(__u32* A_PtrSize);
-	void	SetUpdtVer(__u32 A_Ver);
+	void*			GetMkUpdt(__u32* A_PtrSize);
+	void			SetUpdtVer(__u32 A_Ver);
 
-	__s32 GetModelTblIdx(__u32 A_ModelType);
+	__s32			GetModelTblIdx(__u32 A_ModelType);
 
 protected:
-	__s32		LcChkModelType(__u32 A_ModelType);
-	__s32		LcChkEntityType(__u32 A_EntityType, Ptr_FirmUpEntity A_PtrEntity);
+	__s32			LcChkModelType(__u32 A_ModelType);
+	__s32			LcChkEntityType(__u32 A_EntityType, Ptr_FirmUpEntity A_PtrEntity);
 
 private:
 	St_FirmUpHd		m_FirmHd;

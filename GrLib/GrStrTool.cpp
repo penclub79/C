@@ -49,11 +49,11 @@ __u32		GrStrWlen( WCHAR* A_StrSrc,	__u32 A_LenLim )
 {
 	// local -------------------
 		__u32				Tv_Result;
-		__u16*			Tv_PtrWk;
+		__u16*				Tv_PtrWk;
 		__u32				Tv_Lim;
 	// code --------------------
 		//init
-		Tv_Result		=	0;
+		Tv_Result			=	0;
 
 		if (NULL != A_StrSrc)
 		{
@@ -130,7 +130,7 @@ WCHAR*	GrStrWcat( WCHAR* A_StrDst, WCHAR* A_StrSrc, __u32 A_LenLim )
 	// code --------------------
 		//get len
 		Tv_Len		=	GrStrWlen( A_StrDst,A_LenLim );
-		Tv_Lim    = (A_LenLim - 1) & 0x7FFFFFFF;
+		Tv_Lim		=	(A_LenLim - 1) & 0x7FFFFFFF;
 		Tv_PtrSr	=	A_StrSrc;
 		Tv_PtrTg	=	A_StrDst + Tv_Len;
 		// check exist source

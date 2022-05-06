@@ -49,7 +49,7 @@ class CUpdateManagerDlg : public CDialogEx
 // 생성입니다.
 public:
 	CUpdateManagerDlg(CWnd* pParent = NULL);	// 표준 생성자입니다.
-
+	~CUpdateManagerDlg();
 // 대화 상자 데이터입니다.
 	enum { IDD = IDD_UPDATEMANAGER_DIALOG };
 

@@ -52,12 +52,24 @@ END_MESSAGE_MAP()
 // CUpdateManagerDlg 대화 상자
 
 
-
+// 생성자
 CUpdateManagerDlg::CUpdateManagerDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CUpdateManagerDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
+
+// 소멸자
+CUpdateManagerDlg::~CUpdateManagerDlg()
+{
+
+	if (NULL != m_pObjFwUp)
+	{
+		delete m_pObjFwUp;
+		m_pObjFwUp = NULL;
+	}
+}
+
 
 void CUpdateManagerDlg::DoDataExchange(CDataExchange* pDX)
 {
@@ -163,6 +175,7 @@ void CUpdateManagerDlg::Init()
 	// Local ------------------------------
 	WCHAR szaInitFile[2048] = { 0 };
 	Cls_GrFileCtrl* pObjFile = NULL;
+	Cls_GrFileCtrl* pObjFile2 = NULL;
 	unsigned int uiFileSize = 0;
 	// ------------------------------------
 
@@ -173,17 +186,22 @@ void CUpdateManagerDlg::Init()
 	PathRemoveFileSpec(m_szaNowPath);
 
 	m_pObjFwUp = (CFirmUpdate*)new CFirmUpdate();
-	//m_pObjFwUp->Init();
-	memset(m_TreeCtrl, 0, sizeof(CTreeCtrl));
+	m_pObjFwUp->FirmInit();
 
+	memset(m_staTreeNode, 0, sizeof(_stUpdateTreeNode) * 3); // 72
+	memset(&m_stUpdateInfo, 0, sizeof(_stUpdateInfo));
 
-	
+	memcpy(&szaInitFile, &m_szaNowPath, 2048);
+	GrStrWcat(szaInitFile, _T("\\MkUpdate.init"));
 
-	if (NULL != m_pObjFwUp)
+	// MkUpdate.init 파일 있는지 체크
+	if (GrFileIsExist(szaInitFile))
 	{
-		delete m_pObjFwUp;
-		m_pObjFwUp = NULL;
+		pObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(szaInitFile, FALSE, FALSE);
+		pObjFile2 = new Cls_GrFileCtrl(szaInitFile, FALSE, FALSE);
+		
 	}
+	
 }
 
 
