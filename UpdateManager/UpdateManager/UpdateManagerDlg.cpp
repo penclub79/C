@@ -80,6 +80,8 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON_SELETEMODEL, &CUpdateManagerDlg::OnBnClickedButtonSeletemodel)
+	ON_BN_CLICKED(IDC_BUTTON_SELETEMODEL2, &CUpdateManagerDlg::OnBnClickedButtonSeletemodel2)
 END_MESSAGE_MAP()
 
 
@@ -214,3 +216,15 @@ void CUpdateManagerDlg::Init()
 //		}
 //}
 
+
+
+void CUpdateManagerDlg::OnBnClickedButtonSeletemodel()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CUpdateManagerDlg::OnBnClickedButtonSeletemodel2()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}

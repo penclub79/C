@@ -95,4 +95,7 @@ private:
 	CButton		m_BtnPath;
 	CButton		m_BtnMake;
 
+public:
+	afx_msg void OnBnClickedButtonSeletemodel();
+	afx_msg void OnBnClickedButtonSeletemodel2();
 };
