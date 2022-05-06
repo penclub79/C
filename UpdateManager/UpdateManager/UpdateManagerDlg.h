@@ -73,7 +73,9 @@ public:
 
 protected:
 	void Init();
-
+	BOOL CheckFcc(pUpdateInfo _p);	// MkUpdate.init 파일이 있을 때 FCC체크
+	void InitCtrl();				// MkUpdate.init 파일이 있을 때
+	//void AddModel(unsigned int _uiModelType);
 
 
 private:

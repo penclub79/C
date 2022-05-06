@@ -173,12 +173,11 @@ HCURSOR CUpdateManagerDlg::OnQueryDragIcon()
 void CUpdateManagerDlg::Init()
 {
 	// Local ------------------------------
-	WCHAR szaInitFile[2048] = { 0 };
-	Cls_GrFileCtrl* pObjFile = NULL;
-	Cls_GrFileCtrl* pObjFile2 = NULL;
-	unsigned int uiFileSize = 0;
+		WCHAR szaInitFile[2048] = { 0 };
+		Cls_GrFileCtrl* pObjFile = NULL;
+		//Cls_GrFileCtrl* pObjFile2 = NULL;
+		int iFileSize = 0;
 	// ------------------------------------
-
 
 	// 현재 실행 경로 얻기
 	::GetModuleFileName(NULL, m_szaNowPath, 2048);
@@ -198,10 +197,20 @@ void CUpdateManagerDlg::Init()
 	if (GrFileIsExist(szaInitFile))
 	{
 		pObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(szaInitFile, FALSE, FALSE);
-		pObjFile2 = new Cls_GrFileCtrl(szaInitFile, FALSE, FALSE);
-		
+		//pObjFile2 = new Cls_GrFileCtrl(szaInitFile, FALSE, FALSE); test
 	}
-	
 }
 
+//void CUpdateManagerDlg::AddModel(unsigned int _uiModelType)
+//{
+//	// Local ------------------------------
+//		int iResult = 0;
+//
+//	// ------------------------------------
+//
+//		if (NULL != m_pObjFwUp)
+//		{
+//			
+//		}
+//}
 

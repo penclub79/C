@@ -21,7 +21,6 @@ CFirmUpdate::CFirmUpdate()
 		}
 	}
 
-
 }
 
 CFirmUpdate::~CFirmUpdate()
@@ -69,3 +68,10 @@ void CFirmUpdate::FirmInit()
 	}
 
 }
+
+//int	CFirmUpdate::AddModelType(unsigned int _uiModelType)
+//{
+//	// local ---------------------------------------
+//	int iResult = 0;
+//	// ---------------------------------------------
+//}

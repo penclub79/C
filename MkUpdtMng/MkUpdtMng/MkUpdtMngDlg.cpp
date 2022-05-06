@@ -590,15 +590,15 @@ void CMkUpdtMngDlg::LcAddModel(__u32 A_ModelType)
 void CMkUpdtMngDlg::LcInitCtrl(Ptr_UpdtInfo A_PtrInfo)
 {
 	// local -------------------
-		__s32			Tv_Result;
-		__s32			Tv_MdCnt;//model count
-		__s32			Tv_EntCnt;//entity count
-		__s32			Tv_StrLen;
-		CHAR*			Tv_PtrStr;
-		Ptr_UpdtInfoModel Tv_PtrInfoMd;
-		WCHAR			Tv_StrVer[32];
-		__u32			Tv_Ver[4];
-		CString		Tv_CStrVer;
+		__s32				Tv_Result;
+		__s32				Tv_MdCnt;//model count
+		__s32				Tv_EntCnt;//entity count
+		__s32				Tv_StrLen;
+		CHAR*				Tv_PtrStr;
+		Ptr_UpdtInfoModel	Tv_PtrInfoMd;
+		WCHAR				Tv_StrVer[32];
+		__u32				Tv_Ver[4];
+		CString				Tv_CStrVer;
 	// code --------------------
 		GrDumyZeroMem(Tv_StrVer, 32);
 		GrStrIntToWstr(Tv_StrVer, A_PtrInfo->UpgdVer);
