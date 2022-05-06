@@ -6,6 +6,11 @@
 #include "UpdateManager.h"
 #include "UpdateManagerDlg.h"
 #include "afxdialogex.h"
+#include "FirmUpdate.h"
+#include <GrDumyTool.h>
+#include <GrStrTool.h>
+#include <GrFileCtrl.h>
+#include <GrFileTool.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -32,6 +37,7 @@ protected:
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
 {
+	
 }
 
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
@@ -97,6 +103,8 @@ BOOL CUpdateManagerDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	Init();
+
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -149,4 +157,33 @@ HCURSOR CUpdateManagerDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
+
+void CUpdateManagerDlg::Init()
+{
+	// Local ------------------------------
+	WCHAR szaInitFile[2048] = { 0 };
+	Cls_GrFileCtrl* pObjFile = NULL;
+	unsigned int uiFileSize = 0;
+	// ------------------------------------
+
+
+	// 현재 실행 경로 얻기
+	::GetModuleFileName(NULL, m_szaNowPath, 2048);
+	// 경로에서 파일명과 확장자만 제거
+	PathRemoveFileSpec(m_szaNowPath);
+
+	m_pObjFwUp = (CFirmUpdate*)new CFirmUpdate();
+	//m_pObjFwUp->Init();
+	memset(m_TreeCtrl, 0, sizeof(CTreeCtrl));
+
+
+	
+
+	if (NULL != m_pObjFwUp)
+	{
+		delete m_pObjFwUp;
+		m_pObjFwUp = NULL;
+	}
+}
+
 

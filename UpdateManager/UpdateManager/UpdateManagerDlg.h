@@ -14,10 +14,22 @@
 // ---------------------------------------------------- struct 
 typedef struct _stUpdateTreeNode
 {
-	unsigned int	uiType;
-	HTREEITEM		stNode;
-	CHAR			szaNode[16];
+	unsigned int			uiType;
+	HTREEITEM				stNode;
+	CHAR					szaNode[16];
 } *pUpdateTreeNode;
+
+typedef struct _stUpdateInfoEntity
+{
+	unsigned int			uiType;
+	CHAR					szaFile[256];
+} *pUpdateInfoEntity;
+
+typedef struct _stUpdateInfoModel
+{
+	unsigned int			uiType;
+	_stUpdateInfoEntity		staEntity[16];
+} *pUpdateInfoModel;
 
 typedef struct _stUpdateInfo
 {
@@ -27,17 +39,6 @@ typedef struct _stUpdateInfo
 	WCHAR					szaUpgdFileName[1024];
 } *pUpdateInfo;
 
-typedef struct _stUpdateInfoModel
-{
-	unsigned int			uiType;
-	_stUpdateInfoEntity		staEntity[16];
-} *pUpdateInfoModel;
-
-typedef struct _stUpdateInfoEntity
-{
-	unsigned int	uiType;
-	CHAR			szaFile[256];
-} *pUpdateInfoEntity;
 // ---------------------------------------------------- struct 
 
 
@@ -68,6 +69,21 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	
+
+protected:
+	void Init();
+
+
+
+private:
+	WCHAR				m_szaNowPath[2048];
+
+	CFirmUpdate*		m_pObjFwUp;
+	_stUpdateTreeNode	m_staTreeNode[E_FirmUpInfoTypeMaxIdx];  // 24
+	WCHAR				m_szaMkFileName[1024];
+	_stUpdateInfo		m_stUpdateInfo;
+
 	CTreeCtrl	m_TreeCtrl;
 	CEdit		m_EditPath;
 	CEdit		m_EditVer1;
@@ -76,12 +92,5 @@ public:
 	CEdit		m_EditVer4;
 	CButton		m_BtnPath;
 	CButton		m_BtnMake;
-
-private:
-	CFirmUpdate*		m_pObjFwUp;
-	_stUpdateTreeNode	m_staTreeNode[E_FirmUpInfoTypeMaxIdx];  // 24
-	WCHAR				m_szaMkFileName[1024];
-	WCHAR				m_szaNowPath[2048];
-	_stUpdateInfo		m_stUpdateInfo;
 
 };

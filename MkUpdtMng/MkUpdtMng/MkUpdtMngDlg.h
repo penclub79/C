@@ -32,7 +32,7 @@ typedef struct St_UpdtInfoModel
 
 typedef struct St_UpdtInfo
 {
-	__u32				Fcc;//update ini 'Uini' 0x55696E69
+	__u32				Fcc;	//update ini 'Uini' 0x55696E69
 	__u32				UpgdVer;
 	St_UpdtInfoModel	ModelInfo[16];
 	WCHAR				StrUpdtFileName[1024];
@@ -59,11 +59,11 @@ protected:
 	void	LcAddModel(__u32 A_ModelType);
 	void	LcInit();
 	void	LcInitCtrl(Ptr_UpdtInfo A_PtrInfo);
-	__s32 LcFindModelIdx(__u32 A_ModelType);
+	__s32	LcFindModelIdx(__u32 A_ModelType);
 	__s32	LcModelTypeGet(__u32 A_Idx);
 	//__s32 LcFindEntityIdx(__u32 A_ModelType);
 
-	BOOL8 LcCheckIni(Ptr_UpdtInfo A_PtrInfo);//ini file check
+	BOOL8	LcCheckIni(Ptr_UpdtInfo A_PtrInfo);//ini file check
 	void	LcMkiniFile();
 // Dialog Data
 	enum { IDD = IDD_MKUPDTMNG_DIALOG };
@@ -84,17 +84,18 @@ protected:
 public:
 	afx_msg void OnBnClickedBtnAddmodel();
 	afx_msg void OnBnClickedBtnAddentity();
-	CTreeCtrl m_TreeCtrl;
-//	CEdit m_EdtVersion;
-	CEdit m_EdtPath;
-	CButton m_BtnPath;
-	CButton m_BtnMake;
 	afx_msg void OnBnClickedBtnPath();
 	afx_msg void OnBnClickedBtnMake();
 	virtual BOOL DestroyWindow();
 //	CEdit m_Ver2;
-	CEdit m_EdtVer1;
-	CEdit m_EdtVer2;
-	CEdit m_EdtVer3;
-	CEdit m_EdtVer4;
+	CEdit	m_EdtVer1;
+	CEdit	m_EdtVer2;
+	CEdit	m_EdtVer3;
+	CEdit	m_EdtVer4;
+
+	CTreeCtrl m_TreeCtrl;
+	//	CEdit m_EdtVersion;
+	CEdit	m_EdtPath;
+	CButton m_BtnPath;
+	CButton m_BtnMake;
 };

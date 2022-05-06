@@ -83,7 +83,7 @@ public:
 	CFirmUpdate();
 	virtual	~CFirmUpdate();
 
-	void	Init();
+	void	FirmInit();
 	
 	// ¸ðµ¨ Ãß°¡
 	int		AddModelType(unsigned int _uiModelType);
