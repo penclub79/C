@@ -101,6 +101,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DlgModelAdd.h" />
     <ClInclude Include="FirmUpdate.h" />
     <ClInclude Include="GrInc\GrAdpcm.h" />
     <ClInclude Include="GrInc\GrAES128.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="UpdateManagerDlg.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DlgModelAdd.cpp" />
     <ClCompile Include="FirmUpdate.cpp" />
     <ClCompile Include="GrLib\GrAdpcm.cpp" />
     <ClCompile Include="GrLib\GrAES128.cpp" />

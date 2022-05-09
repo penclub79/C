@@ -177,6 +177,9 @@
     <ClInclude Include="GrInc\GrTypeBase.h">
       <Filter>GrLib\Common\Header</Filter>
     </ClInclude>
+    <ClInclude Include="DlgModelAdd.h">
+      <Filter>APP\헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UpdateManager.cpp">
@@ -303,6 +306,9 @@
       <Filter>GrLib\Common\Source</Filter>
     </ClCompile>
     <ClCompile Include="FirmUpdate.cpp">
+      <Filter>APP\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgModelAdd.cpp">
       <Filter>APP\소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

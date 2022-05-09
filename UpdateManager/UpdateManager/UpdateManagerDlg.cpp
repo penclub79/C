@@ -3,10 +3,12 @@
 //
 
 #include "stdafx.h"
+#include "afxdialogex.h"
 #include "UpdateManager.h"
 #include "UpdateManagerDlg.h"
-#include "afxdialogex.h"
 #include "FirmUpdate.h"
+#include "DlgModelAdd.h"
+
 #include <GrDumyTool.h>
 #include <GrStrTool.h>
 #include <GrFileCtrl.h>
@@ -80,8 +82,9 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON_SELETEMODEL, &CUpdateManagerDlg::OnBnClickedButtonSeletemodel)
-	ON_BN_CLICKED(IDC_BUTTON_SELETEMODEL2, &CUpdateManagerDlg::OnBnClickedButtonSeletemodel2)
+	//ON_BN_CLICKED(IDC_BUTTON_SELETEMODEL, &CUpdateManagerDlg::OnBnClickedButtonSeletemodel)
+	//ON_BN_CLICKED(IDC_BUTTON_SELETEMODEL2, &CUpdateManagerDlg::OnBnClickedButtonSeletemodel2)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL_CREATE, &CUpdateManagerDlg::OnClickedButtonModelCreate)
 END_MESSAGE_MAP()
 
 
@@ -217,14 +220,17 @@ void CUpdateManagerDlg::Init()
 //}
 
 
-
-void CUpdateManagerDlg::OnBnClickedButtonSeletemodel()
+// 모델 생성 다이얼로그 버튼 
+void CUpdateManagerDlg::OnClickedButtonModelCreate()
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-}
+	// Local ------------------------------
+	DlgModelAdd* pDlgModelAdd = NULL;
+	
+
+	// ------------------------------------
+
+	pDlgModelAdd = (DlgModelAdd*)new DlgModelAdd(NULL, m_szaNowPath);
 
 
-void CUpdateManagerDlg::OnBnClickedButtonSeletemodel2()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
 }

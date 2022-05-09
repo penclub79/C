@@ -11,8 +11,8 @@ class DlgAddEntity : public CDialogEx
 private:
 	__u32		m_ModelType;
 	__u32		m_EntityType;
-	CString m_StrFileName;
-	TCHAR*	m_PtrStrPath;
+	CString		m_StrFileName;
+	TCHAR*		m_PtrStrPath;
 public:
 	DlgAddEntity(CWnd* pParent, TCHAR* A_PtrPath);   // standard constructor
 	virtual ~DlgAddEntity();
