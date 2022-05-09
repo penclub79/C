@@ -227,25 +227,31 @@ void CUpdateManagerDlg::OnClickedButtonModelCreate()
 	// Local ------------------------------
 	DlgModelAdd* pDlgModelAdd;
 	int iModelType = 0;
-	
 	// ------------------------------------
 
 	pDlgModelAdd = (DlgModelAdd*)new DlgModelAdd();
 	pDlgModelAdd->DoModal();
 
 	iModelType = pDlgModelAdd->GetModelType();
-	
+
 	if (E_FirmUpInfoTypeNone != iModelType)
 	{
-		
+		TreeAddModel(iModelType);
 	}
-
 
 	if (NULL != pDlgModelAdd)
 	{
 		delete pDlgModelAdd;
 		pDlgModelAdd = NULL;
 	}
+}
+
+void CUpdateManagerDlg::TreeAddModel(int _iModelType)
+{
+	// Local ------------------------------
+	int iModelType	= _iModelType;
+	int iResult		= 0;
+	// ------------------------------------
 
 
 }

@@ -68,16 +68,12 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 
-public:
-	
-
-protected:
 	void Init();
 	//BOOL CheckFcc(pUpdateInfo _p);	// MkUpdate.init 파일이 있을 때 FCC체크
 	void InitCtrl();				// MkUpdate.init 파일이 있을 때
 	//void AddModel(unsigned int _uiModelType);
-
-
+	void TreeAddModel(int _iModelType);
+	
 private:
 	WCHAR				m_szaNowPath[2048];
 
@@ -97,5 +93,5 @@ private:
 
 public:
 	afx_msg void OnClickedButtonModelCreate();
-//	IDC_TREE_ITEM IDC_TREE_ITEM;
+
 };

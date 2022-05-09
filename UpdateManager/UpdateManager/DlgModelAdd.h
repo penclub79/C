@@ -15,9 +15,7 @@ public:
 
 	enum { IDD = IDD_DIALOG_MODEL_ADD };
 	afx_msg void OnSelchangeComboModeltype();
-
 	int		GetModelType();
-	CString GetModelName();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);   // DDX / DDV Support
@@ -25,7 +23,6 @@ protected:
 
 private:
 	int m_iModelType;
-	CString m_strModelName;
 	CComboBox m_CModelType;
 
 	void SetModelName(TCHAR* _pszName);

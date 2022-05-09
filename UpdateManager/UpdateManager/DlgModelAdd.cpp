@@ -12,8 +12,7 @@ DlgModelAdd::DlgModelAdd(CWnd* pParent /*=NULL*/)
 }
 
 DlgModelAdd::~DlgModelAdd()
-{
-	
+{	
 }
 
 void DlgModelAdd::DoDataExchange(CDataExchange* pDX)
@@ -84,59 +83,12 @@ void DlgModelAdd::OnSelchangeComboModeltype()
 	}
 }
 
-
 void DlgModelAdd::OnClickedButtonModelMake()
 {
-	//Local -------------------------------------
-	CString strModelName;
-	TCHAR* pszBuffer = NULL;
-	//-------------------------------------------
-
-	GetDlgItemText(IDC_EDIT_MODEL_NAME, strModelName);
-
-	pszBuffer = new TCHAR[50];
-	memset(pszBuffer, 0, sizeof(TCHAR) * 50);
-
-	if (strModelName.IsEmpty())
-	{
-		AfxMessageBox(_T("모델명을 입력해야 합니다."));
-		return;
-	}
-
-	if (strModelName.GetLength() > sizeof(TCHAR) * 50)
-	{
-		AfxMessageBox(_T("50자 미만입니다."));
-		SetDlgItemText(IDC_EDIT_MODEL_NAME, _T(""));
-		return;
-	}
-
-	if (NULL != strModelName.GetBuffer(0))
-	{
-		_tcscpy(&pszBuffer[0], strModelName.GetBuffer(0));
-		SetModelName(&pszBuffer[0]);
-	}
-
-	if (NULL != pszBuffer)
-	{
-		delete[] pszBuffer;
-		pszBuffer = NULL;
-	}
-
 	CDialogEx::OnOK();
-}
-
-void DlgModelAdd::SetModelName(TCHAR* _pszName)
-{
-	TCHAR* pszModelName = _pszName;
-	m_strModelName = (LPCTSTR)pszModelName;
 }
 
 int	DlgModelAdd::GetModelType()
 {
 	return m_iModelType;
-}
-
-CString DlgModelAdd::GetModelName()
-{
-	return m_strModelName;
 }

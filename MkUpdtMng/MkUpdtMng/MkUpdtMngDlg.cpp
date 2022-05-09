@@ -545,7 +545,6 @@ BOOL8 CMkUpdtMngDlg::LcCheckIni(Ptr_UpdtInfo A_PtrInfo)
 		{
 			Tv_Result		= TRUE;
 		}
-
 		return Tv_Result;
 }
 	
