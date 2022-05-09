@@ -73,7 +73,7 @@ public:
 
 protected:
 	void Init();
-	BOOL CheckFcc(pUpdateInfo _p);	// MkUpdate.init 파일이 있을 때 FCC체크
+	//BOOL CheckFcc(pUpdateInfo _p);	// MkUpdate.init 파일이 있을 때 FCC체크
 	void InitCtrl();				// MkUpdate.init 파일이 있을 때
 	//void AddModel(unsigned int _uiModelType);
 
@@ -86,15 +86,16 @@ private:
 	WCHAR				m_szaMkFileName[1024];
 	_stUpdateInfo		m_stUpdateInfo;
 
-	CTreeCtrl	m_TreeCtrl;
-	CEdit		m_EditPath;
-	CEdit		m_EditVer1;
-	CEdit		m_EditVer2;
-	CEdit		m_EditVer3;
-	CEdit		m_EditVer4;
-	CButton		m_BtnPath;
-	CButton		m_BtnMake;
+	CTreeCtrl	m_CTreeCtrl;
+	CEdit		m_CEditPath;
+	CEdit		m_CEditVer1;
+	CEdit		m_CEditVer2;
+	CEdit		m_CEditVer3;
+	CEdit		m_CEditVer4;
+	CButton		m_CBtnPath;
+	CButton		m_CBtnMake;
 
 public:
 	afx_msg void OnClickedButtonModelCreate();
+//	IDC_TREE_ITEM IDC_TREE_ITEM;
 };

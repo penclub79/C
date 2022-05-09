@@ -236,11 +236,11 @@ void CMkUpdtMngDlg::OnBnClickedBtnAddentity()
 		__s32			Tv_ModelIdx;
 		CHAR			Tv_StrFile[128];
 	// code --------------------
-		Tv_DlgEntity = (DlgAddEntity*)new DlgAddEntity(NULL, m_NowPath);
-		HTREEITEM Tv_TreeItm = m_TreeCtrl.GetSelectedItem();
-		Tv_StrItm		= m_TreeCtrl.GetItemText(Tv_TreeItm);
+		Tv_DlgEntity			= (DlgAddEntity*)new DlgAddEntity(NULL, m_NowPath);
+		HTREEITEM Tv_TreeItm	= m_TreeCtrl.GetSelectedItem();
+		Tv_StrItm				= m_TreeCtrl.GetItemText(Tv_TreeItm);
 
-		for(Tv_WkCnt = 0;Tv_WkCnt < E_FirmUpInfoTypeMaxIdx;Tv_WkCnt++)
+		for(Tv_WkCnt = 0; Tv_WkCnt < E_FirmUpInfoTypeMaxIdx; Tv_WkCnt++)
 		{
 			Tv_StrLen = Tv_StrItm.GetLength();
 			
@@ -306,8 +306,6 @@ void CMkUpdtMngDlg::LcAddEntity(__u32 A_ModelIdx, __u32 A_EntityType, PCHAR A_Pt
 				Tv_Result = m_ObjFwUp->AddEntity(Tv_ModelType, A_EntityType, Tv_PtrFileBuf, Tv_FileSize);
 				if(0 <= Tv_Result)
 				{
-					//
-
 					//find model
 					Tv_ModelIdx = LcFindModelIdx(Tv_ModelType);
 					if(0 <= Tv_ModelIdx)

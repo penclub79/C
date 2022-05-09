@@ -76,6 +76,7 @@ CUpdateManagerDlg::~CUpdateManagerDlg()
 void CUpdateManagerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_TREE_ITEM, m_CTreeCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
@@ -224,13 +225,27 @@ void CUpdateManagerDlg::Init()
 void CUpdateManagerDlg::OnClickedButtonModelCreate()
 {
 	// Local ------------------------------
-	DlgModelAdd* pDlgModelAdd = NULL;
+	DlgModelAdd* pDlgModelAdd;
+	int iModelType = 0;
 	
-
 	// ------------------------------------
 
-	pDlgModelAdd = (DlgModelAdd*)new DlgModelAdd(NULL, m_szaNowPath);
+	pDlgModelAdd = (DlgModelAdd*)new DlgModelAdd();
+	pDlgModelAdd->DoModal();
 
+	iModelType = pDlgModelAdd->GetModelType();
+	
+	if (E_FirmUpInfoTypeNone != iModelType)
+	{
+		
+	}
+
+
+	if (NULL != pDlgModelAdd)
+	{
+		delete pDlgModelAdd;
+		pDlgModelAdd = NULL;
+	}
 
 
 }

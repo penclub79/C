@@ -30,6 +30,8 @@ firmware upgrade
 #define	E_FirmUpInfoTypeJa1708		22
 #define	E_FirmUpInfoTypeJa1716		23
 
+
+
 #define	E_FirmUpEntityNone			0
 #define	E_FirmUpEntityLoader		1
 #define	E_FirmUpEntityFdt			2
