@@ -253,5 +253,9 @@ void CUpdateManagerDlg::TreeAddModel(int _iModelType)
 	int iResult		= 0;
 	// ------------------------------------
 
+	if (NULL != m_pObjFwUp)
+	{
+		iResult = m_pObjFwUp->AddModelType(iModelType);
+	}
 
 }

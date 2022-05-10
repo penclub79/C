@@ -148,9 +148,9 @@ __s32 Cls_FirmUpdt::AddType(__u32 A_ModelType)
 __s32 Cls_FirmUpdt::LcChkModelType(__u32 A_ModelType)
 {
 	// local -------------------
-		__s32		Tv_Result;
-		__s32		Tv_WkCnt;
-		Ptr_FirmUpInfo Tv_PtrInfo;
+		__s32			Tv_Result;
+		__s32			Tv_WkCnt;
+		Ptr_FirmUpInfo	Tv_PtrInfo;
 	// code --------------------
 		Tv_Result		= E_FirmUpErrCode;
 

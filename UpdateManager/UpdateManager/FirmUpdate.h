@@ -85,31 +85,38 @@ public:
 	CFirmUpdate();
 	virtual	~CFirmUpdate();
 
+	// Firm Data 초기화
 	void	FirmInit();
-	
+
 	// 모델 추가
 	int		AddModelType(unsigned int _uiModelType);
+	
+
+protected:
 	// 모델 삭제
 	void	DelModelType(unsigned int _uiModelType);
 	// 버전 파일 선택
 	int		AddVerFile(unsigned int _uiModelType, unsigned int _uiVersionType, void* _pSrc, unsigned int _uiSize);
 	// 버전 파일 삭제
+
+
 	void	DelVerFile(unsigned int _uiModelType, unsigned int _uiVersionType);
-
-	void*	GetMkUpdt(unsigned int* _puiSize);
-	void	SetUpdtVer(unsigned int _uiVer);
-
-	int		GetModelTblIdx(unsigned int _uiModelType);
-
-protected:
-	int		LcChkModelType(unsigned int _uiModelType);
-	int		LcChkEntityType(unsigned int _uiVersionType, pFirmUpEntity _stEntity);
+	
+	int		ChkEntityType(unsigned int _uiVersionType, pFirmUpEntity _stEntity);
 
 private:
 	_stFirmUpHeader		m_stFirmHeader;
 	_stFirmUpEnd		m_stFirmEd;
 	void*				m_pData[E_FirmUpInfoCnt][E_FirmUpEntityCnt];
 	void*				m_pMkUpdt;
+
+	void*	GetMkUpdt(unsigned int* _puiSize);
+	void	SetUpdtVer(unsigned int _uiVer);
+	int		GetModelTblIdx(unsigned int _uiModelType);
+
+	// 모델 타입 체크
+	int		ChkModelType(unsigned int _uiModelType);
+
 };
 
 //====================================================================
