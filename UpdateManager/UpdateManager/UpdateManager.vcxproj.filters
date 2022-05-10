@@ -180,6 +180,9 @@
     <ClInclude Include="DlgModelAdd.h">
       <Filter>APP\헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="DlgVerFileAdd.h">
+      <Filter>APP\헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UpdateManager.cpp">
@@ -309,6 +312,9 @@
       <Filter>APP\소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="DlgModelAdd.cpp">
+      <Filter>APP\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgVerFileAdd.cpp">
       <Filter>APP\소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

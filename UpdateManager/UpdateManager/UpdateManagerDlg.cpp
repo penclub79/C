@@ -8,6 +8,7 @@
 #include "UpdateManagerDlg.h"
 #include "FirmUpdate.h"
 #include "DlgModelAdd.h"
+#include "DlgVerFileAdd.h"
 
 #include <GrDumyTool.h>
 #include <GrStrTool.h>
@@ -64,12 +65,6 @@ CUpdateManagerDlg::CUpdateManagerDlg(CWnd* pParent /*=NULL*/)
 // 소멸자
 CUpdateManagerDlg::~CUpdateManagerDlg()
 {
-
-	if (NULL != m_pObjFwUp)
-	{
-		delete m_pObjFwUp;
-		m_pObjFwUp = NULL;
-	}
 }
 
 
@@ -83,9 +78,8 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	//ON_BN_CLICKED(IDC_BUTTON_SELETEMODEL, &CUpdateManagerDlg::OnBnClickedButtonSeletemodel)
-	//ON_BN_CLICKED(IDC_BUTTON_SELETEMODEL2, &CUpdateManagerDlg::OnBnClickedButtonSeletemodel2)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_CREATE, &CUpdateManagerDlg::OnClickedButtonModelCreate)
+	ON_BN_CLICKED(IDC_BUTTON_ENTITY_SELETE, &CUpdateManagerDlg::OnClickedButtonEntitySelete)
 END_MESSAGE_MAP()
 
 
@@ -221,7 +215,7 @@ void CUpdateManagerDlg::Init()
 //}
 
 
-// 모델 생성 다이얼로그 버튼 
+// 모델 생성 Button
 void CUpdateManagerDlg::OnClickedButtonModelCreate()
 {
 	// Local ------------------------------
@@ -246,6 +240,7 @@ void CUpdateManagerDlg::OnClickedButtonModelCreate()
 	}
 }
 
+//트리에 모델 추가
 void CUpdateManagerDlg::TreeAddModel(int _iModelType)
 {
 	// Local ------------------------------
@@ -255,7 +250,91 @@ void CUpdateManagerDlg::TreeAddModel(int _iModelType)
 
 	if (NULL != m_pObjFwUp)
 	{
+		// 모델 추가시 중복체크 함수도 포함
 		iResult = m_pObjFwUp->AddModelType(iModelType);
+
+		if (E_FirmUpInfoTypeNone <= m_pObjFwUp)
+		{
+			m_staTreeNode[iResult].uiType = _iModelType;
+
+			switch (_iModelType)
+			{
+			case E_FirmUpInfoTypeJa1704:
+				_tcscpy((TCHAR*)&m_staTreeNode[iResult].szaNode, _T("Ja1704"));
+				m_staTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1704"), NULL, NULL);
+				break;
+			case E_FirmUpInfoTypeJa1708:
+				_tcscpy((TCHAR*)&m_staTreeNode[iResult].szaNode, _T("Ja1708"));
+				m_staTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1708"), NULL, NULL);
+				break;
+			case E_FirmUpInfoTypeJa1716:
+				_tcscpy((TCHAR*)&m_staTreeNode[iResult].szaNode, _T("Ja1716"));
+				m_staTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1716"), NULL, NULL);
+				break;
+			default:
+				break;
+			}
+
+			m_stUpdateInfo.staModelInfo[iResult].uiType = _iModelType;
+		}
+		else
+		{
+			ProcErrCode(iResult);
+		}
+
 	}
+
+}
+
+// 에러 처리
+void CUpdateManagerDlg::ProcErrCode(int _iResult)
+{
+	switch (_iResult)
+	{
+	case E_FirmUpErrCode:
+		MessageBox(_T("Error"));
+		break;
+	case E_FirmUpErrExistType:
+		MessageBox(_T("Exist Same Type"));
+		break;
+	case E_FirmUpErrExistEntity:
+		MessageBox(_T("Exist Same Entity Type"));
+		break;
+	case E_FirmUpErrExistData:
+		MessageBox(_T("Exist Same Entity Data Type"));
+		break;
+	default:
+		MessageBox(_T("Error"));
+		break;
+	}
+}
+
+// 버전 파일 선택 Button
+void CUpdateManagerDlg::OnClickedButtonEntitySelete()
+{
+	// Local ------------------------------
+	DlgVerFileAdd*	pDlgVerFileAdd;
+	CString			strModelName;
+	HTREEITEM		stTreeItem = { 0 };
+	TCHAR			aszModel[16] = { 0 };
+	int				iLen = 0;
+	// ------------------------------------
+
+	pDlgVerFileAdd = (DlgVerFileAdd*)new DlgVerFileAdd(NULL, m_szaNowPath);
+	
+	// Tree에서 클릭한 값의 제목을 가져온다.
+	stTreeItem = m_CTreeCtrl.GetSelectedItem();
+	strModelName = m_CTreeCtrl.GetItemText(stTreeItem);
+
+	// 24까지 반복
+	for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
+	{
+		iLen = strModelName.GetLength();
+		_tcscpy(aszModel, strModelName.GetBuffer(0));
+		
+
+		
+	}
+
 
 }

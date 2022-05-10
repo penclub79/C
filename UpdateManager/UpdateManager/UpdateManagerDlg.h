@@ -72,7 +72,9 @@ protected:
 	//BOOL CheckFcc(pUpdateInfo _p);	// MkUpdate.init 파일이 있을 때 FCC체크
 	void InitCtrl();				// MkUpdate.init 파일이 있을 때
 	//void AddModel(unsigned int _uiModelType);
-	void TreeAddModel(int _iModelType);
+
+	void TreeAddModel(int _iModelType); // 트리 모델 추가
+	void ProcErrCode(int _iResult); // 에러 처리
 	
 private:
 	WCHAR				m_szaNowPath[2048];
@@ -92,6 +94,6 @@ private:
 	CButton		m_CBtnMake;
 
 public:
-	afx_msg void OnClickedButtonModelCreate();
-
+	afx_msg void OnClickedButtonModelCreate(); // 모델 추가
+	afx_msg void OnClickedButtonEntitySelete(); // 버전 파일 선택
 };
