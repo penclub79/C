@@ -23,6 +23,7 @@ public:
 
 	void SetModelType(int _iModelType);
 	void SetModelName(TCHAR* _pszModelName);
+	void GetVerFileType(int* _piModelType, int* _piVerFileType, TCHAR* _pszFileName, int* _piStrLen);
 	
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
@@ -30,7 +31,7 @@ protected:
 
 private:
 	int			m_iModelType;
-	int			m_iEntityType;
+	int			m_iVerFileType;
 	TCHAR*		m_pszNowPath;
 	CString		m_strFileName;
 	CString		m_strModelName;
@@ -39,4 +40,5 @@ private:
 	
 public:
 	CEdit m_CEditFile;
+	afx_msg void OnSelchangeComboChoiseFile();
 };

@@ -73,7 +73,8 @@ protected:
 	void InitCtrl();				// MkUpdate.init 파일이 있을 때
 	//void AddModel(unsigned int _uiModelType);
 
-	void TreeAddModel(int _iModelType); // 트리 모델 추가
+	void TreeAddModel(int _iModelType); // 트리에 모델 추가
+	void TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR* _pszFilePath, int _iFileLen); // 트리에 모델에서 버전파일 추가
 	void ProcErrCode(int _iResult); // 에러 처리
 	
 private:

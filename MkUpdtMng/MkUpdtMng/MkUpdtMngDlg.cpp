@@ -270,7 +270,7 @@ void CMkUpdtMngDlg::OnBnClickedBtnAddentity()
 		{
 			GrDumyZeroMem(Tv_StrFile, 128);
 			
-			// 모델 타입, 엔티티 타입, 파일명, 파일명 길이
+			// 모델 타입, 엔티티 타입, 파일명, 파일명 길이 얻기
 			Tv_DlgEntity->GetAddEntity(&Tv_ModelType, &Tv_EntityType, Tv_StrFile, &Tv_StrLen);
 
 			LcAddEntity(Tv_ModelType, Tv_EntityType, Tv_StrFile, Tv_StrLen);
@@ -654,12 +654,12 @@ void CMkUpdtMngDlg::LcMkiniFile()
 {
 	// local -------------------
 		CString			Tv_StrVer;
-		WCHAR				Tv_StrIniFile[2048];
+		WCHAR			Tv_StrIniFile[2048];
 		Cls_GrFileCtrl*	Tv_ObjFile;
-		CString		Tv_StrVer1;
-		CString		Tv_StrVer2;
-		CString		Tv_StrVer3;
-		CString		Tv_StrVer4;
+		CString			Tv_StrVer1;
+		CString			Tv_StrVer2;
+		CString			Tv_StrVer3;
+		CString			Tv_StrVer4;
 		__u8			Tv_Ver[4];
 		__u32			Tv_Version;
 	// code --------------------

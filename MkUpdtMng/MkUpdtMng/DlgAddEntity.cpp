@@ -115,9 +115,9 @@ void DlgAddEntity::GetAddEntity(__u32* A_PtrModelType, __u32* A_PtrEntityType, P
 	// code --------------------
 		*A_PtrModelType		= m_ModelType;
 		*A_PtrEntityType	= m_EntityType;//m_CbEntityType.GetCurSel();
-		Tv_StrLen		= m_StrFileName.GetLength();
+		Tv_StrLen			= m_StrFileName.GetLength();
 		WideCharToMultiByte(CP_ACP, 0, m_StrFileName, -1, A_PtrStr, Tv_StrLen, NULL, NULL);
-		*A_PtrStrLen	= Tv_StrLen;
+		*A_PtrStrLen		= Tv_StrLen;
 }
 
 void DlgAddEntity::OnCbnSelchangeCbEntity()

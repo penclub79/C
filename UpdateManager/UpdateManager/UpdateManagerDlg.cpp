@@ -315,8 +315,12 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	// Local ------------------------------
 	DlgVerFileAdd*	pDlgVerFileAdd;
 	CString			strModelName;
-	HTREEITEM		stTreeItem = { 0 };
-	TCHAR			aszModel[16] = { 0 };
+	HTREEITEM		stTreeItem			= { 0 };
+	TCHAR			aszModel[16]		= { 0 };
+	int				iModelType			= 0;
+	int				iVerFileType		= 0;
+	TCHAR			pszFilePath[128]	= { 0 };
+	int				iFileLen			= 0;
 	// ------------------------------------
 
 	pDlgVerFileAdd = (DlgVerFileAdd*)new DlgVerFileAdd(NULL, m_szaNowPath);
@@ -334,7 +338,8 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	if (IDOK == pDlgVerFileAdd->DoModal())
 	{
 
-
+		pDlgVerFileAdd->GetVerFileType(&iModelType, &iVerFileType, pszFilePath, &iFileLen);
+		TreeAddVerFile(iModelType, iVerFileType, pszFilePath, iFileLen);
 	}
 
 
@@ -343,5 +348,24 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 		delete pDlgVerFileAdd;
 		pDlgVerFileAdd = NULL;
 	}
+
+}
+
+// 트리에 해당 모델에서 버전파일 추가 및 출력
+void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR* _pszFilePath, int _iFileLen)
+{
+	// Local ------------------------------
+	FILE* pFile;
+	TCHAR* pszBuff = NULL;
+	Cls_GrFileCtrl* liFileCtrl; // 라이브러리
+	int iModelIdx = 0;
+	// ------------------------------------
+
+	if (NULL != m_pObjFwUp)
+	{
+		iModelIdx = _iModelIdx;
+		liFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(_pszFilePath, FALSE, FALSE);
+	}
+
 
 }

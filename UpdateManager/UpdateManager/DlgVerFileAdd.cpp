@@ -39,6 +39,7 @@ BEGIN_MESSAGE_MAP(DlgVerFileAdd, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_VERSION_OK, &DlgVerFileAdd::OnClickedButtonVersionOk)
 	ON_BN_CLICKED(IDC_BUTTON_VERSION_CANCEL, &DlgVerFileAdd::OnClickedButtonVersionCancel)
 	ON_BN_CLICKED(IDC_BUTTON_FILE_OPEN, &DlgVerFileAdd::OnClickedButtonFileOpen)
+	ON_CBN_SELCHANGE(IDC_COMBO_CHOISE_FILE, &DlgVerFileAdd::OnSelchangeComboChoiseFile)
 END_MESSAGE_MAP()
 
 
@@ -163,4 +164,38 @@ void DlgVerFileAdd::OnClickedButtonVersionOk()
 void DlgVerFileAdd::OnClickedButtonVersionCancel()
 {
 	OnOK();
+}
+
+// ComboBox 버전파일 
+void DlgVerFileAdd::OnSelchangeComboChoiseFile()
+{
+	int iSelIdx = 0;
+
+	iSelIdx = m_CVerFileType.GetCurSel();
+	m_iVerFileType = E_FirmUpInfoTypeNone;
+
+	switch (iSelIdx)
+	{
+	case 1:
+		m_iVerFileType = E_FirmUpEntityLoader;
+		break;
+	case 2:
+		m_iVerFileType = E_FirmUpEntityFdt;
+		break;
+	case 3:
+		m_iVerFileType = E_FirmUpEntityUboot;
+		break;
+	case 4:
+		m_iVerFileType = E_FirmUpEntityKernel;
+		break;
+	case 5:
+		m_iVerFileType = E_FirmUpEntityLogo;
+		break;
+	case 6:
+		m_iVerFileType = E_FirmUpEntityRootfs;
+		break;
+	default:
+		break;
+	}
+
 }
