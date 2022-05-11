@@ -269,6 +269,8 @@ void CMkUpdtMngDlg::OnBnClickedBtnAddentity()
 		if(IDOK == Tv_DlgEntity->DoModal())
 		{
 			GrDumyZeroMem(Tv_StrFile, 128);
+			
+			// 모델 타입, 엔티티 타입, 파일명, 파일명 길이
 			Tv_DlgEntity->GetAddEntity(&Tv_ModelType, &Tv_EntityType, Tv_StrFile, &Tv_StrLen);
 
 			LcAddEntity(Tv_ModelType, Tv_EntityType, Tv_StrFile, Tv_StrLen);

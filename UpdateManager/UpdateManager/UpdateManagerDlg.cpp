@@ -320,20 +320,20 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	// ------------------------------------
 
 	pDlgVerFileAdd = (DlgVerFileAdd*)new DlgVerFileAdd(NULL, m_szaNowPath);
-	
+
+	// 버전 파일 Dlg 호출
+
 	// Tree에서 클릭한 값의 제목을 가져온다.
 	stTreeItem = m_CTreeCtrl.GetSelectedItem();
 	strModelName = m_CTreeCtrl.GetItemText(stTreeItem);
+
 	_tcscpy(aszModel, strModelName.GetBuffer(0));
 	pDlgVerFileAdd->SetModelName(&aszModel[0]);
 	
-	// 버전 파일 Dlg 호출
-	pDlgVerFileAdd->DoModal();
 
-	// 24까지 반복
-	for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
+	if (IDOK == pDlgVerFileAdd->DoModal())
 	{
-		_tcscpy(aszModel, strModelName.GetBuffer(0));
+
 
 	}
 
