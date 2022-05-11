@@ -16,13 +16,13 @@ typedef struct _stUpdateTreeNode
 {
 	unsigned int			uiType;
 	HTREEITEM				stNode;
-	CHAR					szaNode[16];
+	TCHAR					szaNode[16];
 } *pUpdateTreeNode;
 
 typedef struct _stUpdateInfoEntity
 {
 	unsigned int			uiType;
-	CHAR					szaFile[256];
+	TCHAR					szaFile[256];
 } *pUpdateInfoEntity;
 
 typedef struct _stUpdateInfoModel

@@ -260,15 +260,15 @@ void CUpdateManagerDlg::TreeAddModel(int _iModelType)
 			switch (_iModelType)
 			{
 			case E_FirmUpInfoTypeJa1704:
-				_tcscpy((TCHAR*)&m_staTreeNode[iResult].szaNode, _T("Ja1704"));
+				_tcscpy(m_staTreeNode[iResult].szaNode, _T("Ja1704"));
 				m_staTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1704"), NULL, NULL);
 				break;
 			case E_FirmUpInfoTypeJa1708:
-				_tcscpy((TCHAR*)&m_staTreeNode[iResult].szaNode, _T("Ja1708"));
+				_tcscpy(m_staTreeNode[iResult].szaNode, _T("Ja1708"));
 				m_staTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1708"), NULL, NULL);
 				break;
 			case E_FirmUpInfoTypeJa1716:
-				_tcscpy((TCHAR*)&m_staTreeNode[iResult].szaNode, _T("Ja1716"));
+				_tcscpy(m_staTreeNode[iResult].szaNode, _T("Ja1716"));
 				m_staTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1716"), NULL, NULL);
 				break;
 			default:
@@ -317,7 +317,6 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	CString			strModelName;
 	HTREEITEM		stTreeItem = { 0 };
 	TCHAR			aszModel[16] = { 0 };
-	int				iLen = 0;
 	// ------------------------------------
 
 	pDlgVerFileAdd = (DlgVerFileAdd*)new DlgVerFileAdd(NULL, m_szaNowPath);
@@ -325,16 +324,24 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	// Tree에서 클릭한 값의 제목을 가져온다.
 	stTreeItem = m_CTreeCtrl.GetSelectedItem();
 	strModelName = m_CTreeCtrl.GetItemText(stTreeItem);
+	_tcscpy(aszModel, strModelName.GetBuffer(0));
+	pDlgVerFileAdd->SetModelName(&aszModel[0]);
+	
+	// 버전 파일 Dlg 호출
+	pDlgVerFileAdd->DoModal();
 
 	// 24까지 반복
 	for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
 	{
-		iLen = strModelName.GetLength();
 		_tcscpy(aszModel, strModelName.GetBuffer(0));
-		
 
-		
 	}
 
+
+	if (NULL != pDlgVerFileAdd)
+	{
+		delete pDlgVerFileAdd;
+		pDlgVerFileAdd = NULL;
+	}
 
 }

@@ -30,6 +30,7 @@ void DlgVerFileAdd::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(DlgVerFileAdd, CDialogEx)
+
 END_MESSAGE_MAP()
 
 
@@ -56,3 +57,17 @@ void DlgVerFileAdd::SetModelType(int _iModelType)
 	m_iModelType = _iModelType;
 }
 
+
+void DlgVerFileAdd::SetModelName(TCHAR* _pszModelName)
+{
+	TCHAR* pszModelName = _pszModelName;
+	CString strModelName = (LPCTSTR)pszModelName;
+	//SetDlgItemText(IDC_EDIT_VERSION_READ, strModelName);
+	m_pEdit = (CEdit*)GetDlgItem(IDC_EDIT_VERSION_READ);
+
+	if (m_pEdit)
+	{
+		m_pEdit->SetWindowText(_T("sdg"));
+	}
+
+}

@@ -17,7 +17,7 @@ public:
 	enum { IDD = IDD_DIALOG_VERSION_FILE };
 
 	void SetModelType(int _iModelType);
-	
+	void SetModelName(TCHAR* _pszModelName);
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 	DECLARE_MESSAGE_MAP()
@@ -27,5 +27,7 @@ private:
 	int		m_iEntityType;
 	TCHAR*	m_pszNowPath;
 	CString m_strFileName;
+	CEdit*	m_pEdit;
+	
 
 };
