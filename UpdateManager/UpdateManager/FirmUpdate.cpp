@@ -139,3 +139,8 @@ int	CFirmUpdate::ChkModelType(unsigned int _uiModelType)
 
 	return iResult;
 }
+
+int	CFirmUpdate::AddVerFile(unsigned int _uiModelType, unsigned int _uiVersionType, void* _pSrc, unsigned int _uiSize)
+{
+
+}

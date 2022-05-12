@@ -357,15 +357,35 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 	// Local ------------------------------
 	FILE* pFile;
 	TCHAR* pszBuff = NULL;
-	Cls_GrFileCtrl* liFileCtrl; // 라이브러리
+	Cls_GrFileCtrl* pFileCtrl; // 라이브러리
 	int iModelIdx = 0;
+	int iFileSize = 0;
+	int iResult = 0;
 	// ------------------------------------
 
 	if (NULL != m_pObjFwUp)
 	{
 		iModelIdx = _iModelIdx;
-		liFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(_pszFilePath, FALSE, FALSE);
+		pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(_pszFilePath, FALSE, FALSE);
+		
+		// open시 파일 선택했다면 IsOpened = TRUE
+		if (pFileCtrl->IsOpened())
+		{
+			iFileSize = pFileCtrl->GetSize();
+
+			pszBuff = new TCHAR(iFileSize);
+			pFileCtrl->Seek(0);
+			pFileCtrl->Read(pszBuff, iFileSize);
+			//iResult = m_pObjFwUp
+
+		}
+
 	}
 
+	if (NULL != pFileCtrl)
+	{
+		delete pFileCtrl;
+		pFileCtrl = NULL;
+	}
 
 }
