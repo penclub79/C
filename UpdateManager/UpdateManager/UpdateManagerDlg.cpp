@@ -358,14 +358,17 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 	FILE* pFile;
 	TCHAR* pszBuff = NULL;
 	Cls_GrFileCtrl* pFileCtrl; // 라이브러리
-	int iModelIdx = 0;
+	int iModelType = 0;
+	int iVerFileType = 0;
 	int iFileSize = 0;
 	int iResult = 0;
+	int iModelIdx = 0;
 	// ------------------------------------
 
 	if (NULL != m_pObjFwUp)
 	{
-		iModelIdx = _iModelIdx;
+		iModelType = _iModelIdx;
+		iVerFileType = _iVerFileType;
 		pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(_pszFilePath, FALSE, FALSE);
 		
 		// open시 파일 선택했다면 IsOpened = TRUE
@@ -376,8 +379,17 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 			pszBuff = new TCHAR(iFileSize);
 			pFileCtrl->Seek(0);
 			pFileCtrl->Read(pszBuff, iFileSize);
-			//iResult = m_pObjFwUp
+			iResult = m_pObjFwUp->AddVerFile(iModelType, iVerFileType, pszBuff, iFileSize);
 
+			if (0 <= iResult)
+			{
+				// find model
+				iModelIdx = m_pObjFwUp->GetModelTypeIdx(iModelType);
+				if (0 <= iModelIdx)
+				{
+
+				}
+			}
 		}
 
 	}
@@ -386,6 +398,12 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 	{
 		delete pFileCtrl;
 		pFileCtrl = NULL;
+	}
+
+	if (NULL != pszBuff)
+	{
+		delete pszBuff;
+		pszBuff = NULL;
 	}
 
 }

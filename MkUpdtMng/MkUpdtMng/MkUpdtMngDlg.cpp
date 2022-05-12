@@ -280,6 +280,7 @@ void CMkUpdtMngDlg::OnBnClickedBtnAddentity()
 		Tv_DlgEntity = NULL;
 }
 
+// TreeAddVerFile
 void CMkUpdtMngDlg::LcAddEntity(__u32 A_ModelIdx, __u32 A_EntityType, PCHAR A_PtrStrFile, __u32 A_StrLen)
 {
 	// local -------------------

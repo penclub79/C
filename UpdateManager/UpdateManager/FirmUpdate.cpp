@@ -31,10 +31,6 @@ CFirmUpdate::~CFirmUpdate()
 void CFirmUpdate::FirmInit()
 {
 	// local ---------------------------------------
-	unsigned int	uiResult		= 0;
-	unsigned int	uiIndex			= 0;
-	unsigned int	uiCount			= 0;
-
 	pFirmUpHeader	stFirmHd		= { 0 };
 	pFirmUpInfo		stFirmUpInfo	= { 0 };
 	pFirmUpEnd		stFirmEnd		= { 0 };
@@ -70,22 +66,22 @@ void CFirmUpdate::FirmInit()
 }
 
 // 모델 타입 추가
-int	CFirmUpdate::AddModelType(unsigned int _uiModelType)
+int	CFirmUpdate::AddModelType(int _iModelType)
 {
 	// local ---------------------------------------
-	int iResult = 0;
-	pFirmUpInfo stFirmUpInfo = { 0 };
-	BOOL bIsExist = FALSE;
-	int iIndex = 0;
+	int			iResult			= 0;
+	pFirmUpInfo stFirmUpInfo	= { 0 };
+	BOOL		bIsExist		= FALSE;
+	int			iIndex			= 0;
 	// ---------------------------------------------
 
 	iResult = E_FirmUpErrCode;
 	
 	// 24보다 작거나 같고 0이 아닌 model type
-	if ((E_FirmUpInfoTypeMaxIdx >= _uiModelType) && (_uiModelType != E_FirmUpInfoTypeNone))
+	if ((E_FirmUpInfoTypeMaxIdx >= _iModelType) && (_iModelType != E_FirmUpInfoTypeNone))
 	{
 		// 모델 중복 체크
-		if (E_FirmUpErrCode != ChkModelType(_uiModelType))
+		if (E_FirmUpErrCode != ChkModelType(_iModelType))
 		{
 			// 모델 존재
 			bIsExist = TRUE;
@@ -101,7 +97,7 @@ int	CFirmUpdate::AddModelType(unsigned int _uiModelType)
 			if (E_FirmUpErrCode != iIndex)
 			{
 				stFirmUpInfo = &m_stFirmHeader.FirmInfo[iIndex];
-				stFirmUpInfo->ModelType = _uiModelType;
+				stFirmUpInfo->ModelType = _iModelType;
 				iResult = iIndex;
 			}
 		}
@@ -140,7 +136,92 @@ int	CFirmUpdate::ChkModelType(unsigned int _uiModelType)
 	return iResult;
 }
 
-int	CFirmUpdate::AddVerFile(unsigned int _uiModelType, unsigned int _uiVersionType, void* _pSrc, unsigned int _uiSize)
+int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, void* _pSrc, int _iFileSize)
 {
+	// Local --------------------------------------
+	int iResult = 0;
+	int iModelIdx = 0;
+	int iVerFileIdx = 0;
+	//---------------------------------------------
 
+
+	iResult = E_FirmUpErrCode;
+	iModelIdx = ChkModelType(_iModelType);
+
+	if (0 <= iModelIdx)
+	{
+
+		// 버전 파일타입 check시 중복이라면
+		if (0 > ChkEntityType(_iVerFileType, m_stFirmHeader.FirmInfo[iModelIdx].Entity))
+		{
+			iVerFileIdx = ChkEntityType(E_FirmUpEntityNone, m_stFirmHeader.FirmInfo[iModelIdx].Entity);
+
+			if (NULL == m_pData[iModelIdx][iVerFileIdx])
+			{
+				m_pData[iModelIdx][iVerFileIdx] = new TCHAR(_iFileSize);
+
+				if (NULL != m_pData[iModelIdx][iVerFileIdx])
+				{
+					m_stFirmHeader.FirmInfo[iModelIdx].Entity[iVerFileIdx].Size = _iFileSize;
+					m_stFirmHeader.FirmInfo[iModelIdx].Entity[iVerFileIdx].Type = _iVerFileType;
+					memcpy(m_pData[iModelIdx][iVerFileIdx], _pSrc, _iFileSize);
+					m_stFirmHeader.Size = m_stFirmHeader.Size + _iFileSize;
+					iResult = iVerFileIdx;
+				}
+				else
+				{
+					DbgMsgPrint("Cls_FirmUpdt::AddEntity() : malloc failed.\n");
+				}
+			}
+			else
+			{
+				DbgMsgPrint("Cls_FirmUpdt::AddEntity() : error exist data\n");
+				iResult = E_FirmUpErrExistData;
+			}
+		}
+		else
+		{
+			DbgMsgPrint("Cls_FirmUpdt::AddEntity() : error exist entity\n");
+			iResult = E_FirmUpErrExistEntity;
+		}
+	}
+	else
+	{
+		DbgMsgPrint("Cls_FirmUpdt::AddEntity() : Model Type Index error.\n");
+	}
+
+	return iResult;
+}
+
+// 버전파일 타입 체크
+int	CFirmUpdate::ChkEntityType(int _iVerFileType, pFirmUpEntity _stEntity)
+{
+	// Local --------------------------------------
+	int				iResult			= 0;
+	pFirmUpEntity	stFirmUpEntity	= { 0 };
+	//---------------------------------------------
+
+	iResult = E_FirmUpErrCode;
+	stFirmUpEntity = _stEntity;
+
+	for (int i = 0; i < E_FirmUpEntityCnt; i++)
+	{
+		// 해당 버전 파일타입이 있다면
+		if (stFirmUpEntity->Type == _iVerFileType)
+		{
+			// 해당 인덱스를 추출
+			iResult = i;
+			break;
+		}
+
+		// 다음 FirmUpEntity 구조체로 넘김
+		stFirmUpEntity++;
+	}
+
+	return iResult;
+}
+
+int	CFirmUpdate::GetModelTypeIdx(int _iModelType)
+{
+	return ChkModelType(_iModelType);
 }

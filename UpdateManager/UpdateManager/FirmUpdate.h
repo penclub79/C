@@ -89,20 +89,22 @@ public:
 	void	FirmInit();
 
 	// 모델 추가
-	int		AddModelType(unsigned int _uiModelType);
+	int		AddModelType(int _iModelType);
 	
+	// 버전 파일 추가
+	int		AddVerFile(int _iModelType, int _iVerFileType, void* _pSrc, int _iFileSize);
+
+	int		GetModelTypeIdx(int _iModelType);
 
 protected:
 	// 모델 삭제
-	void	DelModelType(unsigned int _uiModelType);
-
-	// 버전 파일 선택
-	int		AddVerFile(unsigned int _uiModelType, unsigned int _uiVersionType, void* _pSrc, unsigned int _uiSize);
+	void	DelModelType(int _iModelType);
 
 	// 버전 파일 삭제
-	void	DelVerFile(unsigned int _uiModelType, unsigned int _uiVersionType);
+	void	DelVerFile(int _iModelType, int _iVersionType);
 	
-	int		ChkEntityType(unsigned int _uiVersionType, pFirmUpEntity _stEntity);
+	// 버전 파일 체크
+	int		ChkEntityType(int _iVersionType, pFirmUpEntity _stEntity);
 
 private:
 	_stFirmUpHeader		m_stFirmHeader;
@@ -111,8 +113,8 @@ private:
 	void*				m_pMkUpdt;
 
 	void*	GetMkUpdt(unsigned int* _puiSize);
-	void	SetUpdtVer(unsigned int _uiVer);
-	int		GetModelTblIdx(unsigned int _uiModelType);
+	void	SetUpdtVer(int _iVer);
+	
 
 	// 모델 타입 체크
 	int		ChkModelType(unsigned int _uiModelType);
