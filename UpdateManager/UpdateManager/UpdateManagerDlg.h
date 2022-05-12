@@ -100,4 +100,5 @@ public:
 	afx_msg void OnClickedButtonModelCreate(); // 모델 추가
 	afx_msg void OnClickedButtonEntitySelete(); // 버전 파일 선택
 	afx_msg void OnClickedButtonSavePath();
+	afx_msg void OnClickedButtonPackageMake();
 };

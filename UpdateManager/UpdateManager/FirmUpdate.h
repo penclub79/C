@@ -96,6 +96,8 @@ public:
 
 	int		GetModelTypeIdx(int _iModelType);
 
+	void	SetUpdateVersion(unsigned int _uiVersion);
+
 protected:
 	// ¸ðµ¨ »èÁ¦
 	void	DelModelType(int _iModelType);

@@ -232,3 +232,9 @@ int	CFirmUpdate::GetModelTypeIdx(int _iModelType)
 {
 	return ChkModelType(_iModelType);
 }
+
+// 구조체에 버전 적용시키기
+void CFirmUpdate::SetUpdateVersion(unsigned int _uiVersion)
+{
+	m_stFirmHeader.UpgdVer = _uiVersion;
+}

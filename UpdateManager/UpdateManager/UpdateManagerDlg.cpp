@@ -73,6 +73,10 @@ void CUpdateManagerDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_TREE_ITEM, m_CTreeCtrl);
 	DDX_Control(pDX, IDC_EDIT_PATH, m_CEditPath);
+	DDX_Control(pDX, IDC_EDIT_VERSION1, m_CEditVer1);
+	DDX_Control(pDX, IDC_EDIT_VERSION2, m_CEditVer2);
+	DDX_Control(pDX, IDC_EDIT_VERSION3, m_CEditVer3);
+	DDX_Control(pDX, IDC_EDIT_VERSION4, m_CEditVer4);
 }
 
 BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
@@ -82,6 +86,7 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_CREATE, &CUpdateManagerDlg::OnClickedButtonModelCreate)
 	ON_BN_CLICKED(IDC_BUTTON_ENTITY_SELETE, &CUpdateManagerDlg::OnClickedButtonEntitySelete)
 	ON_BN_CLICKED(IDC_BUTTON_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonSavePath)
+	ON_BN_CLICKED(IDC_BUTTON_PACKAGE_MAKE, &CUpdateManagerDlg::OnClickedButtonPackageMake)
 END_MESSAGE_MAP()
 
 
@@ -202,20 +207,6 @@ void CUpdateManagerDlg::Init()
 		//pObjFile2 = new Cls_GrFileCtrl(szaInitFile, FALSE, FALSE); test
 	}
 }
-
-//void CUpdateManagerDlg::AddModel(unsigned int _uiModelType)
-//{
-//	// Local ------------------------------
-//		int iResult = 0;
-//
-//	// ------------------------------------
-//
-//		if (NULL != m_pObjFwUp)
-//		{
-//			
-//		}
-//}
-
 
 // 모델 생성 Button
 void CUpdateManagerDlg::OnClickedButtonModelCreate()
@@ -491,7 +482,7 @@ int CUpdateManagerDlg::FindTreeNode(int _iModelType)
 	return iResult;
 }
 
-
+// 저장 경로 설정
 void CUpdateManagerDlg::OnClickedButtonSavePath()
 {
 	CFileDialog* pFileDlg;
@@ -513,4 +504,36 @@ void CUpdateManagerDlg::OnClickedButtonSavePath()
 		memset(m_stUpdateInfo.szaUpgdFileName, 0, 1024);
 		_tcscpy(m_stUpdateInfo.szaUpgdFileName, strPath.GetBuffer(0));
 	}
+}
+
+// 업데이트 패키지 생성
+void CUpdateManagerDlg::OnClickedButtonPackageMake()
+{
+	BOOL bIsSuccess = FALSE;
+	CString strVersion1;
+	CString strVersion2;
+	CString strVersion3;
+	CString strVersion4;
+
+	int aiVersion[4] = { 0 };
+	unsigned int uiVersion = 0;
+
+	if (NULL != m_pObjFwUp)
+	{
+		m_CEditVer1.GetWindowTextW(strVersion1);
+		m_CEditVer2.GetWindowTextW(strVersion2);
+		m_CEditVer3.GetWindowTextW(strVersion3);
+		m_CEditVer4.GetWindowTextW(strVersion4);
+
+		// String을 int로 변환
+		aiVersion[0] = (int)(_ttoi(strVersion1));
+		aiVersion[1] = (int)(_ttoi(strVersion2));
+		aiVersion[2] = (int)(_ttoi(strVersion3));
+		aiVersion[3] = (int)(_ttoi(strVersion4));
+		
+		uiVersion = (aiVersion[0] << 24) | (aiVersion[1] << 16) | (aiVersion[2] << 8) | aiVersion[3];
+
+		m_pObjFwUp->
+	}
+
 }

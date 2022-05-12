@@ -298,7 +298,7 @@ void* Cls_FirmUpdt::GetMkUpdt(__u32* A_PtrSize)
 				GrDumyCopyMem(Tv_PtrUpdt, &m_FirmHd, sizeof(St_FirmUpHd));
 
 				*A_PtrSize	= m_FirmHd.Size;
-				Tv_Result		= m_PtrMkUpdt;
+				Tv_Result	= m_PtrMkUpdt;
 			}
 		}
 
