@@ -72,6 +72,7 @@ void CUpdateManagerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_TREE_ITEM, m_CTreeCtrl);
+	DDX_Control(pDX, IDC_EDIT_PATH, m_CEditPath);
 }
 
 BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
@@ -80,6 +81,7 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_CREATE, &CUpdateManagerDlg::OnClickedButtonModelCreate)
 	ON_BN_CLICKED(IDC_BUTTON_ENTITY_SELETE, &CUpdateManagerDlg::OnClickedButtonEntitySelete)
+	ON_BN_CLICKED(IDC_BUTTON_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonSavePath)
 END_MESSAGE_MAP()
 
 
@@ -351,7 +353,7 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 
 }
 
-// 트리에 해당 모델에서 버전파일 추가 및 출력
+// 트리에 해당 모델에서 버전파일 확인 후 구조체에 데이터 적용
 void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR* _pszFilePath, int _iFileLen)
 {
 	// Local ------------------------------
@@ -363,6 +365,9 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 	int iFileSize = 0;
 	int iResult = 0;
 	int iModelIdx = 0;
+	TCHAR aszFileName[64] = { 0 };
+	CString strPath;
+	CString strFileName;
 	// ------------------------------------
 
 	if (NULL != m_pObjFwUp)
@@ -387,8 +392,24 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 				iModelIdx = m_pObjFwUp->GetModelTypeIdx(iModelType);
 				if (0 <= iModelIdx)
 				{
+					m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].uiType = _iVerFileType;
+					// 파일 경로 복사
+					memcpy(m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].szaFile, _pszFilePath, iFileSize);
+
+					// 파일 이름만 복사
+					// 경로
+					strPath = _pszFilePath;
+					// '\\'찾은 index에서 
+					strFileName = strPath.Right(strPath.GetLength() - strPath.ReverseFind('\\') - 1);
+					// 메모리 카피
+					_tcscpy(aszFileName, strFileName.GetBuffer(0));
+					TreeAddVerFileNode(iModelType, iVerFileType, aszFileName);
 
 				}
+			}
+			else
+			{
+				ProcErrCode(iResult);
 			}
 		}
 
@@ -406,4 +427,90 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 		pszBuff = NULL;
 	}
 
+}
+
+
+void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, TCHAR* _pszFileName)
+{
+	int iResult = 0;
+	int iNodeIdx = 0;
+	TCHAR szTmp[64] = { 0 };
+	TCHAR szNodeName[64] = { 0 };
+	CString strFormatName;
+	iNodeIdx = FindTreeNode(_iModelType);
+
+	switch (_iVerFileType)
+	{
+	case E_FirmUpEntityLoader:
+		_tcscpy(szTmp, _T("Loader"));
+		break;
+	case E_FirmUpEntityFdt:
+		_tcscpy(szTmp, _T("FDT"));
+		break;
+	case E_FirmUpEntityUboot:
+		_tcscpy(szTmp, _T("U-Boot"));
+		break;
+	case E_FirmUpEntityKernel:
+		_tcscpy(szTmp, _T("Kernel"));
+		break;
+	case E_FirmUpEntityLogo:
+		_tcscpy(szTmp, _T("Logo"));
+		break;
+	case E_FirmUpEntityRootfs:
+		_tcscpy(szTmp, _T("RootFs"));
+		break;
+	}
+	// Node에 들어갈 제목 수정
+	strFormatName.Format(_T("%s(%s)"), szTmp, _pszFileName);
+	_tcscpy(szNodeName, strFormatName.GetBuffer(0));
+
+	// 트리 Node에 추가
+	m_CTreeCtrl.InsertItem(szNodeName, m_staTreeNode[iNodeIdx].stNode, NULL);
+	m_CTreeCtrl.Invalidate(TRUE);
+
+	m_stUpdateInfo.staModelInfo[iNodeIdx].uiType = _iModelType;
+}
+
+
+// 모델타입 트리에서 찾기
+int CUpdateManagerDlg::FindTreeNode(int _iModelType)
+{
+	int iResult = 0;
+
+	iResult = -1;
+
+	for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
+	{
+		if (_iModelType == m_staTreeNode[i].uiType)
+		{
+			iResult = i;
+			break;
+		}
+	}
+
+	return iResult;
+}
+
+
+void CUpdateManagerDlg::OnClickedButtonSavePath()
+{
+	CFileDialog* pFileDlg;
+	CString strPath;
+
+	
+	pFileDlg = (CFileDialog*)new CFileDialog(TRUE, NULL, NULL, OFN_PATHMUSTEXIST, _T("All Files(*.*)|*.*"), NULL);
+
+	//FileDialog 오픈 했을 때 lpstrInitialDir를 통해 초기 경로 폴더로 열기
+	pFileDlg->m_ofn.lpstrInitialDir = m_szaNowPath;
+	
+	if (IDOK == pFileDlg->DoModal())
+	{
+		strPath = pFileDlg->GetPathName();
+		memset(m_szaMkFileName, 0, sizeof(TCHAR) * 1024);
+		_tcscpy(m_szaMkFileName, strPath.GetBuffer(0));
+		m_CEditPath.SetWindowTextW(strPath);
+
+		memset(m_stUpdateInfo.szaUpgdFileName, 0, 1024);
+		_tcscpy(m_stUpdateInfo.szaUpgdFileName, strPath.GetBuffer(0));
+	}
 }

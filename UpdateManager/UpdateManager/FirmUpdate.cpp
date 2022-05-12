@@ -190,6 +190,13 @@ int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, void* _pSrc, int
 		DbgMsgPrint("Cls_FirmUpdt::AddEntity() : Model Type Index error.\n");
 	}
 
+
+	if (NULL != m_pData[iModelIdx][iVerFileIdx])
+	{
+		delete m_pData[iModelIdx][iVerFileIdx];
+		m_pData[iModelIdx][iVerFileIdx] = NULL;
+	}
+
 	return iResult;
 }
 

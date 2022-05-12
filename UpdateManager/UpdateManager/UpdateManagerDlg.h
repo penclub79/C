@@ -36,7 +36,7 @@ typedef struct _stUpdateInfo
 	unsigned int			uiFcc;
 	unsigned int			uiUpgdVersion;
 	_stUpdateInfoModel		staModelInfo[16];
-	WCHAR					szaUpgdFileName[1024];
+	TCHAR					szaUpgdFileName[1024];
 } *pUpdateInfo;
 
 // ---------------------------------------------------- struct 
@@ -75,14 +75,15 @@ protected:
 
 	void TreeAddModel(int _iModelType); // 트리에 모델 추가
 	void TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR* _pszFilePath, int _iFileLen); // 트리에 모델에서 버전파일 추가
+	void TreeAddVerFileNode(int _iModelType, int _iVerFileType, TCHAR* _pszFileName);
 	void ProcErrCode(int _iResult); // 에러 처리
 	
 private:
-	WCHAR				m_szaNowPath[2048];
+	TCHAR				m_szaNowPath[2048];
 
 	CFirmUpdate*		m_pObjFwUp;
 	_stUpdateTreeNode	m_staTreeNode[E_FirmUpInfoTypeMaxIdx];  // 24
-	WCHAR				m_szaMkFileName[1024];
+	TCHAR				m_szaMkFileName[1024];
 	_stUpdateInfo		m_stUpdateInfo;
 
 	CTreeCtrl	m_CTreeCtrl;
@@ -94,7 +95,9 @@ private:
 	CButton		m_CBtnPath;
 	CButton		m_CBtnMake;
 
+	int FindTreeNode(int _iModelType);
 public:
 	afx_msg void OnClickedButtonModelCreate(); // 모델 추가
 	afx_msg void OnClickedButtonEntitySelete(); // 버전 파일 선택
+	afx_msg void OnClickedButtonSavePath();
 };

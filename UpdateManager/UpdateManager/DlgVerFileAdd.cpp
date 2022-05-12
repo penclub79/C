@@ -154,11 +154,6 @@ void DlgVerFileAdd::GetVerFileType(int* _piModelType, int* _piVerFileType, TCHAR
 	_tcscpy(_pszFileName, m_strFileName.GetBuffer(0));
 }
 
-int	DlgVerFileAdd::GetModelTypeIdx(int _iModelType)
-{
-
-}
-
 // OK ¹öÆ°
 void DlgVerFileAdd::OnClickedButtonVersionOk()
 {
