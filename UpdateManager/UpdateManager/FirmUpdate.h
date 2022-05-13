@@ -98,6 +98,9 @@ public:
 
 	void	SetUpdateVersion(unsigned int _uiVersion);
 
+	// 패키지 저장시 사이즈 얻기
+	void*	GetMakeUpdate(unsigned int* _puiSize);
+
 protected:
 	// 모델 삭제
 	void	DelModelType(int _iModelType);
@@ -112,9 +115,9 @@ private:
 	_stFirmUpHeader		m_stFirmHeader;
 	_stFirmUpEnd		m_stFirmEd;
 	void*				m_pData[E_FirmUpInfoCnt][E_FirmUpEntityCnt];
-	void*				m_pMkUpdt;
+	void*				m_pMakeUpdate;
 
-	void*	GetMkUpdt(unsigned int* _puiSize);
+	
 	void	SetUpdtVer(int _iVer);
 	
 

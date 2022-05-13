@@ -77,7 +77,7 @@ protected:
 	void TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR* _pszFilePath, int _iFileLen); // 트리에 모델에서 버전파일 추가
 	void TreeAddVerFileNode(int _iModelType, int _iVerFileType, TCHAR* _pszFileName);
 	void ProcErrCode(int _iResult); // 에러 처리
-	
+	void InitMakeFile(); // init파일 만드는 함수
 private:
 	TCHAR				m_szaNowPath[2048];
 

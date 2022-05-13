@@ -423,11 +423,12 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 
 void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, TCHAR* _pszFileName)
 {
-	int iResult = 0;
-	int iNodeIdx = 0;
-	TCHAR szTmp[64] = { 0 };
-	TCHAR szNodeName[64] = { 0 };
+	int iResult				= 0;
+	int iNodeIdx			= 0;
+	TCHAR szTmp[64]			= { 0 };
+	TCHAR szNodeName[64]	= { 0 };
 	CString strFormatName;
+
 	iNodeIdx = FindTreeNode(_iModelType);
 
 	switch (_iVerFileType)
@@ -509,14 +510,21 @@ void CUpdateManagerDlg::OnClickedButtonSavePath()
 // 업데이트 패키지 생성
 void CUpdateManagerDlg::OnClickedButtonPackageMake()
 {
-	BOOL bIsSuccess = FALSE;
 	CString strVersion1;
 	CString strVersion2;
 	CString strVersion3;
 	CString strVersion4;
-
-	int aiVersion[4] = { 0 };
-	unsigned int uiVersion = 0;
+	
+	Cls_GrFileCtrl* pFileCtrl		= NULL;
+	void*			pFile			= NULL;
+	BOOL			bIsSuccess		= FALSE;
+	int				aiVersion[4]	= { 0 };
+	unsigned int	uiFileSize		= 0;
+	unsigned int	uiVersion		= 0;
+	int				iWorteSize		= 0;
+	int				iWriteSize		= 0;
+	int				iResult			= 0;
+	
 
 	if (NULL != m_pObjFwUp)
 	{
@@ -533,7 +541,110 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 		
 		uiVersion = (aiVersion[0] << 24) | (aiVersion[1] << 16) | (aiVersion[2] << 8) | aiVersion[3];
 
-		m_pObjFwUp->
+		// 버전 저장
+		m_pObjFwUp->SetUpdateVersion(uiVersion);
+
+		// 저장할 패키지 사이즈 얻어오기
+		//pFile = m_pObjFwUp->GetMakeUpdate(&uiFileSize);
+		
+		// FileCtrl클래스 할당
+		if (NULL == pFileCtrl)
+		{
+			// 파일 만드는 클래스 할당
+			pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(m_szaMkFileName, TRUE, TRUE);
+		}
+
+		if (TRUE == pFileCtrl->IsOpened())
+		{
+			iWorteSize = 0;
+
+			// GEtMakeUpdate에서 받아온 파일 사이즈 담기
+			iWriteSize = uiFileSize;
+			
+			while (TRUE)
+			{
+				// Write함수에 파일 포인터, 파일 사이즈로 결과값 담기
+				iResult = pFileCtrl->Write(pFile, iWriteSize);
+				iWorteSize = iWorteSize + iResult;
+				iWriteSize = iWriteSize + iResult;
+
+				// 파일 사이즈랑 같다면
+				if (iWorteSize == uiFileSize)
+				{
+					// 결과 TRUE
+					bIsSuccess = TRUE;
+					// init파일 만드는 함수호출
+					InitMakeFile();
+					break;
+				}
+			}
+		}
+		else
+		{
+			MessageBox(_T("File Open Error"), _T("Error"), MB_OK | MB_ICONWARNING);
+		}
+
+		// 메모리 해제
+		if (NULL != pFileCtrl)
+		{
+			free(pFileCtrl);
+			pFileCtrl = NULL;
+		}
 	}
 
+	if (bIsSuccess)
+	{
+		MessageBox(_T("Make File Success"), NULL, MB_OK | MB_ICONWARNING);
+	}
+
+}
+
+// init파일 만드는 함수
+void CUpdateManagerDlg::InitMakeFile()
+{
+	CString strVersion1;
+	CString strVersion2;
+	CString strVersion3;
+	CString strVersion4;
+	CString strPath;
+	CString strFile;
+
+	TCHAR* pszBuff = NULL;
+	int aiVersion[4] = { 0 };
+	int iVersion = 0;
+	int iPathLen = 0;
+
+	m_stUpdateInfo.uiFcc = E_MkUpdt_IniFcc;
+
+	m_CEditVer1.GetWindowTextW(strVersion1);
+	m_CEditVer2.GetWindowTextW(strVersion2);
+	m_CEditVer3.GetWindowTextW(strVersion3);
+	m_CEditVer4.GetWindowTextW(strVersion4);
+
+	aiVersion[0] = (int)(_ttoi(strVersion1));
+	aiVersion[1] = (int)(_ttoi(strVersion2));
+	aiVersion[2] = (int)(_ttoi(strVersion3));
+	aiVersion[3] = (int)(_ttoi(strVersion4));
+
+	iVersion = (aiVersion[0] << 24) | (aiVersion[1] << 16) | (aiVersion[2] << 8) | aiVersion[3];
+
+	m_stUpdateInfo.uiUpgdVersion = iVersion;
+	
+	strPath = (LPCTSTR)m_szaNowPath;
+	iPathLen = strPath.GetLength();
+
+	// 현재 경로를 복사
+	pszBuff = new TCHAR(sizeof(TCHAR) * iPathLen + 1);
+	memset(pszBuff, 0, sizeof(TCHAR)* iPathLen);
+
+	// init파일로 만들기
+	strFile.Format(_T("%s\\MkUpdt.init"), strPath);
+	
+
+
+	if (NULL != pszBuff)
+	{
+		delete pszBuff;
+		pszBuff = NULL;
+	}
 }

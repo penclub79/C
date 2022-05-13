@@ -11,7 +11,7 @@ CFirmUpdate::CFirmUpdate()
 {
 	m_stFirmEd = { 0 };
 	m_stFirmHeader = { 0 };
-	m_pMkUpdt = NULL;
+	m_pMakeUpdate = NULL;
 	
 	for (int i = 0; i < E_FirmUpInfoCnt; i++)
 	{
@@ -57,10 +57,10 @@ void CFirmUpdate::FirmInit()
 	}
 
 	// make Update NULL 체크
-	if (NULL != m_pMkUpdt)
+	if (NULL != m_pMakeUpdate)
 	{
-		free(m_pMkUpdt);
-		m_pMkUpdt = NULL;
+		free(m_pMakeUpdate);
+		m_pMakeUpdate = NULL;
 	}
 
 }
@@ -237,4 +237,69 @@ int	CFirmUpdate::GetModelTypeIdx(int _iModelType)
 void CFirmUpdate::SetUpdateVersion(unsigned int _uiVersion)
 {
 	m_stFirmHeader.UpgdVer = _uiVersion;
+}
+
+// 패키지 저장시 사이즈 얻기
+void* CFirmUpdate::GetMakeUpdate(unsigned int* _puiSize)
+{
+	void* pResult = NULL;
+	int* piUpdateMem = NULL;
+	int iUpdatePos = 0;
+
+
+	if (0 < m_stFirmHeader.Size)
+	{
+		/*if (NULL != m_pMakeUpdate)
+		{
+
+		}*/
+
+		// 헤더 사이즈 만큼 동적할당
+		m_pMakeUpdate = malloc(m_stFirmHeader.Size);
+
+		// 새로운 포인터 변수에 담는다.
+		piUpdateMem = (int*)m_pMakeUpdate;
+
+		// 헤더 메모리가 NULL이 아니면
+		if (NULL != m_pMakeUpdate)
+		{
+			// 헤더 사이즈 + 헤더 구조체 사이즈
+			piUpdateMem = piUpdateMem + sizeof(_stFirmUpHeader);
+
+			// 16까지 반복
+			for (int iInfo = 0; iInfo < E_FirmUpInfoCnt; iInfo++)
+			{
+				// 16까지 반복
+				for (int iEnti = 0; iEnti < E_FirmUpEntityCnt; iEnti++)
+				{
+					if (NULL != m_pData[iInfo][iEnti])
+					{
+						// 새로운 포인터 변수에 데이터 memmove
+						memmove(piUpdateMem, m_pData[iInfo][iEnti], m_stFirmHeader.FirmInfo[iInfo].Entity[iEnti].Size);
+
+						// 구조체 헤더->펌웨어Info->Entity->Offset에 0을 담음
+						m_stFirmHeader.FirmInfo[iInfo].Entity[iEnti].Offset = iUpdatePos;
+
+						// 위 UpdatePos 변수에 헤더->펌웨어Info->Entity의 사이즈를 담음
+						iUpdatePos = iUpdatePos + m_stFirmHeader.FirmInfo[iInfo].Entity[iEnti].Size;
+
+						// 포인터 변수에 헤더->펌웨어Info->Entity의 사이즈를 담음
+						piUpdateMem = piUpdateMem + m_stFirmHeader.FirmInfo[iInfo].Entity[iEnti].Size;
+					}
+				}
+			}
+			// 패키지 make 구조체 End
+			memmove(piUpdateMem, &m_stFirmEd, sizeof(_stFirmUpEnd));
+
+			// 패키지 make 구조체 Header
+			memmove(piUpdateMem, &m_stFirmHeader, sizeof(_stFirmUpHeader));
+
+			// GET 헤더 사이즈
+			*_puiSize = m_stFirmHeader.Size;
+			pResult = m_pMakeUpdate;
+		}
+	}
+
+	return pResult;
+
 }
