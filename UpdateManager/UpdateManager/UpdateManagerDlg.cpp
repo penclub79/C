@@ -194,7 +194,7 @@ void CUpdateManagerDlg::Init()
 	m_pObjFwUp = (CFirmUpdate*)new CFirmUpdate();
 	m_pObjFwUp->FirmInit();
 
-	memset(m_staTreeNode, 0, sizeof(_stUpdateTreeNode) * 3); // 72
+	memset(m_astTreeNode, 0, sizeof(_stUpdateTreeNode) * 3); // 72
 	memset(&m_stUpdateInfo, 0, sizeof(_stUpdateInfo));
 
 	memcpy(&szaInitFile, &m_szaNowPath, 2048);
@@ -248,21 +248,21 @@ void CUpdateManagerDlg::TreeAddModel(int _iModelType)
 
 		if (E_FirmUpInfoTypeNone <= m_pObjFwUp)
 		{
-			m_staTreeNode[iResult].uiType = _iModelType;
+			m_astTreeNode[iResult].uiType = _iModelType;
 
 			switch (_iModelType)
 			{
 			case E_FirmUpInfoTypeJa1704:
-				_tcscpy(m_staTreeNode[iResult].szaNode, _T("Ja1704"));
-				m_staTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1704"), NULL, NULL);
+				_tcscpy(m_astTreeNode[iResult].szaNode, _T("Ja1704"));
+				m_astTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1704"), NULL, NULL);
 				break;
 			case E_FirmUpInfoTypeJa1708:
-				_tcscpy(m_staTreeNode[iResult].szaNode, _T("Ja1708"));
-				m_staTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1708"), NULL, NULL);
+				_tcscpy(m_astTreeNode[iResult].szaNode, _T("Ja1708"));
+				m_astTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1708"), NULL, NULL);
 				break;
 			case E_FirmUpInfoTypeJa1716:
-				_tcscpy(m_staTreeNode[iResult].szaNode, _T("Ja1716"));
-				m_staTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1716"), NULL, NULL);
+				_tcscpy(m_astTreeNode[iResult].szaNode, _T("Ja1716"));
+				m_astTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1716"), NULL, NULL);
 				break;
 			default:
 				break;
@@ -353,7 +353,7 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 	Cls_GrFileCtrl* pFileCtrl; // 라이브러리
 	int iModelType = 0;
 	int iVerFileType = 0;
-	int iFileSize = 0;
+	unsigned int uiFileSize = 0;
 	int iResult = 0;
 	int iModelIdx = 0;
 	TCHAR aszFileName[64] = { 0 };
@@ -370,12 +370,12 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 		// open시 파일 선택했다면 IsOpened = TRUE
 		if (pFileCtrl->IsOpened())
 		{
-			iFileSize = pFileCtrl->GetSize();
+			uiFileSize = pFileCtrl->GetSize();
 
-			pszBuff = new TCHAR(iFileSize);
+			pszBuff = new TCHAR(sizeof(TCHAR)* uiFileSize);
 			pFileCtrl->Seek(0);
-			pFileCtrl->Read(pszBuff, iFileSize);
-			iResult = m_pObjFwUp->AddVerFile(iModelType, iVerFileType, pszBuff, iFileSize);
+			pFileCtrl->Read(pszBuff, uiFileSize);
+			iResult = m_pObjFwUp->AddVerFile(iModelType, iVerFileType, pszBuff, uiFileSize);
 
 			if (0 <= iResult)
 			{
@@ -385,7 +385,7 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 				{
 					m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].uiType = _iVerFileType;
 					// 파일 경로 복사
-					memcpy(m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].szaFile, _pszFilePath, iFileSize);
+					memcpy(m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].szaFile, _pszFilePath, uiFileSize);
 
 					// 파일 이름만 복사
 					// 경로
@@ -457,7 +457,7 @@ void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, T
 	_tcscpy(szNodeName, strFormatName.GetBuffer(0));
 
 	// 트리 Node에 추가
-	m_CTreeCtrl.InsertItem(szNodeName, m_staTreeNode[iNodeIdx].stNode, NULL);
+	m_CTreeCtrl.InsertItem(szNodeName, m_astTreeNode[iNodeIdx].stNode, NULL);
 	m_CTreeCtrl.Invalidate(TRUE);
 
 	m_stUpdateInfo.staModelInfo[iNodeIdx].uiType = _iModelType;
@@ -473,7 +473,7 @@ int CUpdateManagerDlg::FindTreeNode(int _iModelType)
 
 	for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
 	{
-		if (_iModelType == m_staTreeNode[i].uiType)
+		if (_iModelType == m_astTreeNode[i].uiType)
 		{
 			iResult = i;
 			break;
@@ -498,8 +498,8 @@ void CUpdateManagerDlg::OnClickedButtonSavePath()
 	if (IDOK == pFileDlg->DoModal())
 	{
 		strPath = pFileDlg->GetPathName();
-		memset(m_szaMkFileName, 0, sizeof(TCHAR) * 1024);
-		_tcscpy(m_szaMkFileName, strPath.GetBuffer(0));
+		memset(m_aszMkFileName, 0, sizeof(TCHAR) * 1024);
+		_tcscpy(m_aszMkFileName, strPath.GetBuffer(0));
 		m_CEditPath.SetWindowTextW(strPath);
 
 		memset(m_stUpdateInfo.szaUpgdFileName, 0, 1024);
@@ -510,11 +510,6 @@ void CUpdateManagerDlg::OnClickedButtonSavePath()
 // 업데이트 패키지 생성
 void CUpdateManagerDlg::OnClickedButtonPackageMake()
 {
-	CString strVersion1;
-	CString strVersion2;
-	CString strVersion3;
-	CString strVersion4;
-	
 	Cls_GrFileCtrl* pFileCtrl		= NULL;
 	void*			pFile			= NULL;
 	BOOL			bIsSuccess		= FALSE;
@@ -528,16 +523,11 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 
 	if (NULL != m_pObjFwUp)
 	{
-		m_CEditVer1.GetWindowTextW(strVersion1);
-		m_CEditVer2.GetWindowTextW(strVersion2);
-		m_CEditVer3.GetWindowTextW(strVersion3);
-		m_CEditVer4.GetWindowTextW(strVersion4);
-
-		// String을 int로 변환
-		aiVersion[0] = (int)(_ttoi(strVersion1));
-		aiVersion[1] = (int)(_ttoi(strVersion2));
-		aiVersion[2] = (int)(_ttoi(strVersion3));
-		aiVersion[3] = (int)(_ttoi(strVersion4));
+		// String을 int로 받기
+		aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
+		aiVersion[1] = this->GetDlgItemInt(IDC_EDIT_VERSION2);
+		aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
+		aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION4);	
 		
 		uiVersion = (aiVersion[0] << 24) | (aiVersion[1] << 16) | (aiVersion[2] << 8) | aiVersion[3];
 
@@ -551,7 +541,7 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 		if (NULL == pFileCtrl)
 		{
 			// 파일 만드는 클래스 할당
-			pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(m_szaMkFileName, TRUE, TRUE);
+			pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(m_aszMkFileName, TRUE, TRUE);
 		}
 
 		if (TRUE == pFileCtrl->IsOpened())
@@ -602,45 +592,52 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 // init파일 만드는 함수
 void CUpdateManagerDlg::InitMakeFile()
 {
-	CString strVersion1;
-	CString strVersion2;
-	CString strVersion3;
-	CString strVersion4;
 	CString strPath;
 	CString strFile;
 
-	TCHAR* pszBuff = NULL;
-	int aiVersion[4] = { 0 };
-	int iVersion = 0;
-	int iPathLen = 0;
+	Cls_GrFileCtrl* pFileCtrl		= NULL;
+	TCHAR*			pszBuff			= NULL;
+	int				aiVersion[4]	= { 0 };
+	int				iVersion		= 0;
+	int				iFileNameLen	= 0;
 
 	m_stUpdateInfo.uiFcc = E_MkUpdt_IniFcc;
 
-	m_CEditVer1.GetWindowTextW(strVersion1);
-	m_CEditVer2.GetWindowTextW(strVersion2);
-	m_CEditVer3.GetWindowTextW(strVersion3);
-	m_CEditVer4.GetWindowTextW(strVersion4);
+	aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
+	aiVersion[1] = this->GetDlgItemInt(IDC_EDIT_VERSION2);
+	aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
+	aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION4);
 
-	aiVersion[0] = (int)(_ttoi(strVersion1));
-	aiVersion[1] = (int)(_ttoi(strVersion2));
-	aiVersion[2] = (int)(_ttoi(strVersion3));
-	aiVersion[3] = (int)(_ttoi(strVersion4));
+	
 
 	iVersion = (aiVersion[0] << 24) | (aiVersion[1] << 16) | (aiVersion[2] << 8) | aiVersion[3];
 
 	m_stUpdateInfo.uiUpgdVersion = iVersion;
 	
 	strPath = (LPCTSTR)m_szaNowPath;
-	iPathLen = strPath.GetLength();
-
-	// 현재 경로를 복사
-	pszBuff = new TCHAR(sizeof(TCHAR) * iPathLen + 1);
-	memset(pszBuff, 0, sizeof(TCHAR)* iPathLen);
-
+	
 	// init파일로 만들기
 	strFile.Format(_T("%s\\MkUpdt.init"), strPath);
-	
+	iFileNameLen = strFile.GetLength();
 
+	// 버퍼 동적할당
+	pszBuff = new TCHAR(iFileNameLen);
+	memset(pszBuff, 0, sizeof(TCHAR)* iFileNameLen);
+
+	// 현재 경로를 복사
+	_tcscpy(pszBuff, strFile.GetBuffer(0));
+	
+	pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(pszBuff, TRUE, TRUE);
+	if (pFileCtrl->IsOpened())
+	{	// init파일 생성
+		pFileCtrl->Write(&m_stUpdateInfo, sizeof(_stUpdateInfo));
+	}
+	
+	if (NULL != pFileCtrl)
+	{
+		delete pFileCtrl;
+		pFileCtrl = NULL;
+	}
 
 	if (NULL != pszBuff)
 	{

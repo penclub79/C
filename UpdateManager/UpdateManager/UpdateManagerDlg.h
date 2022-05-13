@@ -82,8 +82,8 @@ private:
 	TCHAR				m_szaNowPath[2048];
 
 	CFirmUpdate*		m_pObjFwUp;
-	_stUpdateTreeNode	m_staTreeNode[E_FirmUpInfoTypeMaxIdx];  // 24
-	TCHAR				m_szaMkFileName[1024];
+	_stUpdateTreeNode	m_astTreeNode[E_FirmUpInfoTypeMaxIdx];  // 24
+	TCHAR				m_aszMkFileName[1024];
 	_stUpdateInfo		m_stUpdateInfo;
 
 	CTreeCtrl	m_CTreeCtrl;
