@@ -664,6 +664,7 @@ void CMkUpdtMngDlg::LcMkiniFile()
 		__u8			Tv_Ver[4];
 		__u32			Tv_Version;
 	// code --------------------
+
 		m_UpdtInfo.Fcc			= E_MkUpdt_IniFcc;
 
 		m_EdtVer1.GetWindowTextW(Tv_StrVer1);

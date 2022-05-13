@@ -180,10 +180,9 @@ HCURSOR CUpdateManagerDlg::OnQueryDragIcon()
 void CUpdateManagerDlg::Init()
 {
 	// Local ------------------------------
-		WCHAR szaInitFile[2048] = { 0 };
-		Cls_GrFileCtrl* pObjFile = NULL;
-		//Cls_GrFileCtrl* pObjFile2 = NULL;
-		int iFileSize = 0;
+		WCHAR			szaInitFile[2048]	= { 0 };
+		Cls_GrFileCtrl* pObjFile			= NULL;
+		int				iFileSize			= 0;
 	// ------------------------------------
 
 	// 현재 실행 경로 얻기
@@ -348,17 +347,18 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR* _pszFilePath, int _iFileLen)
 {
 	// Local ------------------------------
-	FILE* pFile;
-	TCHAR* pszBuff = NULL;
+	FILE*			pFile;
+	CString			strPath;
+	CString			strFileName;
 	Cls_GrFileCtrl* pFileCtrl; // 라이브러리
-	int iModelType = 0;
-	int iVerFileType = 0;
-	unsigned int uiFileSize = 0;
-	int iResult = 0;
-	int iModelIdx = 0;
-	TCHAR aszFileName[64] = { 0 };
-	CString strPath;
-	CString strFileName;
+
+	TCHAR*			pszBuff			= NULL;
+	int				iModelType		= 0;
+	int				iVerFileType	= 0;
+	unsigned int	uiFileSize		= 0;
+	int				iResult			= 0;
+	int				iModelIdx		= 0;
+	TCHAR			aszFileName[64] = { 0 };
 	// ------------------------------------
 
 	if (NULL != m_pObjFwUp)
@@ -372,7 +372,7 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 		{
 			uiFileSize = pFileCtrl->GetSize();
 
-			pszBuff = new TCHAR(sizeof(TCHAR)* uiFileSize);
+			pszBuff = new TCHAR(sizeof(TCHAR) * uiFileSize);
 			pFileCtrl->Seek(0);
 			pFileCtrl->Read(pszBuff, uiFileSize);
 			iResult = m_pObjFwUp->AddVerFile(iModelType, iVerFileType, pszBuff, uiFileSize);
@@ -608,8 +608,6 @@ void CUpdateManagerDlg::InitMakeFile()
 	aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
 	aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION4);
 
-	
-
 	iVersion = (aiVersion[0] << 24) | (aiVersion[1] << 16) | (aiVersion[2] << 8) | aiVersion[3];
 
 	m_stUpdateInfo.uiUpgdVersion = iVersion;
@@ -621,18 +619,21 @@ void CUpdateManagerDlg::InitMakeFile()
 	iFileNameLen = strFile.GetLength();
 
 	// 버퍼 동적할당
-	pszBuff = new TCHAR(iFileNameLen);
-	memset(pszBuff, 0, sizeof(TCHAR)* iFileNameLen);
+	pszBuff = new TCHAR(sizeof(TCHAR) * iFileNameLen + 30);
+	memset(pszBuff, 0, iFileNameLen);
 
 	// 현재 경로를 복사
 	_tcscpy(pszBuff, strFile.GetBuffer(0));
 	
+	// 경로에 내 파일 생성
 	pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(pszBuff, TRUE, TRUE);
+	
 	if (pFileCtrl->IsOpened())
-	{	// init파일 생성
+	{	// 파일 생성
 		pFileCtrl->Write(&m_stUpdateInfo, sizeof(_stUpdateInfo));
 	}
-	
+	int test = pFileCtrl->GetSize();
+
 	if (NULL != pFileCtrl)
 	{
 		delete pFileCtrl;
