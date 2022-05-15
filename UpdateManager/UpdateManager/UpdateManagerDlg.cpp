@@ -592,11 +592,10 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 // init파일 만드는 함수
 void CUpdateManagerDlg::InitMakeFile()
 {
-	CString strPath;
-	CString strFile;
+	CString			strFile;
 
+	TCHAR			aszPath[2048]	= { 0 };
 	Cls_GrFileCtrl* pFileCtrl		= NULL;
-	TCHAR*			pszBuff			= NULL;
 	int				aiVersion[4]	= { 0 };
 	int				iVersion		= 0;
 	int				iFileNameLen	= 0;
@@ -612,37 +611,28 @@ void CUpdateManagerDlg::InitMakeFile()
 
 	m_stUpdateInfo.uiUpgdVersion = iVersion;
 	
-	strPath = (LPCTSTR)m_szaNowPath;
+	memcpy(aszPath, m_szaNowPath, 2048);
 	
 	// init파일로 만들기
-	strFile.Format(_T("%s\\MkUpdt.init"), strPath);
-	iFileNameLen = strFile.GetLength();
+	strFile.Format(_T("%s\\MkUpdt.init"), aszPath);
 
-	// 버퍼 동적할당
-	pszBuff = new TCHAR(sizeof(TCHAR) * iFileNameLen + 30);
-	memset(pszBuff, 0, iFileNameLen);
-
-	// 현재 경로를 복사
-	_tcscpy(pszBuff, strFile.GetBuffer(0));
+	// 경로+파일 복사
+	_tcscpy(aszPath, strFile);
 	
 	// 경로에 내 파일 생성
-	pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(pszBuff, TRUE, TRUE);
+	pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(aszPath, TRUE, TRUE);
 	
-	if (pFileCtrl->IsOpened())
-	{	// 파일 생성
-		pFileCtrl->Write(&m_stUpdateInfo, sizeof(_stUpdateInfo));
+	if (pFileCtrl)
+	{
+		if (pFileCtrl->IsOpened())
+		{	// 파일 생성
+			pFileCtrl->Write(&m_stUpdateInfo, sizeof(_stUpdateInfo));
+		}
 	}
-	int test = pFileCtrl->GetSize();
 
 	if (NULL != pFileCtrl)
 	{
 		delete pFileCtrl;
 		pFileCtrl = NULL;
-	}
-
-	if (NULL != pszBuff)
-	{
-		delete pszBuff;
-		pszBuff = NULL;
 	}
 }

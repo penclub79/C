@@ -55,7 +55,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions);_WIN32_WINNT=0x0600;_CRT_SECURE_NO_DEPRECATE;_CONSOLE</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>D:\WorkVc7\GrInc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pencl\OneDrive\바탕 화면\Code\C\GrInc;D:\WorkVc7\GrInc</AdditionalIncludeDirectories>
       <StructMemberAlignment>4Bytes</StructMemberAlignment>
     </ClCompile>
     <Link>
