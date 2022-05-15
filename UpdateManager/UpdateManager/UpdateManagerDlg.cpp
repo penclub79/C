@@ -203,9 +203,102 @@ void CUpdateManagerDlg::Init()
 	if (GrFileIsExist(szaInitFile))
 	{
 		pObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(szaInitFile, FALSE, FALSE);
-		//pObjFile2 = new Cls_GrFileCtrl(szaInitFile, FALSE, FALSE); test
+		
+		if (pObjFile->IsOpened())
+		{
+			// 파일 사이즈 가져오기
+			iFileSize = (int)pObjFile->GetSize();
+			if (iFileSize = sizeof(_stUpdateInfo))
+			{
+				pObjFile->Read(&m_stUpdateInfo, iFileSize);
+			}
+		}
+
+		// UpdateInfo 체크
+		if (TRUE == CheckInit(&m_stUpdateInfo))
+		{
+			//InitCtrl();
+		}
+
+		if (NULL != pObjFile)
+		{
+			delete pObjFile;
+			pObjFile = NULL;
+		}
 	}
 }
+
+// Init 체크
+BOOL CUpdateManagerDlg::CheckInit(pUpdateInfo _pstUpdateInfo)
+{
+	BOOL bResult = FALSE;
+
+	if (E_MkUpdt_IniFcc == _pstUpdateInfo->uiFcc)
+	{
+		bResult = TRUE;
+	}
+
+	return bResult;
+}
+
+void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
+{
+	// Local -------------------------------
+	CString				strVersion;
+	CString				strFileName;
+
+	pUpdateInfoModel	pstUpdateInfoModel;
+	TCHAR				aszVersion[32]		= { 0 };
+	TCHAR*				pszFileName			= NULL;
+	int					aiVersion[4]		= { 0 };
+	int					iStrLen				= 0;
+	// -------------------------------------
+
+	GrStrIntToWstr(aszVersion, _pstUpdateInfo->uiUpgdVersion);
+	aiVersion[0] = (_pstUpdateInfo->uiUpgdVersion >> 24) & 0xFF;
+	aiVersion[1] = (_pstUpdateInfo->uiUpgdVersion >> 16) & 0xFF;
+	aiVersion[2] = (_pstUpdateInfo->uiUpgdVersion >> 8) & 0xFF;
+	aiVersion[3] = _pstUpdateInfo->uiUpgdVersion & 0xFF;
+
+	strVersion.Format(_T("%d"), aiVersion[0]);
+	m_CEditVer1.SetWindowTextW(strVersion.GetString());
+
+	strVersion.Format(_T("%d"), aiVersion[1]);
+	m_CEditVer2.SetWindowTextW(strVersion.GetString());
+
+	strVersion.Format(_T("%d"), aiVersion[2]);
+	m_CEditVer3.SetWindowTextW(strVersion.GetString());
+
+	strVersion.Format(_T("%d"), aiVersion[3]);
+	m_CEditVer4.SetWindowTextW(strVersion.GetString());
+
+	for (int i = 0; i < E_FirmUpInfoCnt; i++)
+	{
+		if (E_FirmUpInfoTypeNone != _pstUpdateInfo->staModelInfo[i].uiType)
+		{
+			TreeAddModel(_pstUpdateInfo->staModelInfo[i].uiType);
+
+			pstUpdateInfoModel = &_pstUpdateInfo->staModelInfo[i];
+			for (int si = 0; si < E_FirmUpEntityCnt; si++)
+			{
+				if (E_FirmUpEntityNone != pstUpdateInfoModel->uiType)
+				{
+					pszFileName = pstUpdateInfoModel->staEntity[i].szaFile;
+					strFileName = (LPCTSTR)pszFileName;
+					iStrLen = strFileName.GetLength();
+
+					if (GrFileIsExist(pszFileName))
+					{
+						TreeAddVerFile(pstUpdateInfoModel->uiType, pstUpdateInfoModel->staEntity[i].uiType, pszFileName, iStrLen);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
 
 // 모델 생성 Button
 void CUpdateManagerDlg::OnClickedButtonModelCreate()
@@ -395,7 +488,6 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 					// 메모리 카피
 					_tcscpy(aszFileName, strFileName.GetBuffer(0));
 					TreeAddVerFileNode(iModelType, iVerFileType, aszFileName);
-
 				}
 			}
 			else
@@ -403,15 +495,12 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 				ProcErrCode(iResult);
 			}
 		}
-
 	}
-
 	if (NULL != pFileCtrl)
 	{
 		delete pFileCtrl;
 		pFileCtrl = NULL;
 	}
-
 	if (NULL != pszBuff)
 	{
 		delete pszBuff;
@@ -573,7 +662,6 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 		{
 			MessageBox(_T("File Open Error"), _T("Error"), MB_OK | MB_ICONWARNING);
 		}
-
 		// 메모리 해제
 		if (NULL != pFileCtrl)
 		{
@@ -581,7 +669,6 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 			pFileCtrl = NULL;
 		}
 	}
-
 	if (bIsSuccess)
 	{
 		MessageBox(_T("Make File Success"), NULL, MB_OK | MB_ICONWARNING);

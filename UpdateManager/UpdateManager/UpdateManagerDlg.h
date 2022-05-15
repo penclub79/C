@@ -70,7 +70,7 @@ protected:
 
 	void Init();
 	//BOOL CheckFcc(pUpdateInfo _p);	// MkUpdate.init 파일이 있을 때 FCC체크
-	void InitCtrl();				// MkUpdate.init 파일이 있을 때
+	void InitCtrl(pUpdateInfo _pstUpdateInfo);				// MkUpdate.init 파일이 있을 때
 	//void AddModel(unsigned int _uiModelType);
 
 	void TreeAddModel(int _iModelType); // 트리에 모델 추가
@@ -78,6 +78,7 @@ protected:
 	void TreeAddVerFileNode(int _iModelType, int _iVerFileType, TCHAR* _pszFileName);
 	void ProcErrCode(int _iResult); // 에러 처리
 	void InitMakeFile(); // init파일 만드는 함수
+	BOOL CheckInit(pUpdateInfo _pstUpdateInfo);
 private:
 	TCHAR				m_szaNowPath[2048];
 
@@ -86,14 +87,14 @@ private:
 	TCHAR				m_aszMkFileName[1024];
 	_stUpdateInfo		m_stUpdateInfo;
 
-	CTreeCtrl	m_CTreeCtrl;
-	CEdit		m_CEditPath;
-	CEdit		m_CEditVer1;
-	CEdit		m_CEditVer2;
-	CEdit		m_CEditVer3;
-	CEdit		m_CEditVer4;
-	CButton		m_CBtnPath;
-	CButton		m_CBtnMake;
+	CTreeCtrl			m_CTreeCtrl;
+	CEdit				m_CEditPath;
+	CEdit				m_CEditVer1;
+	CEdit				m_CEditVer2;
+	CEdit				m_CEditVer3;
+	CEdit				m_CEditVer4;
+	CButton				m_CBtnPath;
+	CButton				m_CBtnMake;
 
 	int FindTreeNode(int _iModelType);
 public:
