@@ -79,6 +79,9 @@ protected:
 	void ProcErrCode(int _iResult); // 에러 처리
 	void InitMakeFile(); // init파일 만드는 함수
 	BOOL CheckInit(pUpdateInfo _pstUpdateInfo);
+	int FindModelIndex(int _iModelType);
+	int GetModelType(int _iIndex);
+
 private:
 	TCHAR				m_szaNowPath[2048];
 
@@ -102,4 +105,5 @@ public:
 	afx_msg void OnClickedButtonEntitySelete(); // 버전 파일 선택
 	afx_msg void OnClickedButtonSavePath();
 	afx_msg void OnClickedButtonPackageMake();
+	virtual BOOL DestroyWindow();
 };

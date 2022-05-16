@@ -180,7 +180,7 @@ HCURSOR CUpdateManagerDlg::OnQueryDragIcon()
 void CUpdateManagerDlg::Init()
 {
 	// Local ------------------------------
-		WCHAR			szaInitFile[2048]	= { 0 };
+		TCHAR			szaInitFile[2048]	= { 0 };
 		Cls_GrFileCtrl* pObjFile			= NULL;
 		int				iFileSize			= 0;
 	// ------------------------------------
@@ -198,7 +198,7 @@ void CUpdateManagerDlg::Init()
 
 	memcpy(&szaInitFile, &m_szaNowPath, 2048);
 	GrStrWcat(szaInitFile, _T("\\MkUpdate.init"));
-
+	BOOL test = GrFileIsExist(szaInitFile);
 	// MkUpdate.init 파일 있는지 체크
 	if (GrFileIsExist(szaInitFile))
 	{
@@ -215,9 +215,9 @@ void CUpdateManagerDlg::Init()
 		}
 
 		// UpdateInfo 체크
-		if (TRUE == CheckInit(&m_stUpdateInfo))
+		if (CheckInit(&m_stUpdateInfo))
 		{
-			//InitCtrl();
+			InitCtrl(&m_stUpdateInfo);
 		}
 
 		if (NULL != pObjFile)
@@ -255,6 +255,7 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 	// -------------------------------------
 
 	GrStrIntToWstr(aszVersion, _pstUpdateInfo->uiUpgdVersion);
+
 	aiVersion[0] = (_pstUpdateInfo->uiUpgdVersion >> 24) & 0xFF;
 	aiVersion[1] = (_pstUpdateInfo->uiUpgdVersion >> 16) & 0xFF;
 	aiVersion[2] = (_pstUpdateInfo->uiUpgdVersion >> 8) & 0xFF;
@@ -295,6 +296,10 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 			}
 		}
 	}
+
+	m_CEditPath.SetWindowTextW(m_stUpdateInfo.szaUpgdFileName);
+	memset(m_aszMkFileName, 0, sizeof(TCHAR) * 1024);
+	memcpy(m_aszMkFileName, m_stUpdateInfo.szaUpgdFileName, sizeof(TCHAR) * 1024);
 }
 
 
@@ -512,10 +517,10 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 
 void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, TCHAR* _pszFileName)
 {
-	int iResult				= 0;
-	int iNodeIdx			= 0;
-	TCHAR szTmp[64]			= { 0 };
-	TCHAR szNodeName[64]	= { 0 };
+	int		iResult				= 0;
+	int		iNodeIdx			= 0;
+	TCHAR	szTmp[64]			= { 0 };
+	TCHAR	szNodeName[64]		= { 0 };
 	CString strFormatName;
 
 	iNodeIdx = FindTreeNode(_iModelType);
@@ -701,7 +706,7 @@ void CUpdateManagerDlg::InitMakeFile()
 	memcpy(aszPath, m_szaNowPath, 2048);
 	
 	// init파일로 만들기
-	strFile.Format(_T("%s\\MkUpdt.init"), aszPath);
+	strFile.Format(_T("%s\\MkUpdate.init"), aszPath);
 
 	// 경로+파일 복사
 	_tcscpy(aszPath, strFile);
@@ -722,4 +727,38 @@ void CUpdateManagerDlg::InitMakeFile()
 		delete pFileCtrl;
 		pFileCtrl = NULL;
 	}
+}
+
+BOOL CUpdateManagerDlg::DestroyWindow()
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	InitMakeFile();
+	return CDialogEx::DestroyWindow();
+}
+
+int CUpdateManagerDlg::FindModelIndex(int _iModelType)
+{
+	return m_pObjFwUp->GetModelTypeIdx(_iModelType);
+}
+
+int CUpdateManagerDlg::GetModelType(int _iIndex)
+{
+	int iResult = 0;
+	
+	iResult = -1;
+
+	switch (_iIndex)
+	{
+	case 1:
+		iResult = E_FirmUpInfoTypeJa1704;
+		break;
+	case 2:
+		iResult = E_FirmUpInfoTypeJa1708;
+		break;
+	case 3:
+		iResult = E_FirmUpInfoTypeJa1716;
+		break;
+	}
+
+	return iResult;
 }
