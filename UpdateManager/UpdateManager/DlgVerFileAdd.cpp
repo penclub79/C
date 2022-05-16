@@ -194,8 +194,6 @@ void DlgVerFileAdd::OnSelchangeComboChoiseFile()
 	case 6:
 		m_iVerFileType = E_FirmUpEntityRootfs;
 		break;
-	default:
-		break;
 	}
 
 }

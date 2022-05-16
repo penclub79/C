@@ -106,4 +106,7 @@ public:
 	afx_msg void OnClickedButtonSavePath();
 	afx_msg void OnClickedButtonPackageMake();
 	virtual BOOL DestroyWindow();
+	afx_msg void OnClickedButtonMainCancel();
+	virtual void OnOK();
+	afx_msg void OnClickedButtonModelLoad();
 };

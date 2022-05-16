@@ -87,6 +87,8 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_ENTITY_SELETE, &CUpdateManagerDlg::OnClickedButtonEntitySelete)
 	ON_BN_CLICKED(IDC_BUTTON_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonSavePath)
 	ON_BN_CLICKED(IDC_BUTTON_PACKAGE_MAKE, &CUpdateManagerDlg::OnClickedButtonPackageMake)
+	ON_BN_CLICKED(IDC_BUTTON_MAIN_CANCEL, &CUpdateManagerDlg::OnClickedButtonMainCancel)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL_LOAD, &CUpdateManagerDlg::OnClickedButtonModelLoad)
 END_MESSAGE_MAP()
 
 
@@ -198,33 +200,33 @@ void CUpdateManagerDlg::Init()
 
 	memcpy(&szaInitFile, &m_szaNowPath, 2048);
 	GrStrWcat(szaInitFile, _T("\\MkUpdate.init"));
-	BOOL test = GrFileIsExist(szaInitFile);
+	
 	// MkUpdate.init 파일 있는지 체크
-	if (GrFileIsExist(szaInitFile))
+	//if (GrFileIsExist(szaInitFile))
+	//{
+	//	pObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(szaInitFile, FALSE, FALSE);
+	//	
+	//	if (pObjFile->IsOpened())
+	//	{
+	//		// 파일 사이즈 가져오기
+	//		iFileSize = (int)pObjFile->GetSize();
+	//		if (iFileSize = sizeof(_stUpdateInfo))
+	//		{
+	//			pObjFile->Read(&m_stUpdateInfo, iFileSize);
+	//		}
+	//	}
+
+	//	// UpdateInfo 체크
+	//	if (CheckInit(&m_stUpdateInfo))
+	//	{
+	//		InitCtrl(&m_stUpdateInfo);
+	//	}
+	//}
+
+	if (NULL != pObjFile)
 	{
-		pObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(szaInitFile, FALSE, FALSE);
-		
-		if (pObjFile->IsOpened())
-		{
-			// 파일 사이즈 가져오기
-			iFileSize = (int)pObjFile->GetSize();
-			if (iFileSize = sizeof(_stUpdateInfo))
-			{
-				pObjFile->Read(&m_stUpdateInfo, iFileSize);
-			}
-		}
-
-		// UpdateInfo 체크
-		if (CheckInit(&m_stUpdateInfo))
-		{
-			InitCtrl(&m_stUpdateInfo);
-		}
-
-		if (NULL != pObjFile)
-		{
-			delete pObjFile;
-			pObjFile = NULL;
-		}
+		delete pObjFile;
+		pObjFile = NULL;
 	}
 }
 
@@ -301,8 +303,6 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 	memset(m_aszMkFileName, 0, sizeof(TCHAR) * 1024);
 	memcpy(m_aszMkFileName, m_stUpdateInfo.szaUpgdFileName, sizeof(TCHAR) * 1024);
 }
-
-
 
 
 // 모델 생성 Button
@@ -761,4 +761,28 @@ int CUpdateManagerDlg::GetModelType(int _iIndex)
 	}
 
 	return iResult;
+}
+
+// Cancel 버튼
+void CUpdateManagerDlg::OnClickedButtonMainCancel()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	OnOK();
+}
+
+
+void CUpdateManagerDlg::OnOK()
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+
+	CDialogEx::OnOK();
+}
+
+
+// 모델 불러오기 버튼
+void CUpdateManagerDlg::OnClickedButtonModelLoad()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+
 }
