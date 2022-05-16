@@ -290,13 +290,17 @@ void CUpdateManagerDlg::OnClickedButtonModelCreate()
 	// ------------------------------------
 
 	pDlgModelAdd = (DlgModelAdd*)new DlgModelAdd();
+	
 	pDlgModelAdd->DoModal();
 
-	iModelType = pDlgModelAdd->GetModelType();
-
-	if (E_FirmUpInfoTypeNone != iModelType)
+	if (pDlgModelAdd->m_bModalResult)
 	{
-		TreeAddModel(iModelType);
+		iModelType = pDlgModelAdd->GetModelType();
+
+		if (E_FirmUpInfoTypeNone != iModelType)
+		{
+			TreeAddModel(iModelType);
+		}
 	}
 
 	if (NULL != pDlgModelAdd)
@@ -336,8 +340,6 @@ void CUpdateManagerDlg::TreeAddModel(int _iModelType)
 			case E_FirmUpInfoTypeJa1716:
 				_tcscpy(m_astTreeNode[iResult].szaNode, _T("Ja1716"));
 				m_astTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1716"), NULL, NULL);
-				break;
-			default:
 				break;
 			}
 
@@ -400,19 +402,19 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	_tcscpy(aszModel, strModelName.GetBuffer(0));
 	pDlgVerFileAdd->SetModelName(&aszModel[0]);
 	
-
-	if (IDOK == pDlgVerFileAdd->DoModal())
+	pDlgVerFileAdd->DoModal();
+	
+	if (pDlgVerFileAdd->m_bModalResult)
 	{
-
 		pDlgVerFileAdd->GetVerFileType(&iModelType, &iVerFileType, pszFilePath, &iFileLen);
 		TreeAddVerFile(iModelType, iVerFileType, pszFilePath, iFileLen);
-	}
 
 
-	if (NULL != pDlgVerFileAdd)
-	{
-		delete pDlgVerFileAdd;
-		pDlgVerFileAdd = NULL;
+		if (NULL != pDlgVerFileAdd)
+		{
+			delete pDlgVerFileAdd;
+			pDlgVerFileAdd = NULL;
+		}
 	}
 
 }
@@ -449,6 +451,8 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 			uiFileSize = pFileCtrl->GetSize();
 
 			pszBuff = (PCHAR)malloc(uiFileSize);
+			memset(pszBuff, 0, uiFileSize);
+
 			pFileCtrl->Seek(0);
 			pFileCtrl->Read(pszBuff, uiFileSize);
 			iResult = m_pObjFwUp->AddVerFile(iModelType, iVerFileType, pszBuff, uiFileSize);
@@ -476,10 +480,8 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 					/*strFileName = strPath.Right(strPath.GetLength() - strPath.ReverseFind('\\') - 1);*/
 					GrStrFnGetFileName(aszMulPathFull, aszMulFileName);
 
-					MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, aszMulFileName, strlen(aszMulFileName), aszUniFileName, 64);
 					// 메모리 카피
-					//_tcscpy(aszFileName, strFileName.GetBuffer(0));
-					TreeAddVerFileNode(iModelType, iVerFileType, aszUniFileName);
+					TreeAddVerFileNode(iModelType, iVerFileType, aszMulFileName);
 				}
 			}
 			else
@@ -487,6 +489,7 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 				ProcErrCode(iResult);
 			}
 		}
+		
 		if (NULL != pFileCtrl)
 		{
 			delete pFileCtrl;
@@ -497,12 +500,12 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 }
 
 
-void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, TCHAR* _pszFileName)
+void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, char* _pszFileName)
 {
 	int		iResult				= 0;
 	int		iNodeIdx			= 0;
-	TCHAR	szTmp[64]			= { 0 };
-	TCHAR	szNodeName[64]		= { 0 };
+	CHAR	szFileName[64]			= { 0 };
+	WCHAR	szNodeName[64]		= { 0 };
 	CString strFormatName;
 
 	iNodeIdx = FindTreeNode(_iModelType);
@@ -510,27 +513,30 @@ void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, T
 	switch (_iVerFileType)
 	{
 	case E_FirmUpEntityLoader:
-		_tcscpy(szTmp, _T("Loader("));
+		GrStrCopy(szFileName, "Loader(");
 		break;
 	case E_FirmUpEntityFdt:
-		_tcscpy(szTmp, _T("FDT("));
+		GrStrCopy(szFileName, "FDT(");
 		break;
 	case E_FirmUpEntityUboot:
-		_tcscpy(szTmp, _T("U-Boot("));
+		GrStrCopy(szFileName, "U-Boot(");
 		break;
 	case E_FirmUpEntityKernel:
-		_tcscpy(szTmp, _T("Kernel("));
+		GrStrCopy(szFileName, "Kernel(");
 		break;
 	case E_FirmUpEntityLogo:
-		_tcscpy(szTmp, _T("Logo("));
+		GrStrCopy(szFileName, "Logo(");
 		break;
 	case E_FirmUpEntityRootfs:
-		_tcscpy(szTmp, _T("RootFs("));
+		GrStrCopy(szFileName, "RootFs(");
 		break;
 	}
 	// Node에 들어갈 제목 수정
-	strFormatName.Format(_T("%s(%s)"), szTmp, (LPCTSTR)_pszFileName);
-	_tcscpy(szNodeName, strFormatName.GetBuffer(0));
+	//strFormatName.Format(_T("%s(%s)"), szTmp, (LPCTSTR)_pszFileName);
+	GrStrCat(szFileName, _pszFileName);
+	GrStrCat(szFileName, ")");
+	GrStrStrToWstr(szNodeName, szFileName);
+	//_tcscpy(szNodeName, strFormatName.GetBuffer(0));
 
 	// 트리 Node에 추가
 	m_CTreeCtrl.InsertItem(szNodeName, m_astTreeNode[iNodeIdx].stNode, NULL);
@@ -749,7 +755,7 @@ int CUpdateManagerDlg::GetModelType(int _iIndex)
 void CUpdateManagerDlg::OnClickedButtonMainCancel()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	OnOK();
+	PostMessage(WM_CLOSE);
 }
 
 
@@ -818,4 +824,20 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 			pObjFile = NULL;
 		}
 	}
+}
+
+
+LRESULT CUpdateManagerDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+
+	switch (message)
+	{
+	case WM_CLOSE:
+		break;
+
+	default:
+		break;
+	}
+	return CDialogEx::WindowProc(message, wParam, lParam);
 }

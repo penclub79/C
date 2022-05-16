@@ -17,8 +17,8 @@ DlgVerFileAdd::DlgVerFileAdd(CWnd* pParent /*=NULL*/, TCHAR* _pszNowPath)
 {
 	m_iModelType	= E_FirmUpInfoTypeNone;
 	m_pszNowPath	= _pszNowPath;
-
-	m_iVerFileType = 0;
+	m_bModalResult	= FALSE;
+	m_iVerFileType	= 0;
 
 }
 
@@ -157,13 +157,17 @@ void DlgVerFileAdd::GetVerFileType(int* _piModelType, int* _piVerFileType, TCHAR
 // OK 버튼
 void DlgVerFileAdd::OnClickedButtonVersionOk()
 {
-	OnOK(); // 임시
+	m_bModalResult = TRUE;
+	//PostMessage(WM_CLOSE);
+	CDialogEx::OnOK();
 }
 
 // Cancel 버튼
 void DlgVerFileAdd::OnClickedButtonVersionCancel()
 {
-	OnOK();
+	m_bModalResult = FALSE;
+	//PostMessage(WM_CLOSE);
+	CDialogEx::OnOK();
 }
 
 // ComboBox 버전파일 
@@ -196,4 +200,22 @@ void DlgVerFileAdd::OnSelchangeComboChoiseFile()
 		break;
 	}
 
+}
+
+
+LRESULT DlgVerFileAdd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+
+	switch (message)
+	{
+	case WM_CLOSE:
+		Sleep(0);
+		break;
+
+	default:
+		break;
+	}
+
+	return CDialogEx::WindowProc(message, wParam, lParam);
 }

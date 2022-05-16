@@ -24,6 +24,8 @@ public:
 	void SetModelType(int _iModelType);
 	void SetModelName(TCHAR* _pszModelName);
 	void GetVerFileType(int* _piModelType, int* _piVerFileType, TCHAR* _pszFileName, int* _piStrLen);
+
+	BOOL m_bModalResult;
 	
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
@@ -41,4 +43,5 @@ private:
 public:
 	CEdit m_CEditFile;
 	afx_msg void OnSelchangeComboChoiseFile();
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };

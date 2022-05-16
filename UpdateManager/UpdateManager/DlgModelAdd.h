@@ -16,6 +16,7 @@ public:
 	enum { IDD = IDD_DIALOG_MODEL_ADD };
 	afx_msg void OnSelchangeComboModeltype();
 	int		GetModelType();
+	BOOL	m_bModalResult;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);   // DDX / DDV Support
@@ -32,5 +33,6 @@ public:
 	afx_msg void OnClickedButtonModelMake();
 	afx_msg void OnClickedButtonModelCancel();
 
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };
 
