@@ -30,5 +30,7 @@ private:
 	
 public:
 	afx_msg void OnClickedButtonModelMake();
+	afx_msg void OnClickedButtonModelCancel();
+
 };
 

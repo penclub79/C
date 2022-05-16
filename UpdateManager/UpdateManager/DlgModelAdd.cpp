@@ -26,6 +26,7 @@ void DlgModelAdd::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(DlgModelAdd, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO_MODELTYPE, &DlgModelAdd::OnSelchangeComboModeltype)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_MAKE, &DlgModelAdd::OnClickedButtonModelMake)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL_CANCEL, &DlgModelAdd::OnClickedButtonModelCancel)
 END_MESSAGE_MAP()
 
 BOOL DlgModelAdd::OnInitDialog()
@@ -92,3 +93,10 @@ int	DlgModelAdd::GetModelType()
 {
 	return m_iModelType;
 }
+
+void DlgModelAdd::OnClickedButtonModelCancel()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	OnOK();
+}
+

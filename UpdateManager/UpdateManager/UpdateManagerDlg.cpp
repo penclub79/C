@@ -183,7 +183,7 @@ void CUpdateManagerDlg::Init()
 {
 	// Local ------------------------------
 		TCHAR			szaInitFile[2048]	= { 0 };
-		Cls_GrFileCtrl* pObjFile			= NULL;
+		//Cls_GrFileCtrl* pObjFile			= NULL;
 		int				iFileSize			= 0;
 	// ------------------------------------
 
@@ -195,39 +195,15 @@ void CUpdateManagerDlg::Init()
 	m_pObjFwUp = (CFirmUpdate*)new CFirmUpdate();
 	m_pObjFwUp->FirmInit();
 
+	// Tree 초기화 & UpdateInfo 구조체 초기화
 	memset(m_astTreeNode, 0, sizeof(_stUpdateTreeNode) * 3); // 72
 	memset(&m_stUpdateInfo, 0, sizeof(_stUpdateInfo));
 
-	memcpy(&szaInitFile, &m_szaNowPath, 2048);
-	GrStrWcat(szaInitFile, _T("\\MkUpdate.init"));
-	
-	// MkUpdate.init 파일 있는지 체크
-	//if (GrFileIsExist(szaInitFile))
-	//{
-	//	pObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(szaInitFile, FALSE, FALSE);
-	//	
-	//	if (pObjFile->IsOpened())
-	//	{
-	//		// 파일 사이즈 가져오기
-	//		iFileSize = (int)pObjFile->GetSize();
-	//		if (iFileSize = sizeof(_stUpdateInfo))
-	//		{
-	//			pObjFile->Read(&m_stUpdateInfo, iFileSize);
-	//		}
-	//	}
-
-	//	// UpdateInfo 체크
-	//	if (CheckInit(&m_stUpdateInfo))
-	//	{
-	//		InitCtrl(&m_stUpdateInfo);
-	//	}
-	//}
-
-	if (NULL != pObjFile)
+	/*if (NULL != pObjFile)
 	{
 		delete pObjFile;
 		pObjFile = NULL;
-	}
+	}*/
 }
 
 // Init 체크
@@ -445,18 +421,20 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR* _pszFilePath, int _iFileLen)
 {
 	// Local ------------------------------
-	FILE*			pFile;
 	CString			strPath;
 	CString			strFileName;
 	Cls_GrFileCtrl* pFileCtrl; // 라이브러리
 
-	TCHAR*			pszBuff			= NULL;
-	int				iModelType		= 0;
-	int				iVerFileType	= 0;
-	unsigned int	uiFileSize		= 0;
-	int				iResult			= 0;
-	int				iModelIdx		= 0;
-	TCHAR			aszFileName[64] = { 0 };
+	PCHAR			pszBuff;
+	int				iModelType			= 0;
+	int				iVerFileType		= 0;
+	unsigned int	uiFileSize			= 0;
+	int				iResult				= 0;
+	int				iModelIdx			= 0;
+	TCHAR			aszUniFileName[64]	= { 0 };
+	CHAR			aszMulPathFull[256];
+	CHAR			aszMulPath[2048];
+	CHAR			aszMulFileName[64];
 	// ------------------------------------
 
 	if (NULL != m_pObjFwUp)
@@ -470,7 +448,7 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 		{
 			uiFileSize = pFileCtrl->GetSize();
 
-			pszBuff = new TCHAR(sizeof(TCHAR) * uiFileSize);
+			pszBuff = (PCHAR)malloc(uiFileSize);
 			pFileCtrl->Seek(0);
 			pFileCtrl->Read(pszBuff, uiFileSize);
 			iResult = m_pObjFwUp->AddVerFile(iModelType, iVerFileType, pszBuff, uiFileSize);
@@ -479,20 +457,29 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 			{
 				// find model
 				iModelIdx = m_pObjFwUp->GetModelTypeIdx(iModelType);
+
+				WideCharToMultiByte(CP_ACP, 0, m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].szaFile, 256, aszMulPathFull, 256, NULL, NULL);
+
+				WideCharToMultiByte(CP_ACP, 0, _pszFilePath, 2048, aszMulPath, 2048, NULL, NULL);
+
 				if (0 <= iModelIdx)
 				{
 					m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].uiType = _iVerFileType;
 					// 파일 경로 복사
-					memcpy(m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].szaFile, _pszFilePath, uiFileSize);
+					GrStrCopy(aszMulPathFull, aszMulPath);
+					/*memcpy(m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].szaFile, _pszFilePath, uiFileSize);*/
 
 					// 파일 이름만 복사
 					// 경로
-					strPath = _pszFilePath;
+					//strPath = _pszFilePath;
 					// '\\'찾은 index에서 
-					strFileName = strPath.Right(strPath.GetLength() - strPath.ReverseFind('\\') - 1);
+					/*strFileName = strPath.Right(strPath.GetLength() - strPath.ReverseFind('\\') - 1);*/
+					GrStrFnGetFileName(aszMulPathFull, aszMulFileName);
+
+					MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, aszMulFileName, strlen(aszMulFileName), aszUniFileName, 64);
 					// 메모리 카피
-					_tcscpy(aszFileName, strFileName.GetBuffer(0));
-					TreeAddVerFileNode(iModelType, iVerFileType, aszFileName);
+					//_tcscpy(aszFileName, strFileName.GetBuffer(0));
+					TreeAddVerFileNode(iModelType, iVerFileType, aszUniFileName);
 				}
 			}
 			else
@@ -500,18 +487,13 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 				ProcErrCode(iResult);
 			}
 		}
+		if (NULL != pFileCtrl)
+		{
+			delete pFileCtrl;
+			pFileCtrl = NULL;
+		}
 	}
-	if (NULL != pFileCtrl)
-	{
-		delete pFileCtrl;
-		pFileCtrl = NULL;
-	}
-	if (NULL != pszBuff)
-	{
-		delete pszBuff;
-		pszBuff = NULL;
-	}
-
+	
 }
 
 
@@ -528,30 +510,31 @@ void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, T
 	switch (_iVerFileType)
 	{
 	case E_FirmUpEntityLoader:
-		_tcscpy(szTmp, _T("Loader"));
+		_tcscpy(szTmp, _T("Loader("));
 		break;
 	case E_FirmUpEntityFdt:
-		_tcscpy(szTmp, _T("FDT"));
+		_tcscpy(szTmp, _T("FDT("));
 		break;
 	case E_FirmUpEntityUboot:
-		_tcscpy(szTmp, _T("U-Boot"));
+		_tcscpy(szTmp, _T("U-Boot("));
 		break;
 	case E_FirmUpEntityKernel:
-		_tcscpy(szTmp, _T("Kernel"));
+		_tcscpy(szTmp, _T("Kernel("));
 		break;
 	case E_FirmUpEntityLogo:
-		_tcscpy(szTmp, _T("Logo"));
+		_tcscpy(szTmp, _T("Logo("));
 		break;
 	case E_FirmUpEntityRootfs:
-		_tcscpy(szTmp, _T("RootFs"));
+		_tcscpy(szTmp, _T("RootFs("));
 		break;
 	}
 	// Node에 들어갈 제목 수정
-	strFormatName.Format(_T("%s(%s)"), szTmp, _pszFileName);
+	strFormatName.Format(_T("%s(%s)"), szTmp, (LPCTSTR)_pszFileName);
 	_tcscpy(szNodeName, strFormatName.GetBuffer(0));
 
 	// 트리 Node에 추가
 	m_CTreeCtrl.InsertItem(szNodeName, m_astTreeNode[iNodeIdx].stNode, NULL);
+	//m_CTreeCtrl.Invalidate(TRUE);
 	m_CTreeCtrl.Invalidate(TRUE);
 
 	m_stUpdateInfo.staModelInfo[iNodeIdx].uiType = _iModelType;
@@ -583,7 +566,6 @@ void CUpdateManagerDlg::OnClickedButtonSavePath()
 	CFileDialog* pFileDlg;
 	CString strPath;
 
-	
 	pFileDlg = (CFileDialog*)new CFileDialog(TRUE, NULL, NULL, OFN_PATHMUSTEXIST, _T("All Files(*.*)|*.*"), NULL);
 
 	//FileDialog 오픈 했을 때 lpstrInitialDir를 통해 초기 경로 폴더로 열기
@@ -708,7 +690,7 @@ void CUpdateManagerDlg::InitMakeFile()
 	// init파일로 만들기
 	strFile.Format(_T("%s\\MkUpdate.init"), aszPath);
 
-	// 경로+파일 복사
+	// 경로 + 파일 복사
 	_tcscpy(aszPath, strFile);
 	
 	// 경로에 내 파일 생성
@@ -783,6 +765,57 @@ void CUpdateManagerDlg::OnOK()
 void CUpdateManagerDlg::OnClickedButtonModelLoad()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CFileDialog*	pFileDlg = NULL;
+	CString			strPath;
+	TCHAR			aszLdPathFile[2048] = { 0 };
+	Cls_GrFileCtrl* pObjFile			= NULL;
+	int				iFileSize			= 0;
+	BOOL			bIsSameModel		= FALSE;
+	
+	if (NULL == pFileDlg)
+	{
+		pFileDlg = (CFileDialog*)new CFileDialog(TRUE, NULL, NULL, OFN_PATHMUSTEXIST, _T("Init Files(*.init)|*.init"), NULL);
+	}
+	
+	pFileDlg->m_ofn.lpstrInitialDir = m_szaNowPath;
 
+	if (IDOK == pFileDlg->DoModal())
+	{
+		strPath = pFileDlg->GetPathName();
+		_tcscpy(aszLdPathFile, strPath);
+	}
+	
+	// 불러온 파일이 또 있는지 체크
+	bIsSameModel = CheckInit(&m_stUpdateInfo);
 
+	// MkUpdate.init 파일 있는지 체크
+	if (FALSE == bIsSameModel)
+	{
+		if (GrFileIsExist(aszLdPathFile))
+		{
+			pObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(aszLdPathFile, FALSE, FALSE);
+
+			if (pObjFile->IsOpened())
+			{
+				// 파일 사이즈 가져오기
+				iFileSize = (int)pObjFile->GetSize();
+				if (iFileSize = sizeof(_stUpdateInfo))
+				{
+					pObjFile->Read(&m_stUpdateInfo, iFileSize);
+				}
+			}
+
+			// UpdateInfo 체크
+			if (CheckInit(&m_stUpdateInfo))
+			{
+				InitCtrl(&m_stUpdateInfo);
+			}
+		}
+
+		if (NULL != pObjFile)
+		{
+			delete pObjFile;
+			pObjFile = NULL;
+		}
+	}
 }

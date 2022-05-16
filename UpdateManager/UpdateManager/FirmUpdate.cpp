@@ -139,18 +139,16 @@ int	CFirmUpdate::ChkModelType(unsigned int _uiModelType)
 int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, void* _pSrc, int _iFileSize)
 {
 	// Local --------------------------------------
-	int iResult = 0;
-	int iModelIdx = 0;
+	int iResult		= 0;
+	int iModelIdx	= 0;
 	int iVerFileIdx = 0;
 	//---------------------------------------------
-
 
 	iResult = E_FirmUpErrCode;
 	iModelIdx = ChkModelType(_iModelType);
 
 	if (0 <= iModelIdx)
 	{
-
 		// 버전 파일타입 check시 중복이라면
 		if (0 > ChkEntityType(_iVerFileType, m_stFirmHeader.FirmInfo[iModelIdx].Entity))
 		{
@@ -191,11 +189,11 @@ int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, void* _pSrc, int
 	}
 
 
-	if (NULL != m_pData[iModelIdx][iVerFileIdx])
+	/*if (NULL != m_pData[iModelIdx][iVerFileIdx])
 	{
 		delete m_pData[iModelIdx][iVerFileIdx];
 		m_pData[iModelIdx][iVerFileIdx] = NULL;
-	}
+	}*/
 
 	return iResult;
 }
@@ -242,10 +240,11 @@ void CFirmUpdate::SetUpdateVersion(unsigned int _uiVersion)
 // 패키지 저장시 사이즈 얻기
 void* CFirmUpdate::GetMakeUpdate(unsigned int* _puiSize)
 {
-	void* pResult = NULL;
-	int* piUpdateMem = NULL;
-	int iUpdatePos = 0;
-
+	// Local --------------------------------------
+	void*	pResult		= NULL;
+	int*	piUpdateMem = NULL;
+	int		iUpdatePos	= 0;
+	//---------------------------------------------
 
 	if (0 < m_stFirmHeader.Size)
 	{
