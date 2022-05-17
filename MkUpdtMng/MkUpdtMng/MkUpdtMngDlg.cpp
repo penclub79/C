@@ -283,7 +283,7 @@ void CMkUpdtMngDlg::OnBnClickedBtnAddentity()
 // TreeAddVerFile
 void CMkUpdtMngDlg::LcAddEntity(__u32 A_ModelIdx, __u32 A_EntityType, PCHAR A_PtrStrFile, __u32 A_StrLen)
 {
-	// local -------------------
+	// local --------------------------------
 		FILE*			Tv_PtrFile;
 		PCHAR			Tv_PtrFileBuf;
 		Cls_GrFileCtrl* Tv_ObjFileCtrl;
@@ -292,7 +292,8 @@ void CMkUpdtMngDlg::LcAddEntity(__u32 A_ModelIdx, __u32 A_EntityType, PCHAR A_Pt
 		__u32			Tv_ModelIdx;
 		char			Tv_StrChar[64];
 		__u32			Tv_ModelType;
-	// code --------------------
+
+	// code ---------------------------------
 		if(m_ObjFwUp != NULL)
 		{
 			//Tv_ModelType	= LcModelTypeGet(A_ModelIdx);

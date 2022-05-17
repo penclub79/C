@@ -9,9 +9,9 @@
 
 CFirmUpdate::CFirmUpdate()
 {
-	m_stFirmEd = { 0 };
-	m_stFirmHeader = { 0 };
-	m_pMakeUpdate = NULL;
+	m_stFirmEd		= { 0 };
+	m_stFirmHeader	= { 0 };
+	m_pMakeUpdate	= NULL;
 	
 	for (int i = 0; i < E_FirmUpInfoCnt; i++)
 	{
@@ -25,6 +25,24 @@ CFirmUpdate::CFirmUpdate()
 
 CFirmUpdate::~CFirmUpdate()
 {
+	// m_pData NULL 체크
+	for (int i = 0; i < E_FirmUpInfoCnt; i++)
+	{
+		for (int si = 0; si < E_FirmUpEntityCnt; si++)
+		{
+			if (NULL != m_pData[i][si])
+			{
+				free(m_pData[i][si]);
+				m_pData[i][si] = NULL;
+			}
+		}
+	}
+
+	if (NULL != m_pMakeUpdate)
+	{
+		free(m_pMakeUpdate);
+		m_pMakeUpdate = NULL;
+	}
 
 }
 
@@ -46,7 +64,7 @@ void CFirmUpdate::FirmInit()
 	// m_pData NULL 체크
 	for (int i = 0; i < E_FirmUpInfoCnt; i++)
 	{
-		for (int si = 0; si < E_FirmUpInfoCnt; si++)
+		for (int si = 0; si < E_FirmUpEntityCnt; si++)
 		{
 			if (NULL != m_pData[i][si])
 			{
@@ -159,7 +177,9 @@ int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, char* _pSrc, int
 
 			if (NULL == m_pData[iModelIdx][iVerFileIdx])
 			{
-				m_pData[iModelIdx][iVerFileIdx] = new int(_iFileSize);
+				
+				m_pData[iModelIdx][iVerFileIdx] = malloc(_iFileSize);
+				//m_pData[iModelIdx][iVerFileIdx] = new char(_iFileSize);// <----- 이 코드로 인해 알수없는 곳에서 버그가 계속 발생
 
 				if (NULL != m_pData[iModelIdx][iVerFileIdx])
 				{

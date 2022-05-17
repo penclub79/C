@@ -150,7 +150,7 @@ void DlgVerFileAdd::GetVerFileType(int* _piModelType, int* _piVerFileType, CHAR*
 	*_piModelType = m_iModelType; // ModelType에 데이터가 안들어가져잇음
 	*_piVerFileType = m_iVerFileType;
 	*_piStrLen = m_strFileName.GetLength();
-	strcpy(_pszFileName, CT2A(m_strFileName));
+	strcpy(_pszFileName, CT2A(m_strFileName)); // CT2A는 쓰지 말아야 한다.
 }
 
 // OK 버튼

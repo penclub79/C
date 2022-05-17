@@ -262,7 +262,7 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 				if (E_FirmUpEntityNone != pstUpdateInfoModel->uiType)
 				{
 					/*WideCharToMultiByte(CP_ACP, 0, pstUpdateInfoModel->astEntity[i].aszFile, 256, pszFileName, 256, NULL, NULL);*/
-					memcpy(pstUpdateInfoModel->astEntity[i].aszFile, pszFileName, 256);
+					//memcpy(pstUpdateInfoModel->astEntity[i].aszFile, pszFileName, 256);
 
 					strFileName = pszFileName;
 					iStrLen = strFileName.GetLength();
@@ -331,15 +331,15 @@ void CUpdateManagerDlg::TreeAddModel(int _iModelType)
 			switch (_iModelType)
 			{
 			case E_FirmUpInfoTypeJa1704:
-				_tcscpy(m_astTreeNode[iResult].aszNode, _T("Ja1704"));
+				GrStrCopy(m_astTreeNode[iResult].aszNode, "Ja1704");
 				m_astTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1704"), NULL, NULL);
 				break;
 			case E_FirmUpInfoTypeJa1708:
-				_tcscpy(m_astTreeNode[iResult].aszNode, _T("Ja1708"));
+				GrStrCopy(m_astTreeNode[iResult].aszNode, "Ja1708");
 				m_astTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1708"), NULL, NULL);
 				break;
 			case E_FirmUpInfoTypeJa1716:
-				_tcscpy(m_astTreeNode[iResult].aszNode, _T("Ja1716"));
+				GrStrCopy(m_astTreeNode[iResult].aszNode, "Ja1716");
 				m_astTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1716"), NULL, NULL);
 				break;
 			}
@@ -387,6 +387,7 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	int				iModelIdx			= 0;
 	int				iVerFileType		= 0;
 	CHAR			pszFilePath[128]	= { 0 };
+	TCHAR			aszUniNode[16]		= { 0 };
 	int				iFileLen			= 0;
 	// ------------------------------------
 
@@ -396,36 +397,44 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 
 	// Tree에서 클릭한 값의 제목을 가져온다.
 	stTreeItem = m_CTreeCtrl.GetSelectedItem();
-	strModelName = m_CTreeCtrl.GetItemText(stTreeItem);
-	iFileLen = strModelName.GetLength();
-
-	pDlgVerFileAdd->SetModelName(strModelName);
-
-	for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
+	if (NULL != stTreeItem)
 	{
-		if (0 == strModelName.Compare(m_astTreeNode[i].aszNode))
+		strModelName = m_CTreeCtrl.GetItemText(stTreeItem);
+		iFileLen = strModelName.GetLength();
+
+		pDlgVerFileAdd->SetModelName(strModelName);
+
+		for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
 		{
-			pDlgVerFileAdd->SetModelType(m_astTreeNode[i].uiType);
-			break;
+			MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_astTreeNode[i].aszNode, strlen(m_astTreeNode[i].aszNode), aszUniNode, 16);
+
+			// 비교 함수
+			if (0 == strModelName.Compare(aszUniNode))
+			{
+				pDlgVerFileAdd->SetModelType(m_astTreeNode[i].uiType);
+				break;
+			}
 		}
+
+		pDlgVerFileAdd->DoModal();
+		if (pDlgVerFileAdd->m_bModalResult)
+		{
+			pDlgVerFileAdd->GetVerFileType(&iModelType, &iVerFileType, pszFilePath, &iFileLen);
+		}
+
+		TreeAddVerFile(iModelType, iVerFileType, pszFilePath, iFileLen);
 	}
-
-	pDlgVerFileAdd->DoModal();
-	// -------------------------------여기까지 문제 없음
-
-
-	if (pDlgVerFileAdd->m_bModalResult)
+	else
 	{
-		pDlgVerFileAdd->GetVerFileType(&iModelType, &iVerFileType, pszFilePath, &iFileLen);
+		MessageBox(_T("선택한 모델이 없습니다"));
 	}
+	
 
 	if (NULL != pDlgVerFileAdd)
 	{
 		delete pDlgVerFileAdd;
 		pDlgVerFileAdd = NULL;
 	}
-
-	TreeAddVerFile(iModelType, iVerFileType, pszFilePath, iFileLen);
 
 }
 
@@ -514,6 +523,7 @@ void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, c
 	int		iNodeIdx			= 0;
 	CHAR	szFileName[64]		= { 0 };
 	WCHAR	szNodeName[64]		= { 0 };
+
 	CString strFormatName;
 
 	iNodeIdx = FindTreeNode(_iModelType);
@@ -539,12 +549,11 @@ void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, c
 		GrStrCopy(szFileName, "RootFs(");
 		break;
 	}
+
 	// Node에 들어갈 제목 수정
-	//strFormatName.Format(_T("%s(%s)"), szTmp, (LPCTSTR)_pszFileName);
 	GrStrCat(szFileName, _pszFileName);
 	GrStrCat(szFileName, ")");
 	GrStrStrToWstr(szNodeName, szFileName);
-	//_tcscpy(szNodeName, strFormatName.GetBuffer(0));
 
 	// 트리 Node에 추가
 	m_CTreeCtrl.InsertItem(szNodeName, m_astTreeNode[iNodeIdx].stNode, NULL);
@@ -780,7 +789,7 @@ void CUpdateManagerDlg::OnOK()
 void CUpdateManagerDlg::OnClickedButtonModelLoad()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CFileDialog*	pFileDlg = NULL;
+	CFileDialog*	pFileDlg			= NULL;
 	CString			strPath;
 	TCHAR			aszLdPathFile[2048] = { 0 };
 	Cls_GrFileCtrl* pObjFile			= NULL;
@@ -789,7 +798,7 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 	
 	if (NULL == pFileDlg)
 	{
-		pFileDlg = (CFileDialog*)new CFileDialog(TRUE, NULL, NULL, OFN_PATHMUSTEXIST, _T("Init Files(*.init)|*.init"), NULL);
+		pFileDlg = new CFileDialog(TRUE, NULL, NULL, OFN_PATHMUSTEXIST, _T("Init Files(*.init)|*.init"), NULL);
 	}
 	
 	pFileDlg->m_ofn.lpstrInitialDir = m_szaNowPath;

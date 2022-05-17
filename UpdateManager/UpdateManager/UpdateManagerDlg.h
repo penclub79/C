@@ -16,7 +16,7 @@ typedef struct _stUpdateTreeNode
 {
 	unsigned int			uiType;
 	HTREEITEM				stNode;
-	TCHAR					aszNode[16];
+	CHAR					aszNode[16];
 } *pUpdateTreeNode;
 
 typedef struct _stUpdateInfoEntity
@@ -36,7 +36,7 @@ typedef struct _stUpdateInfo
 	unsigned int			uiFcc;
 	unsigned int			uiUpgdVersion;
 	_stUpdateInfoModel		astModelInfo[16];
-	TCHAR					aszUpgdFileName[1024];
+	WCHAR					aszUpgdFileName[1024];
 } *pUpdateInfo;
 
 // ---------------------------------------------------- struct 
@@ -83,11 +83,11 @@ protected:
 	int GetModelType(int _iIndex);
 
 private:
-	TCHAR				m_szaNowPath[2048];
+	WCHAR				m_szaNowPath[2048];
 
 	CFirmUpdate*		m_pObjFwUp;
 	_stUpdateTreeNode	m_astTreeNode[E_FirmUpInfoTypeMaxIdx];  // 24
-	TCHAR				m_aszMkFileName[1024];
+	WCHAR				m_aszMkFileName[1024];
 	_stUpdateInfo		m_stUpdateInfo;
 
 	CTreeCtrl			m_CTreeCtrl;
