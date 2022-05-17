@@ -508,33 +508,33 @@ void CMkUpdtMngDlg::LcInit()
 		GrDumyZeroMem(m_TreeNode, sizeof(St_UpdtTreeNode) * 3);
 
 		GrDumyZeroMem(&m_UpdtInfo, sizeof(St_UpdtInfo));
-		GrStrWcopy(Tv_StrIniFile, m_NowPath);
-		GrStrWcat(Tv_StrIniFile, _T("\\MkUpdt.init")); // init파일 경로
+		//GrStrWcopy(Tv_StrIniFile, m_NowPath);
+		//GrStrWcat(Tv_StrIniFile, _T("\\MkUpdt.init")); // init파일 경로
 
-		if(GrFileIsExist(Tv_StrIniFile)) // init 파일 존재하는지 체크
-		{
-			//exist
-			Tv_ObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(Tv_StrIniFile, FALSE, FALSE);
+		//if(GrFileIsExist(Tv_StrIniFile)) // init 파일 존재하는지 체크
+		//{
+		//	//exist
+		//	Tv_ObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(Tv_StrIniFile, FALSE, FALSE);
 
-			if(Tv_ObjFile->IsOpened())
-			{
-				Tv_FileSize = (__u32)Tv_ObjFile->GetSize(); // init파일 사이즈 가져오기
-				if(Tv_FileSize == sizeof(St_UpdtInfo))
-				{
-					Tv_ObjFile->Read(&m_UpdtInfo, Tv_FileSize);
-				}
-			}
+		//	if(Tv_ObjFile->IsOpened())
+		//	{
+		//		Tv_FileSize = (__u32)Tv_ObjFile->GetSize(); // init파일 사이즈 가져오기
+		//		if(Tv_FileSize == sizeof(St_UpdtInfo))
+		//		{
+		//			Tv_ObjFile->Read(&m_UpdtInfo, Tv_FileSize);
+		//		}
+		//	}
 
-			//check update info
-			if(LcCheckIni(&m_UpdtInfo))
-			{
-				//init control
-				LcInitCtrl(&m_UpdtInfo);
-			}
+		//	//check update info
+		//	if(LcCheckIni(&m_UpdtInfo))
+		//	{
+		//		//init control
+		//		LcInitCtrl(&m_UpdtInfo);
+		//	}
 
-			delete Tv_ObjFile;
-			Tv_ObjFile	= NULL;
-		}
+		//	delete Tv_ObjFile;
+		//	Tv_ObjFile	= NULL;
+		//}
 }
 
 BOOL8 CMkUpdtMngDlg::LcCheckIni(Ptr_UpdtInfo A_PtrInfo)

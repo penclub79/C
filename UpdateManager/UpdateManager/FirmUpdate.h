@@ -92,7 +92,7 @@ public:
 	int		AddModelType(int _iModelType);
 	
 	// 버전 파일 추가
-	int		AddVerFile(int _iModelType, int _iVerFileType, void* _pSrc, int _iFileSize);
+	int		AddVerFile(int _iModelType, int _iVerFileType, char* _pSrc, int _iFileSize);
 
 	int		GetModelTypeIdx(int _iModelType);
 

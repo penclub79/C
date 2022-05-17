@@ -146,12 +146,12 @@ void DlgVerFileAdd::OnClickedButtonFileOpen()
 }
 
 // 버전 파일타입 정보 GET
-void DlgVerFileAdd::GetVerFileType(int* _piModelType, int* _piVerFileType, TCHAR* _pszFileName, int* _piStrLen)
+void DlgVerFileAdd::GetVerFileType(int* _piModelType, int* _piVerFileType, CHAR* _pszFileName, int* _piStrLen)
 {
-	*_piModelType = m_iModelType;
+	*_piModelType = m_iModelType; // ModelType에 데이터가 안들어가져잇음
 	*_piVerFileType = m_iVerFileType;
 	*_piStrLen = m_strFileName.GetLength();
-	_tcscpy(_pszFileName, m_strFileName.GetBuffer(0));
+	strcpy(_pszFileName, CT2A(m_strFileName));
 }
 
 // OK 버튼
@@ -203,19 +203,19 @@ void DlgVerFileAdd::OnSelchangeComboChoiseFile()
 }
 
 
-LRESULT DlgVerFileAdd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
-
-	switch (message)
-	{
-	case WM_CLOSE:
-		Sleep(0);
-		break;
-
-	default:
-		break;
-	}
-
-	return CDialogEx::WindowProc(message, wParam, lParam);
-}
+//LRESULT DlgVerFileAdd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+//{
+//	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+//
+//	switch (message)
+//	{
+//	case WM_CLOSE:
+//		Sleep(0);
+//		break;
+//
+//	default:
+//		break;
+//	}
+//
+//	return CDialogEx::WindowProc(message, wParam, lParam);
+//}

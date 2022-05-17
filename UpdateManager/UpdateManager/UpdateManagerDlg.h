@@ -74,7 +74,7 @@ protected:
 	//void AddModel(unsigned int _uiModelType);
 
 	void TreeAddModel(int _iModelType); // 트리에 모델 추가
-	void TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR* _pszFilePath, int _iFileLen); // 트리에 모델에서 버전파일 추가
+	void TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* _pszFilePath, int _iFileLen); // 트리에 모델에서 버전파일 추가
 	void TreeAddVerFileNode(int _iModelType, int _iVerFileType, char* _pszFileName);
 	void ProcErrCode(int _iResult); // 에러 처리
 	void InitMakeFile(); // init파일 만드는 함수
@@ -109,5 +109,5 @@ public:
 	afx_msg void OnClickedButtonMainCancel();
 	virtual void OnOK();
 	afx_msg void OnClickedButtonModelLoad();
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+//	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };

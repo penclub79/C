@@ -23,7 +23,7 @@ public:
 
 	void SetModelType(int _iModelType);
 	void SetModelName(TCHAR* _pszModelName);
-	void GetVerFileType(int* _piModelType, int* _piVerFileType, TCHAR* _pszFileName, int* _piStrLen);
+	void GetVerFileType(int* _piModelType, int* _piVerFileType, CHAR* _pszFileName, int* _piStrLen);
 
 	BOOL m_bModalResult;
 	
@@ -43,5 +43,5 @@ private:
 public:
 	CEdit m_CEditFile;
 	afx_msg void OnSelchangeComboChoiseFile();
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+//	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };

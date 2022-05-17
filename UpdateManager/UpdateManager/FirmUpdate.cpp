@@ -136,7 +136,7 @@ int	CFirmUpdate::ChkModelType(unsigned int _uiModelType)
 	return iResult;
 }
 
-int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, void* _pSrc, int _iFileSize)
+int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, char* _pSrc, int _iFileSize)
 {
 	// Local --------------------------------------
 	int iResult		= 0;
@@ -145,24 +145,28 @@ int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, void* _pSrc, int
 	//---------------------------------------------
 
 	iResult = E_FirmUpErrCode;
-	iModelIdx = ChkModelType(_iModelType);
 
+	// 트리에 모델이 없으면 -1
+	iModelIdx = ChkModelType(_iModelType); 
+
+	// 트리에 모델타입이 있을때
 	if (0 <= iModelIdx)
 	{
-		// 버전 파일타입 check시 중복이라면
+		// 버전 파일타입 check시 없으면 -1 반환
 		if (0 > ChkEntityType(_iVerFileType, m_stFirmHeader.FirmInfo[iModelIdx].Entity))
 		{
 			iVerFileIdx = ChkEntityType(E_FirmUpEntityNone, m_stFirmHeader.FirmInfo[iModelIdx].Entity);
 
 			if (NULL == m_pData[iModelIdx][iVerFileIdx])
 			{
-				m_pData[iModelIdx][iVerFileIdx] = new TCHAR(_iFileSize);
+				m_pData[iModelIdx][iVerFileIdx] = new CHAR(_iFileSize);
 
 				if (NULL != m_pData[iModelIdx][iVerFileIdx])
 				{
 					m_stFirmHeader.FirmInfo[iModelIdx].Entity[iVerFileIdx].Size = _iFileSize;
 					m_stFirmHeader.FirmInfo[iModelIdx].Entity[iVerFileIdx].Type = _iVerFileType;
-					memcpy(m_pData[iModelIdx][iVerFileIdx], _pSrc, _iFileSize);
+
+					memmove(m_pData[iModelIdx][iVerFileIdx], _pSrc, _iFileSize);
 					m_stFirmHeader.Size = m_stFirmHeader.Size + _iFileSize;
 					iResult = iVerFileIdx;
 				}

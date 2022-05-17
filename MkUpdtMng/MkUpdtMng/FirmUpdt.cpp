@@ -263,6 +263,7 @@ void* Cls_FirmUpdt::GetMkUpdt(__u32* A_PtrSize)
 
 		if(0 < m_FirmHd.Size)
 		{
+			// 메모리 해제??
 			if(NULL != m_PtrMkUpdt)
 			{
 				free(m_PtrMkUpdt);

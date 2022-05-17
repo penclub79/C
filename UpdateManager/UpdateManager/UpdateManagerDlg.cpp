@@ -65,6 +65,11 @@ CUpdateManagerDlg::CUpdateManagerDlg(CWnd* pParent /*=NULL*/)
 // 소멸자
 CUpdateManagerDlg::~CUpdateManagerDlg()
 {
+	if (NULL != m_pObjFwUp)
+	{
+		delete m_pObjFwUp;
+		m_pObjFwUp = NULL;
+	}
 }
 
 
@@ -192,18 +197,12 @@ void CUpdateManagerDlg::Init()
 	// 경로에서 파일명과 확장자만 제거
 	PathRemoveFileSpec(m_szaNowPath);
 
-	m_pObjFwUp = (CFirmUpdate*)new CFirmUpdate();
+	m_pObjFwUp = (CFirmUpdate*) new CFirmUpdate();
 	m_pObjFwUp->FirmInit();
 
 	// Tree 초기화 & UpdateInfo 구조체 초기화
 	memset(m_astTreeNode, 0, sizeof(_stUpdateTreeNode) * 3); // 72
 	memset(&m_stUpdateInfo, 0, sizeof(_stUpdateInfo));
-
-	/*if (NULL != pObjFile)
-	{
-		delete pObjFile;
-		pObjFile = NULL;
-	}*/
 }
 
 // Init 체크
@@ -227,7 +226,7 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 
 	pUpdateInfoModel	pstUpdateInfoModel;
 	TCHAR				aszVersion[32]		= { 0 };
-	TCHAR*				pszFileName			= NULL;
+	CHAR*				pszFileName			= NULL;
 	int					aiVersion[4]		= { 0 };
 	int					iStrLen				= 0;
 	// -------------------------------------
@@ -262,8 +261,9 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 			{
 				if (E_FirmUpEntityNone != pstUpdateInfoModel->uiType)
 				{
-					pszFileName = pstUpdateInfoModel->staEntity[i].szaFile;
-					strFileName = (LPCTSTR)pszFileName;
+					WideCharToMultiByte(CP_ACP, 0, pstUpdateInfoModel->staEntity[i].szaFile, 256, pszFileName, 256, NULL, NULL);
+
+					strFileName = pszFileName;
 					iStrLen = strFileName.GetLength();
 
 					if (GrFileIsExist(pszFileName))
@@ -386,8 +386,9 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	HTREEITEM		stTreeItem			= { 0 };
 	TCHAR			aszModel[16]		= { 0 };
 	int				iModelType			= 0;
+	int				iModelIdx			= 0;
 	int				iVerFileType		= 0;
-	TCHAR			pszFilePath[128]	= { 0 };
+	CHAR			pszFilePath[128]	= { 0 };
 	int				iFileLen			= 0;
 	// ------------------------------------
 
@@ -398,17 +399,35 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	// Tree에서 클릭한 값의 제목을 가져온다.
 	stTreeItem = m_CTreeCtrl.GetSelectedItem();
 	strModelName = m_CTreeCtrl.GetItemText(stTreeItem);
+	iFileLen = strModelName.GetLength();
 
 	_tcscpy(aszModel, strModelName.GetBuffer(0));
 	pDlgVerFileAdd->SetModelName(&aszModel[0]);
-	
+
+	for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
+	{
+		switch (m_astTreeNode[i].uiType)
+		{
+		case E_FirmUpInfoTypeJa1704:
+			iModelIdx = E_FirmUpInfoTypeJa1704;
+			break;
+		case E_FirmUpInfoTypeJa1708:
+			iModelIdx = E_FirmUpInfoTypeJa1708;
+			break;
+		case E_FirmUpInfoTypeJa1716:
+			iModelIdx = E_FirmUpInfoTypeJa1716;
+			break;
+		}
+		pDlgVerFileAdd->SetModelType(iModelIdx);
+		break;
+	}
+
 	pDlgVerFileAdd->DoModal();
 	
 	if (pDlgVerFileAdd->m_bModalResult)
 	{
 		pDlgVerFileAdd->GetVerFileType(&iModelType, &iVerFileType, pszFilePath, &iFileLen);
 		TreeAddVerFile(iModelType, iVerFileType, pszFilePath, iFileLen);
-
 
 		if (NULL != pDlgVerFileAdd)
 		{
@@ -420,7 +439,7 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 }
 
 // 트리에 해당 모델에서 버전파일 확인 후 구조체에 데이터 적용
-void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR* _pszFilePath, int _iFileLen)
+void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* _pszFilePath, int _iFileLen)
 {
 	// Local ------------------------------
 	CString			strPath;
@@ -433,10 +452,9 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 	unsigned int	uiFileSize			= 0;
 	int				iResult				= 0;
 	int				iModelIdx			= 0;
-	TCHAR			aszUniFileName[64]	= { 0 };
-	CHAR			aszMulPathFull[256];
-	CHAR			aszMulPath[2048];
-	CHAR			aszMulFileName[64];
+	
+	CHAR			aszMulPath[128]		= { 0 };
+	CHAR			aszMulFileName[64]	= { 0 };
 	// ------------------------------------
 
 	if (NULL != m_pObjFwUp)
@@ -450,6 +468,7 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 		{
 			uiFileSize = pFileCtrl->GetSize();
 
+			//pszBuff = (PCHAR)malloc(uiFileSize);
 			pszBuff = (PCHAR)malloc(uiFileSize);
 			memset(pszBuff, 0, uiFileSize);
 
@@ -459,26 +478,19 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 
 			if (0 <= iResult)
 			{
-				// find model
+				// 모델 타입 1704 = 1, 1708 = 2, 1716 = 3 대입
 				iModelIdx = m_pObjFwUp->GetModelTypeIdx(iModelType);
-
-				WideCharToMultiByte(CP_ACP, 0, m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].szaFile, 256, aszMulPathFull, 256, NULL, NULL);
-
-				WideCharToMultiByte(CP_ACP, 0, _pszFilePath, 2048, aszMulPath, 2048, NULL, NULL);
 
 				if (0 <= iModelIdx)
 				{
 					m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].uiType = _iVerFileType;
+					
 					// 파일 경로 복사
-					GrStrCopy(aszMulPathFull, aszMulPath);
-					/*memcpy(m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].szaFile, _pszFilePath, uiFileSize);*/
+					GrStrCopy(aszMulPath, _pszFilePath);
 
 					// 파일 이름만 복사
-					// 경로
 					//strPath = _pszFilePath;
-					// '\\'찾은 index에서 
-					/*strFileName = strPath.Right(strPath.GetLength() - strPath.ReverseFind('\\') - 1);*/
-					GrStrFnGetFileName(aszMulPathFull, aszMulFileName);
+					GrStrFnGetFileName(aszMulFileName, aszMulPath);
 
 					// 메모리 카피
 					TreeAddVerFileNode(iModelType, iVerFileType, aszMulFileName);
@@ -487,6 +499,12 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, TCHAR*
 			else
 			{
 				ProcErrCode(iResult);
+			}
+
+			if (NULL != pszBuff)
+			{
+				free(pszBuff);
+				pszBuff = NULL;
 			}
 		}
 		
@@ -645,6 +663,7 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 				{
 					// 결과 TRUE
 					bIsSuccess = TRUE;
+
 					// init파일 만드는 함수호출
 					InitMakeFile();
 					break;
@@ -827,17 +846,17 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 }
 
 
-LRESULT CUpdateManagerDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
-
-	switch (message)
-	{
-	case WM_CLOSE:
-		break;
-
-	default:
-		break;
-	}
-	return CDialogEx::WindowProc(message, wParam, lParam);
-}
+//LRESULT CUpdateManagerDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+//{
+//	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+//
+//	switch (message)
+//	{
+//	case WM_CLOSE:
+//		break;
+//
+//	default:
+//		break;
+//	}
+//	return CDialogEx::WindowProc(message, wParam, lParam);
+//}
