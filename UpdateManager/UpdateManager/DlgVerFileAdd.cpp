@@ -110,10 +110,9 @@ void DlgVerFileAdd::SetModelType(int _iModelType)
 }
 
 
-void DlgVerFileAdd::SetModelName(TCHAR* _pszModelName)
+void DlgVerFileAdd::SetModelName(CString strModelName)
 {	
-	TCHAR* pszModelName = _pszModelName;
-	m_strModelName = (LPCTSTR)pszModelName;
+	m_strModelName = strModelName;
 }
 
 // Open ¹öÆ°

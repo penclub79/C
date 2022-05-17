@@ -22,7 +22,7 @@ public:
 	enum { IDD = IDD_DIALOG_VERSION_FILE };
 
 	void SetModelType(int _iModelType);
-	void SetModelName(TCHAR* _pszModelName);
+	void SetModelName(CString strModelName);
 	void GetVerFileType(int* _piModelType, int* _piVerFileType, CHAR* _pszFileName, int* _piStrLen);
 
 	BOOL m_bModalResult;

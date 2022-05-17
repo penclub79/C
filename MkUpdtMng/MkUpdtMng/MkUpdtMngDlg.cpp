@@ -236,7 +236,7 @@ void CMkUpdtMngDlg::OnBnClickedBtnAddentity()
 		__s32			Tv_ModelIdx;
 		CHAR			Tv_StrFile[128];
 	// code --------------------
-		Tv_DlgEntity			= (DlgAddEntity*)new DlgAddEntity(NULL, m_NowPath);
+		Tv_DlgEntity			= new DlgAddEntity(NULL, m_NowPath);
 		HTREEITEM Tv_TreeItm	= m_TreeCtrl.GetSelectedItem();
 		Tv_StrItm				= m_TreeCtrl.GetItemText(Tv_TreeItm);
 
@@ -252,13 +252,13 @@ void CMkUpdtMngDlg::OnBnClickedBtnAddentity()
 				switch(m_TreeNode[Tv_WkCnt].Type)
 				{
 				case E_FirmUpInfoTypeJa1704:
-					Tv_ModelIdx	= 1;
+					Tv_ModelIdx = E_FirmUpInfoTypeJa1704;
 					break;
 				case E_FirmUpInfoTypeJa1708:
-					Tv_ModelIdx	= 2;
+					Tv_ModelIdx = E_FirmUpInfoTypeJa1708;
 					break;
 				case E_FirmUpInfoTypeJa1716:
-					Tv_ModelIdx	= 3;
+					Tv_ModelIdx = E_FirmUpInfoTypeJa1716;
 					break;
 				}
 				Tv_DlgEntity->SetModelType(Tv_ModelIdx);
@@ -297,7 +297,7 @@ void CMkUpdtMngDlg::LcAddEntity(__u32 A_ModelIdx, __u32 A_EntityType, PCHAR A_Pt
 		{
 			//Tv_ModelType	= LcModelTypeGet(A_ModelIdx);
 			Tv_ModelType	= A_ModelIdx;
-			Tv_ObjFileCtrl	= (Cls_GrFileCtrl*)new Cls_GrFileCtrl(A_PtrStrFile, FALSE, FALSE);
+			Tv_ObjFileCtrl	= new Cls_GrFileCtrl(A_PtrStrFile, FALSE, FALSE);
 			if(Tv_ObjFileCtrl->IsOpened())
 			{
 				Tv_FileSize = (__u32)Tv_ObjFileCtrl->GetSize();

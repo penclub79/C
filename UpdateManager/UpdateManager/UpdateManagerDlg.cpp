@@ -252,32 +252,33 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 
 	for (int i = 0; i < E_FirmUpInfoCnt; i++)
 	{
-		if (E_FirmUpInfoTypeNone != _pstUpdateInfo->staModelInfo[i].uiType)
+		if (E_FirmUpInfoTypeNone != _pstUpdateInfo->astModelInfo[i].uiType)
 		{
-			TreeAddModel(_pstUpdateInfo->staModelInfo[i].uiType);
+			TreeAddModel(_pstUpdateInfo->astModelInfo[i].uiType);
 
-			pstUpdateInfoModel = &_pstUpdateInfo->staModelInfo[i];
+			pstUpdateInfoModel = &_pstUpdateInfo->astModelInfo[i];
 			for (int si = 0; si < E_FirmUpEntityCnt; si++)
 			{
 				if (E_FirmUpEntityNone != pstUpdateInfoModel->uiType)
 				{
-					WideCharToMultiByte(CP_ACP, 0, pstUpdateInfoModel->staEntity[i].szaFile, 256, pszFileName, 256, NULL, NULL);
+					/*WideCharToMultiByte(CP_ACP, 0, pstUpdateInfoModel->astEntity[i].aszFile, 256, pszFileName, 256, NULL, NULL);*/
+					memcpy(pstUpdateInfoModel->astEntity[i].aszFile, pszFileName, 256);
 
 					strFileName = pszFileName;
 					iStrLen = strFileName.GetLength();
 
 					if (GrFileIsExist(pszFileName))
 					{
-						TreeAddVerFile(pstUpdateInfoModel->uiType, pstUpdateInfoModel->staEntity[i].uiType, pszFileName, iStrLen);
+						TreeAddVerFile(pstUpdateInfoModel->uiType, pstUpdateInfoModel->astEntity[i].uiType, pszFileName, iStrLen);
 					}
 				}
 			}
 		}
 	}
 
-	m_CEditPath.SetWindowTextW(m_stUpdateInfo.szaUpgdFileName);
+	m_CEditPath.SetWindowTextW(m_stUpdateInfo.aszUpgdFileName);
 	memset(m_aszMkFileName, 0, sizeof(TCHAR) * 1024);
-	memcpy(m_aszMkFileName, m_stUpdateInfo.szaUpgdFileName, sizeof(TCHAR) * 1024);
+	memcpy(m_aszMkFileName, m_stUpdateInfo.aszUpgdFileName, sizeof(TCHAR) * 1024);
 }
 
 
@@ -330,28 +331,26 @@ void CUpdateManagerDlg::TreeAddModel(int _iModelType)
 			switch (_iModelType)
 			{
 			case E_FirmUpInfoTypeJa1704:
-				_tcscpy(m_astTreeNode[iResult].szaNode, _T("Ja1704"));
+				_tcscpy(m_astTreeNode[iResult].aszNode, _T("Ja1704"));
 				m_astTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1704"), NULL, NULL);
 				break;
 			case E_FirmUpInfoTypeJa1708:
-				_tcscpy(m_astTreeNode[iResult].szaNode, _T("Ja1708"));
+				_tcscpy(m_astTreeNode[iResult].aszNode, _T("Ja1708"));
 				m_astTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1708"), NULL, NULL);
 				break;
 			case E_FirmUpInfoTypeJa1716:
-				_tcscpy(m_astTreeNode[iResult].szaNode, _T("Ja1716"));
+				_tcscpy(m_astTreeNode[iResult].aszNode, _T("Ja1716"));
 				m_astTreeNode[iResult].stNode = m_CTreeCtrl.InsertItem(_T("Ja1716"), NULL, NULL);
 				break;
 			}
 
-			m_stUpdateInfo.staModelInfo[iResult].uiType = _iModelType;
+			m_stUpdateInfo.astModelInfo[iResult].uiType = _iModelType;
 		}
 		else
 		{
 			ProcErrCode(iResult);
 		}
-
 	}
-
 }
 
 // 에러 처리
@@ -384,7 +383,6 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	DlgVerFileAdd*	pDlgVerFileAdd;
 	CString			strModelName;
 	HTREEITEM		stTreeItem			= { 0 };
-	TCHAR			aszModel[16]		= { 0 };
 	int				iModelType			= 0;
 	int				iModelIdx			= 0;
 	int				iVerFileType		= 0;
@@ -392,7 +390,7 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	int				iFileLen			= 0;
 	// ------------------------------------
 
-	pDlgVerFileAdd = (DlgVerFileAdd*)new DlgVerFileAdd(NULL, m_szaNowPath);
+	pDlgVerFileAdd = new DlgVerFileAdd(NULL, m_szaNowPath);
 
 	// 버전 파일 Dlg 호출
 
@@ -401,40 +399,33 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	strModelName = m_CTreeCtrl.GetItemText(stTreeItem);
 	iFileLen = strModelName.GetLength();
 
-	_tcscpy(aszModel, strModelName.GetBuffer(0));
-	pDlgVerFileAdd->SetModelName(&aszModel[0]);
+	pDlgVerFileAdd->SetModelName(strModelName);
 
 	for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
 	{
-		switch (m_astTreeNode[i].uiType)
+		if (0 == strModelName.Compare(m_astTreeNode[i].aszNode))
 		{
-		case E_FirmUpInfoTypeJa1704:
-			iModelIdx = E_FirmUpInfoTypeJa1704;
-			break;
-		case E_FirmUpInfoTypeJa1708:
-			iModelIdx = E_FirmUpInfoTypeJa1708;
-			break;
-		case E_FirmUpInfoTypeJa1716:
-			iModelIdx = E_FirmUpInfoTypeJa1716;
+			pDlgVerFileAdd->SetModelType(m_astTreeNode[i].uiType);
 			break;
 		}
-		pDlgVerFileAdd->SetModelType(iModelIdx);
-		break;
 	}
 
 	pDlgVerFileAdd->DoModal();
-	
+	// -------------------------------여기까지 문제 없음
+
+
 	if (pDlgVerFileAdd->m_bModalResult)
 	{
 		pDlgVerFileAdd->GetVerFileType(&iModelType, &iVerFileType, pszFilePath, &iFileLen);
-		TreeAddVerFile(iModelType, iVerFileType, pszFilePath, iFileLen);
-
-		if (NULL != pDlgVerFileAdd)
-		{
-			delete pDlgVerFileAdd;
-			pDlgVerFileAdd = NULL;
-		}
 	}
+
+	if (NULL != pDlgVerFileAdd)
+	{
+		delete pDlgVerFileAdd;
+		pDlgVerFileAdd = NULL;
+	}
+
+	TreeAddVerFile(iModelType, iVerFileType, pszFilePath, iFileLen);
 
 }
 
@@ -444,16 +435,15 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* 
 	// Local ------------------------------
 	CString			strPath;
 	CString			strFileName;
-	Cls_GrFileCtrl* pFileCtrl; // 라이브러리
 
-	PCHAR			pszBuff;
+	Cls_GrFileCtrl* pFileCtrl			= NULL; // 라이브러리
+	PCHAR			pszBuff				= NULL;
 	int				iModelType			= 0;
 	int				iVerFileType		= 0;
 	unsigned int	uiFileSize			= 0;
 	int				iResult				= 0;
 	int				iModelIdx			= 0;
 	
-	CHAR			aszMulPath[128]		= { 0 };
 	CHAR			aszMulFileName[64]	= { 0 };
 	// ------------------------------------
 
@@ -461,7 +451,7 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* 
 	{
 		iModelType = _iModelIdx;
 		iVerFileType = _iVerFileType;
-		pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(_pszFilePath, FALSE, FALSE);
+		pFileCtrl = new Cls_GrFileCtrl(_pszFilePath, FALSE, FALSE);
 		
 		// open시 파일 선택했다면 IsOpened = TRUE
 		if (pFileCtrl->IsOpened())
@@ -469,8 +459,8 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* 
 			uiFileSize = pFileCtrl->GetSize();
 
 			//pszBuff = (PCHAR)malloc(uiFileSize);
-			pszBuff = (PCHAR)malloc(uiFileSize);
-			memset(pszBuff, 0, uiFileSize);
+			pszBuff = (PCHAR)malloc(uiFileSize+1);
+			memset(pszBuff, 0, uiFileSize + 1);
 
 			pFileCtrl->Seek(0);
 			pFileCtrl->Read(pszBuff, uiFileSize);
@@ -483,14 +473,14 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* 
 
 				if (0 <= iModelIdx)
 				{
-					m_stUpdateInfo.staModelInfo[iModelIdx].staEntity[iResult].uiType = _iVerFileType;
+					m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iResult].uiType = _iVerFileType;
 					
 					// 파일 경로 복사
-					GrStrCopy(aszMulPath, _pszFilePath);
+					GrStrCopy(m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iResult].aszFile, _pszFilePath);
 
 					// 파일 이름만 복사
 					//strPath = _pszFilePath;
-					GrStrFnGetFileName(aszMulFileName, aszMulPath);
+					GrStrFnGetFileName(m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iResult].aszFile, aszMulFileName);
 
 					// 메모리 카피
 					TreeAddVerFileNode(iModelType, iVerFileType, aszMulFileName);
@@ -522,7 +512,7 @@ void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, c
 {
 	int		iResult				= 0;
 	int		iNodeIdx			= 0;
-	CHAR	szFileName[64]			= { 0 };
+	CHAR	szFileName[64]		= { 0 };
 	WCHAR	szNodeName[64]		= { 0 };
 	CString strFormatName;
 
@@ -561,7 +551,7 @@ void CUpdateManagerDlg::TreeAddVerFileNode(int _iModelType, int _iVerFileType, c
 	//m_CTreeCtrl.Invalidate(TRUE);
 	m_CTreeCtrl.Invalidate(TRUE);
 
-	m_stUpdateInfo.staModelInfo[iNodeIdx].uiType = _iModelType;
+	m_stUpdateInfo.astModelInfo[iNodeIdx].uiType = _iModelType;
 }
 
 
@@ -602,8 +592,8 @@ void CUpdateManagerDlg::OnClickedButtonSavePath()
 		_tcscpy(m_aszMkFileName, strPath.GetBuffer(0));
 		m_CEditPath.SetWindowTextW(strPath);
 
-		memset(m_stUpdateInfo.szaUpgdFileName, 0, 1024);
-		_tcscpy(m_stUpdateInfo.szaUpgdFileName, strPath.GetBuffer(0));
+		memset(m_stUpdateInfo.aszUpgdFileName, 0, 1024);
+		_tcscpy(m_stUpdateInfo.aszUpgdFileName, strPath.GetBuffer(0));
 	}
 }
 

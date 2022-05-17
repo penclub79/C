@@ -159,14 +159,14 @@ int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, char* _pSrc, int
 
 			if (NULL == m_pData[iModelIdx][iVerFileIdx])
 			{
-				m_pData[iModelIdx][iVerFileIdx] = new CHAR(_iFileSize);
+				m_pData[iModelIdx][iVerFileIdx] = new int(_iFileSize);
 
 				if (NULL != m_pData[iModelIdx][iVerFileIdx])
 				{
 					m_stFirmHeader.FirmInfo[iModelIdx].Entity[iVerFileIdx].Size = _iFileSize;
 					m_stFirmHeader.FirmInfo[iModelIdx].Entity[iVerFileIdx].Type = _iVerFileType;
 
-					memmove(m_pData[iModelIdx][iVerFileIdx], _pSrc, _iFileSize);
+					GrDumyCopyMem(m_pData[iModelIdx][iVerFileIdx], _pSrc, _iFileSize);
 					m_stFirmHeader.Size = m_stFirmHeader.Size + _iFileSize;
 					iResult = iVerFileIdx;
 				}
