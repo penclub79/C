@@ -52,28 +52,28 @@ firmware upgrade
 //global type
 typedef struct _stFirmUpEntity
 {
-	unsigned int		Type;
-	unsigned int		Offset;
-	unsigned int		Size;
+	__u32				Type;
+	__u32				Offset;
+	__u32				Size;
 } *pFirmUpEntity;
 
 typedef struct _stFirmUpInfo
 {
-	unsigned int		ModelType;
+	__u32				ModelType;
 	_stFirmUpEntity		Entity[E_FirmUpEntityCnt];
 } *pFirmUpInfo;
 
 typedef struct _stFirmUpHeader
 {
-	unsigned int		Fcc; // 파일 맞는지 아닌지.(1)
-	unsigned int		UpgdVer;
-	unsigned int		Size;
+	__u32				Fcc; // 파일 맞는지 아닌지.(1)
+	__u32				UpgdVer;
+	__u32				Size;
 	_stFirmUpInfo		FirmInfo[E_FirmUpInfoCnt];
 } *pFirmUpHeader;
 
 typedef struct _stFirmUpEnd
 {
-	unsigned int		Fcc; // 파일 맞는지 아닌지.(2)
+	__u32				Fcc; // 파일 맞는지 아닌지.(2)
 } *pFirmUpEnd;
 
 //====================================================================

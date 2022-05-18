@@ -494,6 +494,48 @@ void CMkUpdtMngDlg::OnBnClickedBtnMake()
 		}
 }
 
+void CMkUpdtMngDlg::LcMkiniFile()
+{
+	// local -------------------
+	CString			Tv_StrVer;
+	WCHAR			Tv_StrIniFile[2048];
+	Cls_GrFileCtrl*	Tv_ObjFile;
+	CString			Tv_StrVer1;
+	CString			Tv_StrVer2;
+	CString			Tv_StrVer3;
+	CString			Tv_StrVer4;
+	__u8			Tv_Ver[4];
+	__u32			Tv_Version;
+	// code --------------------
+
+	m_UpdtInfo.Fcc = E_MkUpdt_IniFcc;
+
+	m_EdtVer1.GetWindowTextW(Tv_StrVer1);
+	m_EdtVer2.GetWindowTextW(Tv_StrVer2);
+	m_EdtVer3.GetWindowTextW(Tv_StrVer3);
+	m_EdtVer4.GetWindowTextW(Tv_StrVer4);
+
+	Tv_Ver[0] = (__u8)(_ttoi(Tv_StrVer1));
+	Tv_Ver[1] = (__u8)(_ttoi(Tv_StrVer2));
+	Tv_Ver[2] = (__u8)(_ttoi(Tv_StrVer3));
+	Tv_Ver[3] = (__u8)(_ttoi(Tv_StrVer4));
+
+	Tv_Version = (Tv_Ver[0] << 24) | (Tv_Ver[1] << 16) | (Tv_Ver[2] << 8) | Tv_Ver[3];
+	m_UpdtInfo.UpgdVer = Tv_Version;
+
+	GrStrWcopy(Tv_StrIniFile, m_NowPath);
+	GrStrWcat(Tv_StrIniFile, _T("\\MkUpdt.init"));
+	Tv_ObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(Tv_StrIniFile, TRUE, TRUE);
+
+	if (Tv_ObjFile->IsOpened())
+	{
+		Tv_ObjFile->Write(&m_UpdtInfo, sizeof(St_UpdtInfo));
+	}
+
+	delete Tv_ObjFile;
+	Tv_ObjFile = NULL;
+}
+
 void CMkUpdtMngDlg::LcInit()
 {
 	// local -------------------
@@ -652,47 +694,7 @@ void CMkUpdtMngDlg::LcInitCtrl(Ptr_UpdtInfo A_PtrInfo)
 		GrStrWcopy(m_MkFileName, m_UpdtInfo.StrUpdtFileName);
 }
 
-void CMkUpdtMngDlg::LcMkiniFile()
-{
-	// local -------------------
-		CString			Tv_StrVer;
-		WCHAR			Tv_StrIniFile[2048];
-		Cls_GrFileCtrl*	Tv_ObjFile;
-		CString			Tv_StrVer1;
-		CString			Tv_StrVer2;
-		CString			Tv_StrVer3;
-		CString			Tv_StrVer4;
-		__u8			Tv_Ver[4];
-		__u32			Tv_Version;
-	// code --------------------
 
-		m_UpdtInfo.Fcc			= E_MkUpdt_IniFcc;
-
-		m_EdtVer1.GetWindowTextW(Tv_StrVer1);
-		m_EdtVer2.GetWindowTextW(Tv_StrVer2);
-		m_EdtVer3.GetWindowTextW(Tv_StrVer3);
-		m_EdtVer4.GetWindowTextW(Tv_StrVer4);
-
-		Tv_Ver[0] = (__u8)(_ttoi(Tv_StrVer1));
-		Tv_Ver[1] = (__u8)(_ttoi(Tv_StrVer2));
-		Tv_Ver[2] = (__u8)(_ttoi(Tv_StrVer3));
-		Tv_Ver[3] = (__u8)(_ttoi(Tv_StrVer4));
-
-		Tv_Version = (Tv_Ver[0] << 24) | (Tv_Ver[1] << 16) | (Tv_Ver[2] << 8) | Tv_Ver[3];
-		m_UpdtInfo.UpgdVer = Tv_Version;
-
-		GrStrWcopy(Tv_StrIniFile, m_NowPath);
-		GrStrWcat(Tv_StrIniFile, _T("\\MkUpdt.init"));
-		Tv_ObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(Tv_StrIniFile, TRUE, TRUE);
-
-		if(Tv_ObjFile->IsOpened())
-		{
-			Tv_ObjFile->Write(&m_UpdtInfo, sizeof(St_UpdtInfo));
-		}
-
-		delete Tv_ObjFile;
-		Tv_ObjFile	= NULL;
-}
 
 BOOL CMkUpdtMngDlg::DestroyWindow()
 {

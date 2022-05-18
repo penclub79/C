@@ -9,15 +9,18 @@
 
 CFirmUpdate::CFirmUpdate()
 {
+	__u8		Tv_WkCnt;
+	__u8		Tv_WkIdx;
+
 	m_stFirmEd		= { 0 };
 	m_stFirmHeader	= { 0 };
 	m_pMakeUpdate	= NULL;
 	
-	for (int i = 0; i < E_FirmUpInfoCnt; i++)
+	for (Tv_WkCnt = 0; Tv_WkCnt < E_FirmUpInfoCnt; Tv_WkCnt++)
 	{
-		for (int si = 0; si < E_FirmUpInfoCnt; si++)
+		for (Tv_WkIdx = 0; Tv_WkIdx < E_FirmUpEntityCnt; Tv_WkIdx++)
 		{
-			m_pData[i][si] = NULL;
+			m_pData[Tv_WkCnt][Tv_WkIdx] = NULL;
 		}
 	}
 
@@ -25,15 +28,19 @@ CFirmUpdate::CFirmUpdate()
 
 CFirmUpdate::~CFirmUpdate()
 {
+
+	__u8		Tv_WkCnt;
+	__u8		Tv_WkIdx;
+
 	// m_pData NULL 체크
-	for (int i = 0; i < E_FirmUpInfoCnt; i++)
+	for (Tv_WkCnt = 0; Tv_WkCnt < E_FirmUpInfoCnt; Tv_WkCnt++)
 	{
-		for (int si = 0; si < E_FirmUpEntityCnt; si++)
+		for (Tv_WkIdx = 0; Tv_WkIdx < E_FirmUpEntityCnt; Tv_WkIdx++)
 		{
-			if (NULL != m_pData[i][si])
+			if (NULL != m_pData[Tv_WkCnt][Tv_WkIdx])
 			{
-				free(m_pData[i][si]);
-				m_pData[i][si] = NULL;
+				free(m_pData[Tv_WkCnt][Tv_WkIdx]);
+				m_pData[Tv_WkCnt][Tv_WkIdx] = NULL;
 			}
 		}
 	}
@@ -53,23 +60,29 @@ void CFirmUpdate::FirmInit()
 	pFirmUpInfo		stFirmUpInfo	= { 0 };
 	pFirmUpEnd		stFirmEnd		= { 0 };
 	BOOL			bIsExist		= FALSE;
+	__s32			Tv_WkIdx;
+	__s32			Tv_WkCnt;
 	// ---------------------------------------------
+
+	GrDumyZeroMem(&m_stFirmHeader,	sizeof(_stFirmUpHeader));
+	GrDumyZeroMem(&m_stFirmEd,		sizeof(_stFirmUpEnd));
 
 	// 펌웨어 구조체 값 삽입
 	m_stFirmHeader.Fcc		= E_FirmUpHdFcc;
 	m_stFirmHeader.UpgdVer	= E_FirmUpVer;
 	m_stFirmEd.Fcc			= E_FirmUpEdFcc;
-	m_stFirmHeader.Size		= sizeof(pFirmUpHeader) + sizeof(pFirmUpEnd);
+	//m_stFirmHeader.Size		= sizeof(pFirmUpHeader) + sizeof(pFirmUpEnd); <--- 구조체의 크기가 안맞아서 패키지 파일 생성시 에러가 발생
+	m_stFirmHeader.Size = sizeof(_stFirmUpHeader)+sizeof(_stFirmUpEnd);
 
 	// m_pData NULL 체크
-	for (int i = 0; i < E_FirmUpInfoCnt; i++)
+	for (Tv_WkIdx = 0; Tv_WkIdx < E_FirmUpInfoCnt; Tv_WkIdx++)
 	{
-		for (int si = 0; si < E_FirmUpEntityCnt; si++)
+		for (Tv_WkCnt = 0; Tv_WkCnt < E_FirmUpEntityCnt; Tv_WkCnt++)
 		{
-			if (NULL != m_pData[i][si])
+			if (NULL != m_pData[Tv_WkIdx][Tv_WkCnt])
 			{
-				free(m_pData[i][si]);
-				m_pData[i][si] = NULL;
+				free(m_pData[Tv_WkIdx][Tv_WkCnt]);
+				m_pData[Tv_WkIdx][Tv_WkCnt] = NULL;
 			}
 		}
 	}
@@ -160,35 +173,42 @@ int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, char* _pSrc, int
 	int iResult		= 0;
 	int iModelIdx	= 0;
 	int iVerFileIdx = 0;
+	__s32		Tv_WkIdx;
+	__s32		Tv_EttIdx;
 	//---------------------------------------------
 
 	iResult = E_FirmUpErrCode;
 
 	// 트리에 모델이 없으면 -1
-	iModelIdx = ChkModelType(_iModelType); 
+	Tv_WkIdx = ChkModelType(_iModelType);
 
 	// 트리에 모델타입이 있을때
-	if (0 <= iModelIdx)
+	if (0 <= Tv_WkIdx)
 	{
 		// 버전 파일타입 check시 없으면 -1 반환
-		if (0 > ChkEntityType(_iVerFileType, m_stFirmHeader.FirmInfo[iModelIdx].Entity))
+		if (0 > ChkEntityType(_iVerFileType, m_stFirmHeader.FirmInfo[Tv_WkIdx].Entity))
 		{
-			iVerFileIdx = ChkEntityType(E_FirmUpEntityNone, m_stFirmHeader.FirmInfo[iModelIdx].Entity);
+			Tv_EttIdx = ChkEntityType(E_FirmUpEntityNone, m_stFirmHeader.FirmInfo[Tv_WkIdx].Entity);
 
-			if (NULL == m_pData[iModelIdx][iVerFileIdx])
+			if (NULL == m_pData[Tv_WkIdx][Tv_EttIdx])
 			{
 				
-				m_pData[iModelIdx][iVerFileIdx] = malloc(_iFileSize);
-				//m_pData[iModelIdx][iVerFileIdx] = new char(_iFileSize);// <----- 이 코드로 인해 알수없는 곳에서 버그가 계속 발생
+				m_pData[Tv_WkIdx][Tv_EttIdx] = malloc(_iFileSize);
+				//m_pData[iModelIdx][iVerFileIdx] = new char[_iFileSize];// <----- 이 코드로 인해 알수없는 곳에서 버그가 계속 발생
 
-				if (NULL != m_pData[iModelIdx][iVerFileIdx])
+				/*
+					new char() 문법 사용이 잘못되어서 에러가 나는 것
+					new char[]로 변경하면 에러가 나지 않음.
+				*/
+
+				if (NULL != m_pData[Tv_WkIdx][Tv_EttIdx])
 				{
-					m_stFirmHeader.FirmInfo[iModelIdx].Entity[iVerFileIdx].Size = _iFileSize;
-					m_stFirmHeader.FirmInfo[iModelIdx].Entity[iVerFileIdx].Type = _iVerFileType;
+					m_stFirmHeader.FirmInfo[Tv_WkIdx].Entity[Tv_EttIdx].Size = _iFileSize;
+					m_stFirmHeader.FirmInfo[Tv_WkIdx].Entity[Tv_EttIdx].Type = _iVerFileType;
 
-					GrDumyCopyMem(m_pData[iModelIdx][iVerFileIdx], _pSrc, _iFileSize);
+					GrDumyCopyMem(m_pData[Tv_WkIdx][Tv_EttIdx], _pSrc, _iFileSize);
 					m_stFirmHeader.Size = m_stFirmHeader.Size + _iFileSize;
-					iResult = iVerFileIdx;
+					iResult = Tv_EttIdx;
 				}
 				else
 				{
@@ -211,13 +231,6 @@ int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, char* _pSrc, int
 	{
 		DbgMsgPrint("Cls_FirmUpdt::AddEntity() : Model Type Index error.\n");
 	}
-
-
-	/*if (NULL != m_pData[iModelIdx][iVerFileIdx])
-	{
-		delete m_pData[iModelIdx][iVerFileIdx];
-		m_pData[iModelIdx][iVerFileIdx] = NULL;
-	}*/
 
 	return iResult;
 }
@@ -264,66 +277,58 @@ void CFirmUpdate::SetUpdateVersion(unsigned int _uiVersion)
 // 패키지 저장시 사이즈 얻기
 void* CFirmUpdate::GetMakeUpdate(unsigned int* _puiSize)
 {
-	// Local --------------------------------------
-	void*	pResult		= NULL;
-	int*	piUpdateMem = NULL;
-	int		iUpdatePos	= 0;
-	//---------------------------------------------
+	//m_stFirmHeader m_pMakeUpdate
+		// local -------------------
+		void*		Tv_Result;
+	__u8*		Tv_PtrUpdt;
+	__u8		Tv_MdCnt;
+	__u8		Tv_EttCnt;
+	__u32		Tv_UpdtPos;
+	// code --------------------
+	Tv_Result = NULL;
 
 	if (0 < m_stFirmHeader.Size)
 	{
+		// 메모리 해제??
 		if (NULL != m_pMakeUpdate)
 		{
-			delete m_pMakeUpdate;
+			free(m_pMakeUpdate);
 			m_pMakeUpdate = NULL;
 		}
 
-		// 헤더 사이즈 만큼 동적할당
 		m_pMakeUpdate = malloc(m_stFirmHeader.Size);
-
-		// 새로운 포인터 변수에 담는다.
-		piUpdateMem = (int*)m_pMakeUpdate;
-
-		// 헤더 메모리가 NULL이 아니면
+		Tv_PtrUpdt = (__u8*)m_pMakeUpdate;
 		if (NULL != m_pMakeUpdate)
 		{
-			// 헤더 사이즈 + 헤더 구조체 사이즈
-			piUpdateMem = piUpdateMem + sizeof(_stFirmUpHeader);
-
-			// 16까지 반복
-			for (int iInfo = 0; iInfo < E_FirmUpInfoCnt; iInfo++)
+			Tv_PtrUpdt = Tv_PtrUpdt + sizeof(m_stFirmHeader);
+			Tv_UpdtPos = sizeof(m_stFirmHeader);
+			for (Tv_MdCnt = 0; Tv_MdCnt < E_FirmUpInfoCnt; Tv_MdCnt++)
 			{
-				// 16까지 반복
-				for (int iEnti = 0; iEnti < E_FirmUpEntityCnt; iEnti++)
+				for (Tv_EttCnt = 0; Tv_EttCnt < E_FirmUpEntityCnt; Tv_EttCnt++)
 				{
-					if (NULL != m_pData[iInfo][iEnti])
+					if (NULL != m_pData[Tv_MdCnt][Tv_EttCnt])
 					{
-						// 새로운 포인터 변수에 데이터 memmove
-						memmove(piUpdateMem, m_pData[iInfo][iEnti], m_stFirmHeader.FirmInfo[iInfo].Entity[iEnti].Size);
+						GrDumyCopyMem(Tv_PtrUpdt, m_pData[Tv_MdCnt][Tv_EttCnt], m_stFirmHeader.FirmInfo[Tv_MdCnt].Entity[Tv_EttCnt].Size);
+						m_stFirmHeader.FirmInfo[Tv_MdCnt].Entity[Tv_EttCnt].Offset = Tv_UpdtPos;
 
-						// 구조체 헤더->펌웨어Info->Entity->Offset에 0을 담음
-						m_stFirmHeader.FirmInfo[iInfo].Entity[iEnti].Offset = iUpdatePos;
-
-						// 위 UpdatePos 변수에 헤더->펌웨어Info->Entity의 사이즈를 담음
-						iUpdatePos = iUpdatePos + m_stFirmHeader.FirmInfo[iInfo].Entity[iEnti].Size;
-
-						// 포인터 변수에 헤더->펌웨어Info->Entity의 사이즈를 담음
-						piUpdateMem = piUpdateMem + m_stFirmHeader.FirmInfo[iInfo].Entity[iEnti].Size;
+						Tv_UpdtPos = Tv_UpdtPos + m_stFirmHeader.FirmInfo[Tv_MdCnt].Entity[Tv_EttCnt].Size;
+						Tv_PtrUpdt = Tv_PtrUpdt + m_stFirmHeader.FirmInfo[Tv_MdCnt].Entity[Tv_EttCnt].Size;
 					}
 				}
 			}
-			// 패키지 make 구조체 End
-			memmove(piUpdateMem, &m_stFirmEd, sizeof(_stFirmUpEnd));
 
-			// 패키지 make 구조체 Header
-			memmove(piUpdateMem, &m_stFirmHeader, sizeof(_stFirmUpHeader));
+			//make end
+			GrDumyCopyMem(Tv_PtrUpdt, &m_stFirmEd, sizeof(_stFirmUpEnd));
 
-			// GET 헤더 사이즈
+			//make header
+			Tv_PtrUpdt = (__u8*)m_pMakeUpdate;
+			GrDumyCopyMem(Tv_PtrUpdt, &m_stFirmHeader, sizeof(_stFirmUpHeader));
+
 			*_puiSize = m_stFirmHeader.Size;
-			pResult = m_pMakeUpdate;
+			Tv_Result = m_pMakeUpdate;
 		}
 	}
 
-	return pResult;
+	return Tv_Result;
 
 }

@@ -14,33 +14,32 @@
 // ---------------------------------------------------- struct 
 typedef struct _stUpdateTreeNode
 {
-	unsigned int			uiType;
+	__u32					uiType;
 	HTREEITEM				stNode;
 	CHAR					aszNode[16];
 } *pUpdateTreeNode;
 
 typedef struct _stUpdateInfoEntity
 {
-	unsigned int			uiType;
+	__u32					uiType;
 	CHAR					aszFile[256];
 } *pUpdateInfoEntity;
 
 typedef struct _stUpdateInfoModel
 {
-	unsigned int			uiType;
+	__u32					uiType;
 	_stUpdateInfoEntity		astEntity[16];
 } *pUpdateInfoModel;
 
 typedef struct _stUpdateInfo
 {
-	unsigned int			uiFcc;
-	unsigned int			uiUpgdVersion;
+	__u32					uiFcc;
+	__u32					uiUpgdVersion;
 	_stUpdateInfoModel		astModelInfo[16];
 	WCHAR					aszUpgdFileName[1024];
 } *pUpdateInfo;
 
 // ---------------------------------------------------- struct 
-
 
 
 // CUpdateManagerDlg 대화 상자
