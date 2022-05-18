@@ -197,7 +197,7 @@ void CUpdateManagerDlg::Init()
 	// 경로에서 파일명과 확장자만 제거
 	PathRemoveFileSpec(m_szaNowPath);
 
-	m_pObjFwUp = (CFirmUpdate*) new CFirmUpdate();
+	m_pObjFwUp = new CFirmUpdate();
 	m_pObjFwUp->FirmInit();
 
 	// Tree 초기화 & UpdateInfo 구조체 초기화
@@ -290,7 +290,7 @@ void CUpdateManagerDlg::OnClickedButtonModelCreate()
 	int iModelType = 0;
 	// ------------------------------------
 
-	pDlgModelAdd = (DlgModelAdd*)new DlgModelAdd();
+	pDlgModelAdd = new DlgModelAdd();
 	
 	pDlgModelAdd->DoModal();
 
@@ -402,10 +402,12 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 		strModelName = m_CTreeCtrl.GetItemText(stTreeItem);
 		iFileLen = strModelName.GetLength();
 
+		// FirmUpdate 클래스에 Model이름 적용
 		pDlgVerFileAdd->SetModelName(strModelName);
 
 		for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
 		{
+			// Char를 TCHAR로 바꾼다. 이유는 CString 변수와 네임을 비교하기 위해서
 			MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_astTreeNode[i].aszNode, strlen(m_astTreeNode[i].aszNode), aszUniNode, 16);
 
 			// 비교 함수
@@ -419,6 +421,7 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 		pDlgVerFileAdd->DoModal();
 		if (pDlgVerFileAdd->m_bModalResult)
 		{
+			// 버전 파일의 정보를 FirmUpdate클래스에서 가져온다.
 			pDlgVerFileAdd->GetVerFileType(&iModelType, &iVerFileType, pszFilePath, &iFileLen);
 		}
 
@@ -468,7 +471,7 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* 
 			uiFileSize = pFileCtrl->GetSize();
 
 			//pszBuff = (PCHAR)malloc(uiFileSize);
-			pszBuff = (PCHAR)malloc(uiFileSize+1);
+			pszBuff = (PCHAR)malloc(uiFileSize + 1);
 			memset(pszBuff, 0, uiFileSize + 1);
 
 			pFileCtrl->Seek(0);
@@ -477,7 +480,7 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* 
 
 			if (0 <= iResult)
 			{
-				// 모델 타입 1704 = 1, 1708 = 2, 1716 = 3 대입
+				// 모델1704가 있으면 0번째 인덱스를 반환함.
 				iModelIdx = m_pObjFwUp->GetModelTypeIdx(iModelType);
 
 				if (0 <= iModelIdx)
@@ -640,7 +643,7 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 		if (NULL == pFileCtrl)
 		{
 			// 파일 만드는 클래스 할당
-			pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(m_aszMkFileName, TRUE, TRUE);
+			pFileCtrl = new Cls_GrFileCtrl(m_aszMkFileName, TRUE, TRUE);
 		}
 
 		if (TRUE == pFileCtrl->IsOpened())
@@ -715,10 +718,10 @@ void CUpdateManagerDlg::InitMakeFile()
 	strFile.Format(_T("%s\\MkUpdate.init"), aszPath);
 
 	// 경로 + 파일 복사
-	_tcscpy(aszPath, strFile);
+	wsprintf(aszPath, strFile);
 	
 	// 경로에 내 파일 생성
-	pFileCtrl = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(aszPath, TRUE, TRUE);
+	pFileCtrl = new Cls_GrFileCtrl(aszPath, TRUE, TRUE);
 	
 	if (pFileCtrl)
 	{
@@ -806,7 +809,7 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 	if (IDOK == pFileDlg->DoModal())
 	{
 		strPath = pFileDlg->GetPathName();
-		_tcscpy(aszLdPathFile, strPath);
+		wsprintf(aszLdPathFile, strPath);
 	}
 	
 	// 불러온 파일이 또 있는지 체크
@@ -817,7 +820,7 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 	{
 		if (GrFileIsExist(aszLdPathFile))
 		{
-			pObjFile = (Cls_GrFileCtrl*)new Cls_GrFileCtrl(aszLdPathFile, FALSE, FALSE);
+			pObjFile = new Cls_GrFileCtrl(aszLdPathFile, FALSE, FALSE);
 
 			if (pObjFile->IsOpened())
 			{

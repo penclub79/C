@@ -272,10 +272,11 @@ void* CFirmUpdate::GetMakeUpdate(unsigned int* _puiSize)
 
 	if (0 < m_stFirmHeader.Size)
 	{
-		/*if (NULL != m_pMakeUpdate)
+		if (NULL != m_pMakeUpdate)
 		{
-
-		}*/
+			delete m_pMakeUpdate;
+			m_pMakeUpdate = NULL;
+		}
 
 		// 헤더 사이즈 만큼 동적할당
 		m_pMakeUpdate = malloc(m_stFirmHeader.Size);
