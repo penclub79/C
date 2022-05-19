@@ -658,8 +658,6 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 		// 해결! int자료형을 unsigned int로 양수의 정수 데이터만 담는 방법으로 해결함.
 		
 
-		// -------------------------------------- 여기까지 파일사이즈 맞음..
-
 		// FileCtrl클래스 할당
 		
 		// 파일 만드는 클래스 할당
@@ -668,7 +666,7 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 		if (TRUE == pFileCtrl->IsOpened())
 		{
 			iWorteSize = 0;
-
+			
 			// GEtMakeUpdate에서 받아온 파일 사이즈 담기
 			iWriteSize = uiFileSize;
 			
@@ -852,7 +850,7 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 		// Init
 		m_pObjFwUp->FirmInit();
 		m_CTreeCtrl.DeleteAllItems();
-
+		
 		strPath = pFileDlg->GetPathName();
 		wsprintf(aszLdPathFile, strPath);
 	
@@ -882,7 +880,6 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 			{
 				InitCtrl(&m_stUpdateInfo);
 			}
-			
 		}
 
 		if (NULL != pObjFile)
@@ -919,40 +916,46 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 void CUpdateManagerDlg::OnClickedButtonEntityDelete()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	HTREEITEM stMyItem;
-	HTREEITEM stChildItem;
+	HTREEITEM		stTreeModel;
+	HTREEITEM		stTreeVerFile;
 
-	DlgVerFileAdd* pDlgVerFileAdd = NULL;
-	int iModelType		= 0;
-	int iModelIdx		= 0;
-	int iVerFileType	= 0;
-	int iFileLen		= 0;
-	CHAR	pszFilePath[128] = { 0 };
+	CFileDialog*	pFileDlg		= NULL;
+	DlgVerFileAdd*	pDlgVerFileAdd	= NULL;
+	int				iModelIdx		= 0;
+	int				iVerFileIdx		= 0;
 
-	pDlgVerFileAdd = new DlgVerFileAdd(NULL, m_szaNowPath);
+	stTreeModel = m_CTreeCtrl.GetSelectedItem();
 	
-	stChildItem = m_CTreeCtrl.GetSelectedItem();
-	if (stChildItem != NULL)
+	if (stTreeModel != NULL)
 	{
-		m_CTreeCtrl.DeleteItem(stChildItem);
-
-		// 버전 파일의 정보를 FirmUpdate클래스에서 가져온다.
-		pDlgVerFileAdd->GetVerFileType(&iModelType, &iVerFileType, pszFilePath, &iFileLen);
-
-		iModelIdx = m_pObjFwUp->GetModelTypeIdx(iModelType);
-		
-		iVerFileType = FindTreeNode(iModelType);
-		m_pObjFwUp->DelVerFile(iModelType, iVerFileType);
+		// 삭제
+		m_CTreeCtrl.DeleteItem(stTreeModel);
 	}
 	else
 	{
 		MessageBox(_T("삭제할 파일을 선택해야 합니다."));
 	}
 
-
-	if (NULL != pDlgVerFileAdd)
+	// 내가 고른 Model이 몇번째 index인가
+	while (stTreeModel)
 	{
-		delete pDlgVerFileAdd;
-		pDlgVerFileAdd = NULL;
+		stTreeModel = m_CTreeCtrl.GetNextItem(stTreeModel, TVGN_NEXT);
+		iModelIdx++;
 	}
+	iModelIdx = iModelIdx - 1;
+	
+	stTreeVerFile = m_CTreeCtrl.GetChildItem(NULL);
+	while (stTreeVerFile)
+	{
+		stTreeVerFile = m_CTreeCtrl.GetNextItem(stTreeVerFile, TVGN_NEXT);
+		iVerFileIdx++;
+	}
+	iVerFileIdx = iVerFileIdx - 1;
+	// -------------------------------------------
+	
+	if (m_pObjFwUp)
+	{	// 펌웨어 구조체에서 버전 파일 지우기
+		m_pObjFwUp->DelVerFile(m_astTreeNode[iModelIdx].uiType, m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iVerFileIdx].uiType);
+	}
+
 }
