@@ -95,6 +95,7 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_MAIN_CANCEL, &CUpdateManagerDlg::OnClickedButtonMainCancel)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_LOAD, &CUpdateManagerDlg::OnClickedButtonModelLoad)
 	ON_BN_CLICKED(IDC_BUTTON_ENTITY_DELETE, &CUpdateManagerDlg::OnClickedButtonEntityDelete)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL_DELETE, &CUpdateManagerDlg::OnClickedButtonModelDelete)
 END_MESSAGE_MAP()
 
 
@@ -712,7 +713,7 @@ void CUpdateManagerDlg::InitMakeFile()
 {
 	CString			strFile;
 
-	TCHAR			aszPath[2048]	= { 0 };
+	WCHAR			aszPath[2048]	= { 0 };
 	Cls_GrFileCtrl* pFileCtrl		= NULL;
 	__u8			aszVersion[4]	= { 0 };
 	__u32			uiVersion		= 0;
@@ -745,13 +746,11 @@ void CUpdateManagerDlg::InitMakeFile()
 	m_stUpdateInfo.uiUpgdVersion = uiVersion;
 	
 	// 저장파일 이름 재설정
-	strMakeName.Format(_T("%s_V(%d%d%d%d).udf"), m_aszMkFileName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]);
-	wsprintf(m_aszMkFileName, strMakeName.GetBuffer(0));
-
-	/*memset(m_stUpdateInfo.aszUpgdFileName, 0, sizeof(WCHAR)* 1024);
-	wsprintf(m_stUpdateInfo.aszUpgdFileName, strMakeName.GetBuffer(0));*/
-
-	memcpy(aszPath, m_aszMkFileName, 2048);
+	GrStrWcopy(aszPath, m_szaNowPath);
+	/*strMakeName.Format(_T("%s_V(%d%d%d%d).udf"), m_aszMkFileName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]);
+	wsprintf(m_aszMkFileName, strMakeName.GetBuffer(0));*/
+	GrStrWcat(aszPath, _T("%s_V(%d%d%d%d).udf", m_aszMkFileName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]));
+	
 	
 	// init파일로 만들기
 	//strFile.Format(_T("%s\\MkUpdate.init"), aszPath);
@@ -926,6 +925,8 @@ void CUpdateManagerDlg::OnClickedButtonEntityDelete()
 
 	stTreeModel = m_CTreeCtrl.GetSelectedItem();
 	
+
+
 	if (stTreeModel != NULL)
 	{
 		// 삭제
@@ -936,6 +937,11 @@ void CUpdateManagerDlg::OnClickedButtonEntityDelete()
 		MessageBox(_T("삭제할 파일을 선택해야 합니다."));
 	}
 
+	// ------------------------------------- 파일 불러오기 했을 때
+
+
+
+	// ------------------------------------- 파일 불러오기를 하지 않았을때 [로직]
 	// 내가 고른 Model이 몇번째 index인가
 	while (stTreeModel)
 	{
@@ -951,11 +957,19 @@ void CUpdateManagerDlg::OnClickedButtonEntityDelete()
 		iVerFileIdx++;
 	}
 	iVerFileIdx = iVerFileIdx - 1;
-	// -------------------------------------------
+	// -------------------------------------------------------------------------
 	
 	if (m_pObjFwUp)
 	{	// 펌웨어 구조체에서 버전 파일 지우기
 		m_pObjFwUp->DelVerFile(m_astTreeNode[iModelIdx].uiType, m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iVerFileIdx].uiType);
 	}
+
+}
+
+
+void CUpdateManagerDlg::OnClickedButtonModelDelete()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
 
 }

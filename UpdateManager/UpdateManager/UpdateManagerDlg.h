@@ -110,4 +110,5 @@ public:
 	afx_msg void OnClickedButtonModelLoad();
 //	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnClickedButtonEntityDelete();
+	afx_msg void OnClickedButtonModelDelete();
 };
