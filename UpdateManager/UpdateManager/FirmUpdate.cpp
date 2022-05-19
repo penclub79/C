@@ -207,7 +207,7 @@ int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, char* _pSrc, int
 					m_stFirmHeader.FirmInfo[Tv_WkIdx].Entity[Tv_EttIdx].Type = _iVerFileType;
 
 					GrDumyCopyMem(m_pData[Tv_WkIdx][Tv_EttIdx], _pSrc, _iFileSize);
-					m_stFirmHeader.Size = m_stFirmHeader.Size + _iFileSize;
+					m_stFirmHeader.Size = m_stFirmHeader.Size + _iFileSize; // 잘못된 파일 사이즈를 가져옴
 					iResult = Tv_EttIdx;
 				}
 				else

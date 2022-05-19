@@ -33,7 +33,7 @@ typedef struct _stUpdateInfoModel
 
 typedef struct _stUpdateInfo
 {
-	__u32					uiFcc;
+	__u32					uiFcc;			//update ini 'Uini' 0x55696E69
 	__u32					uiUpgdVersion;
 	_stUpdateInfoModel		astModelInfo[16];
 	WCHAR					aszUpgdFileName[1024];
@@ -109,4 +109,5 @@ public:
 	virtual void OnOK();
 	afx_msg void OnClickedButtonModelLoad();
 //	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	afx_msg void OnClickedButtonEntityDelete();
 };

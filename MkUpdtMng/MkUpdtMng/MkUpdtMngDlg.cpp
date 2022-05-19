@@ -549,10 +549,10 @@ void CMkUpdtMngDlg::LcInit()
 		m_ObjFwUp	= (Cls_FirmUpdt*)new Cls_FirmUpdt();
 		m_ObjFwUp->Init();
 		GrDumyZeroMem(m_TreeNode, sizeof(St_UpdtTreeNode) * 3);
-
 		GrDumyZeroMem(&m_UpdtInfo, sizeof(St_UpdtInfo));
-		//GrStrWcopy(Tv_StrIniFile, m_NowPath);
-		//GrStrWcat(Tv_StrIniFile, _T("\\MkUpdt.init")); // init파일 경로
+
+		GrStrWcopy(Tv_StrIniFile, m_NowPath);
+		GrStrWcat(Tv_StrIniFile, _T("\\MkUpdt.init")); // init파일 경로
 
 		//if(GrFileIsExist(Tv_StrIniFile)) // init 파일 존재하는지 체크
 		//{
@@ -562,6 +562,7 @@ void CMkUpdtMngDlg::LcInit()
 		//	if(Tv_ObjFile->IsOpened())
 		//	{
 		//		Tv_FileSize = (__u32)Tv_ObjFile->GetSize(); // init파일 사이즈 가져오기
+		//		int test = sizeof(St_UpdtInfo);
 		//		if(Tv_FileSize == sizeof(St_UpdtInfo))
 		//		{
 		//			Tv_ObjFile->Read(&m_UpdtInfo, Tv_FileSize);
