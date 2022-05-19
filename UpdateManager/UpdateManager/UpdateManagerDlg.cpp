@@ -224,7 +224,6 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 {
 	// Local -------------------------------
 	CString				strVersion;
-	CString				strFileName;
 
 	pUpdateInfoModel	pstUpdateInfoModel;
 	TCHAR				aszVersion[32]		= { 0 };
@@ -265,12 +264,12 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 			{
 				if (E_FirmUpEntityNone != pstUpdateInfoModel->uiType)
 				{
-					strFileName = pszFileName;
-					iStrLen = strFileName.GetLength();
+					pszFileName = pstUpdateInfoModel->astEntity[si].aszFile; //Entity 구조체 파일이름을 담는다.
+					iStrLen = GrStrLen(pszFileName); // 라이브러리 길이 구하는 함수
 
 					if (GrFileIsExist(pszFileName))
 					{
-						TreeAddVerFile(pstUpdateInfoModel->uiType, pstUpdateInfoModel->astEntity[i].uiType, pszFileName, iStrLen);
+						TreeAddVerFile(pstUpdateInfoModel->uiType, pstUpdateInfoModel->astEntity[si].uiType, pszFileName, iStrLen);
 					}
 				}
 			}
@@ -322,7 +321,7 @@ void CUpdateManagerDlg::TreeAddModel(int _iModelType)
 
 	if (NULL != m_pObjFwUp)
 	{
-		// 모델 추가시 중복체크 함수도 포함
+		// 모델 추가 시 중복체크 함수도 포함
 		iResult = m_pObjFwUp->AddModelType(iModelType);
 
 		if (E_FirmUpInfoTypeNone <= m_pObjFwUp)
@@ -400,6 +399,7 @@ void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 	stTreeItem = m_CTreeCtrl.GetSelectedItem();
 	if (NULL != stTreeItem)
 	{
+
 		strModelName = m_CTreeCtrl.GetItemText(stTreeItem);
 		iFileLen = strModelName.GetLength();
 
@@ -598,7 +598,7 @@ void CUpdateManagerDlg::OnClickedButtonSavePath()
 	if (IDOK == pFileDlg->DoModal())
 	{
 		strPath = pFileDlg->GetPathName();
-		GrDumyZeroMem(m_aszMkFileName, sizeof(WCHAR)* 1024);
+		GrDumyZeroMem(m_aszMkFileName, sizeof(WCHAR) * 1024);
 
 		// 경로 + 파일 복사
 		//wsprintf(m_aszMkFileName, strPath.GetBuffer(0));
@@ -613,7 +613,7 @@ void CUpdateManagerDlg::OnClickedButtonSavePath()
 // 업데이트 패키지 생성
 void CUpdateManagerDlg::OnClickedButtonPackageMake()
 {
-	CString			strMakeName;
+	
 	Cls_GrFileCtrl* pFileCtrl		= NULL;
 	void*			pFile			= NULL;
 	BOOL			bIsSuccess		= FALSE;
@@ -653,17 +653,13 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 		// 구조체에 버전 저장
 		m_pObjFwUp->SetUpdateVersion(uiVersion);
 
-		// 저장파일 이름 재설정
-		strMakeName.Format(_T("%s_V(%d%d%d%d).udf"), m_aszMkFileName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]);
-		wsprintf(m_aszMkFileName, strMakeName.GetBuffer(0));
-
-		memset(m_stUpdateInfo.aszUpgdFileName, 0, sizeof(WCHAR) * 1024);
-		wsprintf(m_stUpdateInfo.aszUpgdFileName, strMakeName.GetBuffer(0));
-
 		// 저장할 패키지 사이즈 얻어오기
 		pFile = m_pObjFwUp->GetMakeUpdate(&uiFileSize); //에러나서 주석처리
 		// 해결! int자료형을 unsigned int로 양수의 정수 데이터만 담는 방법으로 해결함.
 		
+
+		// -------------------------------------- 여기까지 파일사이즈 맞음..
+
 		// FileCtrl클래스 할당
 		
 		// 파일 만드는 클래스 할당
@@ -681,7 +677,7 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 				// Write함수에 파일 포인터, 파일 사이즈로 결과값 담기
 				iResult = pFileCtrl->Write(pFile, iWriteSize);
 				iWorteSize = iWorteSize + iResult;
-				iWriteSize = iWriteSize + iResult;
+				iWriteSize = iWriteSize - iResult;
 
 				// 파일 사이즈랑 같다면
 				if (iWorteSize == uiFileSize)
@@ -720,28 +716,50 @@ void CUpdateManagerDlg::InitMakeFile()
 
 	TCHAR			aszPath[2048]	= { 0 };
 	Cls_GrFileCtrl* pFileCtrl		= NULL;
-	int				aiVersion[4]	= { 0 };
-	int				iVersion		= 0;
+	__u8			aszVersion[4]	= { 0 };
+	__u32			uiVersion		= 0;
 	int				iFileNameLen	= 0;
+	CString			strVer1;
+	CString			strVer2;
+	CString			strVer3;
+	CString			strVer4;
+	CString			strMakeName;
 
 	m_stUpdateInfo.uiFcc = E_MkUpdt_IniFcc;
 
-	aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
+	/*aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
 	aiVersion[1] = this->GetDlgItemInt(IDC_EDIT_VERSION2);
 	aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
-	aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION4);
+	aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION4);*/
 
-	iVersion = (aiVersion[0] << 24) | (aiVersion[1] << 16) | (aiVersion[2] << 8) | aiVersion[3];
+	m_CEditVer1.GetWindowTextW(strVer1);
+	m_CEditVer2.GetWindowTextW(strVer2);
+	m_CEditVer3.GetWindowTextW(strVer3);
+	m_CEditVer4.GetWindowTextW(strVer4);
 
-	m_stUpdateInfo.uiUpgdVersion = iVersion;
+	aszVersion[0] = (__u8)(_ttoi(strVer1));
+	aszVersion[1] = (__u8)(_ttoi(strVer2));
+	aszVersion[2] = (__u8)(_ttoi(strVer3));
+	aszVersion[3] = (__u8)(_ttoi(strVer4));
+
+	uiVersion = (aszVersion[0] << 24) | (aszVersion[1] << 16) | (aszVersion[2] << 8) | aszVersion[3];
+
+	m_stUpdateInfo.uiUpgdVersion = uiVersion;
 	
-	memcpy(aszPath, m_szaNowPath, 2048);
+	// 저장파일 이름 재설정
+	strMakeName.Format(_T("%s_V(%d%d%d%d).udf"), m_aszMkFileName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]);
+	wsprintf(m_aszMkFileName, strMakeName.GetBuffer(0));
+
+	/*memset(m_stUpdateInfo.aszUpgdFileName, 0, sizeof(WCHAR)* 1024);
+	wsprintf(m_stUpdateInfo.aszUpgdFileName, strMakeName.GetBuffer(0));*/
+
+	memcpy(aszPath, m_aszMkFileName, 2048);
 	
 	// init파일로 만들기
 	//strFile.Format(_T("%s\\MkUpdate.init"), aszPath);
 	
 	// 경로에 내 파일 생성
-	pFileCtrl = new Cls_GrFileCtrl(aszPath, TRUE, TRUE);
+	pFileCtrl = new Cls_GrFileCtrl(aszPath, TRUE, TRUE); // 굳이 써줄 필요가 없는 코드
 	
 	if (pFileCtrl)
 	{
@@ -821,6 +839,7 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 	__u32			iFileSize			= 0;
 	BOOL			bIsSameModel		= FALSE;
 	
+	
 	if (NULL == pFileDlg)
 	{
 		pFileDlg = new CFileDialog(TRUE, NULL, NULL, OFN_PATHMUSTEXIST, _T("Init Files(*.udf)|*.udf"), NULL);
@@ -830,18 +849,15 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 
 	if (IDOK == pFileDlg->DoModal())
 	{
+		// Init
+		m_pObjFwUp->FirmInit();
+		m_CTreeCtrl.DeleteAllItems();
+
 		strPath = pFileDlg->GetPathName();
 		wsprintf(aszLdPathFile, strPath);
 	
-
 		// 현재 트리에서 있는 모델과 불러온 파일의 모델이 같은 FCC면 TRUE 다르면 FALSE
 		bIsSameModel = CheckInit(&m_stUpdateInfo);
-
-		if (TRUE == bIsSameModel)
-		{
-			//Init();
-			m_CTreeCtrl.DeleteAllItems();
-		}
 
 		// 파일 존재하는지 체크
 		if (GrFileIsExist(aszLdPathFile))
@@ -854,19 +870,18 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 			{
 				// 파일 사이즈 가져오기
 				iFileSize = (__u32)pObjFile->GetSize();
-				int test = sizeof(_stUpdateInfo);
-				if (iFileSize - 8 == sizeof(_stUpdateInfo))
+
+				if (iFileSize == sizeof(_stUpdateInfo))
 				{
 					pObjFile->Read(&m_stUpdateInfo, iFileSize);
 				}
 			}
 
 			//// UpdateInfo 체크
-			//if (CheckInit(&m_stUpdateInfo))
-			//{
-			//	InitCtrl(&m_stUpdateInfo);
-			//}
-			InitCtrl(&m_stUpdateInfo);
+			if (CheckInit(&m_stUpdateInfo))
+			{
+				InitCtrl(&m_stUpdateInfo);
+			}
 			
 		}
 
@@ -906,8 +921,12 @@ void CUpdateManagerDlg::OnClickedButtonEntityDelete()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	HTREEITEM stMyItem;
 	HTREEITEM stChildItem;
-	stChildItem = m_CTreeCtrl.GetChildItem(stMyItem);
-
-
+	
+	stChildItem = m_CTreeCtrl.GetSelectedItem();
+	if (stChildItem != NULL)
+	{
+		m_CTreeCtrl.DeleteItem(stChildItem);
+		m_pObjFwUp->DelVerFile();
+	}
 
 }

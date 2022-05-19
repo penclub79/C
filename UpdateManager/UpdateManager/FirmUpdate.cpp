@@ -207,7 +207,7 @@ int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, char* _pSrc, int
 					m_stFirmHeader.FirmInfo[Tv_WkIdx].Entity[Tv_EttIdx].Type = _iVerFileType;
 
 					GrDumyCopyMem(m_pData[Tv_WkIdx][Tv_EttIdx], _pSrc, _iFileSize);
-					m_stFirmHeader.Size = m_stFirmHeader.Size + _iFileSize; // 잘못된 파일 사이즈를 가져옴
+					m_stFirmHeader.Size = m_stFirmHeader.Size + _iFileSize; 
 					iResult = Tv_EttIdx;
 				}
 				else
@@ -330,5 +330,41 @@ void* CFirmUpdate::GetMakeUpdate(unsigned int* _puiSize)
 	}
 
 	return Tv_Result;
+}
+
+// 버전 삭제
+void CFirmUpdate::DelVerFile(int _iModelType, int _iVersionType)
+{
+	int iModelIdx					= 0;
+	_stFirmUpInfo* pFirmInfo		= NULL;
+	_stFirmUpEntity* pFirmVerFile	= NULL;
+
+	iModelIdx = ChkModelType(_iModelType);
+
+	if (0 <= iModelIdx)
+	{
+		pFirmInfo = &m_stFirmHeader.FirmInfo[iModelIdx];
+
+		pFirmVerFile = pFirmInfo->Entity;
+
+		for (int i = 0; i < E_FirmUpEntityCnt; i++)
+		{
+			if (_iVersionType == pFirmVerFile->Type)
+			{
+				if (m_pData[iModelIdx][i] != NULL)
+				{
+					free(m_pData[iModelIdx][i]);
+					m_pData[iModelIdx][i] = NULL;
+				}
+				// 헤더에서 버전 파일 사이즈를 뺀다.
+				m_stFirmHeader.Size = m_stFirmHeader.Size - pFirmVerFile->Size;
+				pFirmVerFile->Offset = 0;
+				pFirmVerFile->Size = 0;
+				pFirmVerFile->Type = E_FirmUpEntityNone;
+			}
+
+			pFirmVerFile++;
+		}
+	}
 
 }

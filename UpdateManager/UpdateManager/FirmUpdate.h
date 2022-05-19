@@ -101,15 +101,18 @@ public:
 	// 패키지 저장시 사이즈 얻기
 	void*	GetMakeUpdate(unsigned int* _puiSize);
 
-protected:
 	// 모델 삭제
 	void	DelModelType(int _iModelType);
 
 	// 버전 파일 삭제
 	void	DelVerFile(int _iModelType, int _iVersionType);
-	
+
+protected:
 	// 버전 파일 체크
 	int		ChkEntityType(int _iVersionType, pFirmUpEntity _stEntity);
+
+	// 모델 타입 체크
+	int		ChkModelType(unsigned int _uiModelType);
 
 private:
 	_stFirmUpHeader		m_stFirmHeader;
@@ -119,10 +122,6 @@ private:
 
 	
 	void	SetUpdtVer(int _iVer);
-	
-
-	// 모델 타입 체크
-	int		ChkModelType(unsigned int _uiModelType);
 
 };
 
