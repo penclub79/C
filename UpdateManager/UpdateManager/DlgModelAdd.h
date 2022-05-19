@@ -17,13 +17,14 @@ public:
 	afx_msg void OnSelchangeComboModeltype();
 	int		GetModelType();
 	BOOL	m_bModalResult;
+	int		m_iModelType;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);   // DDX / DDV Support
 	DECLARE_MESSAGE_MAP()
 
 private:
-	int m_iModelType;
+	
 	CComboBox m_CModelType;
 
 	void SetModelName(TCHAR* _pszName);

@@ -24,7 +24,7 @@ public:
 	void SetModelType(int _iModelType);
 	void SetModelName(CString strModelName);
 	void GetVerFileType(int* _piModelType, int* _piVerFileType, CHAR* _pszFileName, int* _piStrLen);
-
+	
 	BOOL m_bModalResult;
 	
 protected:

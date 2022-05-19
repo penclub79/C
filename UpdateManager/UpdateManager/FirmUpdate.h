@@ -105,7 +105,7 @@ public:
 	void	DelModelType(int _iModelType);
 
 	// 버전 파일 삭제
-	void	DelVerFile(int _iModelType, int _iVersionType);
+	void	DelVerFile(int _iModelType, int _iVerFileType);
 
 protected:
 	// 버전 파일 체크

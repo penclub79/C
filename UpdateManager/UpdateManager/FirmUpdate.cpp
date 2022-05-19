@@ -279,7 +279,7 @@ void* CFirmUpdate::GetMakeUpdate(unsigned int* _puiSize)
 {
 	//m_stFirmHeader m_pMakeUpdate
 		// local -------------------
-		void*		Tv_Result;
+	void*		Tv_Result;
 	__u8*		Tv_PtrUpdt;
 	__u8		Tv_MdCnt;
 	__u8		Tv_EttCnt;
@@ -333,10 +333,10 @@ void* CFirmUpdate::GetMakeUpdate(unsigned int* _puiSize)
 }
 
 // 버전 삭제
-void CFirmUpdate::DelVerFile(int _iModelType, int _iVersionType)
+void CFirmUpdate::DelVerFile(int _iModelType, int _iVerFileType)
 {
 	int iModelIdx					= 0;
-	_stFirmUpInfo* pFirmInfo		= NULL;
+	_stFirmUpInfo*	pFirmInfo		= NULL;
 	_stFirmUpEntity* pFirmVerFile	= NULL;
 
 	iModelIdx = ChkModelType(_iModelType);
@@ -349,7 +349,7 @@ void CFirmUpdate::DelVerFile(int _iModelType, int _iVersionType)
 
 		for (int i = 0; i < E_FirmUpEntityCnt; i++)
 		{
-			if (_iVersionType == pFirmVerFile->Type)
+			if (_iVerFileType == pFirmVerFile->Type)
 			{
 				if (m_pData[iModelIdx][i] != NULL)
 				{

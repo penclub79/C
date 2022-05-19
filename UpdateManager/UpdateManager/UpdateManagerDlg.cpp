@@ -286,7 +286,7 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 void CUpdateManagerDlg::OnClickedButtonModelCreate()
 {
 	// Local ------------------------------
-	DlgModelAdd* pDlgModelAdd;
+	DlgModelAdd* pDlgModelAdd = NULL;
 	int iModelType = 0;
 	// ------------------------------------
 
@@ -587,8 +587,8 @@ int CUpdateManagerDlg::FindTreeNode(int _iModelType)
 void CUpdateManagerDlg::OnClickedButtonSavePath()
 {
 	CFileDialog* pFileDlg;
-	CString strPath;
-	CString strInitFile;
+	CString		strPath;
+	CString		strInitFile;
 
 	pFileDlg = new CFileDialog(TRUE, NULL, NULL, OFN_PATHMUSTEXIST, _T("All Files(*.*)|*.*"), NULL);
 
@@ -921,12 +921,38 @@ void CUpdateManagerDlg::OnClickedButtonEntityDelete()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	HTREEITEM stMyItem;
 	HTREEITEM stChildItem;
+
+	DlgVerFileAdd* pDlgVerFileAdd = NULL;
+	int iModelType		= 0;
+	int iModelIdx		= 0;
+	int iVerFileType	= 0;
+	int iFileLen		= 0;
+	CHAR	pszFilePath[128] = { 0 };
+
+	pDlgVerFileAdd = new DlgVerFileAdd(NULL, m_szaNowPath);
 	
 	stChildItem = m_CTreeCtrl.GetSelectedItem();
 	if (stChildItem != NULL)
 	{
 		m_CTreeCtrl.DeleteItem(stChildItem);
-		m_pObjFwUp->DelVerFile();
+
+		// 버전 파일의 정보를 FirmUpdate클래스에서 가져온다.
+		pDlgVerFileAdd->GetVerFileType(&iModelType, &iVerFileType, pszFilePath, &iFileLen);
+
+		iModelIdx = m_pObjFwUp->GetModelTypeIdx(iModelType);
+		
+		iVerFileType = FindTreeNode(iModelType);
+		m_pObjFwUp->DelVerFile(iModelType, iVerFileType);
+	}
+	else
+	{
+		MessageBox(_T("삭제할 파일을 선택해야 합니다."));
 	}
 
+
+	if (NULL != pDlgVerFileAdd)
+	{
+		delete pDlgVerFileAdd;
+		pDlgVerFileAdd = NULL;
+	}
 }

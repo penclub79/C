@@ -109,11 +109,11 @@ void DlgVerFileAdd::SetModelType(int _iModelType)
 	m_iModelType = _iModelType;
 }
 
-
 void DlgVerFileAdd::SetModelName(CString strModelName)
 {	
 	m_strModelName = strModelName;
 }
+
 
 // Open ¹öÆ°
 void DlgVerFileAdd::OnClickedButtonFileOpen()
