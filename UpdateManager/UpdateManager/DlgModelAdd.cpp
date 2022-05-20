@@ -26,7 +26,7 @@ void DlgModelAdd::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(DlgModelAdd, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO_MODELTYPE, &DlgModelAdd::OnSelchangeComboModeltype)
-	ON_BN_CLICKED(IDC_BUTTON_MODEL_MAKE, &DlgModelAdd::OnClickedButtonModelMake)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL_SELECT, &DlgModelAdd::OnClickedButtonModelMake)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_CANCEL, &DlgModelAdd::OnClickedButtonModelCancel)
 END_MESSAGE_MAP()
 
