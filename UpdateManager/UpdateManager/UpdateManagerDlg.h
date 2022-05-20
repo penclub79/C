@@ -99,6 +99,8 @@ private:
 	CEdit				m_CEditVer4;
 	CButton				m_CBtnPath;
 	CButton				m_CBtnMake;
+	CString		m_strPathItem;
+
 
 	int FindTreeNode(int _iModelType);
 public:

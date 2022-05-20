@@ -154,3 +154,7 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+/MkUpdtMng/321 (2)/fuck.udt
+/UpdateManager/UpdateManager/_V(0000).udf
+/UpdateManager/UpdateManager/UpdateManager.rc
+/.gitignore

@@ -92,11 +92,11 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_CREATE, &CUpdateManagerDlg::OnClickedButtonModelCreate)
 	ON_BN_CLICKED(IDC_BUTTON_ENTITY_SELETE, &CUpdateManagerDlg::OnClickedButtonEntitySelete)
 	ON_BN_CLICKED(IDC_BUTTON_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonSavePath)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL_MAKES, &CUpdateManagerDlg::OnClickedButtonModelMakes)
 	ON_BN_CLICKED(IDC_BUTTON_PACKAGE_MAKE, &CUpdateManagerDlg::OnClickedButtonPackageMake)
 	ON_BN_CLICKED(IDC_BUTTON_MAIN_CANCEL, &CUpdateManagerDlg::OnClickedButtonMainCancel)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_LOAD2, &CUpdateManagerDlg::OnClickedButtonModelLoad)
 	ON_BN_CLICKED(IDC_BUTTON_ENTITY_DELETE, &CUpdateManagerDlg::OnClickedButtonEntityDelete)
-	ON_BN_CLICKED(IDC_BUTTON_MODEL_MAKES, &CUpdateManagerDlg::OnClickedButtonModelMakes)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonModelSavePath)
 END_MESSAGE_MAP()
 
@@ -134,6 +134,11 @@ BOOL CUpdateManagerDlg::OnInitDialog()
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	Init();
+
+	if (m_strPathItem.IsEmpty())
+		GetDlgItem(IDC_BUTTON_MODEL_MAKES)->EnableWindow(FALSE);
+	else
+		GetDlgItem(IDC_BUTTON_MODEL_MAKES)->EnableWindow(TRUE);
 
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
@@ -608,6 +613,7 @@ void CUpdateManagerDlg::OnClickedButtonSavePath()
 		GrStrWcopy(m_aszMkFileName, (LPWSTR)(LPCTSTR)strPath);
 		m_CEditPath.SetWindowTextW(strPath);
 
+		// 구조체에 업데이트 경로+파일명 넣기
 		GrDumyZeroMem(m_stUpdateInfo.aszUpgdFileName, 1024);
 		GrStrWcopy(m_stUpdateInfo.aszUpgdFileName, (LPWSTR)(LPCTSTR)strPath);
 	}
@@ -661,8 +667,6 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 		// 해결! int자료형을 unsigned int로 양수의 정수 데이터만 담는 방법으로 해결함.
 		
 
-		// -------------------------------------- 여기까지 파일사이즈 맞음..
-
 		// FileCtrl클래스 할당
 		
 		// 파일 만드는 클래스 할당
@@ -683,15 +687,15 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 				iWriteSize = iWriteSize - iResult;
 
 				// 파일 사이즈랑 같다면
-				if (iWorteSize == uiFileSize)
-				{
-					// 결과 TRUE
-					bIsSuccess = TRUE;
+				//if (iWorteSize == uiFileSize)
+				//{
+				//	// 결과 TRUE
+				//	bIsSuccess = TRUE;
 
-					// init파일 만드는 함수호출
-					InitMakeFile();
-					break;
-				}
+				//	// init파일 만드는 함수호출
+				//	InitMakeFile();
+				//	break;
+				//}
 			}
 		}
 		else
@@ -750,19 +754,22 @@ void CUpdateManagerDlg::InitMakeFile()
 	m_stUpdateInfo.uiUpgdVersion = uiVersion;
 	
 	// 저장파일 이름 재설정
-	strMakeName.Format(_T("%s_V(%d%d%d%d).udf"), m_aszMkFileName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]);
-	wsprintf(m_aszMkFileName, strMakeName.GetBuffer(0));
+	/*strMakeName.Format(_T("%s_V(%d%d%d%d).init"), m_aszMkFileName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]);
+	wsprintf(m_aszMkFileName, strMakeName.GetBuffer(0));*/
 
 	/*memset(m_stUpdateInfo.aszUpgdFileName, 0, sizeof(WCHAR)* 1024);
 	wsprintf(m_stUpdateInfo.aszUpgdFileName, strMakeName.GetBuffer(0));*/
 
-	memcpy(aszPath, m_aszMkFileName, 2048);
+	strMakeName.Format(_T("%s_V(%d%d%d%d).init"), m_aszMkModelName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]);
+	wsprintf(m_aszMkModelName, strMakeName.GetBuffer(0));
+
+	memcpy(aszPath, m_aszMkModelName, 2048);
 	
 	// init파일로 만들기
 	//strFile.Format(_T("%s\\MkUpdate.init"), aszPath);
 	
 	// 경로에 내 파일 생성
-	pFileCtrl = new Cls_GrFileCtrl(aszPath, TRUE, TRUE); // 굳이 써줄 필요가 없는 코드
+	pFileCtrl = new Cls_GrFileCtrl(aszPath, TRUE, TRUE);
 	
 	if (pFileCtrl)
 	{
@@ -771,8 +778,6 @@ void CUpdateManagerDlg::InitMakeFile()
 			pFileCtrl->Write(&m_stUpdateInfo, sizeof(_stUpdateInfo));
 		}
 	}
-
-	int test = pFileCtrl->GetSize();
 
 	if (NULL != pFileCtrl)
 	{
@@ -966,10 +971,12 @@ void CUpdateManagerDlg::OnClickedButtonModelSavePath()
 	CFileDialog* pFileDlg;
 	CString		strPath;
 	CString		strInitFile;
+	
 
 	pFileDlg = new CFileDialog(TRUE, NULL, NULL, OFN_PATHMUSTEXIST, _T("All Files(*.init)|*.init"), NULL);
 
 	pFileDlg->m_ofn.lpstrInitialDir = m_szaNowPath;
+
 
 	if (IDOK == pFileDlg->DoModal())
 	{
@@ -978,14 +985,72 @@ void CUpdateManagerDlg::OnClickedButtonModelSavePath()
 
 		GrStrWcopy(m_aszMkModelName, (LPWSTR)(LPCTSTR)strPath);
 		m_CEditModelPath.SetWindowTextW(strPath);
+		m_strPathItem = strPath;
 	}
+
+	if (m_strPathItem.IsEmpty())
+		GetDlgItem(IDC_BUTTON_MODEL_MAKES)->EnableWindow(FALSE);
+	else
+		GetDlgItem(IDC_BUTTON_MODEL_MAKES)->EnableWindow(TRUE);
+
 }
 
 
 // 모델 파일 생성 버튼
 void CUpdateManagerDlg::OnClickedButtonModelMakes()
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString			strVer1;
+	CString			strVer2;
+	CString			strVer3;
+	CString			strVer4;
+	__u8			aszVersion[4]	= { 0 };
+	__u32			uiVersion		= 0;
+	Cls_GrFileCtrl* pFileCtrl = NULL;
 
 
+	if (NULL != m_pObjFwUp)
+	{
+		// String을 int로 받기
+		/*
+		aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
+		aiVersion[1] = this->GetDlgItemInt(IDC_EDIT_VERSION2);
+		aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
+		aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION4);
+		*/
+
+		m_CEditVer1.GetWindowTextW(strVer1);
+		m_CEditVer2.GetWindowTextW(strVer2);
+		m_CEditVer3.GetWindowTextW(strVer3);
+		m_CEditVer4.GetWindowTextW(strVer4);
+
+		aszVersion[0] = (__u8)(_ttoi(strVer1));
+		aszVersion[1] = (__u8)(_ttoi(strVer2));
+		aszVersion[2] = (__u8)(_ttoi(strVer3));
+		aszVersion[3] = (__u8)(_ttoi(strVer4));
+
+		uiVersion = (aszVersion[0] << 24) | (aszVersion[1] << 16) | (aszVersion[2] << 8) | aszVersion[3];
+
+		// 구조체에 버전 저장
+		m_pObjFwUp->SetUpdateVersion(uiVersion);
+
+		// 파일 만드는 클래스 할당
+		//pFileCtrl = new Cls_GrFileCtrl(m_aszMkModelName, FALSE, FALSE);
+		
+		/*if (TRUE == pFileCtrl->IsOpened())
+		{*/
+			// init파일 생성
+			InitMakeFile();
+			MessageBox(_T("Make Model Success"), NULL, MB_OK | MB_ICONWARNING);
+		//}
+		//else
+		//{
+			//MessageBox(_T("File Open Error"), _T("Error"), MB_OK | MB_ICONWARNING);
+		//}
+
+		if (NULL != pFileCtrl)
+		{
+			delete pFileCtrl;
+			pFileCtrl = NULL;
+		}
+	}
 }
