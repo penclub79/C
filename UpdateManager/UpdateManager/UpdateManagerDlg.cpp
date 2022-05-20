@@ -82,6 +82,7 @@ void CUpdateManagerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_VERSION2, m_CEditVer2);
 	DDX_Control(pDX, IDC_EDIT_VERSION3, m_CEditVer3);
 	DDX_Control(pDX, IDC_EDIT_VERSION4, m_CEditVer4);
+	DDX_Control(pDX, IDC_EDIT_MODEL_PATH, m_CEditModelPath);
 }
 
 BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
@@ -95,6 +96,8 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_MAIN_CANCEL, &CUpdateManagerDlg::OnClickedButtonMainCancel)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_LOAD2, &CUpdateManagerDlg::OnClickedButtonModelLoad)
 	ON_BN_CLICKED(IDC_BUTTON_ENTITY_DELETE, &CUpdateManagerDlg::OnClickedButtonEntityDelete)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL_MAKES, &CUpdateManagerDlg::OnClickedButtonModelMakes)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonModelSavePath)
 END_MESSAGE_MAP()
 
 
@@ -831,7 +834,7 @@ void CUpdateManagerDlg::OnOK()
 // 모델 불러오기 버튼
 void CUpdateManagerDlg::OnClickedButtonModelLoad()
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	
 	CString			strPath;
 	TCHAR			aszLdPathFile[2048] = { 0 };
 	CFileDialog*	pFileDlg			= NULL;
@@ -955,4 +958,34 @@ void CUpdateManagerDlg::OnClickedButtonEntityDelete()
 		delete pDlgVerFileAdd;
 		pDlgVerFileAdd = NULL;
 	}
+}
+
+// 모델 저장할 경로 버튼
+void CUpdateManagerDlg::OnClickedButtonModelSavePath()
+{
+	CFileDialog* pFileDlg;
+	CString		strPath;
+	CString		strInitFile;
+
+	pFileDlg = new CFileDialog(TRUE, NULL, NULL, OFN_PATHMUSTEXIST, _T("All Files(*.init)|*.init"), NULL);
+
+	pFileDlg->m_ofn.lpstrInitialDir = m_szaNowPath;
+
+	if (IDOK == pFileDlg->DoModal())
+	{
+		strPath = pFileDlg->GetPathName();
+		GrDumyZeroMem(m_aszMkModelName, sizeof(WCHAR) * 1024);
+
+		GrStrWcopy(m_aszMkModelName, (LPWSTR)(LPCTSTR)strPath);
+		m_CEditModelPath.SetWindowTextW(strPath);
+	}
+}
+
+
+// 모델 파일 생성 버튼
+void CUpdateManagerDlg::OnClickedButtonModelMakes()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+
 }

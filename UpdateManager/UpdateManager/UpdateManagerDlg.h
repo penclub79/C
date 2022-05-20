@@ -87,10 +87,12 @@ private:
 	CFirmUpdate*		m_pObjFwUp;
 	_stUpdateTreeNode	m_astTreeNode[E_FirmUpInfoTypeMaxIdx];  // 24
 	WCHAR				m_aszMkFileName[1024];
+	WCHAR				m_aszMkModelName[1024];
 	_stUpdateInfo		m_stUpdateInfo;
 
 	CTreeCtrl			m_CTreeCtrl;
 	CEdit				m_CEditPath;
+	CEdit				m_CEditModelPath;
 	CEdit				m_CEditVer1;
 	CEdit				m_CEditVer2;
 	CEdit				m_CEditVer3;
@@ -110,4 +112,7 @@ public:
 	afx_msg void OnClickedButtonModelLoad();
 //	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnClickedButtonEntityDelete();
+	afx_msg void OnClickedButtonModelMakes();
+	afx_msg void OnClickedButtonModelSavePath();
+	
 };
