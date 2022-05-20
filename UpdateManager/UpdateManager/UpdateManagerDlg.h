@@ -100,6 +100,9 @@ private:
 	CButton				m_CBtnPath;
 	CButton				m_CBtnMake;
 	CString		m_strPathItem;
+	__u32				m_iWorteSize;
+	__u32				m_iWriteSize;
+	__u32				m_iResult;
 
 
 	int FindTreeNode(int _iModelType);
