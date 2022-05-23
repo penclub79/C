@@ -60,6 +60,21 @@ CUpdateManagerDlg::CUpdateManagerDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CUpdateManagerDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_pObjFwUp = NULL;
+	m_iWorteSize = 0;
+	m_iWriteSize = 0;
+	m_iResult = 0;
+	
+	memset(m_aszMkFileName, 0, 1024);
+	memset(m_aszMkModelName, 0, 2048);
+	
+	for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
+	{
+		m_astTreeNode[i] = { 0 };
+	}
+	
+
 }
 
 // 소멸자
@@ -98,6 +113,7 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonModelSavePath)
 	ON_BN_CLICKED(IDC_BUTTON_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonSavePath)
 	ON_BN_CLICKED(IDC_BUTTON_PACKAGE_MAKE, &CUpdateManagerDlg::OnClickedButtonPackageMake)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL_DELETE, &CUpdateManagerDlg::OnClickedButtonModelDelete)
 END_MESSAGE_MAP()
 
 
@@ -140,7 +156,21 @@ BOOL CUpdateManagerDlg::OnInitDialog()
 	else
 		GetDlgItem(IDC_BUTTON_MODEL_MAKES)->EnableWindow(TRUE);
 
+	
+/*
+	for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
+	{
+		if (m_astTreeNode[i].uiType)
+			GetDlgItem(IDC_BUTTON_MODEL_DELETE)->EnableWindow(TRUE);
+		else
+			GetDlgItem(IDC_BUTTON_MODEL_DELETE)->EnableWindow(FALSE);
 
+		if (m_astTreeNode[i].aszNode[i])
+			GetDlgItem(IDC_BUTTON_ENTITY_DELETE)->EnableWindow(TRUE);
+		else
+			GetDlgItem(IDC_BUTTON_ENTITY_DELETE)->EnableWindow(FALSE);
+	}*/
+	
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -353,6 +383,7 @@ void CUpdateManagerDlg::TreeAddModel(int _iModelType)
 			}
 
 			m_stUpdateInfo.astModelInfo[iResult].uiType = _iModelType;
+			GetDlgItem(IDC_BUTTON_MODEL_DELETE)->EnableWindow(TRUE);
 		}
 		else
 		{
@@ -907,6 +938,7 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 		delete pFileDlg;
 		pFileDlg = NULL;
 	}
+
 }
 
 
@@ -957,12 +989,15 @@ void CUpdateManagerDlg::OnClickedButtonEntityDelete()
 		iNodeIdx++;
 	}
 
-	m_pObjFwUp->DelVerFile(m_astTreeNode[iModelIdx].uiType, m_stUpdateInfo.astModelInfo[iNodeIdx].astEntity[iVerFileIdx].uiType);
+	// FirmWare 데이터를 삭제
+	m_pObjFwUp->DelVerFile(m_astTreeNode[iModelIdx].uiType, m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iNodeIdx].uiType);
 	
-	if (stFirstTreeNode != NULL)
+	if (stNowTreeNode != NULL)
 	{
 		// 삭제
-		m_CTreeCtrl.DeleteItem(stNowTreeNode);
+		m_CTreeCtrl.DeleteItem(stNowTreeNode);												// 트리 삭제
+		m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iNodeIdx].uiType = 0;				// 구조체 데이터 삭제1
+		memset(m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iNodeIdx].aszFile, 0, 256); // 구조체 데이터 삭제2
 	}
 	else
 	{
@@ -984,7 +1019,7 @@ void CUpdateManagerDlg::OnClickedButtonModelSavePath()
 	if (IDOK == pFileDlg->DoModal())
 	{
 		strPath = pFileDlg->GetPathName();
-		GrDumyZeroMem(m_aszMkModelName, sizeof(WCHAR) * 1024);
+		GrDumyZeroMem(m_aszMkModelName, sizeof(WCHAR) * 2048);
 
 		GrStrWcopy(m_aszMkModelName, (LPWSTR)(LPCTSTR)strPath);
 		m_CEditModelPath.SetWindowTextW(strPath);
@@ -1063,7 +1098,8 @@ void CUpdateManagerDlg::OnClickedButtonModelMakes()
 void CUpdateManagerDlg::InitMakeModel() // Model파일 만드는 함수
 {
 	CString			strFile;
-
+	CFileFind pFileFind;
+	BOOL bIsFile = pFileFind.FindFile(_T("*.init"));
 	TCHAR			aszPath[2048] = { 0 };
 	Cls_GrFileCtrl* pFileCtrl = NULL;
 	__u8			aszVersion[4] = { 0 };
@@ -1095,22 +1131,20 @@ void CUpdateManagerDlg::InitMakeModel() // Model파일 만드는 함수
 	uiVersion = (aszVersion[0] << 24) | (aszVersion[1] << 16) | (aszVersion[2] << 8) | aszVersion[3];
 
 	m_stUpdateInfo.uiUpgdVersion = uiVersion;
-
-	// 자료형 변환 WCHAR -> CHAR
-	//WideCharToMultiByte(CP_ACP, 0, m_aszMkModelName, iLen, aszMulFileName, iLen, NULL, NULL);
-
-	//파일명만 얻기
-	//GrStrFnGetFileName(aszMkModelName, aszMulFileName);
-
-	// 저장파일 이름 재설정
-	/*strMakeName.Format(_T("%s\\%s_V(%d%d%d%d).init"), m_szaNowPath, aszMkModelName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]);*/
-	strMakeName.Format(_T("%s_V(%d%d%d%d).init"), m_aszMkModelName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]);
-	wsprintf(m_aszMkModelName, strMakeName.GetBuffer(0));
-
+	
+	// 파일 존재 여부 체크
+	bIsFile = pFileFind.FindFile(m_aszMkModelName); 
+	
+	// 파일이 존재하지 않으면 새로운 포맷으로 파일을 만들기
+	if (!bIsFile)
+	{
+		strMakeName.Format(_T("%s_V(%d%d%d%d).init"), m_aszMkModelName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]);
+		wsprintf(m_aszMkModelName, strMakeName.GetBuffer(0));
+	}
+	
 	memcpy(aszPath, m_aszMkModelName, 2048);
 
 	// init파일로 만들기
-
 	// 경로에 내 파일 생성
 	pFileCtrl = new Cls_GrFileCtrl(aszPath, TRUE, TRUE);
 
@@ -1127,5 +1161,13 @@ void CUpdateManagerDlg::InitMakeModel() // Model파일 만드는 함수
 		delete pFileCtrl;
 		pFileCtrl = NULL;
 	}
+
+}
+
+void CUpdateManagerDlg::OnClickedButtonModelDelete()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+
 
 }

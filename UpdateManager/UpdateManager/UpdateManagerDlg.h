@@ -88,7 +88,7 @@ private:
 	CFirmUpdate*		m_pObjFwUp;
 	_stUpdateTreeNode	m_astTreeNode[E_FirmUpInfoTypeMaxIdx];  // 24
 	WCHAR				m_aszMkFileName[1024];
-	WCHAR				m_aszMkModelName[1024];
+	WCHAR				m_aszMkModelName[2048];
 	_stUpdateInfo		m_stUpdateInfo;
 
 	CTreeCtrl			m_CTreeCtrl;
@@ -121,4 +121,5 @@ public:
 	afx_msg void OnClickedButtonModelMakes();
 	afx_msg void OnClickedButtonModelSavePath();
 	
+	afx_msg void OnClickedButtonModelDelete();
 };
