@@ -72,7 +72,7 @@ void CFirmUpdate::FirmInit()
 	m_stFirmHeader.UpgdVer	= E_FirmUpVer;
 	m_stFirmEd.Fcc			= E_FirmUpEdFcc;
 	//m_stFirmHeader.Size		= sizeof(pFirmUpHeader) + sizeof(pFirmUpEnd); <--- 구조체의 크기가 안맞아서 패키지 파일 생성시 에러가 발생
-	m_stFirmHeader.Size = sizeof(_stFirmUpHeader)+sizeof(_stFirmUpEnd);
+	m_stFirmHeader.Size = sizeof(_stFirmUpHeader) + sizeof(_stFirmUpEnd);
 
 	// m_pData NULL 체크
 	for (Tv_WkIdx = 0; Tv_WkIdx < E_FirmUpInfoCnt; Tv_WkIdx++)

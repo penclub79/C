@@ -68,8 +68,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	void Init();
-	//BOOL CheckFcc(pUpdateInfo _p);				// MkUpdate.init 파일이 있을 때 FCC체크
-	void InitCtrl(pUpdateInfo _pstUpdateInfo);		// MkUpdate.init 파일이 있을 때
+	//BOOL CheckFcc(pUpdateInfo _p);	// MkUpdate.init 파일이 있을 때 FCC체크
+	void InitCtrl(pUpdateInfo _pstUpdateInfo);				// MkUpdate.init 파일이 있을 때
 	//void AddModel(unsigned int _uiModelType);
 
 	void TreeAddModel(int _iModelType); // 트리에 모델 추가
@@ -77,7 +77,6 @@ protected:
 	void TreeAddVerFileNode(int _iModelType, int _iVerFileType, char* _pszFileName);
 	void ProcErrCode(int _iResult); // 에러 처리
 	void InitMakeFile(); // init파일 만드는 함수
-	void InitMakeModel(); // Model파일 만드는 함수
 	BOOL CheckInit(pUpdateInfo _pstUpdateInfo);
 	int FindModelIndex(int _iModelType);
 	int GetModelType(int _iIndex);
@@ -100,7 +99,7 @@ private:
 	CEdit				m_CEditVer4;
 	CButton				m_CBtnPath;
 	CButton				m_CBtnMake;
-	CString				m_strPathItem;
+	CString		m_strPathItem;
 	__u32				m_iWorteSize;
 	__u32				m_iWriteSize;
 	__u32				m_iResult;
@@ -118,7 +117,11 @@ public:
 	afx_msg void OnClickedButtonModelLoad();
 //	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnClickedButtonEntityDelete();
+<<<<<<< HEAD
 	afx_msg void OnClickedButtonModelMakes();
 	afx_msg void OnClickedButtonModelSavePath();
 	
+=======
+	afx_msg void OnClickedButtonModelDelete();
+>>>>>>> 6034181ac2ce204a230e5b8d9254d0623f642574
 };
