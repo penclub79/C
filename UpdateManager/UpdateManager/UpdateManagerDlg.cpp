@@ -109,10 +109,10 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_MAKES, &CUpdateManagerDlg::OnClickedButtonModelMakes)
 	ON_BN_CLICKED(IDC_BUTTON_MAIN_CANCEL, &CUpdateManagerDlg::OnClickedButtonMainCancel)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_LOAD2, &CUpdateManagerDlg::OnClickedButtonModelLoad)
-	ON_BN_CLICKED(IDC_BUTTON_ENTITY_DELETE, &CUpdateManagerDlg::OnClickedButtonEntityDelete)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonModelSavePath)
 	ON_BN_CLICKED(IDC_BUTTON_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonSavePath)
 	ON_BN_CLICKED(IDC_BUTTON_PACKAGE_MAKE, &CUpdateManagerDlg::OnClickedButtonPackageMake)
+	ON_BN_CLICKED(IDC_BUTTON_ENTITY_DELETE, &CUpdateManagerDlg::OnClickedButtonEntityDelete)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_DELETE, &CUpdateManagerDlg::OnClickedButtonModelDelete)
 END_MESSAGE_MAP()
 
@@ -941,70 +941,6 @@ void CUpdateManagerDlg::OnClickedButtonModelLoad()
 
 }
 
-
-void CUpdateManagerDlg::OnClickedButtonEntityDelete()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	HTREEITEM		stRootTree;
-	HTREEITEM		stFirstTreeNode;
-	HTREEITEM		stNowTreeNode;
-	HTREEITEM stTreeChk;
-
-	CString			strSelectName;
-	CString			strNodeName;
-	CFileDialog*	pFileDlg		 = NULL;
-	int				iVerFileIdx		 = 0;
-	int				iModelIdx = 0;
-	int				iNodeIdx = 0;
-
-	// 내가 선택한 Node의 Root Tree를 가져오기
-	stRootTree = m_CTreeCtrl.GetSelectedItem();
-	while (stRootTree)
-	{
-		stRootTree = m_CTreeCtrl.GetNextItem(stRootTree, TVGN_NEXT);
-		if (NULL == stRootTree)
-		{
-			break;
-		}
-		iModelIdx++;
-	}
-
-	// 내가 선택한 Tree의 Node를 가져오기
-	stNowTreeNode = m_CTreeCtrl.GetSelectedItem();
-	strSelectName = m_CTreeCtrl.GetItemText(stNowTreeNode);
-	
-	stFirstTreeNode = m_CTreeCtrl.GetChildItem(stNowTreeNode);
-	stFirstTreeNode = m_CTreeCtrl.GetNextItem(stFirstTreeNode, TVGN_CHILD); // Tree Root가져오기
-	stFirstTreeNode = m_CTreeCtrl.GetNextItem(stFirstTreeNode, TVGN_CHILD); // Tree Root의 Node가져오기
-	
-	while (stFirstTreeNode)
-	{
-		strNodeName = m_CTreeCtrl.GetItemText(stFirstTreeNode);
-		stFirstTreeNode = m_CTreeCtrl.GetNextItem(stFirstTreeNode, TVGN_NEXT); // Tree Root의 다음 Node 가져오기
-		
-		if (strSelectName == strNodeName) //내가 선택한 문자와 같으면 break
-		{
-			break;
-		}
-		iNodeIdx++;
-	}
-
-	// FirmWare 데이터를 삭제
-	m_pObjFwUp->DelVerFile(m_astTreeNode[iModelIdx].uiType, m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iNodeIdx].uiType);
-	
-	if (stNowTreeNode != NULL)
-	{
-		// 삭제
-		m_CTreeCtrl.DeleteItem(stNowTreeNode);												// 트리 삭제
-		m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iNodeIdx].uiType = 0;				// 구조체 데이터 삭제1
-		memset(m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iNodeIdx].aszFile, 0, 256); // 구조체 데이터 삭제2
-	}
-	else
-	{
-		MessageBox(_T("삭제할 파일을 선택해야 합니다."));
-	}
-}
-
 // 모델 저장할 경로 버튼
 void CUpdateManagerDlg::OnClickedButtonModelSavePath()
 {
@@ -1164,10 +1100,90 @@ void CUpdateManagerDlg::InitMakeModel() // Model파일 만드는 함수
 
 }
 
-void CUpdateManagerDlg::OnClickedButtonModelDelete()
+void CUpdateManagerDlg::OnClickedButtonEntityDelete()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	HTREEITEM		stRootTree;
+	HTREEITEM		stFirstTreeNode;
+	HTREEITEM		stNowTreeNode;
+	CString			strSelectName;
+	CString			strNodeName;
+	int				iModelIdx = 0;
+	int				iNodeIdx = 0;
 
+	// 내가 선택한 Node의 Root Tree를 가져오기
+	stRootTree = m_CTreeCtrl.GetSelectedItem();
+	while (stRootTree)
+	{
+		stRootTree = m_CTreeCtrl.GetNextItem(stRootTree, TVGN_NEXT);
+		if (NULL == stRootTree)
+		{
+			break;
+		}
+		iModelIdx++;
+	}
+
+	// 내가 선택한 Tree의 Node를 가져오기
+	stNowTreeNode = m_CTreeCtrl.GetSelectedItem();
+	strSelectName = m_CTreeCtrl.GetItemText(stNowTreeNode);
+
+	stFirstTreeNode = m_CTreeCtrl.GetChildItem(stNowTreeNode);
+	stFirstTreeNode = m_CTreeCtrl.GetNextItem(stFirstTreeNode, TVGN_CHILD); // Tree Root가져오기
+	stFirstTreeNode = m_CTreeCtrl.GetNextItem(stFirstTreeNode, TVGN_CHILD); // Tree Root의 Node가져오기
+
+	while (stFirstTreeNode)
+	{
+		strNodeName = m_CTreeCtrl.GetItemText(stFirstTreeNode);
+		stFirstTreeNode = m_CTreeCtrl.GetNextItem(stFirstTreeNode, TVGN_NEXT); // Tree Root의 다음 Node 가져오기
+
+		if (strSelectName == strNodeName) //내가 선택한 문자와 같으면 break
+		{
+			break;
+		}
+		iNodeIdx++;
+	}
+
+	// FirmWare 데이터를 삭제
+	m_pObjFwUp->DelVerFile(m_astTreeNode[iModelIdx].uiType, m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iNodeIdx].uiType);
+
+	if (stNowTreeNode != NULL)
+	{
+		// 삭제
+		m_CTreeCtrl.DeleteItem(stNowTreeNode);												// 트리 삭제
+		m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iNodeIdx].uiType = 0;				// 구조체 데이터 삭제1
+		memset(m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iNodeIdx].aszFile, 0, 256); // 구조체 데이터 삭제2
+	}
+	else
+	{
+		MessageBox(_T("삭제할 파일을 선택해야 합니다."));
+	}
+}
+
+void CUpdateManagerDlg::OnClickedButtonModelDelete()
+{
+	HTREEITEM		stRootTree;
+
+	int		iModelIdx = 0;
+
+	stRootTree = m_CTreeCtrl.GetSelectedItem();
+	while (stRootTree)
+	{
+		stRootTree = m_CTreeCtrl.GetNextItem(stRootTree, TVGN_NEXT);
+		if (NULL == stRootTree)
+		{
+			break;
+		}
+		iModelIdx++;
+	}
+
+	if (IDYES == AfxMessageBox(_T("해당 모델타입을 지우시겠습니까?"), MB_YESNO))
+	{
+		AfxMessageBox(_T("OK"));
+	}
+	else if (IDNO)
+	{
+		AfxMessageBox(_T("NO"));
+	}
 
 
 }
