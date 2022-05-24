@@ -347,14 +347,14 @@ void CFirmUpdate::DelVerFile(int _iModelType, int _iVerFileType)
 
 		pFirmVerFile = pFirmInfo->Entity;
 
-		for (int i = 0; i < E_FirmUpEntityCnt; i++)
+		for (int iEntiIdx = 0; iEntiIdx < E_FirmUpEntityCnt; iEntiIdx++)
 		{
 			if (_iVerFileType == pFirmVerFile->Type)
 			{
-				if (m_pData[iModelIdx][i] != NULL)
+				if (NULL != m_pData[iModelIdx][iEntiIdx])
 				{
-					free(m_pData[iModelIdx][i]);
-					m_pData[iModelIdx][i] = NULL;
+					free(m_pData[iModelIdx][iEntiIdx]);
+					m_pData[iModelIdx][iEntiIdx] = NULL;
 				}
 				// 헤더에서 버전 파일 사이즈를 뺀다.
 				m_stFirmHeader.Size = m_stFirmHeader.Size - pFirmVerFile->Size;
@@ -362,7 +362,6 @@ void CFirmUpdate::DelVerFile(int _iModelType, int _iVerFileType)
 				pFirmVerFile->Size = 0;
 				pFirmVerFile->Type = E_FirmUpEntityNone;
 			}
-
 			pFirmVerFile++;
 		}
 	}
@@ -372,13 +371,27 @@ void CFirmUpdate::DelVerFile(int _iModelType, int _iVerFileType)
 void CFirmUpdate::DelModelType(int _iModelType)
 {
 	int iModelIdx = 0;
+	int iEntiIdx = 0;
 	_stFirmUpInfo* pFirmInfo = NULL;
-	
+	_stFirmUpEntity* pFirmVerFile = NULL;
+
 	iModelIdx = ChkModelType(_iModelType);
+	pFirmVerFile = pFirmInfo->Entity;
 
 	if (0 <= iModelIdx)
 	{
 		pFirmInfo = &m_stFirmHeader.FirmInfo[iModelIdx];
+
+		while (pFirmInfo->Entity[iEntiIdx].Type)
+		{
+			m_stFirmHeader.Size = m_stFirmHeader.Size - pFirmInfo->Entity[iEntiIdx].Size;
+			if (NULL != m_pData[iModelIdx][iEntiIdx])
+			{
+				free(m_pData[iModelIdx][iEntiIdx]);
+				m_pData[iModelIdx][iEntiIdx] = NULL;
+			}
+			iEntiIdx++;
+		}
 		memset(pFirmInfo, 0, sizeof(_stFirmUpInfo));
 	}
 

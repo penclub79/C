@@ -106,11 +106,11 @@ BEGIN_MESSAGE_MAP(CUpdateManagerDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_CREATE, &CUpdateManagerDlg::OnClickedButtonModelCreate)
 	ON_BN_CLICKED(IDC_BUTTON_ENTITY_SELETE, &CUpdateManagerDlg::OnClickedButtonEntitySelete)
-	ON_BN_CLICKED(IDC_BUTTON_MODEL_MAKES, &CUpdateManagerDlg::OnClickedButtonModelMakes)
 	ON_BN_CLICKED(IDC_BUTTON_MAIN_CANCEL, &CUpdateManagerDlg::OnClickedButtonMainCancel)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_LOAD2, &CUpdateManagerDlg::OnClickedButtonModelLoad)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonModelSavePath)
 	ON_BN_CLICKED(IDC_BUTTON_SAVE_PATH, &CUpdateManagerDlg::OnClickedButtonSavePath)
+	ON_BN_CLICKED(IDC_BUTTON_MODEL_MAKES, &CUpdateManagerDlg::OnClickedButtonModelMakes)
 	ON_BN_CLICKED(IDC_BUTTON_PACKAGE_MAKE, &CUpdateManagerDlg::OnClickedButtonPackageMake)
 	ON_BN_CLICKED(IDC_BUTTON_ENTITY_DELETE, &CUpdateManagerDlg::OnClickedButtonEntityDelete)
 	ON_BN_CLICKED(IDC_BUTTON_MODEL_DELETE, &CUpdateManagerDlg::OnClickedButtonModelDelete)
@@ -156,20 +156,7 @@ BOOL CUpdateManagerDlg::OnInitDialog()
 	else
 		GetDlgItem(IDC_BUTTON_MODEL_MAKES)->EnableWindow(TRUE);
 
-	
-/*
-	for (int i = 0; i < E_FirmUpInfoTypeMaxIdx; i++)
-	{
-		if (m_astTreeNode[i].uiType)
-			GetDlgItem(IDC_BUTTON_MODEL_DELETE)->EnableWindow(TRUE);
-		else
-			GetDlgItem(IDC_BUTTON_MODEL_DELETE)->EnableWindow(FALSE);
 
-		if (m_astTreeNode[i].aszNode[i])
-			GetDlgItem(IDC_BUTTON_ENTITY_DELETE)->EnableWindow(TRUE);
-		else
-			GetDlgItem(IDC_BUTTON_ENTITY_DELETE)->EnableWindow(FALSE);
-	}*/
 	
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -225,12 +212,6 @@ HCURSOR CUpdateManagerDlg::OnQueryDragIcon()
 
 void CUpdateManagerDlg::Init()
 {
-	// Local ------------------------------
-		TCHAR			szaInitFile[2048]	= { 0 };
-		//Cls_GrFileCtrl* pObjFile			= NULL;
-		int				iFileSize			= 0;
-	// ------------------------------------
-
 	// 현재 실행 경로 얻기
 	::GetModuleFileName(NULL, m_szaNowPath, 2048);
 	// 경로에서 파일명과 확장자만 제거
@@ -242,7 +223,7 @@ void CUpdateManagerDlg::Init()
 	// Tree 초기화 & UpdateInfo 구조체 초기화
 	memset(m_astTreeNode, 0, sizeof(_stUpdateTreeNode) * 3); // 72
 	memset(&m_stUpdateInfo, 0, sizeof(_stUpdateInfo));
-
+	
 }
 
 // Init 체크
@@ -272,10 +253,10 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 
 	GrStrIntToWstr(aszVersion, _pstUpdateInfo->uiUpgdVersion);
 
-	aiVersion[0] = (_pstUpdateInfo->uiUpgdVersion >> 24) & 0xFF;
-	aiVersion[1] = (_pstUpdateInfo->uiUpgdVersion >> 16) & 0xFF;
-	aiVersion[2] = (_pstUpdateInfo->uiUpgdVersion >> 8) & 0xFF;
-	aiVersion[3] = _pstUpdateInfo->uiUpgdVersion & 0xFF;
+	aiVersion[3] = (_pstUpdateInfo->uiUpgdVersion >> 24) & 0xFF;
+	aiVersion[2] = (_pstUpdateInfo->uiUpgdVersion >> 16) & 0xFF;
+	aiVersion[1] = (_pstUpdateInfo->uiUpgdVersion >> 8) & 0xFF;
+	aiVersion[0] = _pstUpdateInfo->uiUpgdVersion & 0xFF;
 
 	strVersion.Format(_T("%d"), aiVersion[0]);
 	m_CEditVer1.SetWindowTextW(strVersion.GetString());
@@ -303,7 +284,7 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 				if (E_FirmUpEntityNone != pstUpdateInfoModel->uiType)
 				{
 					pszFileName = pstUpdateInfoModel->astEntity[si].aszFile; //Entity 구조체 파일이름을 담는다.
-					iStrLen = GrStrLen(pszFileName); // 라이브러리 길이 구하는 함수
+					iStrLen = GrStrLen(pszFileName);						// 라이브러리 길이 구하는 함수
 
 					if (GrFileIsExist(pszFileName))
 					{
@@ -530,7 +511,6 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* 
 					GrStrCopy(m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iResult].aszFile, _pszFilePath);
 
 					// 파일 이름만 복사
-					//strPath = _pszFilePath;
 					GrStrFnGetFileName(m_stUpdateInfo.astModelInfo[iModelIdx].astEntity[iResult].aszFile, aszMulFileName);
 
 					// 메모리 카피
@@ -657,39 +637,33 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 	Cls_GrFileCtrl* pFileCtrl		= NULL;
 	void*			pFile			= NULL;
 	BOOL			bIsSuccess		= FALSE;
-	__u8			aszVersion[4]	= { 0 };
 	__u32			uiFileSize		= 0;
 	__u32			uiVersion		= 0;
 	__u32			iWorteSize		= 0;
 	__u32			iWriteSize		= 0;
 	__u32			iResult			= 0;
-	CString			strVer1;
-	CString			strVer2;
-	CString			strVer3;
-	CString			strVer4;
 	CString			strPath;
+	int				aiVersion[4]	= { 0 };
+
 
 	if (NULL != m_pObjFwUp)
 	{
-		// String을 int로 받기
-		/*
-		aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
-		aiVersion[1] = this->GetDlgItemInt(IDC_EDIT_VERSION2);
-		aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
-		aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION4);
-		*/	
+		if (!m_stUpdateInfo.uiUpgdVersion)
+		{
+			aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION4);
+			aiVersion[1] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
+			aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION2);
+			aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
+		}
+		else
+		{
+			aiVersion[0] = (m_stUpdateInfo.uiUpgdVersion >> 24) & 0xFF;
+			aiVersion[1] = (m_stUpdateInfo.uiUpgdVersion >> 16) & 0xFF;
+			aiVersion[2] = (m_stUpdateInfo.uiUpgdVersion >> 8) & 0xFF;
+			aiVersion[3] = m_stUpdateInfo.uiUpgdVersion & 0xFF;
+		}
 
-		m_CEditVer1.GetWindowTextW(strVer1);
-		m_CEditVer2.GetWindowTextW(strVer2);
-		m_CEditVer3.GetWindowTextW(strVer3);
-		m_CEditVer4.GetWindowTextW(strVer4);
-
-		aszVersion[0] = (__u8)(_ttoi(strVer1));
-		aszVersion[1] = (__u8)(_ttoi(strVer2));
-		aszVersion[2] = (__u8)(_ttoi(strVer3));
-		aszVersion[3] = (__u8)(_ttoi(strVer4));
-		
-		uiVersion = (aszVersion[0] << 24) | (aszVersion[1] << 16) | (aszVersion[2] << 8) | aszVersion[3];
+		uiVersion = (aiVersion[0] << 24) | (aiVersion[1] << 16) | (aiVersion[2] << 8) | aiVersion[3];
 
 		// 구조체에 버전 저장
 		m_pObjFwUp->SetUpdateVersion(uiVersion);
@@ -724,16 +698,8 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 				{
 				//	// 결과 TRUE
 					bIsSuccess = TRUE;
+					InitMakeModel();
 
-				//	// init파일 만드는 함수호출
-					//InitMakeFile();
-					//if (pFileCtrl)
-					//{
-					//	if (pFileCtrl->IsOpened())
-					//	{	// 파일 생성
-					//		pFileCtrl->Write(&m_stUpdateInfo, sizeof(_stUpdateInfo));
-					//	}
-					//}
 					break;
 				}
 			}
@@ -781,43 +747,33 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 void CUpdateManagerDlg::InitMakeFile()
 {
 	CString			strFile;
-
 	TCHAR			aszPath[2048]	= { 0 };
 	Cls_GrFileCtrl* pFileCtrl		= NULL;
-	__u8			aszVersion[4]	= { 0 };
 	__u32			uiVersion		= 0;
 	int				iFileNameLen	= 0;
-	CString			strVer1;
-	CString			strVer2;
-	CString			strVer3;
-	CString			strVer4;
-	CString			strMakeName;
+	int				aiVersion[4] = { 0 };
+	
 
 	m_stUpdateInfo.uiFcc = E_MkUpdt_IniFcc;
 
-	/*aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
-	aiVersion[1] = this->GetDlgItemInt(IDC_EDIT_VERSION2);
-	aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
-	aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION4);*/
+	if (!m_stUpdateInfo.uiUpgdVersion)
+	{
+		aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION4);
+		aiVersion[1] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
+		aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION2);
+		aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
+	}
+	else
+	{
+		aiVersion[0] = (m_stUpdateInfo.uiUpgdVersion >> 24) & 0xFF;
+		aiVersion[1] = (m_stUpdateInfo.uiUpgdVersion >> 16) & 0xFF;
+		aiVersion[2] = (m_stUpdateInfo.uiUpgdVersion >> 8) & 0xFF;
+		aiVersion[3] = m_stUpdateInfo.uiUpgdVersion & 0xFF;
+	}
 
-	m_CEditVer1.GetWindowTextW(strVer1);
-	m_CEditVer2.GetWindowTextW(strVer2);
-	m_CEditVer3.GetWindowTextW(strVer3);
-	m_CEditVer4.GetWindowTextW(strVer4);
-
-	aszVersion[0] = (__u8)(_ttoi(strVer1));
-	aszVersion[1] = (__u8)(_ttoi(strVer2));
-	aszVersion[2] = (__u8)(_ttoi(strVer3));
-	aszVersion[3] = (__u8)(_ttoi(strVer4));
-
-	uiVersion = (aszVersion[0] << 24) | (aszVersion[1] << 16) | (aszVersion[2] << 8) | aszVersion[3];
+	uiVersion = (aiVersion[0] << 24) | (aiVersion[1] << 16) | (aiVersion[2] << 8) | aiVersion[3];
 
 	m_stUpdateInfo.uiUpgdVersion = uiVersion;
-
-	// Model 생성을 통해 이미 경로를 가지고 있음.
-	//memcpy(aszPath, m_aszMkFileName, 2048);
-	
-	// init파일로 만들기
 	
 	// 경로에 내 파일 생성
 	pFileCtrl = new Cls_GrFileCtrl(aszPath, TRUE, TRUE);
@@ -840,7 +796,7 @@ void CUpdateManagerDlg::InitMakeFile()
 BOOL CUpdateManagerDlg::DestroyWindow()
 {
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
-	InitMakeFile();
+	//InitMakeFile();
 	return CDialogEx::DestroyWindow();
 }
 
@@ -1001,98 +957,49 @@ void CUpdateManagerDlg::OnClickedButtonModelSavePath()
 // 모델 파일 생성 버튼
 void CUpdateManagerDlg::OnClickedButtonModelMakes()
 {
-	CString			strVer1;
-	CString			strVer2;
-	CString			strVer3;
-	CString			strVer4;
-	__u8			aszVersion[4]	= { 0 };
-	__u32			uiVersion		= 0;
-	Cls_GrFileCtrl* pFileCtrl		= NULL;
-
-
+	__u32	uiVersion = 0;
+	
 	if (NULL != m_pObjFwUp)
 	{
-		// String을 int로 받기
-		/*
-		aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
-		aiVersion[1] = this->GetDlgItemInt(IDC_EDIT_VERSION2);
-		aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
-		aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION4);
-		*/
-
-		m_CEditVer1.GetWindowTextW(strVer1);
-		m_CEditVer2.GetWindowTextW(strVer2);
-		m_CEditVer3.GetWindowTextW(strVer3);
-		m_CEditVer4.GetWindowTextW(strVer4);
-
-		aszVersion[0] = (__u8)(_ttoi(strVer1));
-		aszVersion[1] = (__u8)(_ttoi(strVer2));
-		aszVersion[2] = (__u8)(_ttoi(strVer3));
-		aszVersion[3] = (__u8)(_ttoi(strVer4));
-
-		uiVersion = (aszVersion[0] << 24) | (aszVersion[1] << 16) | (aszVersion[2] << 8) | aszVersion[3];
-
 		// 구조체에 버전 저장
 		m_pObjFwUp->SetUpdateVersion(uiVersion);
 
-		// 파일 만드는 클래스 할당
-		//pFileCtrl = new Cls_GrFileCtrl(m_aszMkModelName, FALSE, FALSE);
-		
-		/*if (TRUE == pFileCtrl->IsOpened())
-		{*/
-			// init파일 생성
-			//InitMakeFile();
-			InitMakeModel();
-			MessageBox(_T("Make Model Success"), NULL, MB_OK | MB_ICONWARNING);
-		//}
-		//else
-		//{
-			//MessageBox(_T("File Open Error"), _T("Error"), MB_OK | MB_ICONWARNING);
-		//}
-
-		if (NULL != pFileCtrl)
-		{
-			delete pFileCtrl;
-			pFileCtrl = NULL;
-		}
+		InitMakeModel();
+		MessageBox(_T("Make Model Success"), NULL, MB_OK | MB_ICONWARNING);
 	}
 }
 
-
-void CUpdateManagerDlg::InitMakeModel() // Model파일 만드는 함수
+// Model파일 만드는 함수
+void CUpdateManagerDlg::InitMakeModel() 
 {
 	CString			strFile;
-	CFileFind pFileFind;
-	BOOL bIsFile = pFileFind.FindFile(_T("*.init"));
-	TCHAR			aszPath[2048] = { 0 };
-	Cls_GrFileCtrl* pFileCtrl = NULL;
-	__u8			aszVersion[4] = { 0 };
-	__u32			uiVersion = 0;
-	int				iFileNameLen = 0;
-	CString			strVer1;
-	CString			strVer2;
-	CString			strVer3;
-	CString			strVer4;
+	CFileFind		pFileFind;
+	BOOL			bIsFile			= FALSE;
+	TCHAR			aszPath[2048]	= { 0 };
+	Cls_GrFileCtrl* pFileCtrl		= NULL;
+	int				aiVersion[4]	= { 0 };
+	__u32			uiVersion		= 0;
+	int				iFileNameLen	= 0;
 	CString			strMakeName;
 
 	m_stUpdateInfo.uiFcc = E_MkUpdt_IniFcc;
 
-	/*aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
-	aiVersion[1] = this->GetDlgItemInt(IDC_EDIT_VERSION2);
-	aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
-	aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION4);*/
+	if (!m_stUpdateInfo.uiUpgdVersion)
+	{
+		aiVersion[0] = this->GetDlgItemInt(IDC_EDIT_VERSION4);
+		aiVersion[1] = this->GetDlgItemInt(IDC_EDIT_VERSION3);
+		aiVersion[2] = this->GetDlgItemInt(IDC_EDIT_VERSION2);
+		aiVersion[3] = this->GetDlgItemInt(IDC_EDIT_VERSION1);
+	}
+	else
+	{
+		aiVersion[0] = (m_stUpdateInfo.uiUpgdVersion >> 24) & 0xFF;
+		aiVersion[1] = (m_stUpdateInfo.uiUpgdVersion >> 16) & 0xFF;
+		aiVersion[2] = (m_stUpdateInfo.uiUpgdVersion >> 8) & 0xFF;
+		aiVersion[3] = m_stUpdateInfo.uiUpgdVersion & 0xFF;
+	}
 
-	m_CEditVer1.GetWindowTextW(strVer1);
-	m_CEditVer2.GetWindowTextW(strVer2);
-	m_CEditVer3.GetWindowTextW(strVer3);
-	m_CEditVer4.GetWindowTextW(strVer4);
-
-	aszVersion[0] = (__u8)(_ttoi(strVer1));
-	aszVersion[1] = (__u8)(_ttoi(strVer2));
-	aszVersion[2] = (__u8)(_ttoi(strVer3));
-	aszVersion[3] = (__u8)(_ttoi(strVer4));
-
-	uiVersion = (aszVersion[0] << 24) | (aszVersion[1] << 16) | (aszVersion[2] << 8) | aszVersion[3];
+	uiVersion = (aiVersion[0] << 24) | (aiVersion[1] << 16) | (aiVersion[2] << 8) | aiVersion[3];
 
 	m_stUpdateInfo.uiUpgdVersion = uiVersion;
 	
@@ -1102,7 +1009,7 @@ void CUpdateManagerDlg::InitMakeModel() // Model파일 만드는 함수
 	// 파일이 존재하지 않으면 새로운 포맷으로 파일을 만들기
 	if (!bIsFile)
 	{
-		strMakeName.Format(_T("%s_V(%d%d%d%d).init"), m_aszMkModelName, aszVersion[0], aszVersion[1], aszVersion[2], aszVersion[3]);
+		strMakeName.Format(_T("%s_V(%d%d%d%d).init"), m_aszMkModelName, aiVersion[3], aiVersion[2], aiVersion[1], aiVersion[0]);
 		wsprintf(m_aszMkModelName, strMakeName.GetBuffer(0));
 	}
 	
@@ -1189,10 +1096,9 @@ void CUpdateManagerDlg::OnClickedButtonEntityDelete()
 
 void CUpdateManagerDlg::OnClickedButtonModelDelete()
 {
-	HTREEITEM stRootTree;
-	CFileFind pFileFind;
-	BOOL	bRet = FALSE;
-	int		iModelIdx = 0;
+	HTREEITEM	stRootTree;
+	CFileFind	pFileFind;
+	int			iModelIdx = 0;
 
 	stRootTree = m_CTreeCtrl.GetSelectedItem();
 
@@ -1215,7 +1121,8 @@ void CUpdateManagerDlg::OnClickedButtonModelDelete()
 			m_CTreeCtrl.DeleteItem(stRootTree); // 트리에서 모델 삭제
 
 			m_stUpdateInfo.astModelInfo[iModelIdx].uiType = 0; // 구조체에서 데이터 삭제 1
-			memset(m_stUpdateInfo.astModelInfo[iModelIdx].astEntity, 0, sizeof(_stUpdateInfoModel)); // 구조체에서 데이터 삭제 2	
+			memset(m_stUpdateInfo.astModelInfo[iModelIdx].astEntity, 0, sizeof(_stUpdateInfoModel)); // 구조체에서 데이터 삭제 2
+
 		}
 	}
 	else
