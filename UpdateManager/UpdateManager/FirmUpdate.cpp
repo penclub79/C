@@ -366,5 +366,20 @@ void CFirmUpdate::DelVerFile(int _iModelType, int _iVerFileType)
 			pFirmVerFile++;
 		}
 	}
+}
+
+// ¸ðµ¨ »èÁ¦
+void CFirmUpdate::DelModelType(int _iModelType)
+{
+	int iModelIdx = 0;
+	_stFirmUpInfo* pFirmInfo = NULL;
+	
+	iModelIdx = ChkModelType(_iModelType);
+
+	if (0 <= iModelIdx)
+	{
+		pFirmInfo = &m_stFirmHeader.FirmInfo[iModelIdx];
+		memset(pFirmInfo, 0, sizeof(_stFirmUpInfo));
+	}
 
 }

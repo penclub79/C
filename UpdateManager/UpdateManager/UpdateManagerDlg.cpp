@@ -703,7 +703,7 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 
 		// 구조체에 업데이트 경로+파일명 넣기
 		GrDumyZeroMem(m_stUpdateInfo.aszUpgdFileName, 1024);
-		GrStrWcopy(m_stUpdateInfo.aszUpgdFileName, (LPWSTR)(LPCTSTR)strPath);
+		GrStrWcopy(m_stUpdateInfo.aszUpgdFileName, m_aszMkFileName);
 		
 		if (TRUE == pFileCtrl->IsOpened())
 		{
@@ -726,7 +726,14 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 					bIsSuccess = TRUE;
 
 				//	// init파일 만드는 함수호출
-					InitMakeFile();
+					//InitMakeFile();
+					//if (pFileCtrl)
+					//{
+					//	if (pFileCtrl->IsOpened())
+					//	{	// 파일 생성
+					//		pFileCtrl->Write(&m_stUpdateInfo, sizeof(_stUpdateInfo));
+					//	}
+					//}
 					break;
 				}
 			}
@@ -741,6 +748,27 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 			free(pFileCtrl);
 			pFileCtrl = NULL;
 		}
+
+		// 삭제 로직
+		/*bRet = pFileFind.FindFile(m_aszMkModelName);
+		if (TRUE == bRet)
+		{
+			if (TRUE == DeleteFile(m_aszMkModelName))
+			{
+
+			}
+			else
+			{
+				AfxMessageBox(_T("Model File Delete Error."));
+			}
+
+			AfxMessageBox(_T("정상적으로 삭제 되었습니다."));
+		}
+		else
+		{
+			AfxMessageBox(_T("Model File is Not Exist"));
+		}*/
+
 	}
 	if (bIsSuccess)
 	{
@@ -787,7 +815,7 @@ void CUpdateManagerDlg::InitMakeFile()
 	m_stUpdateInfo.uiUpgdVersion = uiVersion;
 
 	// Model 생성을 통해 이미 경로를 가지고 있음.
-	memcpy(aszPath, m_aszMkModelName, 2048);
+	//memcpy(aszPath, m_aszMkFileName, 2048);
 	
 	// init파일로 만들기
 	
@@ -1155,35 +1183,43 @@ void CUpdateManagerDlg::OnClickedButtonEntityDelete()
 	}
 	else
 	{
-		MessageBox(_T("삭제할 파일을 선택해야 합니다."));
+		AfxMessageBox(_T("삭제할 파일을 선택해야 합니다."));
 	}
 }
 
 void CUpdateManagerDlg::OnClickedButtonModelDelete()
 {
-	HTREEITEM		stRootTree;
-
+	HTREEITEM stRootTree;
+	CFileFind pFileFind;
+	BOOL	bRet = FALSE;
 	int		iModelIdx = 0;
 
 	stRootTree = m_CTreeCtrl.GetSelectedItem();
-	while (stRootTree)
+
+	if (stRootTree)
 	{
-		stRootTree = m_CTreeCtrl.GetNextItem(stRootTree, TVGN_NEXT);
-		if (NULL == stRootTree)
+		while (stRootTree)
 		{
-			break;
+			stRootTree = m_CTreeCtrl.GetNextItem(stRootTree, TVGN_NEXT);
+			if (NULL == stRootTree)
+			{
+				break;
+			}
+			iModelIdx++;
 		}
-		iModelIdx++;
-	}
 
-	if (IDYES == AfxMessageBox(_T("해당 모델타입을 지우시겠습니까?"), MB_YESNO))
+		if (IDYES == AfxMessageBox(_T("해당 모델을 지우시겠습니까?"), MB_YESNO))
+		{
+
+			m_pObjFwUp->DelModelType(m_astTreeNode[iModelIdx].uiType); // 펌웨어 데이터 삭제
+			m_CTreeCtrl.DeleteItem(stRootTree); // 트리에서 모델 삭제
+
+			m_stUpdateInfo.astModelInfo[iModelIdx].uiType = 0; // 구조체에서 데이터 삭제 1
+			memset(m_stUpdateInfo.astModelInfo[iModelIdx].astEntity, 0, sizeof(_stUpdateInfoModel)); // 구조체에서 데이터 삭제 2	
+		}
+	}
+	else
 	{
-		AfxMessageBox(_T("OK"));
+		AfxMessageBox(_T("삭제할 모델을 선택해야 합니다."));
 	}
-	else if (IDNO)
-	{
-		AfxMessageBox(_T("NO"));
-	}
-
-
 }
