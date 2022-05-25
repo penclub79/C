@@ -36,7 +36,7 @@ typedef struct _stUpdateInfo
 	__u32					uiFcc;			//update ini 'Uini' 0x55696E69
 	__u32					uiUpgdVersion;
 	_stUpdateInfoModel		astModelInfo[16];
-	WCHAR					aszUpgdFileName[1024];
+	TCHAR					awszUpgdFileName[1024];
 } *pUpdateInfo;
 
 // ---------------------------------------------------- struct 
@@ -73,7 +73,7 @@ protected:
 
 	void TreeAddModel(int _iModelType); // 트리에 모델 추가
 	void TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* _pszFilePath, int _iFileLen); // 트리에 모델에서 버전파일 추가
-	void TreeAddVerFileNode(int _iModelType, int _iVerFileType, char* _pszFileName);
+	void TreeAddVerFileNode(int _iModelType, int _iVerFileType, CHAR* _pszFileName);
 	void ProcErrCode(int _iResult); // 에러 처리
 	void InitMakeFile();	// 업데이트 파일 만드는 함수
 	void InitMakeModel();	// Model파일 만드는 함수
@@ -82,11 +82,11 @@ protected:
 	int GetModelType(int _iIndex);
 
 private:
-	WCHAR				m_aszNowPath[2048];
+	TCHAR				m_awszNowPath[2048];
 	CFirmUpdate*		m_pObjFwUp;
 	_stUpdateTreeNode	m_astTreeNode[E_FirmUpInfoTypeMaxIdx];  // 24
-	WCHAR				m_aszMkFileName[1024];
-	WCHAR				m_aszMkModelName[2048];
+	TCHAR				m_awszMkFileName[1024];
+	TCHAR				m_awszMkModelName[2048];
 	_stUpdateInfo		m_stUpdateInfo;
 	CTreeCtrl			m_CTreeCtrl;
 	CEdit				m_CEditPath;

@@ -102,19 +102,3 @@ void DlgModelAdd::OnClickedButtonModelCancel()
 	m_bModalResult = FALSE;
 	CDialogEx::OnOK();
 }
-
-
-//
-//LRESULT DlgModelAdd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-//{
-//	switch (message)
-//	{
-//	case WM_CLOSE:
-//		break;
-//
-//	default:
-//		break;
-//	}
-//
-//	return CDialogEx::WindowProc(message, wParam, lParam);
-//}
