@@ -157,7 +157,6 @@ void DlgVerFileAdd::GetVerFileType(int* _piModelType, int* _piVerFileType, CHAR*
 void DlgVerFileAdd::OnClickedButtonVersionOk()
 {
 	m_bModalResult = TRUE;
-	//PostMessage(WM_CLOSE);
 	CDialogEx::OnOK();
 }
 
@@ -165,7 +164,6 @@ void DlgVerFileAdd::OnClickedButtonVersionOk()
 void DlgVerFileAdd::OnClickedButtonVersionCancel()
 {
 	m_bModalResult = FALSE;
-	//PostMessage(WM_CLOSE);
 	CDialogEx::OnOK();
 }
 
@@ -198,23 +196,4 @@ void DlgVerFileAdd::OnSelchangeComboChoiseFile()
 		m_iVerFileType = E_FirmUpEntityRootfs;
 		break;
 	}
-
 }
-
-
-//LRESULT DlgVerFileAdd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-//{
-//	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
-//
-//	switch (message)
-//	{
-//	case WM_CLOSE:
-//		Sleep(0);
-//		break;
-//
-//	default:
-//		break;
-//	}
-//
-//	return CDialogEx::WindowProc(message, wParam, lParam);
-//}

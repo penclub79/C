@@ -89,7 +89,7 @@ void DlgModelAdd::OnClickedButtonModelMake()
 {
 	//CDialogEx::OnOK();
 	m_bModalResult = TRUE;
-	PostMessage(WM_CLOSE);
+	CDialogEx::OnOK();
 }
 
 int	DlgModelAdd::GetModelType()
@@ -99,24 +99,22 @@ int	DlgModelAdd::GetModelType()
 
 void DlgModelAdd::OnClickedButtonModelCancel()
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	m_bModalResult = FALSE;
-	PostMessage(WM_CLOSE);
+	CDialogEx::OnOK();
 }
 
 
-
-LRESULT DlgModelAdd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
-	switch (message)
-	{
-	case WM_CLOSE:
-		break;
-
-	default:
-		break;
-	}
-
-	return CDialogEx::WindowProc(message, wParam, lParam);
-}
+//
+//LRESULT DlgModelAdd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+//{
+//	switch (message)
+//	{
+//	case WM_CLOSE:
+//		break;
+//
+//	default:
+//		break;
+//	}
+//
+//	return CDialogEx::WindowProc(message, wParam, lParam);
+//}

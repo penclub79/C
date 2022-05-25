@@ -75,21 +75,19 @@ protected:
 	void TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* _pszFilePath, int _iFileLen); // 트리에 모델에서 버전파일 추가
 	void TreeAddVerFileNode(int _iModelType, int _iVerFileType, char* _pszFileName);
 	void ProcErrCode(int _iResult); // 에러 처리
-	void InitMakeFile(); // init파일 만드는 함수
-	void InitMakeModel(); // Model파일 만드는 함수
+	void InitMakeFile();	// 업데이트 파일 만드는 함수
+	void InitMakeModel();	// Model파일 만드는 함수
 	BOOL CheckInit(pUpdateInfo _pstUpdateInfo);
 	int FindModelIndex(int _iModelType);
 	int GetModelType(int _iIndex);
 
 private:
-	WCHAR				m_szaNowPath[2048];
-
+	WCHAR				m_aszNowPath[2048];
 	CFirmUpdate*		m_pObjFwUp;
 	_stUpdateTreeNode	m_astTreeNode[E_FirmUpInfoTypeMaxIdx];  // 24
 	WCHAR				m_aszMkFileName[1024];
 	WCHAR				m_aszMkModelName[2048];
 	_stUpdateInfo		m_stUpdateInfo;
-
 	CTreeCtrl			m_CTreeCtrl;
 	CEdit				m_CEditPath;
 	CEdit				m_CEditModelPath;
@@ -100,14 +98,11 @@ private:
 	CButton				m_CBtnPath;
 	CButton				m_CBtnMake;
 	CString				m_strPathItem;
-	__u32				m_iWorteSize;
-	__u32				m_iWriteSize;
-	__u32				m_iResult;
-
+	
 
 	int FindTreeNode(int _iModelType);
 public:
-	afx_msg void OnClickedButtonModelCreate(); // 모델 추가
+	afx_msg void OnClickedButtonModelCreate();	// 모델 추가
 	afx_msg void OnClickedButtonEntitySelete(); // 버전 파일 선택
 	afx_msg void OnClickedButtonSavePath();
 	afx_msg void OnClickedButtonPackageMake();
@@ -115,10 +110,8 @@ public:
 	afx_msg void OnClickedButtonMainCancel();
 	virtual void OnOK();
 	afx_msg void OnClickedButtonModelLoad();
-//	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnClickedButtonEntityDelete();
 	afx_msg void OnClickedButtonModelMakes();
 	afx_msg void OnClickedButtonModelSavePath();
-	
 	afx_msg void OnClickedButtonModelDelete();
 };
