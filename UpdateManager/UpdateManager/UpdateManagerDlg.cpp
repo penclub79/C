@@ -241,7 +241,6 @@ void CUpdateManagerDlg::InitCtrl(pUpdateInfo _pstUpdateInfo)
 {
 	// Local -------------------------------
 	CString				strVersion;
-
 	pUpdateInfoModel	pstUpdateInfoModel	= { 0 };
 	TCHAR				aszVersion[32]		= { 0 };
 	CHAR*				pszFileName			= NULL;
@@ -398,8 +397,8 @@ void CUpdateManagerDlg::ProcErrCode(int _iResult)
 void CUpdateManagerDlg::OnClickedButtonEntitySelete()
 {
 	// Local ------------------------------
-	DlgVerFileAdd*	pDlgVerFileAdd;
 	CString			strModelName;
+	DlgVerFileAdd*	pDlgVerFileAdd		= NULL;
 	HTREEITEM		stTreeItem			= { 0 };
 	int				iModelType			= 0;
 	int				iModelIdx			= 0;
@@ -466,7 +465,7 @@ void CUpdateManagerDlg::TreeAddVerFile(int _iModelIdx, int _iVerFileType, CHAR* 
 	CString			strPath;
 	CString			strFileName;
 	Cls_GrFileCtrl* pFileCtrl			= NULL; // 라이브러리
-	CHAR			aszMulFileName[64] = { 0 };
+	CHAR			aszMulFileName[64]	= { 0 };
 	PCHAR			pszBuff				= NULL;
 	int				iModelType			= 0;
 	int				iVerFileType		= 0;
@@ -686,7 +685,7 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 			// GEtMakeUpdate에서 받아온 파일 사이즈 담기
 			uiWriteSize = uiFileSize;
 			
-			while (TRUE == bIsSuccess)
+			while (!bIsSuccess)
 			{
 				// Write함수에 파일 포인터, 파일 사이즈로 결과값 담기
 				uiResult = pFileCtrl->Write(pFile, uiWriteSize);
@@ -706,32 +705,13 @@ void CUpdateManagerDlg::OnClickedButtonPackageMake()
 		{
 			MessageBox(_T("File Open Error"), _T("Error"), MB_OK | MB_ICONWARNING);
 		}
+
 		// 메모리 해제
 		if (NULL != pFileCtrl)
 		{
 			free(pFileCtrl);
 			pFileCtrl = NULL;
 		}
-
-		// 삭제 로직
-		/*bRet = pFileFind.FindFile(m_aszMkModelName);
-		if (TRUE == bRet)
-		{
-			if (TRUE == DeleteFile(m_aszMkModelName))
-			{
-
-			}
-			else
-			{
-				AfxMessageBox(_T("Model File Delete Error."));
-			}
-
-			AfxMessageBox(_T("정상적으로 삭제 되었습니다."));
-		}
-		else
-		{
-			AfxMessageBox(_T("Model File is Not Exist"));
-		}*/
 
 	}
 	if (bIsSuccess)
