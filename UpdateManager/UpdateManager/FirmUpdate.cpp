@@ -9,15 +9,18 @@
 
 CFirmUpdate::CFirmUpdate()
 {
+	__u8		Tv_WkCnt;
+	__u8		Tv_WkIdx;
+
 	m_stFirmEd		= { 0 };
 	m_stFirmHeader	= { 0 };
 	m_pMakeUpdate	= NULL;
 	
-	for (int iModelIdx = 0; iModelIdx < E_FirmUpInfoCnt; iModelIdx++)
+	for (Tv_WkCnt = 0; Tv_WkCnt < E_FirmUpInfoCnt; Tv_WkCnt++)
 	{
-		for (int iEntiIdx = 0; iEntiIdx < E_FirmUpEntityCnt; iEntiIdx++)
+		for (Tv_WkIdx = 0; Tv_WkIdx < E_FirmUpEntityCnt; Tv_WkIdx++)
 		{
-			m_pData[iModelIdx][iEntiIdx] = NULL;
+			m_pData[Tv_WkCnt][Tv_WkIdx] = NULL;
 		}
 	}
 
@@ -25,15 +28,19 @@ CFirmUpdate::CFirmUpdate()
 
 CFirmUpdate::~CFirmUpdate()
 {
+
+	__u8		Tv_WkCnt;
+	__u8		Tv_WkIdx;
+
 	// m_pData NULL 체크
-	for (int iModelIdx = 0; iModelIdx < E_FirmUpInfoCnt; iModelIdx++)
+	for (Tv_WkCnt = 0; Tv_WkCnt < E_FirmUpInfoCnt; Tv_WkCnt++)
 	{
-		for (int iEntiIdx = 0; iEntiIdx < E_FirmUpEntityCnt; iEntiIdx++)
+		for (Tv_WkIdx = 0; Tv_WkIdx < E_FirmUpEntityCnt; Tv_WkIdx++)
 		{
-			if (NULL != m_pData[iModelIdx][iEntiIdx])
+			if (NULL != m_pData[Tv_WkCnt][Tv_WkIdx])
 			{
-				free(m_pData[iModelIdx][iEntiIdx]);
-				m_pData[iModelIdx][iEntiIdx] = NULL;
+				free(m_pData[Tv_WkCnt][Tv_WkIdx]);
+				m_pData[Tv_WkCnt][Tv_WkIdx] = NULL;
 			}
 		}
 	}
@@ -53,6 +60,8 @@ void CFirmUpdate::FirmInit()
 	pFirmUpInfo		stFirmUpInfo	= { 0 };
 	pFirmUpEnd		stFirmEnd		= { 0 };
 	BOOL			bIsExist		= FALSE;
+	__s32			Tv_WkIdx;
+	__s32			Tv_WkCnt;
 	// ---------------------------------------------
 
 	GrDumyZeroMem(&m_stFirmHeader,	sizeof(_stFirmUpHeader));
@@ -66,14 +75,14 @@ void CFirmUpdate::FirmInit()
 	m_stFirmHeader.Size = sizeof(_stFirmUpHeader) + sizeof(_stFirmUpEnd);
 
 	// m_pData NULL 체크
-	for (int iModelIdx = 0; iModelIdx < E_FirmUpInfoCnt; iModelIdx++)
+	for (Tv_WkIdx = 0; Tv_WkIdx < E_FirmUpInfoCnt; Tv_WkIdx++)
 	{
-		for (int iEntiIdx = 0; iEntiIdx < E_FirmUpEntityCnt; iEntiIdx++)
+		for (Tv_WkCnt = 0; Tv_WkCnt < E_FirmUpEntityCnt; Tv_WkCnt++)
 		{
-			if (NULL != m_pData[iModelIdx][iEntiIdx])
+			if (NULL != m_pData[Tv_WkIdx][Tv_WkCnt])
 			{
-				free(m_pData[iModelIdx][iEntiIdx]);
-				m_pData[iModelIdx][iEntiIdx] = NULL;
+				free(m_pData[Tv_WkIdx][Tv_WkCnt]);
+				m_pData[Tv_WkIdx][Tv_WkCnt] = NULL;
 			}
 		}
 	}
@@ -94,7 +103,7 @@ int	CFirmUpdate::AddModelType(int _iModelType)
 	int			iResult			= 0;
 	pFirmUpInfo stFirmUpInfo	= { 0 };
 	BOOL		bIsExist		= FALSE;
-	int			iModelIdx		= 0;
+	int			iIndex			= 0;
 	// ---------------------------------------------
 
 	iResult = E_FirmUpErrCode;
@@ -113,14 +122,14 @@ int	CFirmUpdate::AddModelType(int _iModelType)
 		if (!bIsExist)
 		{
 			// 빈 슬롯을 찾는다. (빈 슬롯이 있어야 모델을 추가할 수 있음)
-			iModelIdx = ChkModelType(E_FirmUpInfoTypeNone);
+			iIndex = ChkModelType(E_FirmUpInfoTypeNone);
 
 			// 에러가 아닐때
-			if (E_FirmUpErrCode != iModelIdx)
+			if (E_FirmUpErrCode != iIndex)
 			{
-				stFirmUpInfo = &m_stFirmHeader.FirmInfo[iModelIdx];
+				stFirmUpInfo = &m_stFirmHeader.FirmInfo[iIndex];
 				stFirmUpInfo->ModelType = _iModelType;
-				iResult = iModelIdx;
+				iResult = iIndex;
 			}
 		}
 	}
@@ -136,20 +145,19 @@ int	CFirmUpdate::AddModelType(int _iModelType)
 int	CFirmUpdate::ChkModelType(unsigned int _uiModelType)
 {
 	// local ---------------------------------------
-	int			iResult			= 0;
-	pFirmUpInfo stFirmUpInfo	= { 0 };
+	int iResult = 0;
+	pFirmUpInfo stFirmUpInfo = { 0 };
 	// ---------------------------------------------
-
 	iResult = E_FirmUpErrCode;
 
 	stFirmUpInfo = m_stFirmHeader.FirmInfo;
 	
 	// E_FirmUpInfoCnt = 16
-	for (int iIndex = 0; iIndex < E_FirmUpInfoCnt; iIndex++)
+	for (int i = 0; i < E_FirmUpInfoCnt; i++)
 	{
 		if (stFirmUpInfo->ModelType == _uiModelType)
 		{
-			iResult = iIndex;
+			iResult = i;
 			break;
 		}
 
@@ -162,28 +170,30 @@ int	CFirmUpdate::ChkModelType(unsigned int _uiModelType)
 int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, char* _pSrc, int _iFileSize)
 {
 	// Local --------------------------------------
-	int		iResult		= 0;
-	int		iModelIdx	= 0;
-	int		iEntiIdx	= 0;
+	int iResult		= 0;
+	int iModelIdx	= 0;
+	int iVerFileIdx = 0;
+	__s32		Tv_WkIdx;
+	__s32		Tv_EttIdx;
 	//---------------------------------------------
 
 	iResult = E_FirmUpErrCode;
 
 	// 트리에 모델이 없으면 -1
-	iModelIdx = ChkModelType(_iModelType);
+	Tv_WkIdx = ChkModelType(_iModelType);
 
 	// 트리에 모델타입이 있을때
-	if (0 <= iModelIdx)
+	if (0 <= Tv_WkIdx)
 	{
 		// 버전 파일타입 check시 없으면 -1 반환
-		if (0 > ChkEntityType(_iVerFileType, m_stFirmHeader.FirmInfo[iModelIdx].Entity))
+		if (0 > ChkEntityType(_iVerFileType, m_stFirmHeader.FirmInfo[Tv_WkIdx].Entity))
 		{
-			iEntiIdx = ChkEntityType(E_FirmUpEntityNone, m_stFirmHeader.FirmInfo[iModelIdx].Entity);
+			Tv_EttIdx = ChkEntityType(E_FirmUpEntityNone, m_stFirmHeader.FirmInfo[Tv_WkIdx].Entity);
 
-			if (NULL == m_pData[iModelIdx][iEntiIdx])
+			if (NULL == m_pData[Tv_WkIdx][Tv_EttIdx])
 			{
 				
-				m_pData[iModelIdx][iEntiIdx] = malloc(_iFileSize);
+				m_pData[Tv_WkIdx][Tv_EttIdx] = malloc(_iFileSize);
 				//m_pData[iModelIdx][iVerFileIdx] = new char[_iFileSize];// <----- 이 코드로 인해 알수없는 곳에서 버그가 계속 발생
 
 				/*
@@ -191,14 +201,14 @@ int	CFirmUpdate::AddVerFile(int _iModelType, int _iVerFileType, char* _pSrc, int
 					new char[]로 변경하면 에러가 나지 않음.
 				*/
 
-				if (NULL != m_pData[iModelIdx][iEntiIdx])
+				if (NULL != m_pData[Tv_WkIdx][Tv_EttIdx])
 				{
-					m_stFirmHeader.FirmInfo[iModelIdx].Entity[iEntiIdx].Size = _iFileSize;
-					m_stFirmHeader.FirmInfo[iModelIdx].Entity[iEntiIdx].Type = _iVerFileType;
+					m_stFirmHeader.FirmInfo[Tv_WkIdx].Entity[Tv_EttIdx].Size = _iFileSize;
+					m_stFirmHeader.FirmInfo[Tv_WkIdx].Entity[Tv_EttIdx].Type = _iVerFileType;
 
-					GrDumyCopyMem(m_pData[iModelIdx][iEntiIdx], _pSrc, _iFileSize);
+					GrDumyCopyMem(m_pData[Tv_WkIdx][Tv_EttIdx], _pSrc, _iFileSize);
 					m_stFirmHeader.Size = m_stFirmHeader.Size + _iFileSize; 
-					iResult = iEntiIdx;
+					iResult = Tv_EttIdx;
 				}
 				else
 				{
@@ -268,13 +278,14 @@ void CFirmUpdate::SetUpdateVersion(unsigned int _uiVersion)
 void* CFirmUpdate::GetMakeUpdate(unsigned int* _puiSize)
 {
 	//m_stFirmHeader m_pMakeUpdate
-	// Local --------------------------------------
-	void*			pvResult;
-	unsigned char*	puszUpdtMem;
-	unsigned int	uiUpdtPos;
-	//---------------------------------------------
-
-	pvResult = NULL;
+		// local -------------------
+	void*		Tv_Result;
+	__u8*		Tv_PtrUpdt;
+	__u8		Tv_MdCnt;
+	__u8		Tv_EttCnt;
+	__u32		Tv_UpdtPos;
+	// code --------------------
+	Tv_Result = NULL;
 
 	if (0 < m_stFirmHeader.Size)
 	{
@@ -286,49 +297,47 @@ void* CFirmUpdate::GetMakeUpdate(unsigned int* _puiSize)
 		}
 
 		m_pMakeUpdate = malloc(m_stFirmHeader.Size);
-		puszUpdtMem = (unsigned char*)m_pMakeUpdate;
+		Tv_PtrUpdt = (__u8*)m_pMakeUpdate;
 		if (NULL != m_pMakeUpdate)
 		{
-			puszUpdtMem = puszUpdtMem + sizeof(m_stFirmHeader);
-			uiUpdtPos = sizeof(m_stFirmHeader);
-			for (int iModelIdx = 0; iModelIdx < E_FirmUpInfoCnt; iModelIdx++)
+			Tv_PtrUpdt = Tv_PtrUpdt + sizeof(m_stFirmHeader);
+			Tv_UpdtPos = sizeof(m_stFirmHeader);
+			for (Tv_MdCnt = 0; Tv_MdCnt < E_FirmUpInfoCnt; Tv_MdCnt++)
 			{
-				for (int iEntiIdx = 0; iEntiIdx < E_FirmUpEntityCnt; iEntiIdx++)
+				for (Tv_EttCnt = 0; Tv_EttCnt < E_FirmUpEntityCnt; Tv_EttCnt++)
 				{
-					if (NULL != m_pData[iModelIdx][iEntiIdx])
+					if (NULL != m_pData[Tv_MdCnt][Tv_EttCnt])
 					{
-						GrDumyCopyMem(puszUpdtMem, m_pData[iModelIdx][iEntiIdx], m_stFirmHeader.FirmInfo[iModelIdx].Entity[iEntiIdx].Size);
-						m_stFirmHeader.FirmInfo[iModelIdx].Entity[iEntiIdx].Offset = uiUpdtPos;
+						GrDumyCopyMem(Tv_PtrUpdt, m_pData[Tv_MdCnt][Tv_EttCnt], m_stFirmHeader.FirmInfo[Tv_MdCnt].Entity[Tv_EttCnt].Size);
+						m_stFirmHeader.FirmInfo[Tv_MdCnt].Entity[Tv_EttCnt].Offset = Tv_UpdtPos;
 
-						uiUpdtPos = uiUpdtPos + m_stFirmHeader.FirmInfo[iModelIdx].Entity[iEntiIdx].Size;
-						puszUpdtMem = puszUpdtMem + m_stFirmHeader.FirmInfo[iModelIdx].Entity[iEntiIdx].Size;
+						Tv_UpdtPos = Tv_UpdtPos + m_stFirmHeader.FirmInfo[Tv_MdCnt].Entity[Tv_EttCnt].Size;
+						Tv_PtrUpdt = Tv_PtrUpdt + m_stFirmHeader.FirmInfo[Tv_MdCnt].Entity[Tv_EttCnt].Size;
 					}
 				}
 			}
 
 			//make end
-			GrDumyCopyMem(puszUpdtMem, &m_stFirmEd, sizeof(_stFirmUpEnd));
+			GrDumyCopyMem(Tv_PtrUpdt, &m_stFirmEd, sizeof(_stFirmUpEnd));
 
 			//make header
-			puszUpdtMem = (unsigned char*)m_pMakeUpdate;
-			GrDumyCopyMem(puszUpdtMem, &m_stFirmHeader, sizeof(_stFirmUpHeader));
+			Tv_PtrUpdt = (__u8*)m_pMakeUpdate;
+			GrDumyCopyMem(Tv_PtrUpdt, &m_stFirmHeader, sizeof(_stFirmUpHeader));
 
 			*_puiSize = m_stFirmHeader.Size;
-			pvResult = m_pMakeUpdate;
+			Tv_Result = m_pMakeUpdate;
 		}
 	}
 
-	return pvResult;
+	return Tv_Result;
 }
 
 // 버전 삭제
 void CFirmUpdate::DelVerFile(int _iModelType, int _iVerFileType)
 {
-	// Local --------------------------------------
 	int iModelIdx					= 0;
 	_stFirmUpInfo*	pFirmInfo		= NULL;
 	_stFirmUpEntity* pFirmVerFile	= NULL;
-	//---------------------------------------------
 
 	iModelIdx = ChkModelType(_iModelType);
 
@@ -361,12 +370,10 @@ void CFirmUpdate::DelVerFile(int _iModelType, int _iVerFileType)
 // 모델 삭제
 void CFirmUpdate::DelModelType(int _iModelType)
 {
-	// Local --------------------------------------
 	int iModelIdx = 0;
 	int iEntiIdx = 0;
 	_stFirmUpInfo* pFirmInfo = NULL;
 	_stFirmUpEntity* pFirmVerFile = NULL;
-	//---------------------------------------------
 
 	iModelIdx = ChkModelType(_iModelType);
 	pFirmVerFile = pFirmInfo->Entity;
