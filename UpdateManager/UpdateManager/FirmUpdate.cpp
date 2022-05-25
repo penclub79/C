@@ -324,9 +324,11 @@ void* CFirmUpdate::GetMakeUpdate(unsigned int* _puiSize)
 // 버전 삭제
 void CFirmUpdate::DelVerFile(int _iModelType, int _iVerFileType)
 {
+	// Local --------------------------------------
 	int iModelIdx					= 0;
 	_stFirmUpInfo*	pFirmInfo		= NULL;
 	_stFirmUpEntity* pFirmVerFile	= NULL;
+	//---------------------------------------------
 
 	iModelIdx = ChkModelType(_iModelType);
 
@@ -359,10 +361,12 @@ void CFirmUpdate::DelVerFile(int _iModelType, int _iVerFileType)
 // 모델 삭제
 void CFirmUpdate::DelModelType(int _iModelType)
 {
+	// Local --------------------------------------
 	int iModelIdx = 0;
 	int iEntiIdx = 0;
 	_stFirmUpInfo* pFirmInfo = NULL;
 	_stFirmUpEntity* pFirmVerFile = NULL;
+	//---------------------------------------------
 
 	iModelIdx = ChkModelType(_iModelType);
 	pFirmVerFile = pFirmInfo->Entity;

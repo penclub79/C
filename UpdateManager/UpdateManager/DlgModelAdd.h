@@ -33,7 +33,5 @@ private:
 public:
 	afx_msg void OnClickedButtonModelMake();
 	afx_msg void OnClickedButtonModelCancel();
-
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };
 
