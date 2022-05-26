@@ -19,17 +19,20 @@ typedef struct _stUpdateTreeNode
 	CHAR					aszNode[16];
 } *pUpdateTreeNode;
 
+
 typedef struct _stUpdateInfoEntity
 {
 	__u32					uiType;
 	CHAR					aszFile[256];
 } *pUpdateInfoEntity;
 
+
 typedef struct _stUpdateInfoModel
 {
 	__u32					uiType;
 	_stUpdateInfoEntity		astEntity[16];
 } *pUpdateInfoModel;
+
 
 typedef struct _stUpdateInfo
 {
