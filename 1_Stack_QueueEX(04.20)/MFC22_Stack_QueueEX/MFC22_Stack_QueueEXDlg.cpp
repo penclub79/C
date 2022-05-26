@@ -49,13 +49,13 @@ END_MESSAGE_MAP()
 
 CMFC22_Stack_QueueEXDlg::CMFC22_Stack_QueueEXDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMFC22_Stack_QueueEXDlg::IDD, pParent)
-	, m_pstrCheckRadio(NULL)
-	, m_bIsStack(TRUE)
+	
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-
-	m_pStack = NULL;
-	m_pQueue = NULL;
+	m_hIcon				= AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_pStack			= NULL;
+	m_pQueue			= NULL;
+	m_pstrCheckRadio	= NULL;
+	m_bIsStack			= TRUE;
 }
 
 CMFC22_Stack_QueueEXDlg::~CMFC22_Stack_QueueEXDlg()
@@ -212,8 +212,10 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString strValue;
-	int iValue	= 0;
-	int iIndex	= 0;
+	int		iValue		= 0;
+	int		iIndex		= 0;
+	int		iStrLen		= 0;
+	WCHAR*	pwszBuff	= NULL;
 
 	GetDlgItemText(IDC_EDIT_INPUT, strValue);
 
@@ -221,12 +223,10 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	{
 		if (NULL != m_pStack)									
 		{
-			int iStrLen = strValue.GetLength();
-			WCHAR* szBuff = NULL;
+			iStrLen = strValue.GetLength();
+			pwszBuff = strValue.GetBuffer(sizeof(WCHAR) * iStrLen + 1);
 
-			szBuff = strValue.GetBuffer(sizeof(WCHAR) * iStrLen + 1);
-
-			m_pStack->Push((char*)szBuff, sizeof(WCHAR) * iStrLen);
+			m_pStack->Push((char*)pwszBuff, sizeof(WCHAR) * iStrLen);
 
 			strValue.ReleaseBuffer();
 
@@ -237,11 +237,10 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPush()
 	{	
 		if (NULL != m_pQueue)
 		{
-			int iStrLen = strValue.GetLength();
-			WCHAR* szBuff = NULL;
-			szBuff = strValue.GetBuffer(sizeof(WCHAR)* iStrLen + 1);
+			iStrLen = strValue.GetLength();
+			pwszBuff = strValue.GetBuffer(sizeof(WCHAR) * iStrLen + 1);
 
-			m_pQueue->EnQueue((char*)szBuff, sizeof(WCHAR) * iStrLen);
+			m_pQueue->EnQueue((char*)pwszBuff, sizeof(WCHAR) * iStrLen);
 
 			strValue.ReleaseBuffer();
 
@@ -268,7 +267,7 @@ void CMFC22_Stack_QueueEXDlg::OnClickedButtonPop()
 			if (iCount > 0)
 			{
 				stLinkData.pszBuffer = new unsigned char[MAX_PATH];
-				memset(stLinkData.pszBuffer, 0, sizeof(unsigned char)*MAX_PATH);
+				memset(stLinkData.pszBuffer, 0, sizeof(unsigned char) * MAX_PATH);
 
 				bResult = m_pStack->Pop(&stLinkData);
 

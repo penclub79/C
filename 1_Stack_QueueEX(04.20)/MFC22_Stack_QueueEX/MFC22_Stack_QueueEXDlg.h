@@ -33,23 +33,19 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
-	
 	void ReDrawList();
 	BOOL IsNumeric(CString _stValue);
 
-	bool m_bIsStack;	// Stack Check
+	BOOL m_bIsStack;	// Stack Check
 	CButton* m_pstrCheckRadio;  // 라디오 버튼 체크
 	CStack* m_pStack;
 	CQueue* m_pQueue;
+	CListBox m_ctlListBox;
 //	CListBox m_strListBox;
 	// 리스트 박스
 public:
 	afx_msg void OnRadioStack();
 	afx_msg void OnRadioQueue();
 	afx_msg void OnClickedButtonPush();
-
-protected:
-	CListBox m_ctlListBox;
-public:
 	afx_msg void OnClickedButtonPop();
 };
