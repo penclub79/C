@@ -1,6 +1,11 @@
 ﻿# 펌웨어 업데이트 프로그램
 
-개인 라이브러리 : Grlib 사용
+
+* 프로젝트 구성
+
+***다이얼로그 사용***
+
+개인 라이브러리 : **Grlib 사용**
 
 
 ## Grlib 적용을 위한 솔루션 설정 
@@ -19,3 +24,11 @@
 
 ## 펌웨어 업데이트 프로그램 실행 화면 
 --- 
+* 기본 화면
+![image](https://user-images.githubusercontent.com/40047360/170393126-4d29d825-f0ca-46fd-b325-b45427aefa39.png)
+
+* 펌웨어 모델 생성동작
+![펌웨어 모델 생성](https://user-images.githubusercontent.com/40047360/170394921-0eafce6a-5885-47d1-8f93-77b5178ac3f2.gif)
+
+* 펌웨어 모델 생성 및 버전 파일적용한 패키지 생성
+![패키지 생성](https://user-images.githubusercontent.com/40047360/170395466-c44fa6fb-3eb0-4dda-afcb-88dd8a739760.gif)
