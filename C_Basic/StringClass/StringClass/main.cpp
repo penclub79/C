@@ -18,17 +18,12 @@ int main()
 	
 
 	// 메모리 할당 해제
-	if (NULL != pstr)
-	{
-		delete[] pstr;
-		pstr = NULL;
-	}
+	delete[] pstr;
+	pstr = NULL;
+		
+	delete[] pnew;
+	pnew = NULL;
 
-	if (NULL != pnew)
-	{
-		delete[] pnew;
-		pnew = NULL;
-	}
 
 	return 0;
 }
