@@ -83,8 +83,6 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 	//DWORD dwFlag;
 	//TCHAR szName[256];
 	//BOOL					bInternet			= FALSE;
-
-
 	pszBuff = new char[1024];
 	memset(pszBuff, 0, 1024);
 
@@ -146,9 +144,6 @@ DWORD WINAPI CBasicSock::ThreadProc(LPVOID _lpParam)
 		
 		// 로그인 성공시
 		// 라스트 리시브 데이터 타임 비교 - 예를들어 마지막으로 받은 데이터 시간과 10초 동안 아무일이 없으면 끊으면 된다.
-		
-		
-
 		
 		/*
 		FD_ACCEPT	:접속한 클라이언트가 있다
