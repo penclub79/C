@@ -164,21 +164,6 @@ HCURSOR CMFC5_DialogBoxExDlg::OnQueryDragIcon()
 }
 
 
-
-void CMFC5_DialogBoxExDlg::UpdateComboBox()
-{
-	int nCnt = m_listbox.GetCount();
-	m_cbListItem.ResetContent();
-
-	for (int i = 0; i < nCnt; i++)
-	{
-		CString strItem;
-		strItem.Format(_T("리스트 항목 : %d"), i + 1);
-		m_cbListItem.AddString(strItem);
-	}
-}
-
-
 void CMFC5_DialogBoxExDlg::OnRadio1()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
@@ -277,5 +262,18 @@ void CMFC5_DialogBoxExDlg::OnClickedButtonDelete()
 	else
 	{
 		AfxMessageBox(_T("콤보 박스에서 삭제할 아이템을 선택하세요."));
+	}
+}
+
+void CMFC5_DialogBoxExDlg::UpdateComboBox()
+{
+	int nCnt = m_listbox.GetCount();
+	m_cbListItem.ResetContent();
+
+	for (int i = 0; i < nCnt; i++)
+	{
+		CString strItem;
+		strItem.Format(_T("리스트 항목 : %d"), i + 1);
+		m_cbListItem.AddString(strItem);
 	}
 }
