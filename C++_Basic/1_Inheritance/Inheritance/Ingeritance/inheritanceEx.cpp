@@ -1,5 +1,8 @@
 #include <iostream>
 #include <stdlib.h>
+#include <string.h>
+#include <cstring>
+#define _CRT_SECURE_NO_WARNINGS
 
 using namespace std;
 
@@ -17,6 +20,12 @@ public:
 	{
 		pszCarName = new char[strlen(_pszCarName) + 1];
 		strcpy(pszCarName, _pszCarName);
+		
+		if (NULL != pszCarName)
+		{
+			delete pszCarName;
+			pszCarName = NULL;
+		}
 	}
 	~Car(){}
 
@@ -39,6 +48,8 @@ public:
 	{
 		iSpeed -= 10;
 	}
+
+	
 };
 
 class Sedan : public Car
