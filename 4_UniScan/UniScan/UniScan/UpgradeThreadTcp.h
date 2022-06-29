@@ -1,10 +1,7 @@
 //
-// Copyright (C) Since 2013 VISIONHITECH. All rights reserved.
+// Copyright (C) Since 2022 DAYOU. All rights reserved.
 // 
 // Description: TCP Firmware upgrade support
-//
-// History:
-//    2013-05-07 made by cgkim and source copy by hkeins
 //
 #pragma once
 
@@ -12,6 +9,7 @@
 #include <afxinet.h>
 #include "UpgradeDefine.h"
 #include "MessageQueue.h"
+#include "./Network/NetScanVision.h"
 
 #define MAX_WAIT_CHECK_COUNT		90	// 리붓이 될때 까지 대기 루프를 도는 횟수
 #define MAX_REBOOT_CHECK_COUNT		120	// 대기가 끝나고 접속시도 횟수

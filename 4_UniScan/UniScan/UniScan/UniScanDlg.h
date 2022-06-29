@@ -6,13 +6,13 @@
 #include "afxwin.h"
 
 //#include "NetDef_IPUTIL.h"
+#include "./Network/NetCommon.h"
 #include "./Network/NetScanVision.h"
 #include "./Network/NetScanMarkIn.h"
 
 #include "ConnectCheckThread.h"
 #include <vector>
 //#include "MyListCtrl.h"
-// 2013-01-30 hkeins : Check List ctrl code separate, jwjang add
 #include "CheckListCtrl.h"
 #include "VHNetworkAdaptorInfo.h"
 

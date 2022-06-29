@@ -57,7 +57,6 @@ BOOL CFactoryDefaultDlg::OnInitDialog()
 
 	ASSERT(m_pScanInfo != NULL); // 다이얼로그 실행 전에 배열 형태로 초기화 해야한다.
 	//////////////////////////////////////////////////////////////////////////
-	// 2010-08-26 hkeins server scan
 	// server list column initialize
 	// ----------------------------------------------------------------------
 	// 0    1             2       3                  4             5
@@ -123,7 +122,6 @@ BOOL CFactoryDefaultDlg::OnInitDialog()
 
 	AddData();
 #ifdef _DEFAULT_ID_PASSWORD_
-	//{{ 2013-07-19 hkeins : 생산 부 요청으로 ID/Pasword 디폴트 값을 admin/1234로 넣었음
 	m_strID       = L"admin";
 	m_strPassword = L"1234";
 

@@ -1,8 +1,7 @@
 //
-// Copyright (C) Since 2013 VISIONHITECH. All rights reserved.
+// Copyright (C) Since 2022 DAYOU. All rights reserved.
 // 
 // Description: interface of live activex class
-// Date: 2013-05-08 hkeins ports from IPScanUtil, made by jwjang
 //
 #pragma once
 

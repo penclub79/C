@@ -1,10 +1,6 @@
 //
-// Copyright (C) Since 2010 VISIONHITECH. All rights reserved.
+// Copyright (C) Since 2022 DAYOU. All rights reserved.
 // 
-// Description: Server scanning class
-// Date: 2010-08-26 hkeins first release
-//       2011-10-12 hkeins Scan 정보 확장
-// Author: hkeins
 //
 #pragma once
 
@@ -23,19 +19,15 @@
 #include "NetScanBase.h"
 
 //
-// Copyright (C) Since 2010 VISIONHITECH. All rights reserved.
+// Copyright (C) Since 2022 DAYOU. All rights reserved.
 // 
 // Description: Network Define second version
-// IP camera 샘플용 프로토콜을 버리고 자사에서 정의한 프로토콜을 사용하도록 수정
-//
-// Date: 2010-08-11
-// Author: hkeins
 //
 #pragma once
 
 const USHORT MAGIC2_CODE = 0x7668;
-// 2010-09-07 hkeins : AxLive에서 해상도를 늘렸을 경우 화면이 멈추는 문제 때문에 64 --> 512Kb로 네트워크 버퍼 크기를 늘림
-const UINT NET_BUF2_SIZE = 1024 * 1024; // 2012-08-09 hkeins : 3M pixel 및 저조도 영상을 대비하기 위해 네트워크 버퍼 크기를 기존 512 KB -> 1024 KB(1MB)로 변경
+
+const UINT NET_BUF2_SIZE = 1024 * 1024;
 
 enum VERSION_PROTOCAL
 {
@@ -208,7 +200,6 @@ typedef struct tagEvItem {
 	int   nIndex;
 } EVITEM, FAR* PEVITEM;
 
-// 2011-07-19 hkeins : ONVIF를 위해 PTZ command 확장
 typedef struct tagPTZCMD {
 	int   nCommand;
 	int   nIndex;
@@ -289,7 +280,6 @@ public:
 	virtual BOOL StartScan();
 	virtual BOOL SendScanRequest();
 
-	//// 2010-08-27 hkeins : change IP configuration
 	//static BOOL RequestIPChange(WCHAR* strTargetServerMAC, WCHAR* strNewIP, WCHAR* strNewGateWay, int nStreamPort = 2700, int nHTTPPort = 80);
 	//static BOOL RequestIPChange2(WCHAR* strTargetServerMAC, WCHAR* strNewIP, WCHAR* strNewGateWay, int nStreamPort = 2700, int nHTTPPort = 80, int cIsDHCP = 0, WCHAR* strNewsubnetMask = L"255.255.255.0", WCHAR* szID = L"", WCHAR* szPass = L"", int nEncMode = 0);
 

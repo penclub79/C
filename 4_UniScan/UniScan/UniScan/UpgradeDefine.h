@@ -1,10 +1,6 @@
 //
-// Copyright (C) Since 2013 VISIONHITECH. All rights reserved.
+// Copyright (C) Since 2022 DAYOU. All rights reserved.
 // 
-// Description: Firmware upgrade by TCP class
-//
-// History:
-//    2013-05-07 made by cgkim and source copy by hkeins
 //
 
 #pragma once

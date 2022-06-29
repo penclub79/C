@@ -147,33 +147,33 @@ BEGIN_MESSAGE_MAP(CUniScanDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
-	ON_MESSAGE(WM_SCAN_MSG, &CUniScanDlg::OnScanMsg)
-	ON_MESSAGE(WM_SCAN_CLOSE_DLG_MSG, &CUniScanDlg::OnScanCloseDlgMsg)
-	ON_MESSAGE(WM_CONNECT_CHECK, &CUniScanDlg::OnConnectCheck)
-	ON_MESSAGE(WM_SORT_REQUEST, &CUniScanDlg::OnSortRequest)
 	ON_WM_DESTROY()
 	ON_WM_GETMINMAXINFO()
 	ON_WM_SIZE()
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
-	ON_COMMAND(ID_SETUP_SETUP, &CUniScanDlg::OnSetupResolution)
-	ON_COMMAND(ID_SETUP_OSDSETUP, &CUniScanDlg::OnSetupOSD)
-	ON_NOTIFY(NM_RCLICK, IDC_SVR_LIST, &CUniScanDlg::OnNMRClickSvrList)
-	ON_NOTIFY(NM_CLICK, IDC_SVR_LIST, &CUniScanDlg::OnNMClickSvrList)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_SVR_LIST, &CUniScanDlg::OnLvnItemchangedSvrList)
-	ON_NOTIFY(NM_DBLCLK, IDC_SVR_LIST, &CUniScanDlg::OnNMDblclkSvrList3)
+	ON_MESSAGE(WM_SCAN_MSG,						&CUniScanDlg::OnScanMsg)
+	ON_MESSAGE(WM_SCAN_CLOSE_DLG_MSG,			&CUniScanDlg::OnScanCloseDlgMsg)
+	ON_MESSAGE(WM_CONNECT_CHECK,				&CUniScanDlg::OnConnectCheck)
+	ON_MESSAGE(WM_SORT_REQUEST,					&CUniScanDlg::OnSortRequest)
+	ON_COMMAND(ID_SETUP_SETUP,					&CUniScanDlg::OnSetupResolution)
+	ON_COMMAND(ID_SETUP_OSDSETUP,				&CUniScanDlg::OnSetupOSD)
+	ON_NOTIFY(NM_RCLICK, IDC_SVR_LIST,			&CUniScanDlg::OnNMRClickSvrList)
+	ON_NOTIFY(NM_CLICK, IDC_SVR_LIST,			&CUniScanDlg::OnNMClickSvrList)
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_SVR_LIST,	&CUniScanDlg::OnLvnItemchangedSvrList)
+	ON_NOTIFY(NM_DBLCLK, IDC_SVR_LIST,			&CUniScanDlg::OnNMDblclkSvrList3)
 	//ON_CBN_SELCHANGE(IDC_PROTOCAL_COMBO,		&CUniScanDlg::OnCbnSelchangeProtocalCombo)
-	ON_BN_CLICKED(IDOK, &CUniScanDlg::OnBnClickedOk)
-	ON_BN_CLICKED(IDCANCEL, &CUniScanDlg::OnBnClickedCancel)
-	ON_BN_CLICKED(IDC_SCAN_BTN, &CUniScanDlg::OnBnClickedScanBtn)
-	ON_BN_CLICKED(IDC_CHANGEIP_BTN, &CUniScanDlg::OnBnClickedChangeipBtn2)
-	ON_BN_CLICKED(IDC_CLOSE, &CUniScanDlg::OnBnClickedClose)
-	ON_BN_CLICKED(IDC_CLEAR_BTN, &CUniScanDlg::OnBnClickedClearBtn)
-	//ON_BN_CLICKED(IDC_UPGRADE_BTN,				&CUniScanDlg::OnBnClickedUpgradeBtn)
-	ON_BN_CLICKED(IDC_FACTORY_BTN, &CUniScanDlg::OnBnClickedFactoryBtn)
-	ON_CBN_SELCHANGE(IDC_ADAPTOR_CMB, &CUniScanDlg::OnCbnSelchangeAdaptorCmb)
+	ON_BN_CLICKED(IDOK,							&CUniScanDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL,						&CUniScanDlg::OnBnClickedCancel)
+	ON_BN_CLICKED(IDC_SCAN_BTN,					&CUniScanDlg::OnBnClickedScanBtn)
+	ON_BN_CLICKED(IDC_CHANGEIP_BTN,				&CUniScanDlg::OnBnClickedChangeipBtn2)
+	ON_BN_CLICKED(IDC_CLOSE,					&CUniScanDlg::OnBnClickedClose)
+	ON_BN_CLICKED(IDC_CLEAR_BTN,				&CUniScanDlg::OnBnClickedClearBtn)
+	//ON_BN_CLICKED(IDC_UPGRADE_BTN,			&CUniScanDlg::OnBnClickedUpgradeBtn)
+	ON_BN_CLICKED(IDC_FACTORY_BTN,				&CUniScanDlg::OnBnClickedFactoryBtn)
+	ON_CBN_SELCHANGE(IDC_ADAPTOR_CMB,			&CUniScanDlg::OnCbnSelchangeAdaptorCmb)
 	//ON_COMMAND(IDC_PROTOCAL_COMBO, &CUniScanDlg::OnProtocalCombo)
-	ON_BN_CLICKED(IDC_OPEN_XML, &CUniScanDlg::OnClickedOpenXml)
+	ON_BN_CLICKED(IDC_OPEN_XML,					&CUniScanDlg::OnClickedOpenXml)
 END_MESSAGE_MAP()
 
 
@@ -213,7 +213,6 @@ BOOL CUniScanDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	//////////////////////////////////////////////////////////////////////////
-	// 2010-08-26 hkeins server scan
 	// server list column initialize
 	// ----------------------------------------------------------------------
 	// 0    1             2       3                  4             5
@@ -614,7 +613,6 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		////////////////////////////////////////
 		//{{ 중복제거 //////////////////////////
 
-		// 20110208-hkeins : BUG fix. find by MAC address(old : find by ip address)
 		// 시나리오상 IP가 중복될 수도 있음
 
 		for (i = 0; i < m_cSvrList.GetItemCount(); i++)
@@ -978,12 +976,12 @@ void  CUniScanDlg::ClearScanList()
 		if (pInfo)
 		{
 			//		TRACE(_T("MAC: %s\n"), pInfo->szMAC);
-			delete pInfo; // 2012-08-07 : hkeins Memory leak bug fix
+			delete pInfo;
 			pInfo = NULL;
 		}
 	}
 	m_cSvrList.DeleteAllItems();
-	m_cSvrList.ClearState(); // 2003-01-30 hkeins : list sorting function add
+	m_cSvrList.ClearState();
 	//	TRACE(_T("ClearScanList <--\n"));
 }
 
@@ -1662,7 +1660,6 @@ void CUniScanDlg::OnNMDblclkSvrList3(NMHDR *pNMHDR, LRESULT *pResult)
 	// 리스트 컨트롤에서 데이터가 있는 영역의 마우스 우 클릭 팝업 메뉴 띄우기
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 
-	// 2012-08-07 hkeins : 더블 클릭 시 Setup 화면을 실행하도록 적용
 	if (m_nCurSvrListSel >= 0)
 	{
 		CString szHttpAddress;
@@ -1779,7 +1776,6 @@ LRESULT CUniScanDlg::OnConnectCheck(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-// 2013-01-30 hkeins : List sorting function add
 //WM_SORT_REQUEST
 // ----------------------------------------------------------------------------------------------------
 //   0           1             2             3            4             5              6                              

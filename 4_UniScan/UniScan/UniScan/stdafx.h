@@ -67,7 +67,6 @@ const UINT TM_SCANNING_ANI = 1000; // scanning animate timer
 //const UINT TM_SCANNING		= 1001; // scan request timer
 
 
-// 2013-01-30 hkeins : sort function impl.
 extern int  _CompareIP(WCHAR* szIP1, WCHAR* szIP2);
 inline BOOL _ParseIP(WCHAR* szIP, int* nP1, int* nP2, int* nP3, int* nP4);
 

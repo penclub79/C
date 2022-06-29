@@ -1,10 +1,7 @@
 //
-// Copyright (C) Since 2013 VISIONHITECH. All rights reserved.
+// Copyright (C) Since 2022 DAYOU. All rights reserved.
 // 
 // Description: Network adaptor information
-// History:
-// 2013-07-15 hkeins : Network adaptor information (IP address, MAC address etc)
-// ref. library      : Iphlpapi.lib
 //
 #pragma once
 #include <vector>

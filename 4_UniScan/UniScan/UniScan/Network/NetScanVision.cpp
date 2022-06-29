@@ -1,5 +1,5 @@
 #include "..\StdAfx.h"
-#include "NetCommon.h"
+
 #include "NetScanVision.h"
 #include <atlconv.h>
 
@@ -64,7 +64,6 @@ CString tagSCAN_STRUCT::_ReadValues() // 모든 값을 읽여서 Caption : Value 값으로
 	return str;
 }
 
-// 2013-01-31 hkeins : 현재 display 항목
 // ----------------------------------------------------------------------------------------------------
 //   0           1             2             3            4             5              6                              
 // | IP        | MAC Address | Stream Port | Http Port  | System Name | Model Type   | Firmware Version | 
@@ -153,7 +152,6 @@ BOOL CNetScanVision::StartScan()
 }
 
 
-// 2010-08-26 hkeins : Camera scanning routine
 // scanner logic
 void CNetScanVision::thrReceiver()
 {
@@ -171,7 +169,6 @@ void CNetScanVision::thrReceiver()
 	LPCAPTION_HEADER	lpCapt			= NULL;
 	DWORD				dwLastError		= 0;
 	BOOL				bIsSuccessBind	= FALSE;
-
 	SOCKADDR			stSockAddr;
 
 	bIsSuccessBind = SocketBind();
@@ -198,7 +195,7 @@ void CNetScanVision::thrReceiver()
 
 		while (this->m_dwScanThreadID)
 		{
-			if (SOCKET_ERROR == recvfrom(m_hReceiveSock, m_pReceive_buffer, SCAN_INFO_m_pReceive_buffer_SIZE, 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
+			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, SCAN_INFO_m_pReceive_buffer_SIZE, 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
 			{
 				dwLastError = WSAGetLastError();
 				TRACE("Vision recvfrom error = %d\n", dwLastError);
@@ -235,7 +232,7 @@ void CNetScanVision::thrReceiver()
 						{
 							pScanInfo->cIsDHCP = pInfo2->cIsDHCP;
 							//WideCopyStringFromAnsi(pScanInfo->szGateWay, 30, pInfo2->szGatewayIP);
-							WideCopyStringFromAnsi(pScanInfo->szSubnetMask, 30, pInfo2->szSubnetmask); // 2012-07-10 hkeins : scan utility subnet mask reading 오류 수정
+							WideCopyStringFromAnsi(pScanInfo->szSubnetMask, 30, pInfo2->szSubnetmask);
 						}
 
 						pExtField = NULL;
@@ -278,7 +275,7 @@ void CNetScanVision::thrReceiver()
 										//TRACE( pExtInfos[i].aszCaption );
 										//TRACE( L" = " );
 
-										pExtInfos[i].nValueLen = lpCapt->nDataLen + 2; // 2012-08-07 hkeins : 데이터 길이를 복사하지 않는 버그 수정
+										pExtInfos[i].nValueLen = lpCapt->nDataLen + 2;
 
 										pszTemp = new CHAR[pExtInfos[i].nValueLen];
 

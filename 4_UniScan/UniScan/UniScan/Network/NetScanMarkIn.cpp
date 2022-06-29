@@ -1,5 +1,4 @@
 #include "../StdAfx.h"
-#include "NetScanVision.h"
 #include "NetScanMarkIn.h"
 #include <atlconv.h>
 

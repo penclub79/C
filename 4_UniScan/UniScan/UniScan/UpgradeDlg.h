@@ -3,7 +3,7 @@
 #include "resource.h"
 #include "afxcmn.h"
 #include "afxwin.h"
-#include "Network\\NetScanVision.h"
+#include "./Network/NetScanVision.h"
 #include "UpgradeThreadTcp.h"
 #include "UpgradeThreadHttp.h"
 #include "ProgressListCtrl.h"

@@ -1,8 +1,6 @@
 //
-// Copyright (C) Since 2013 VISIONHITECH. All rights reserved.
+// Copyright (C) Since 2022 DAYOU. All rights reserved.
 // 
-// Description: ip camera connection check class
-// 2013-01-30 hkeins : connection check thread test
 // 
 //
 #pragma once

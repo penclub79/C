@@ -1,9 +1,6 @@
 //
-// Copyright (C) Since 2013 VISIONHITECH. All rights reserved.
+// Copyright (C) Since 2022 DAYOU. All rights reserved.
 // 
-// Description: ip camera connection check class
-// 2013-01-30 hkeins : Check List ctrl code separate, jwjang add
-// first column check box and column click separation
 //
 //
 #include "stdafx.h"
@@ -68,7 +65,6 @@ void CCheckHeadCtrl::OnItemClicked(NMHDR* pNMHDR, LRESULT* pResult)
 
 	if (0 == nItem)
 	{
-		// 2013-01-30 hkeins : first column check box and column click separation
 		POINT pt = { 0, };
 		::GetCursorPos(&pt);
 		::ScreenToClient(GetSafeHwnd(), &pt);

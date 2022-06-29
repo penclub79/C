@@ -46,7 +46,7 @@ public:
 	CString GetEditText(int iIndex, int iSubIndex);
 	void ResizeEdit();
 	void DeleteEdit(int iIndex, int iSubIndex);
-	void SetFocusEdit(int iIndex, int iSubIndex); // 2013-07-19 hkeins : Add set focus on edit function
+	void SetFocusEdit(int iIndex, int iSubIndex); 
 
 	void CreateColumns();
 	void InitHdr();

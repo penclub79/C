@@ -1,9 +1,7 @@
 //
-// Copyright (C) Since 2013 VISIONHITECH. All rights reserved.
+// Copyright (C) Since 2022 DAYOU. All rights reserved.
 // 
 // Description: ip camera connection check class
-// 2013-01-30 hkeins : Check List ctrl code separate, jwjang add
-// first column check box and column click separation
 //
 //
 #ifndef _CHECK_LIST_CTRL_V1_

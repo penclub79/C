@@ -180,7 +180,6 @@ BOOL CIPChangeDlg2::OnInitDialog()
 	OnBnClickedButReset();
 
 	//////////////////////////////////////////////////////////////////////////
-	// 2010-08-26 hkeins server scan
 	// server list column initialize
 	// ----------------------------------------------------------------------
 	// 0    1             2       3                  4             5
@@ -273,7 +272,6 @@ BOOL CIPChangeDlg2::OnInitDialog()
 
 
 #ifdef _DEFAULT_ID_PASSWORD_
-	//{{ 2013-07-19 hkeins : 생산 부 요청으로 ID/Pasword 디폴트 값을 admin/1234로 넣었음
 	m_strID = L"admin";
 	m_strPassword = L"1234";
 

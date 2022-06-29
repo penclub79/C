@@ -73,7 +73,7 @@ typedef struct tagSCAN_STRUCT
 	}
 	~tagSCAN_STRUCT()
 	{
-		SAFE_DELETEA(pExtScanInfos); // 2012-01-02 : hkeins memory delete error fix. DELETE vs DELETEA 동작 차이에 의해 메모리 해제시 오류가 발생
+		SAFE_DELETEA(pExtScanInfos);
 	}
 
 	tagSCAN_STRUCT& operator = (tagSCAN_STRUCT& src)
@@ -121,27 +121,27 @@ typedef struct tagSCAN_STRUCT
 
 	BOOL operator == (tagSCAN_STRUCT& src)
 	{
-		if (0 != wcscmp(this->szMAC, src.szMAC))			return FALSE;
-		if (0 != wcscmp(this->szGateWay, src.szGateWay))			return FALSE;
-		if (0 != wcscmp(this->szSubnetMask, src.szSubnetMask))			return FALSE;
-		if (0 != wcscmp(this->szSwVersion, src.szSwVersion))			return FALSE;
-		if (0 != wcscmp(this->szModelName, src.szModelName))			return FALSE;
+		if (0 != wcscmp(this->szMAC, src.szMAC))				return FALSE;
+		if (0 != wcscmp(this->szGateWay, src.szGateWay))		return FALSE;
+		if (0 != wcscmp(this->szSubnetMask, src.szSubnetMask))	return FALSE;
+		if (0 != wcscmp(this->szSwVersion, src.szSwVersion))	return FALSE;
+		if (0 != wcscmp(this->szModelName, src.szModelName))	return FALSE;
 
 		//if( this->nStreamPort			!= src.nStreamPort		)			return FALSE;
-		if (this->nHTTPPort != src.nHTTPPort)			return FALSE;
-		if (this->version != src.version)			return FALSE;
-		if (this->cIsDHCP != src.cIsDHCP)			return FALSE;
-		if (this->nExtraFieldCount != src.nExtraFieldCount)			return FALSE;
-		if (this->iBasePort != src.iBasePort)			return FALSE;
-		if (this->iVideoCnt != src.iVideoCnt)			return FALSE;
+		if (this->nHTTPPort != src.nHTTPPort)					return FALSE;
+		if (this->version != src.version)						return FALSE;
+		if (this->cIsDHCP != src.cIsDHCP)						return FALSE;
+		if (this->nExtraFieldCount != src.nExtraFieldCount)		return FALSE;
+		if (this->iBasePort != src.iBasePort)					return FALSE;
+		if (this->iVideoCnt != src.iVideoCnt)					return FALSE;
 
 		for (int i = 0; i < src.nExtraFieldCount; i++)
 		{
-			if (this->pExtScanInfos[i].nValueLen != src.pExtScanInfos[i].nValueLen)			return FALSE;
+			if (this->pExtScanInfos[i].nValueLen != src.pExtScanInfos[i].nValueLen)	return FALSE;
 			if (this->pExtScanInfos[i].nValueLen)
 			{
-				if (0 != wcscmp(this->pExtScanInfos[i].aszCaption, src.pExtScanInfos[i].aszCaption))		return FALSE;
-				if (0 != wcscmp(this->pExtScanInfos[i].lpszValue, src.pExtScanInfos[i].lpszValue))		return FALSE;
+				if (0 != wcscmp(this->pExtScanInfos[i].aszCaption, src.pExtScanInfos[i].aszCaption)) return FALSE;
+				if (0 != wcscmp(this->pExtScanInfos[i].lpszValue, src.pExtScanInfos[i].lpszValue)) return FALSE;
 			}
 		}
 		return TRUE;

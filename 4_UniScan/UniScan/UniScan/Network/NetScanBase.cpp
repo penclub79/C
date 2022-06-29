@@ -15,6 +15,7 @@ NetScanBase::NetScanBase()
 	m_ulBindAddress		= 0;
 	m_iRevPort			= 0;
 	m_lCloseMsg			= 0;
+	m_hReceiveSock		= 0;
 }
 
 NetScanBase::~NetScanBase()
@@ -85,7 +86,6 @@ BOOL NetScanBase::SocketBind()
 		}
 
 		ThreadExit();
-		return FALSE;
 	}
 
 	SOCKADDR_IN		stSockAddr;
