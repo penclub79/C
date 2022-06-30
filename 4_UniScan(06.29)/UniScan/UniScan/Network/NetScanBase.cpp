@@ -86,6 +86,7 @@ BOOL NetScanBase::SocketBind()
 		}
 
 		ThreadExit();
+		return FALSE;
 	}
 
 	SOCKADDR_IN		stSockAddr;
