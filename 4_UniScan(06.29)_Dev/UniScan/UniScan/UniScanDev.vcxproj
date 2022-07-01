@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A1DF5AAD-B045-4EF1-A7F6-CCDD247211C3}</ProjectGuid>
+    <ProjectGuid>{5CAA1152-8223-474A-9A9C-FD8043969099}</ProjectGuid>
     <RootNamespace>UniScan</RootNamespace>
     <Keyword>MFCProj</Keyword>
   </PropertyGroup>
@@ -172,6 +172,7 @@
   <ItemGroup>
     <Image Include="res\bitmap1.bmp" />
     <Image Include="res\checkboxes.bmp" />
+    <Image Include="res\IP-scaner_Icon.ico" />
     <Image Include="res\UniScan.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

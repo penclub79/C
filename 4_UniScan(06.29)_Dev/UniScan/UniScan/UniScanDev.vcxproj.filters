@@ -212,5 +212,8 @@
     <Image Include="res\checkboxes.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="res\IP-scaner_Icon.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>
