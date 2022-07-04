@@ -278,6 +278,7 @@ BOOL CUniScanDlg::OnInitDialog()
 
 	m_apScanner[0] = new CNetScanMarkIn();
 	m_apScanner[1] = new CNetScanVision();
+	m_apScanner[2] = new CNetScanOnvif();
 
 	m_btnChangeIP.EnableWindow(TRUE);
 

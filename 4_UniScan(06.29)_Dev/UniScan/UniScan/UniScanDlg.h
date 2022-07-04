@@ -9,6 +9,7 @@
 #include "./Network/NetCommon.h"
 #include "./Network/NetScanVision.h"
 #include "./Network/NetScanMarkIn.h"
+#include "NetScanOnvif.h"
 
 #include "ConnectCheckThread.h"
 #include <vector>
@@ -16,7 +17,7 @@
 #include "CheckListCtrl.h"
 #include "VHNetworkAdaptorInfo.h"
 
-#define COUNT_SCAN_CLIENT	2
+#define COUNT_SCAN_CLIENT	3
 
 // CUniScanDlg 대화 상자
 class CUniScanDlg : public CDialog
