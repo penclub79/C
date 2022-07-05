@@ -2,6 +2,13 @@
 
 #include "./Network/NetScanBase.h"
 
+
+typedef struct _ONVIFINFO
+{
+	char* pszInfo;
+}ONVIFINFO;
+
+
 class CNetScanOnvif : public NetScanBase
 {
 public:
@@ -13,7 +20,7 @@ public:
 
 protected:
 	static DWORD thrOnvifScanThread(LPVOID pParam);
-	void thrOnvifGetInfo();
+	void thrOnvifReceiver();
 
 private:
 

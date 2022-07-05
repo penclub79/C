@@ -3,7 +3,7 @@
 #define MK_UDP_REQ_PORT		9010
 #define MK_UDP_RSP_PORT		9011
 #define VH_UDP_SCAN_PORT	64988
-#define ONVIF_
+#define ONVIF_PORT			3702
 
 
 
