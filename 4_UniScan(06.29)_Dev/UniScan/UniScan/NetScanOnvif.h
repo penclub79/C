@@ -5,7 +5,7 @@
 
 typedef struct _ONVIFINFO
 {
-	char* pszInfo;
+	char szInfo[SCAN_INFO_m_pReceive_buffer_SIZE];
 }ONVIFINFO;
 
 

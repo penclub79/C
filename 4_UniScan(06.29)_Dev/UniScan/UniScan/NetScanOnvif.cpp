@@ -26,7 +26,6 @@ DWORD CNetScanOnvif::thrOnvifScanThread(LPVOID pParam)
 
 BOOL CNetScanOnvif::StartScan()
 {
-	m_iRevPort = ONVIF_PORT;
 	this->StartScanF((LPTHREAD_START_ROUTINE)thrOnvifScanThread);
 	return TRUE;
 }
@@ -35,24 +34,30 @@ void CNetScanOnvif::thrOnvifReceiver()
 {
 	BOOL		bIsSuccessBind = FALSE;
 	SOCKADDR	stSockAddr;
-	int			iRevLen = 0;
 	char*		pszBuff = NULL;
 	int			iRecvSock = 0;
 	SOCKET		recvSock;
-	sockaddr_in	multicast_addr;
+	sockaddr_in	multicast_addr, other_addr;
+	int			iRevLen = sizeof(other_addr);
 	//in_addr		local_addr;
-	char*			pszIpAddr = "239.255.255.250";
-	char*			pszLocalIp = "192.168.0.90";
 	struct		ip_mreq mreq;
+	//ONVIFINFO*	pReceive		= NULL;
+	LPXNode lpHeader = NULL;
+	LPXNode lpBody = NULL;
+	LPXNode lpBodyCommon = NULL;
+	LPXNode lpItemData = NULL;
+	XNode	stNode;
+
 
 	recvSock = socket(AF_INET, SOCK_DGRAM, 0);
 	memset(&multicast_addr, 0, sizeof(multicast_addr));
 
 	multicast_addr.sin_family = AF_INET;
-	multicast_addr.sin_addr.s_addr = inet_addr(pszIpAddr); // 남는 IP를 자동으로 적용해주는 함수
+	multicast_addr.sin_addr.s_addr = inet_addr("192.168.0.90"); // 남는 IP를 자동으로 적용해주는 함수
+	//multicast_addr.sin_port = htons(0);
 	multicast_addr.sin_port = htons(m_iRevPort);
 
-	mreq.imr_multiaddr = multicast_addr.sin_addr;
+	mreq.imr_multiaddr.s_addr = inet_addr("239.255.255.250");
 	mreq.imr_interface.s_addr = htonl(INADDR_ANY);
 
 	// 멀티캐스트 그룹 가입
@@ -60,7 +65,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 	{
 		TRACE("IP_ADD_MEMBERSHIP error\n");
 	}
-
 
 	if (SOCKET_ERROR == bind(recvSock, (struct sockaddr*)&multicast_addr, sizeof(multicast_addr)))
 	{
@@ -70,26 +74,70 @@ void CNetScanOnvif::thrOnvifReceiver()
 
 	//if (bIsSuccessBind)
 	//{
+	m_pReceive_buffer = new char[SCAN_INFO_m_pReceive_buffer_SIZE];
+	//pReceive = (ONVIFINFO*)m_pReceive_buffer;
+	memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_m_pReceive_buffer_SIZE);
+
+
+	while (this->m_dwScanThreadID)
+	{
+		//if (SOCKET_ERROR == recvfrom(recvSock, m_pReceive_buffer, sizeof(pszBuff), 0, (SOCKADDR*)&stSockAddr, &iRevLen))
+		if (SOCKET_ERROR == recvfrom(recvSock, m_pReceive_buffer, sizeof(SCAN_INFO_m_pReceive_buffer_SIZE), 0, (SOCKADDR*)&stSockAddr, &iRevLen))
+		{
+			TRACE("recvfrom error\n");
+			this->ThreadExit();
+			break;
+		}
+		
+			TRACE("recvfrom Success\n");
+	}
+	//}
+
+	return;
+
+
+	// UDP 소켓 생성
+	recvSock = socket(AF_INET, SOCK_DGRAM, 0);
+	memset(&multicast_addr, 0, sizeof(multicast_addr));
+
+	// 멀티 캐스트 주소 정보 초기화
+	multicast_addr.sin_family = AF_INET;
+	multicast_addr.sin_addr.s_addr = inet_addr("192.168.0.90"); // 남는 IP를 자동으로 적용해주는 함수
+	multicast_addr.sin_port = htons(multicast_addr.sin_port);
+	
+	if (SOCKET_ERROR == bind(recvSock, (struct sockaddr*)&multicast_addr, sizeof(multicast_addr)))
+	{
+		TRACE("bind error\n");
+	}
+
+	// 가입
+	mreq.imr_multiaddr.s_addr = inet_addr("239.255.255.250");
+	mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+
+	// 멀티캐스트 그룹 가입
+	if (SOCKET_ERROR == setsockopt(recvSock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)))
+	{
+		TRACE("IP_ADD_MEMBERSHIP error\n");
+	}
+
+
+	//if (bIsSuccessBind)
+	//{
 		m_pReceive_buffer = new char[SCAN_INFO_m_pReceive_buffer_SIZE];
 		memset(m_pReceive_buffer, 0, sizeof(char)*SCAN_INFO_m_pReceive_buffer_SIZE);
-		m_pReceive_buffer = (char*)pszBuff;
 
 		while (this->m_dwScanThreadID)
 		{
 			//if (SOCKET_ERROR == recvfrom(recvSock, m_pReceive_buffer, sizeof(pszBuff), 0, (SOCKADDR*)&stSockAddr, &iRevLen))
-			if (SOCKET_ERROR == recvfrom(recvSock, m_pReceive_buffer, sizeof(pszBuff), 0, (SOCKADDR*)&stSockAddr, &iRevLen))
+			if (SOCKET_ERROR == recvfrom(recvSock, m_pReceive_buffer, sizeof(SCAN_INFO_m_pReceive_buffer_SIZE), 0, (SOCKADDR*)&other_addr, &iRevLen))
 			{
 				TRACE("recvfrom error\n");
 				this->ThreadExit();
 				break;
 			}
 
-			if (m_pReceive_buffer)
-			{
-				TRACE("recvfrom Success\n");
-				this->ThreadExit();
-				break;
-			}
+			
+			TRACE("recvfrom Success\n");
 		}
 	//}
 	
@@ -98,14 +146,14 @@ void CNetScanOnvif::thrOnvifReceiver()
 
 BOOL CNetScanOnvif::SendScanRequest()
 {
-	sockaddr_in OnvifSendSock;
-	BOOL		bEnable			= NULL;
+	sockaddr_in OnvifSendSock = { 0 }, OnvifRecvSock = { 0 };
+	int			iEnable			= 1;
 	SOCKET		hSendSock		= NULL;
 	ONVIFINFO*	stOnvifInfo		= NULL;
-	//FILE*		pFile			= NULL;
 	DWORD		dwFileSize		= 0;
 	const char*	szIpAddr		= "239.255.255.250";
 	int			iSize			= 0;
+	int			iRevLen = 0;
 
 	enum { ENUM_PROBE_MSG, ENUM_HELLO_MSG };
 
@@ -155,22 +203,35 @@ BOOL CNetScanOnvif::SendScanRequest()
 	//stNode.Load(pszBuff);
 
 	hSendSock = socket(AF_INET, SOCK_DGRAM, 0);
-	if (SOCKET_ERROR == setsockopt(hSendSock, SOL_SOCKET, SO_BROADCAST, (char*)&bEnable, sizeof(bEnable)))
+	if (SOCKET_ERROR == setsockopt(hSendSock, SOL_SOCKET, SO_BROADCAST, (const char*)&iEnable, sizeof(int)))
 	{
 		TRACE(_T("SetSocket Error = %d\n", WSAGetLastError()));
+		closesocket(hSendSock);
 		return FALSE;
 	}
 
 	OnvifSendSock.sin_family = AF_INET;
-	OnvifSendSock.sin_port = htons(m_iRevPort);
-	OnvifSendSock.sin_addr.s_addr = inet_addr(szIpAddr); //멀티캐스트
+	OnvifSendSock.sin_port = htons(3702);
+	OnvifSendSock.sin_addr.s_addr = inet_addr(szIpAddr);
 
 	iSize = strlen(g_xmlSchs[0]);
-	//if (SOCKET_ERROR == sendto(hSendSock, g_xmlSchs[0], sizeof(pszBuff), 0, (SOCKADDR*)&OnvifSendSock, sizeof(sockaddr_in)))
-	if (SOCKET_ERROR == sendto(hSendSock, g_xmlSchs[0], iSize, 0, (SOCKADDR*)&OnvifSendSock, sizeof(sockaddr_in)))
+	if (SOCKET_ERROR == sendto(hSendSock, g_xmlSchs[0], iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(sockaddr_in)))
 	{
 		TRACE("Send Error");
+		closesocket(hSendSock);
+		return FALSE;
 	}
+	socklen_t len = sizeof(OnvifRecvSock);
+	if (-1 == getsockname(hSendSock, (struct sockaddr*)&OnvifRecvSock, &len))
+	{
+		perror("getSockname Error");
+	}
+	else
+	{
+		TRACE(_T("%d"), ntohs(OnvifRecvSock.sin_port));
+		m_iRevPort = ntohs(OnvifRecvSock.sin_port);
+	}
+
 
 	return TRUE;
 }
