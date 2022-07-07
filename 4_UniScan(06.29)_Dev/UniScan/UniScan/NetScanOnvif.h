@@ -22,6 +22,11 @@ protected:
 	static DWORD thrOnvifScanThread(LPVOID pParam);
 	void thrOnvifReceiver();
 
+	BOOL CreateSocket();
+	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
+
+	BOOL m_bConnected;
+
 private:
 
 };

@@ -393,7 +393,7 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		msg.LoadString(IDS_STATUS_SCANNING);
 		SetStatusMsg(msg);
 
-		m_apScanner[2]->SendScanRequest();
+
 		// start set
 		for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
 		{
