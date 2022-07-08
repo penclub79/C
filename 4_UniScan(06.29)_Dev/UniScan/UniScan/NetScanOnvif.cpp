@@ -231,9 +231,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 	DWORD		dwFileSize		= 0;
 	const char*	szIpAddr		= "239.255.255.250";
 	int			iSize			= 0;
-	int			iRevLen = 0;
 	char		szMessageID[128] = { 0 };
-	
 	int			iReuse = 1;
 	int			iError = 0;
 
@@ -256,24 +254,13 @@ BOOL CNetScanOnvif::SendScanRequest()
 			      </Probe>\
 			   </Body>\
 			</Envelope>",
-		// Hello message
+		// GetDeviceInformation
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
-		<env:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:dn=\"http://www.onvif.org/ver10/network/wsdl\" xmlns:env=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
-			<env:Header>\
-				<wsa:MessageID>uuid:%s</wsa:MessageID>\
-				<wsa:To>urn:schemas-xmlsoap-org:ws:2005:04:discovery</wsa:To>\
-				<wsa:Action>http://schemas.xmlsoap.org/ws/2005/04/discovery/Hello</wsa:Action>\
-				<d:AppSequence InstanceId=\"1077004800\" MessageNumber=\"1\" />\
-			</env:Header>\
-			<env:Body>\
-				<d:Hello>\
-					<wsa:EndPointReference>\
-					<wsa:Address>uuid:%s</wsa:Address>\
-					</wsa:EndPointReference>\
-					<d:MetadataVersion>1000</d:MetadataVersion>\
-				</d:Hello>\
-			</env:Body>\
-		</env:Envelope>",
+			<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:tds=\"http://www.onvif.org/ver10/device/wsdl\">\
+				<SOAP-ENV:Body>\
+					<tds:GetDeviceInformation/>\
+				</SOAP-ENV:Body>\
+			</SOAP-ENV:Envelope>",
 	};
 	//pFile = fopen("D:\\C_IPScanner\\IP_Scanner\\Probe.txt", "rb");
 	//fseek(pFile, 0, SEEK_END);
@@ -284,25 +271,17 @@ BOOL CNetScanOnvif::SendScanRequest()
 	//fread(pszBuff, 1, dwFileSize, pFile);
 	//stNode.Load(pszBuff);
 
+
+	// 家南 积己
 	if (NULL == m_hReceiveSock)
 	{
 		CreateSocket();
 	}
 
-	////localInterface.s_addr = inet_addr("192.168.0.90");
-	//if (SOCKET_ERROR == m_hReceiveSock, IPPROTO_IP, IP_MULTICAST_IF, (char*)&localInterface, sizeof(localInterface))
-	//{
-	//	iError = WSAGetLastError();
-	//	TRACE(_T("SetSocket Error = %d\n", iError));
-	//	closesocket(m_hReceiveSock);
-	//	return FALSE;
-	//}
-
 	if (NULL == m_hReceiveSock)
 	{
 		return FALSE;
 	}
-
 
 	OnvifSendSock.sin_family = AF_INET;
 	OnvifSendSock.sin_port = htons(3702);
@@ -316,7 +295,18 @@ BOOL CNetScanOnvif::SendScanRequest()
 	sprintf_s(pszSendBuffer, 4096, g_xmlSchs[0], szMessageID);
 
 	iSize = strlen(pszSendBuffer);
-	if (SOCKET_ERROR == sendto(m_hReceiveSock, pszSendBuffer, iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
+	//if (SOCKET_ERROR == sendto(m_hReceiveSock, pszSendBuffer, iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
+	//{
+	//	iError = WSAGetLastError();
+	//	TRACE(_T("sendto Error = %d\n"), iError);
+	//	closesocket(m_hReceiveSock);
+
+	//	delete[] pszSendBuffer;
+	//	pszSendBuffer = NULL;
+	//	return FALSE;
+	//}
+
+	if (SOCKET_ERROR == sendto(m_hReceiveSock, g_xmlSchs[1], iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
 	{
 		iError = WSAGetLastError();
 		TRACE(_T("sendto Error = %d\n"), iError);
