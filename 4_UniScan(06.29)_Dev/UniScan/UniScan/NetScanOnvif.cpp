@@ -40,11 +40,10 @@ void CNetScanOnvif::thrOnvifReceiver()
 	//sockaddr_in	multicast_addr;
 	int			iRevLen = sizeof(sockaddr_in);
 	//struct		ip_mreq mreq;
-	LPXNode		lpHeader = NULL;
 	LPXNode		lpBody = NULL;
-	LPXNode		lpBodyCommon = NULL;
-	LPXNode		lpItemData = NULL;
+	LPXNode		lpAddress = NULL;
 	XNode		stNode;
+	char		aszAddress[127] = { 0 };
 	int			iError = 0;
 	int			iReuse = 1;
 	DWORD		dwLastError = 0;
@@ -74,60 +73,26 @@ void CNetScanOnvif::thrOnvifReceiver()
 			}
 		}
 
+		// 파싱할 데이터
+		stNode.Load(m_pReceive_buffer);
+		lpBody = stNode.GetChildArg("SOAP-ENV:Body", NULL);
+		if (NULL != lpBody)
+		{
+			lpAddress = lpBody->GetChildArg("wsa:Address", NULL);
+			if (NULL != lpAddress)
+			{
+				// urn:uuid:XXXXXX-XXXXXX-XXXX 에서 urn:uuid: 문자열을 자름
+				lpAddress->value = lpAddress->value.Right(36);
+				strcpy(&aszAddress[0], lpAddress->value);
+			}
+		}
+
 		::OutputDebugStringA(m_pReceive_buffer);
 		::OutputDebugStringA("\n");
 	}
 	
 
 	return;
-
-
-	//// UDP 소켓 생성
-	//recvSock = socket(AF_INET, SOCK_DGRAM, 0);
-	//memset(&multicast_addr, 0, sizeof(multicast_addr));
-
-	//// 멀티 캐스트 주소 정보 초기화
-	//multicast_addr.sin_family = AF_INET;
-	//multicast_addr.sin_addr.s_addr = inet_addr("192.168.0.90"); // 남는 IP를 자동으로 적용해주는 함수
-	//multicast_addr.sin_port = htons(multicast_addr.sin_port);
-	//
-	//if (SOCKET_ERROR == bind(recvSock, (struct sockaddr*)&multicast_addr, sizeof(multicast_addr)))
-	//{
-	//	TRACE("bind error\n");
-	//}
-
-	//// 가입
-	//mreq.imr_multiaddr.s_addr = inet_addr("239.255.255.250");
-	//mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-
-	//// 멀티캐스트 그룹 가입
-	//if (SOCKET_ERROR == setsockopt(recvSock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)))
-	//{
-	//	TRACE("IP_ADD_MEMBERSHIP error\n");
-	//}
-
-
-	////if (bIsSuccessBind)
-	////{
-	//	m_pReceive_buffer = new char[SCAN_INFO_m_pReceive_buffer_SIZE];
-	//	memset(m_pReceive_buffer, 0, sizeof(char)*SCAN_INFO_m_pReceive_buffer_SIZE);
-
-	//	while (this->m_dwScanThreadID)
-	//	{
-	//		//if (SOCKET_ERROR == recvfrom(recvSock, m_pReceive_buffer, sizeof(pszBuff), 0, (SOCKADDR*)&stSockAddr, &iRevLen))
-	//		if (SOCKET_ERROR == recvfrom(recvSock, m_pReceive_buffer, sizeof(SCAN_INFO_m_pReceive_buffer_SIZE), 0, (SOCKADDR*)&other_addr, &iRevLen))
-	//		{
-	//			TRACE("recvfrom error\n");
-	//			this->ThreadExit();
-	//			break;
-	//		}
-
-	//		
-	//		TRACE("recvfrom Success\n");
-	//	}
-	////}
-	//
-	//return;
 }
 
 BOOL CNetScanOnvif::CreateSocket()
@@ -224,20 +189,19 @@ BOOL CNetScanOnvif::GenerateMsgID(char* szMessageID, int nBufferLen)
 
 BOOL CNetScanOnvif::SendScanRequest()
 {
-	sockaddr_in OnvifSendSock	= { 0 };
-	sockaddr_in	multicast_addr	= { 0 };
-	SOCKET		hSendSock		= NULL;
-	ONVIFINFO*	stOnvifInfo		= NULL;
-	DWORD		dwFileSize		= 0;
-	const char*	szIpAddr		= "239.255.255.250";
-	int			iSize			= 0;
-	char		szMessageID[128] = { 0 };
-	int			iReuse = 1;
-	int			iError = 0;
+	sockaddr_in OnvifSendSock		= { 0 };
+	sockaddr_in	multicast_addr		= { 0 };
+	SOCKET		hSendSock			= NULL;
+	ONVIFINFO*	stOnvifInfo			= NULL;
+	DWORD		dwFileSize			= 0;
+	int			iSize				= 0;
+	char		szMessageID[128]	= { 0 };
+	int			iReuse				= 1;
+	int			iError				= 0;
 
 	enum { ENUM_PROBE_MSG, ENUM_HELLO_MSG };
 
-	const char* g_xmlSchs[2] =
+	const char* g_xmlSchs[4] =
 	{
 		// probe message
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
@@ -254,13 +218,41 @@ BOOL CNetScanOnvif::SendScanRequest()
 			      </Probe>\
 			   </Body>\
 			</Envelope>",
+			// resolve
+		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+			<env:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:dn=\"http://www.onvif.org/ver10/network/wsdl\" xmlns:env=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
+			   <env:Header>\
+				  <wsa:MessageID>uuid:%s</wsa:MessageID>\
+				  <wsa:To>urn:schemas-xmlsoap-org:ws:2005:04:discovery</wsa:To>\
+				  <wsa:Action>http://schemas.xmlsoap.org/ws/2005/04/discovery/Resolve</wsa:Action>\
+			   </env:Header>\
+			   <env:Body>\
+				  <d:Resolve>\
+					 <wsa:EndPointReference>\
+						<wsa:Address>uuid:%s</wsa:Address>\
+					 </wsa:EndPointReference>\
+				  </d:Resolve>\
+			   </env:Body>\
+			</env:Envelope>",
 		// GetDeviceInformation
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
-			<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:tds=\"http://www.onvif.org/ver10/device/wsdl\">\
-				<SOAP-ENV:Body>\
-					<tds:GetDeviceInformation/>\
-				</SOAP-ENV:Body>\
-			</SOAP-ENV:Envelope>",
+			<env:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:dn=\"http://www.onvif.org/ver10/network/wsdl\" xmlns:env=\"http://www.w3.org/2003/05/soap-envelope\">\
+				<env:Header>\
+					<wsa:Action>http://www.onvif.org/ver10/device/wsdl/GetDeviceInformation</wsa:Action>\
+				</env:Header>\
+				<env:Body>\
+					<dn:GetDeviceInformation/>\
+				</env:Body>\
+			</env:Envelope>",
+		// Cap
+		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+			<Envelope xmlns:dn=\"http://www.w3.org/2003/05/soap-envelope\" xmlns : tds =\"http://www.onvif.org/ver10/device/wsdl\">\
+			<Body>\
+				<tds:GetCapabilities>\
+					<tds:Category>Device</tds:Category>\
+				</tds:GetCapabilities>\
+			</Body>\
+			</Envelope>",
 	};
 	//pFile = fopen("D:\\C_IPScanner\\IP_Scanner\\Probe.txt", "rb");
 	//fseek(pFile, 0, SEEK_END);
@@ -287,26 +279,16 @@ BOOL CNetScanOnvif::SendScanRequest()
 	OnvifSendSock.sin_port = htons(3702);
 	OnvifSendSock.sin_addr.s_addr = inet_addr("239.255.255.250"); // multicast group
 
-
+	// UUID 얻기
 	GenerateMsgID(szMessageID, 127);
-	char*	pszSendBuffer = new char[4096];
-	memset(pszSendBuffer, 0, 4096);
+	char*	pszSendBuffer = new char[4000];
+	memset(pszSendBuffer, 0, 4000);
 
-	sprintf_s(pszSendBuffer, 4096, g_xmlSchs[0], szMessageID);
+	// 얻어온 UUID를 XML에 적용
+	sprintf_s(pszSendBuffer, 4000, g_xmlSchs[0], szMessageID);
 
 	iSize = strlen(pszSendBuffer);
-	//if (SOCKET_ERROR == sendto(m_hReceiveSock, pszSendBuffer, iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
-	//{
-	//	iError = WSAGetLastError();
-	//	TRACE(_T("sendto Error = %d\n"), iError);
-	//	closesocket(m_hReceiveSock);
-
-	//	delete[] pszSendBuffer;
-	//	pszSendBuffer = NULL;
-	//	return FALSE;
-	//}
-
-	if (SOCKET_ERROR == sendto(m_hReceiveSock, g_xmlSchs[1], iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
+	if (SOCKET_ERROR == sendto(m_hReceiveSock, pszSendBuffer, iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
 	{
 		iError = WSAGetLastError();
 		TRACE(_T("sendto Error = %d\n"), iError);
@@ -319,66 +301,11 @@ BOOL CNetScanOnvif::SendScanRequest()
 
 	m_bConnected = TRUE;
 
-	//socklen_t len = sizeof(OnvifRecvSock);
-	//if (0 > getsockname(m_hReceiveSock, (struct sockaddr*)&OnvifRecvSock, &len))
-	//{
-	//	perror("getSockname Error");
-	//}
-	//else
-	//{
-	//	TRACE(_T("%d\n"), ntohs(OnvifRecvSock.sin_port));
-	//	m_iRevPort = ntohs(OnvifRecvSock.sin_port);
-	//}
-
-	//if (SOCKET_ERROR == setsockopt(hSendSock, SOL_SOCKET, SO_REUSEADDR, (char*)&iReuse, sizeof(iReuse)))
-	//{
-	//	perror("SO_REUSEADDR error");
-	//	this->ThreadExit();
-	//}
-
-	//// Local 정보 셋팅
-	//OnvifRecvSock.sin_family = AF_INET;
-	//OnvifRecvSock.sin_addr.s_addr = INADDR_ANY;
-	//OnvifRecvSock.sin_port = htons(m_iRevPort);
-
-	//// 바인드
-	//if (SOCKET_ERROR == bind(hSendSock, (struct sockaddr*)&OnvifRecvSock, sizeof(OnvifRecvSock)))
-	//{
-	//	iError = WSAGetLastError();
-	//	TRACE(_T("bind error=%d\n"), iError);
-	//	this->ThreadExit();
-	//}
-
-	//mreq.imr_multiaddr.s_addr = inet_addr("239.255.255.250");
-	//mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-
-	//// 멀티캐스트 그룹 가입
-	//if (SOCKET_ERROR == setsockopt(hSendSock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)))
-	//{
-	//	iError = WSAGetLastError();
-	//	TRACE(_T("IP_ADD_MEMBERSHIP error=%d\n"), iError);
-	//	this->ThreadExit();
-	//}
-
-	////if (bIsSuccessBind)
-	////{
-	//m_pReceive_buffer = new char[SCAN_INFO_m_pReceive_buffer_SIZE];
-	//memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_m_pReceive_buffer_SIZE);
-
-	//while (this->m_dwScanThreadID)
-	//{
-	//	if (SOCKET_ERROR == recvfrom(hSendSock, m_pReceive_buffer, SCAN_INFO_m_pReceive_buffer_SIZE, 0, (SOCKADDR*)&stSockAddr, &iRevLen))
-	//	{
-	//		iError = WSAGetLastError();
-	//		TRACE(_T("recvfrom error=%d\n"), iError);
-	//		this->ThreadExit();
-	//	}
-
-	//	TRACE("recvfrom Success\n");
-	//}
-
-	delete[] pszSendBuffer;
-	pszSendBuffer = NULL;
-
+	if (NULL != pszSendBuffer)
+	{
+		delete[] pszSendBuffer;
+		pszSendBuffer = NULL;
+	}
+	
 	return TRUE;
 }
