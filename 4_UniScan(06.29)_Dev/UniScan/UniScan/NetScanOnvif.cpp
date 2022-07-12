@@ -35,20 +35,15 @@ void CNetScanOnvif::thrOnvifReceiver()
 {
 	BOOL		bIsSuccessBind = FALSE;
 	SOCKADDR	stSockAddr;
-	char*		pszBuff = NULL;
-	int			iRecvSock = 0;
-	//sockaddr_in	multicast_addr;
 	int			iRevLen = sizeof(sockaddr_in);
-	//struct		ip_mreq mreq;
 	LPXNode		lpBody = NULL;
 	LPXNode		lpAddress = NULL;
 	XNode		stNode;
 	char		aszAddress[127] = { 0 };
-	int			iError = 0;
-	int			iReuse = 1;
+	int			iListCnt = 0;
+	char*		aszAddressList[20] = { NULL };
 	DWORD		dwLastError = 0;
 
-	
 	m_pReceive_buffer = new char[SCAN_INFO_m_pReceive_buffer_SIZE];
 	memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_m_pReceive_buffer_SIZE);
 
@@ -64,7 +59,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 		{
 			dwLastError = WSAGetLastError();
 			TRACE(_T("recvfrom error=%d\n"), dwLastError);
-
 
 			if (this->m_hNotifyWnd && dwLastError != WSAEINTR && dwLastError != WSAEINVAL)
 			{
@@ -199,9 +193,9 @@ BOOL CNetScanOnvif::SendScanRequest()
 	int			iReuse				= 1;
 	int			iError				= 0;
 
-	enum { ENUM_PROBE_MSG, ENUM_HELLO_MSG };
+	enum { ENUM_PROBE_MSG };
 
-	const char* g_xmlSchs[4] =
+	const char* g_xmlSchs[3] =
 	{
 		// probe message
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
@@ -243,16 +237,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 				<env:Body>\
 					<dn:GetDeviceInformation/>\
 				</env:Body>\
-			</env:Envelope>",
-		// Cap
-		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
-			<Envelope xmlns:dn=\"http://www.w3.org/2003/05/soap-envelope\" xmlns : tds =\"http://www.onvif.org/ver10/device/wsdl\">\
-			<Body>\
-				<tds:GetCapabilities>\
-					<tds:Category>Device</tds:Category>\
-				</tds:GetCapabilities>\
-			</Body>\
-			</Envelope>",
+			</env:Envelope>"
 	};
 	//pFile = fopen("D:\\C_IPScanner\\IP_Scanner\\Probe.txt", "rb");
 	//fseek(pFile, 0, SEEK_END);
