@@ -46,7 +46,7 @@ typedef struct tagSCAN_EXT_INFO_STRUCT
 
 typedef struct tagSCAN_STRUCT
 {
-	int		iScanType = 0; // 1 : Vision, 2 : MarkIn
+	int		iScanType = 0; // 1 : Vision, 2 : MarkIn, 3 : Onvif
 	WCHAR	szAddr[30];
 	WCHAR	szMAC[30];
 	WCHAR	szGateWay[30];

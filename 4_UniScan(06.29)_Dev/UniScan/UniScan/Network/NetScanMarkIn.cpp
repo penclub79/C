@@ -47,6 +47,8 @@ void CNetScanMarkIn::thrMarkInReceiver()
 	DWORD				dwLastError			= 0;
 	BOOL				bIsSuccessBind		= FALSE;	
 	SOCKADDR			stSockAddr;
+	int					iMacLen				= 0;
+	int					iValIdx				= 0;
 
 
 	bIsSuccessBind = SocketBind();
@@ -73,96 +75,91 @@ void CNetScanMarkIn::thrMarkInReceiver()
 				break;
 			}
 
-			if (pReceive)
+			// Data Little Endian -> Big Endian all Change
+			pReceive->stPacket.uiCommand = htonl(pReceive->stPacket.uiCommand);
+			pReceive->stDevInfo.stNetwork_info.uiHttp_port = htonl(pReceive->stDevInfo.stNetwork_info.uiHttp_port);
+			pReceive->stDevInfo.stNetwork_info.uiBase_port = htonl(pReceive->stDevInfo.stNetwork_info.uiBase_port);
+
+			// Data Respose Success
+			if (MARKIN_PACKET_RSP_DEVICEINFO == pReceive->stPacket.uiCommand)
 			{
-				// Data Little Endian -> Big Endian all Change
-				pReceive->stPacket.uiCommand = htonl(pReceive->stPacket.uiCommand);
-				pReceive->stDevInfo.stNetwork_info.uiHttp_port = htonl(pReceive->stDevInfo.stNetwork_info.uiHttp_port);
-				pReceive->stDevInfo.stNetwork_info.uiBase_port = htonl(pReceive->stDevInfo.stNetwork_info.uiBase_port);
-
-				// Data Respose Success
-				if (MARKIN_PACKET_RSP_DEVICEINFO == pReceive->stPacket.uiCommand)
+				if (pReceive)
 				{
-					if (pReceive)
+					pScanInfo = new SCAN_INFO;
+					if (pScanInfo)
 					{
-						pScanInfo = new SCAN_INFO;
-						if (pScanInfo)
+						memset(pScanInfo, 0, sizeof(SCAN_INFO));
+
+						pScanInfo->iScanType = 2;
+						//// Model Name
+						if (0 < strlen(pReceive->stDevInfo.aszModel_name))
+							sprintf_s(aszModelName, 30, "%s", pReceive->stDevInfo.aszModel_name);
+							//ConversionModelName(pReceive->stDevInfo.aszModel_name, &aszModelName[0]);
+
+						//// IP - info
+						if (0 < pReceive->stDevInfo.stNetwork_info.aszIp[0])
 						{
-							memset(pScanInfo, 0, sizeof(SCAN_INFO));
+							sprintf_s(aszIpAddress, 32, "%d.%d.%d.%d",
+								pReceive->stDevInfo.stNetwork_info.aszIp[0],
+								pReceive->stDevInfo.stNetwork_info.aszIp[1],
+								pReceive->stDevInfo.stNetwork_info.aszIp[2],
+								pReceive->stDevInfo.stNetwork_info.aszIp[3]);
+						}	
+						else
+							wsprintf(pScanInfo->szAddr, _T("N/A"));
 
-							pScanInfo->iScanType = 2;
-							//// Model Name
-							if (0 < strlen(pReceive->stDevInfo.aszModel_name))
-								sprintf_s(aszModelName, 30, "%s", pReceive->stDevInfo.aszModel_name);
-								//ConversionModelName(pReceive->stDevInfo.aszModel_name, &aszModelName[0]);
-
-							//// IP - info
-							if (0 < pReceive->stDevInfo.stNetwork_info.aszIp[0])
-							{
-								sprintf_s(aszIpAddress, 32, "%d.%d.%d.%d",
-									pReceive->stDevInfo.stNetwork_info.aszIp[0],
-									pReceive->stDevInfo.stNetwork_info.aszIp[1],
-									pReceive->stDevInfo.stNetwork_info.aszIp[2],
-									pReceive->stDevInfo.stNetwork_info.aszIp[3]);
-							}	
-							else
-								wsprintf(pScanInfo->szAddr, _T("N/A"));
-
-							//// Gateway
-							if (0 < pReceive->stDevInfo.stNetwork_info.aszGateway[0])
-							{
-								//ConversionNetInfo(pReceive->stDevInfo.stNetwork_info.aszGateway, &aszGateWay[0]);
-								sprintf_s(aszGateWay, 32, "%d.%d.%d.%d",
-									pReceive->stDevInfo.stNetwork_info.aszGateway[0],
-									pReceive->stDevInfo.stNetwork_info.aszGateway[1],
-									pReceive->stDevInfo.stNetwork_info.aszGateway[2],
-									pReceive->stDevInfo.stNetwork_info.aszGateway[3]);
-							}
-							else
-								wsprintf(pScanInfo->szGateWay, _T("N/A"));
-
-							//// MAC
-							if (0 < strlen(pReceive->stDevInfo.stNetwork_info.szMac_address))
-							{
-								//ConversionMac(pReceive->stDevInfo.stNetwork_info.szMac_address, &aszMacAdrs[0]);
-
-								int iMacLen = strlen(pReceive->stDevInfo.stNetwork_info.szMac_address);
-								int iValIdx = 2;
-								for (int i = 0; i < iMacLen / 2; i++)
-								{
-									// 2글자씩 복사
-									memcpy(&aszMacAdrs[i * 3], &pReceive->stDevInfo.stNetwork_info.szMac_address[i * 2], 2);
-									aszMacAdrs[iValIdx] = ':';
-
-									// xx:xx:xx:xx:xx 4개의 콜론
-									if (4 > i)
-										iValIdx += 3;
-								}
-							}
-							else
-								wsprintf(pScanInfo->szMAC, _T("N/A"));
-
-							//// SW Version
-							if (0 < pReceive->stDevInfo.stSw_version.szMajor)
-							{
-								//ConversionVersion(&pReceive->stDevInfo.stSw_version, &aszVersion[0]);
-								sprintf_s(aszVersion, 30, "%d.%d.%d", pReceive->stDevInfo.stSw_version.szMajor, pReceive->stDevInfo.stSw_version.szMinor, pReceive->stDevInfo.stSw_version.szRevision);
-							}
-							else
-								wsprintf(pScanInfo->szSwVersion, _T("N/A"));
-
-							this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIpAddress);
-							this->WideCopyStringFromAnsi(pScanInfo->szGateWay, 32, aszGateWay);
-							this->WideCopyStringFromAnsi(pScanInfo->szMAC, 30, aszMacAdrs);
-							this->WideCopyStringFromAnsi(pScanInfo->szSwVersion, 30, aszVersion);
-							this->WideCopyStringFromAnsi(pScanInfo->szModelName, 30, aszModelName);
-							pScanInfo->nHTTPPort = pReceive->stDevInfo.stNetwork_info.uiHttp_port;
-							pScanInfo->iBasePort = pReceive->stDevInfo.stNetwork_info.uiBase_port;
-							pScanInfo->iVideoCnt = pReceive->stDevInfo.szMax_channel;
-
-							if (this->m_hNotifyWnd)
-								::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+						//// Gateway
+						if (0 < pReceive->stDevInfo.stNetwork_info.aszGateway[0])
+						{
+							sprintf_s(aszGateWay, 32, "%d.%d.%d.%d",
+								pReceive->stDevInfo.stNetwork_info.aszGateway[0],
+								pReceive->stDevInfo.stNetwork_info.aszGateway[1],
+								pReceive->stDevInfo.stNetwork_info.aszGateway[2],
+								pReceive->stDevInfo.stNetwork_info.aszGateway[3]);
 						}
+						else
+							wsprintf(pScanInfo->szGateWay, _T("N/A"));
+
+						//// MAC
+						if (0 < strlen(pReceive->stDevInfo.stNetwork_info.szMac_address))
+						{
+
+							iMacLen = strlen(pReceive->stDevInfo.stNetwork_info.szMac_address);
+							iValIdx = 2;
+							for (int i = 0; i < iMacLen / 2; i++)
+							{
+								// 2글자씩 복사
+								memcpy(&aszMacAdrs[i * 3], &pReceive->stDevInfo.stNetwork_info.szMac_address[i * 2], 2);
+								aszMacAdrs[iValIdx] = ':';
+
+								// xx:xx:xx:xx:xx 4개의 콜론
+								if (4 > i)
+									iValIdx += 3;
+							}
+						}
+						else
+							wsprintf(pScanInfo->szMAC, _T("N/A"));
+
+						//// SW Version
+						if (0 < pReceive->stDevInfo.stSw_version.szMajor)
+						{
+							//ConversionVersion(&pReceive->stDevInfo.stSw_version, &aszVersion[0]);
+							sprintf_s(aszVersion, 30, "%d.%d.%d", pReceive->stDevInfo.stSw_version.szMajor, pReceive->stDevInfo.stSw_version.szMinor, pReceive->stDevInfo.stSw_version.szRevision);
+						}
+						else
+							wsprintf(pScanInfo->szSwVersion, _T("N/A"));
+
+						this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIpAddress);
+						this->WideCopyStringFromAnsi(pScanInfo->szGateWay, 32, aszGateWay);
+						this->WideCopyStringFromAnsi(pScanInfo->szMAC, 30, aszMacAdrs);
+						this->WideCopyStringFromAnsi(pScanInfo->szSwVersion, 30, aszVersion);
+						this->WideCopyStringFromAnsi(pScanInfo->szModelName, 30, aszModelName);
+						pScanInfo->nHTTPPort = pReceive->stDevInfo.stNetwork_info.uiHttp_port;
+						pScanInfo->iBasePort = pReceive->stDevInfo.stNetwork_info.uiBase_port;
+						pScanInfo->iVideoCnt = pReceive->stDevInfo.szMax_channel;
+
+						if (this->m_hNotifyWnd)
+							::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
 					}
 				}
 			}

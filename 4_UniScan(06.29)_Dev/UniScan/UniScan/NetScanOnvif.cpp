@@ -32,16 +32,20 @@ BOOL CNetScanOnvif::StartScan()
 
 void CNetScanOnvif::thrOnvifReceiver()
 {
-	BOOL		bIsSuccessBind = FALSE;
+	BOOL		bIsSuccessBind		= FALSE;
 	SOCKADDR	stSockAddr;
-	int			iRevLen = sizeof(sockaddr_in);
-	LPXNode		lpBody = NULL;
-	LPXNode		lpAddress = NULL;
+	int			iRevLen				= sizeof(sockaddr_in);
+	LPXNode		lpBody				= NULL;
+	LPXNode		lpUUID				= NULL;
+	LPXNode		lpIPAddress			= NULL;
+	int			iHTTPPort			= 0;
 	XNode		stNode;
-	char		aszAddress[127] = { 0 };
-	//int			iListCnt = 0;
-	//char*		aszAddressList[20] = { NULL };
-	DWORD		dwLastError = 0;
+	char		aszUUID[128]		= { 0 };
+	char		aszIPAddress[128]	= { 0 };
+	char*		pszSlice			= NULL;
+	DWORD		dwLastError			= 0;
+	SCAN_INFO*	pScanInfo			= NULL;
+
 
 	m_pReceive_buffer = new char[SCAN_INFO_m_pReceive_buffer_SIZE];
 	memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_m_pReceive_buffer_SIZE);
@@ -71,15 +75,62 @@ void CNetScanOnvif::thrOnvifReceiver()
 		lpBody = stNode.GetChildArg("SOAP-ENV:Body", NULL);
 		if (NULL != lpBody)
 		{
-			lpAddress = lpBody->GetChildArg("wsa:Address", NULL);
-			if (NULL != lpAddress)
+			lpUUID = lpBody->GetChildArg("wsa:Address", NULL);
+			if (NULL != lpUUID)
 			{
 				// urn:uuid:XXXXXX-XXXXXX-XXXX 에서 urn:uuid: 문자열을 자름
-				lpAddress->value = lpAddress->value.Right(36);
-				strcpy(&aszAddress[0], lpAddress->value);
-				SendResolveMessage(aszAddress);
+				lpUUID->value = lpUUID->value.Right(36);
+				strcpy(&aszUUID[0], lpUUID->value);
+				//SendAuthentication(aszAddress);
 				// 배열에 uuid 쌓고 다 쌓았으면 uuid를Resolve Message에 담아서 다시 Send
-				
+			}
+		}
+
+		// table input Data
+		pScanInfo = new SCAN_INFO;
+		if (pScanInfo)
+		{
+			memset(pScanInfo, 0, sizeof(SCAN_INFO));
+
+			// IP Parsing
+			lpBody = stNode.GetChildArg("d:ProbeMatch", NULL);
+			if (NULL != lpBody)
+			{
+				lpIPAddress = lpBody->GetChildArg("d:XAddrs", NULL);
+				if (NULL != lpIPAddress)
+				{
+					int iIndex = 0;
+					strcpy(&aszIPAddress[0], lpIPAddress->value);
+					pszSlice = strtok(aszIPAddress, ":");
+					while (NULL != pszSlice)
+					{
+						pszSlice = strtok(NULL, ":");
+						if (1 == iIndex)
+						{
+							break;
+						}
+						iIndex++;
+					}
+					if (pszSlice)
+					{
+						pszSlice = strtok(pszSlice, "/");
+						iHTTPPort = atoi(pszSlice);
+						pScanInfo->nHTTPPort = iHTTPPort;
+					}
+
+					lpIPAddress->value = lpIPAddress->value.Left(20);
+					lpIPAddress->value = lpIPAddress->value.Right(13);
+					strcpy(&aszIPAddress[0], lpIPAddress->value);
+					
+					this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
+					//wsprintf(pScanInfo->szGateWay, _T("N/A"));
+					//wsprintf(pScanInfo->szMAC, _T("N/A"));
+					//wsprintf(pScanInfo->szModelName, _T("N/A"));
+					//wsprintf(pScanInfo->szSwVersion, _T("N/A"));
+
+					if (this->m_hNotifyWnd)
+						::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+				}
 			}
 		}
 
@@ -87,6 +138,11 @@ void CNetScanOnvif::thrOnvifReceiver()
 		::OutputDebugStringA("\n");
 	}
 	
+	if (NULL != pScanInfo)
+	{
+		delete pScanInfo;
+		pScanInfo = NULL;
+	}
 
 	return;
 }
@@ -298,9 +354,8 @@ BOOL CNetScanOnvif::SendScanRequest()
 	return TRUE;
 }
 
-BOOL CNetScanOnvif::SendResolveMessage(char* pszUUID)
+BOOL CNetScanOnvif::SendAuthentication(char* pszUUID)
 {
-	
 	char*		pszSendBuffer	= NULL;
 	int			iSize			= 0;
 	int			iError			= 0;

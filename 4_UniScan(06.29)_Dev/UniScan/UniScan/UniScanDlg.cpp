@@ -1107,7 +1107,7 @@ BOOL CUniScanDlg::CallLayoutManager()
 	rcNewRect = rcControlRect;
 	rcNewRect.right = rcClientRect.right - 19; // item count label position move to window size relatively
 	rcNewRect.left = rcNewRect.right - rcControlRect.Width();
-	rcNewRect.top = rcClientRect.top + 14;
+	rcNewRect.top = rcClientRect.top + 26;
 	rcNewRect.bottom = rcNewRect.top + rcControlRect.Height();
 	pSTC_SERVER_COUNT->MoveWindow(&rcNewRect);
 
@@ -2020,82 +2020,90 @@ void CUniScanDlg::OnCbnSelchangeAdaptorCmb()
 void CUniScanDlg::OnClickedOpenXml()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	char*	pszBuff			= NULL;
-	FILE*	pFile			= NULL;
-	DWORD	dwFileSize		= 0;
-	LPXNode lpHeader		= NULL;
-	LPXNode lpBody			= NULL;
-	LPXNode lpBodyCommon	= NULL;
-	LPXNode lpItemData		= NULL;
-	XNode	stNode;
+	//char*	pszBuff			= NULL;
+	//FILE*	pFile			= NULL;
+	//DWORD	dwFileSize		= 0;
+	//LPXNode lpHeader		= NULL;
+	//LPXNode lpBody			= NULL;
+	//LPXNode lpBodyCommon	= NULL;
+	//LPXNode lpItemData		= NULL;
+	//XNode	stNode;
 
-	pFile = fopen("D:\\C_IPScanner\\IP_Scanner\\ProbeMatches.txt", "rb");
-	fseek(pFile, 0, SEEK_END);
-	dwFileSize = ftell(pFile);
+	//pFile = fopen("D:\\C_IPScanner\\IP_Scanner\\ProbeMatches.txt", "rb");
+	//fseek(pFile, 0, SEEK_END);
+	//dwFileSize = ftell(pFile);
 
-	pszBuff = new char[sizeof(char)* dwFileSize];
-	memset(pszBuff, 0, dwFileSize);
+	//pszBuff = new char[sizeof(char)* dwFileSize];
+	//memset(pszBuff, 0, dwFileSize);
 
-	fseek(pFile, 0, SEEK_SET);
-	fread(pszBuff, 1, dwFileSize, pFile);
+	//fseek(pFile, 0, SEEK_SET);
+	//fread(pszBuff, 1, dwFileSize, pFile);
 
-	stNode.Load(pszBuff);
+	//stNode.Load(pszBuff);
 
-	lpBody = stNode.GetChildArg("s:Body", NULL);
-	lpBodyCommon = lpBody->GetChild("d:ProbeMatches")->GetChild("d:ProbeMatch");
+	//lpBody = stNode.GetChildArg("s:Body", NULL);
+	//lpBodyCommon = lpBody->GetChild("d:ProbeMatches")->GetChild("d:ProbeMatch");
 
-	lpHeader = stNode.GetChildArg("wsa:MessageID", NULL);
-	TRACE("%s\n", lpHeader->value);
+	//lpHeader = stNode.GetChildArg("wsa:MessageID", NULL);
+	//TRACE("%s\n", lpHeader->value);
 
-	lpHeader = stNode.GetChildArg("wsa:RelatesTo", NULL);
-	TRACE("%s\n", lpHeader->value);
+	//lpHeader = stNode.GetChildArg("wsa:RelatesTo", NULL);
+	//TRACE("%s\n", lpHeader->value);
 
-	lpHeader = stNode.GetChildArg("wsa:To", NULL);
-	TRACE("%s\n", lpHeader->value);
+	//lpHeader = stNode.GetChildArg("wsa:To", NULL);
+	//TRACE("%s\n", lpHeader->value);
 
-	lpHeader = stNode.GetChildArg("wsa:Action", NULL);
-	TRACE("%s\n", lpHeader->value);
+	//lpHeader = stNode.GetChildArg("wsa:Action", NULL);
+	//TRACE("%s\n", lpHeader->value);
 
-	lpItemData = lpBodyCommon->GetChild("wsa:EndpointReference")->GetChild("wsa:Address");
-	TRACE("%s\n", lpItemData->value);
+	//lpItemData = lpBodyCommon->GetChild("wsa:EndpointReference")->GetChild("wsa:Address");
+	//TRACE("%s\n", lpItemData->value);
 
-	lpBody = lpBodyCommon->GetChild("d:Types");
-	TRACE("%s\n", lpBody->value);
+	//lpBody = lpBodyCommon->GetChild("d:Types");
+	//TRACE("%s\n", lpBody->value);
 
-	lpBody = lpBodyCommon->GetChild("d:Scopes");
-	TRACE("%s\n", lpBody->value);
+	//lpBody = lpBodyCommon->GetChild("d:Scopes");
+	//TRACE("%s\n", lpBody->value);
 
-	lpBody = lpBodyCommon->GetChild("d:XAddrs");
-	TRACE("%s\n", lpBody->value);
+	//lpBody = lpBodyCommon->GetChild("d:XAddrs");
+	//TRACE("%s\n", lpBody->value);
 
-	lpBody = lpBodyCommon->GetChild("d:MetadataVersion");
-	TRACE("%s\n", lpBody->value);
+	//lpBody = lpBodyCommon->GetChild("d:MetadataVersion");
+	//TRACE("%s\n", lpBody->value);
 
+	//if (NULL != pszBuff)
+	//{
+	//	delete[] pszBuff;
+	//	pszBuff = NULL;
+	//}
 
-	if (NULL != pszBuff)
-	{
-		delete[] pszBuff;
-		pszBuff = NULL;
-	}
-
-	if (NULL != pFile)
-	{
-		fclose(pFile);
-		pFile = NULL;
-	}
-
+	//if (NULL != pFile)
+	//{
+	//	fclose(pFile);
+	//	pFile = NULL;
+	//}
 }
 
 
 void CUniScanDlg::OnClickedButtonLogin()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CLoginDlg dlg;
+	CLoginDlg* pLoginDlg = NULL;
 
-	if (dlg.DoModal() == IDOK)
+	if (NULL == pLoginDlg)
 	{
-		TRACE(_T("OK"));
+		pLoginDlg = new CLoginDlg();
+	}
+	
+	if (pLoginDlg->DoModal() == IDOK)
+	{
+		SetDlgItemText(IDC_EDIT_LOGIN, pLoginDlg->m_strUsername);
 	}
 
+	if (NULL != pLoginDlg)
+	{
+		delete pLoginDlg;
+		pLoginDlg = NULL;
+	}
 
 }
