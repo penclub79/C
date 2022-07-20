@@ -132,6 +132,9 @@
     <ClInclude Include="factorydefaultdlg.h">
       <Filter>헤더 파일\Dlg</Filter>
     </ClInclude>
+    <ClInclude Include="LoginDlg.h">
+      <Filter>헤더 파일\Dlg</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -214,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="NetScanOnvif.cpp">
       <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="LoginDlg.cpp">
+      <Filter>소스 파일\Dlg</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

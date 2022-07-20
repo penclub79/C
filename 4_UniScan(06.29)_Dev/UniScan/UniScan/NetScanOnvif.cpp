@@ -10,7 +10,6 @@ CNetScanOnvif::CNetScanOnvif()
 
 CNetScanOnvif::~CNetScanOnvif(void)
 {
-	
 }
 
 DWORD CNetScanOnvif::thrOnvifScanThread(LPVOID pParam)
@@ -40,8 +39,8 @@ void CNetScanOnvif::thrOnvifReceiver()
 	LPXNode		lpAddress = NULL;
 	XNode		stNode;
 	char		aszAddress[127] = { 0 };
-	int			iListCnt = 0;
-	char*		aszAddressList[20] = { NULL };
+	//int			iListCnt = 0;
+	//char*		aszAddressList[20] = { NULL };
 	DWORD		dwLastError = 0;
 
 	m_pReceive_buffer = new char[SCAN_INFO_m_pReceive_buffer_SIZE];
@@ -78,6 +77,9 @@ void CNetScanOnvif::thrOnvifReceiver()
 				// urn:uuid:XXXXXX-XXXXXX-XXXX 에서 urn:uuid: 문자열을 자름
 				lpAddress->value = lpAddress->value.Right(36);
 				strcpy(&aszAddress[0], lpAddress->value);
+				SendResolveMessage(aszAddress);
+				// 배열에 uuid 쌓고 다 쌓았으면 uuid를Resolve Message에 담아서 다시 Send
+				
 			}
 		}
 
@@ -192,6 +194,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 	char		szMessageID[128]	= { 0 };
 	int			iReuse				= 1;
 	int			iError				= 0;
+	char*		pszSendBuffer		= NULL;
 
 	enum { ENUM_PROBE_MSG };
 
@@ -266,7 +269,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 
 	// UUID 얻기
 	GenerateMsgID(szMessageID, 127);
-	char*	pszSendBuffer = new char[4000];
+	pszSendBuffer = new char[4000];
 	memset(pszSendBuffer, 0, 4000);
 
 	// 얻어온 UUID를 XML에 적용
@@ -292,5 +295,60 @@ BOOL CNetScanOnvif::SendScanRequest()
 		pszSendBuffer = NULL;
 	}
 	
+	return TRUE;
+}
+
+BOOL CNetScanOnvif::SendResolveMessage(char* pszUUID)
+{
+	
+	char*		pszSendBuffer	= NULL;
+	int			iSize			= 0;
+	int			iError			= 0;
+	sockaddr_in OnvifSendSock	= { 0 };
+	char		szMessageID[128] = { 0 };
+
+	const char* g_xmlSchs =
+	{
+		// resolve
+	"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+		<env:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:dn=\"http://www.onvif.org/ver10/network/wsdl\" xmlns:env=\"http://www.w3.org/2003/05/soap-envelope\">\
+		   <env:Header>\
+			  <wsa:Action>http://www.onvif.org/ver10/device/wsdl/GetDeviceInformation</wsa:Action>\
+		   </env:Header>\
+		   <env:Body>\
+			  <dn:GetDeviceInformation/>\
+		   </env:Body>\
+		</env:Envelope>"
+	};
+
+	OnvifSendSock.sin_family = AF_INET;
+	OnvifSendSock.sin_port = htons(3702);
+	OnvifSendSock.sin_addr.s_addr = inet_addr("239.255.255.250"); // multicast group
+
+	GenerateMsgID(szMessageID, 127);
+
+	pszSendBuffer = new char[4000];
+	memset(pszSendBuffer, 0, 4000);
+	sprintf_s(pszSendBuffer, 4000, g_xmlSchs, szMessageID, pszUUID);
+	TRACE("%s\n", pszSendBuffer);
+
+	iSize = strlen(pszSendBuffer);
+	if (SOCKET_ERROR == sendto(m_hReceiveSock, pszSendBuffer, iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
+	{
+		iError = WSAGetLastError();
+		TRACE(_T("sendto Error = %d\n"), iError);
+		closesocket(m_hReceiveSock);
+
+		delete[] pszSendBuffer;
+		pszSendBuffer = NULL;
+		return FALSE;
+	}
+
+	if (NULL != pszSendBuffer)
+	{
+		delete[] pszSendBuffer;
+		pszSendBuffer = NULL;
+	}
+
 	return TRUE;
 }

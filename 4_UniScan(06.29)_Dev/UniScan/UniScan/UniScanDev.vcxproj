@@ -108,6 +108,7 @@
     <ClInclude Include="IPChangeDlg.h" />
     <ClInclude Include="IPChangeDlg2.h" />
     <ClInclude Include="ListItem.h" />
+    <ClInclude Include="LoginDlg.h" />
     <ClInclude Include="MessageQueue.h" />
     <ClInclude Include="NetCommon.h" />
     <ClInclude Include="NetScanOnvif.h" />
@@ -142,6 +143,7 @@
     <ClCompile Include="IPChangeDlg2.cpp" />
     <ClCompile Include="IPChangeThread.cpp" />
     <ClCompile Include="ListItem.cpp" />
+    <ClCompile Include="LoginDlg.cpp" />
     <ClCompile Include="MessageQueue.cpp" />
     <ClCompile Include="NetScanOnvif.cpp" />
     <ClCompile Include="Network\NetScanBase.cpp" />

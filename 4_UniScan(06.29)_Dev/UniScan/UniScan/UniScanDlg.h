@@ -91,9 +91,9 @@ protected:
 
 	CMenu   m_cPopupMenu;
 	BOOL	m_bSortAscending;
+	ULONG   m_ulAcceptAddress;
 	int     m_nSortOrient;
 	int     m_iSelectVersion;
-	ULONG   m_ulAcceptAddress;
 
 	// Window GDI(그래픽 디바이스 인터페이스) 글꼴을 캡슐화하고 글꼴 조작을 위한 멤버 함수를 제공
 	CFont   m_DISP_FONT;
@@ -165,4 +165,6 @@ public:
 	afx_msg void OnCbnSelchangeAdaptorCmb();
 	//afx_msg void OnCbnSelchangeProtocalCombo();
 	afx_msg void OnClickedOpenXml();
+	afx_msg void OnBnClickedButton1();
+	afx_msg void OnClickedButtonLogin();	// 로그인 버튼
 };

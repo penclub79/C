@@ -8,6 +8,7 @@
 #include "IPChangeDlg.h"
 #include "UpgradeDlg.h"
 #include "IPChangeDlg2.h"
+#include "LoginDlg.h"
 #include "FactoryDefaultDlg.h"
 #include "ResolutionChangeDlg.h"
 #include "OSDChangeDlg.h"
@@ -174,6 +175,7 @@ BEGIN_MESSAGE_MAP(CUniScanDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_ADAPTOR_CMB,			&CUniScanDlg::OnCbnSelchangeAdaptorCmb)
 	//ON_COMMAND(IDC_PROTOCAL_COMBO, &CUniScanDlg::OnProtocalCombo)
 	ON_BN_CLICKED(IDC_OPEN_XML,					&CUniScanDlg::OnClickedOpenXml)
+	ON_BN_CLICKED(IDC_BUTTON_LOGIN, &CUniScanDlg::OnClickedButtonLogin)
 END_MESSAGE_MAP()
 
 
@@ -2018,16 +2020,14 @@ void CUniScanDlg::OnCbnSelchangeAdaptorCmb()
 void CUniScanDlg::OnClickedOpenXml()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	char*	pszBuff = NULL;
-	FILE*	pFile = NULL;
-	DWORD	dwFileSize = 0;
-	LPXNode lpHeader = NULL;
-	LPXNode lpBody = NULL;
-	LPXNode lpBodyCommon = NULL;
-	LPXNode lpItemData = NULL;
+	char*	pszBuff			= NULL;
+	FILE*	pFile			= NULL;
+	DWORD	dwFileSize		= 0;
+	LPXNode lpHeader		= NULL;
+	LPXNode lpBody			= NULL;
+	LPXNode lpBodyCommon	= NULL;
+	LPXNode lpItemData		= NULL;
 	XNode	stNode;
-
-
 
 	pFile = fopen("D:\\C_IPScanner\\IP_Scanner\\ProbeMatches.txt", "rb");
 	fseek(pFile, 0, SEEK_END);
@@ -2082,6 +2082,19 @@ void CUniScanDlg::OnClickedOpenXml()
 	{
 		fclose(pFile);
 		pFile = NULL;
+	}
+
+}
+
+
+void CUniScanDlg::OnClickedButtonLogin()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CLoginDlg dlg;
+
+	if (dlg.DoModal() == IDOK)
+	{
+		TRACE(_T("OK"));
 	}
 
 

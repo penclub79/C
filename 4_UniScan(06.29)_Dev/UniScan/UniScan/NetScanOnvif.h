@@ -21,6 +21,7 @@ public:
 protected:
 	static DWORD thrOnvifScanThread(LPVOID pParam);
 	void thrOnvifReceiver();
+	BOOL SendResolveMessage(char* pszUUID);
 
 	BOOL CreateSocket();
 	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
