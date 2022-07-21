@@ -41,6 +41,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 	int			iHTTPPort			= 0;
 	XNode		stNode;
 	char		aszUUID[128]		= { 0 };
+	char		aszData[128] = { 0 };
 	char		aszIPAddress[128]	= { 0 };
 	char*		pszSlice			= NULL;
 	DWORD		dwLastError			= 0;
@@ -91,7 +92,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 		if (pScanInfo)
 		{
 			memset(pScanInfo, 0, sizeof(SCAN_INFO));
-
+			pScanInfo->iScanType = 3;
 			// IP Parsing
 			lpBody = stNode.GetChildArg("d:ProbeMatch", NULL);
 			if (NULL != lpBody)
@@ -100,15 +101,14 @@ void CNetScanOnvif::thrOnvifReceiver()
 				if (NULL != lpIPAddress)
 				{
 					int iIndex = 0;
-					strcpy(&aszIPAddress[0], lpIPAddress->value);
-					pszSlice = strtok(aszIPAddress, ":");
+					strcpy(&aszData[0], lpIPAddress->value);
+					pszSlice = strtok(aszData, ":");
 					while (NULL != pszSlice)
 					{
 						pszSlice = strtok(NULL, ":");
 						if (1 == iIndex)
-						{
 							break;
-						}
+						
 						iIndex++;
 					}
 					if (pszSlice)
@@ -123,10 +123,11 @@ void CNetScanOnvif::thrOnvifReceiver()
 					strcpy(&aszIPAddress[0], lpIPAddress->value);
 					
 					this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
-					//wsprintf(pScanInfo->szGateWay, _T("N/A"));
-					//wsprintf(pScanInfo->szMAC, _T("N/A"));
-					//wsprintf(pScanInfo->szModelName, _T("N/A"));
-					//wsprintf(pScanInfo->szSwVersion, _T("N/A"));
+					wsprintf(pScanInfo->szGateWay, _T("N/A"));
+					wsprintf(pScanInfo->szMAC, _T("N/A"));
+					wsprintf(pScanInfo->szModelName, _T("N/A"));
+					wsprintf(pScanInfo->szSwVersion, _T("N/A"));
+					pScanInfo->iVideoCnt = 0;
 
 					if (this->m_hNotifyWnd)
 						::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
