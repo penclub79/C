@@ -5,7 +5,6 @@
 NetScanBase::NetScanBase()
 {
 	m_hScanThread		= NULL;
-	m_hNotifyWnd		= NULL;
 	m_hCloseMsgRecvWnd	= NULL;
 	m_dwScanThreadID	= NULL;
 	m_hNotifyWnd		= NULL;

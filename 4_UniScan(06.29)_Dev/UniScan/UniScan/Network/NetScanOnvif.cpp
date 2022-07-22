@@ -35,13 +35,13 @@ void CNetScanOnvif::thrOnvifReceiver()
 	BOOL		bIsSuccessBind		= FALSE;
 	SOCKADDR	stSockAddr;
 	int			iRevLen				= sizeof(sockaddr_in);
+	XNode		stNode;
 	LPXNode		lpBody				= NULL;
 	LPXNode		lpUUID				= NULL;
 	LPXNode		lpIPAddress			= NULL;
 	int			iHTTPPort			= 0;
-	XNode		stNode;
 	char		aszUUID[128]		= { 0 };
-	char		aszData[128] = { 0 };
+	char		aszData[128]		= { 0 };
 	char		aszIPAddress[128]	= { 0 };
 	char*		pszSlice			= NULL;
 	DWORD		dwLastError			= 0;
@@ -92,7 +92,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 		if (pScanInfo)
 		{
 			memset(pScanInfo, 0, sizeof(SCAN_INFO));
-			pScanInfo->iScanType = 3;
 			// IP Parsing
 			lpBody = stNode.GetChildArg("d:ProbeMatch", NULL);
 			if (NULL != lpBody)
@@ -127,6 +126,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 					wsprintf(pScanInfo->szMAC, _T("N/A"));
 					wsprintf(pScanInfo->szModelName, _T("N/A"));
 					wsprintf(pScanInfo->szSwVersion, _T("N/A"));
+					wsprintf(pScanInfo->szSubnetMask, _T("N/A"));
 					pScanInfo->iVideoCnt = 0;
 
 					if (this->m_hNotifyWnd)

@@ -175,7 +175,7 @@ BEGIN_MESSAGE_MAP(CUniScanDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_ADAPTOR_CMB,			&CUniScanDlg::OnCbnSelchangeAdaptorCmb)
 	//ON_COMMAND(IDC_PROTOCAL_COMBO, &CUniScanDlg::OnProtocalCombo)
 	ON_BN_CLICKED(IDC_OPEN_XML,					&CUniScanDlg::OnClickedOpenXml)
-	ON_BN_CLICKED(IDC_BUTTON_LOGIN, &CUniScanDlg::OnClickedButtonLogin)
+	ON_BN_CLICKED(IDC_BUTTON_LOGIN,				&CUniScanDlg::OnClickedButtonLogin)
 END_MESSAGE_MAP()
 
 
@@ -397,21 +397,25 @@ void CUniScanDlg::OnBnClickedScanBtn()
 
 
 		// start set
-		for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-		{
-			if (m_apScanner[i])
-			{
-				m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
-				m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-				m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-				m_apScanner[i]->StartScan();
-			}
-			//m_apScanner[0]->StartScan();
-			//m_apScanner[1]->StartScan();
-			//m_apScanner[2]->StartScan();
-		}
-		
+		//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+		//{
+		//	if (m_apScanner[i])
+		//	{
+		//		m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
+		//		m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+		//		m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+		//		m_apScanner[i]->StartScan();
+		//	}
+		//	//m_apScanner[0]->StartScan();
+		//	//m_apScanner[1]->StartScan();
+		//	//m_apScanner[2]->StartScan();
+		//}
+		m_apScanner[2]->SetBindAddress(m_ulAcceptAddress);
+		m_apScanner[2]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+		m_apScanner[2]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+		m_apScanner[2]->StartScan();
 
+		
 		m_nScanAniCount = 0;
 		SetTimer(TM_SCANNING_ANI, 1000, NULL);
 	}
@@ -434,9 +438,11 @@ void CUniScanDlg::OnBnClickedScanBtn()
 			if (m_apScanner[i])
 			{
 				m_apScanner[i]->StopScan();
-				//m_apScanner[2]->StopScan();
 			}
 		}
+		//m_apScanner[0]->StopScan();
+		//m_apScanner[1]->StopScan();
+		//m_apScanner[2]->StopScan();
 	}
 }
 
@@ -628,12 +634,13 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 			pOldScanInfo = (SCAN_INFO*)m_cSvrList.GetItemData(i);
 			//if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0) // 원래 코드
 			if (wcscmp(pOldScanInfo->szAddr, pScanInfo->szAddr) == 0) // if founded then
-			{
+			{	
+
 				delete pScanInfo;
 				pScanInfo = NULL;
 				_Unlock();
 				return 0;
-					
+
 				if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0)
 				{
 					pOldScanInfo->SetReceiveTime();
@@ -656,6 +663,17 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 						break;
 					}
 				}
+
+				//if (wcslen(pOldScanInfo->szMAC) < 4 || wcslen(pScanInfo->szMAC) < 4)
+				//{
+				//	//pScanInfo->SetReceiveTime();
+				//	//m_cSvrList.SetItemData(i, (DWORD_PTR)pOldScanInfo);
+
+				//	delete pOldScanInfo;
+				//	pScanInfo = NULL;
+				//	_Unlock();
+				//	return 0;
+				//}
 			}
 		}
 		//}}
