@@ -1,7 +1,7 @@
-#include "./Stdafx.h"
+#include "../Stdafx.h"
 #include "NetScanOnvif.h"
 #include <atlconv.h>
-#include "xmlite\XMLite.h"
+#include "../xmlite/XMLite.h"
 
 CNetScanOnvif::CNetScanOnvif()
 {
@@ -42,7 +42,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 	int			iHTTPPort			= 0;
 	char		aszUUID[128]		= { 0 };
 	char		aszData[128]		= { 0 };
-	char		aszIPAddress[128]	= { 0 };
+	char		aszIPAddress[32]	= { 0 };
 	char*		pszSlice			= NULL;
 	DWORD		dwLastError			= 0;
 	SCAN_INFO*	pScanInfo			= NULL;
@@ -67,8 +67,10 @@ void CNetScanOnvif::thrOnvifReceiver()
 			if (this->m_hNotifyWnd && dwLastError != WSAEINTR && dwLastError != WSAEINVAL)
 			{
 				::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV);
-				this->ThreadExit();
 			}
+
+			this->ThreadExit();
+			break;
 		}
 
 		// 파싱할 데이터
@@ -126,17 +128,20 @@ void CNetScanOnvif::thrOnvifReceiver()
 					wsprintf(pScanInfo->szMAC, _T("N/A"));
 					wsprintf(pScanInfo->szModelName, _T("N/A"));
 					wsprintf(pScanInfo->szSwVersion, _T("N/A"));
-					wsprintf(pScanInfo->szSubnetMask, _T("N/A"));
+					pScanInfo->iBasePort = 0;
 					pScanInfo->iVideoCnt = 0;
-
+					
 					if (this->m_hNotifyWnd)
+					{
 						::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+					}
 				}
 			}
 		}
 
 		::OutputDebugStringA(m_pReceive_buffer);
 		::OutputDebugStringA("\n");
+
 	}
 	
 	if (NULL != pScanInfo)
@@ -272,25 +277,9 @@ BOOL CNetScanOnvif::SendScanRequest()
 			      </Probe>\
 			   </Body>\
 			</Envelope>",
-			// resolve
-		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
-			<env:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:dn=\"http://www.onvif.org/ver10/network/wsdl\" xmlns:env=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
-			   <env:Header>\
-				  <wsa:MessageID>uuid:%s</wsa:MessageID>\
-				  <wsa:To>urn:schemas-xmlsoap-org:ws:2005:04:discovery</wsa:To>\
-				  <wsa:Action>http://schemas.xmlsoap.org/ws/2005/04/discovery/Resolve</wsa:Action>\
-			   </env:Header>\
-			   <env:Body>\
-				  <d:Resolve>\
-					 <wsa:EndPointReference>\
-						<wsa:Address>uuid:%s</wsa:Address>\
-					 </wsa:EndPointReference>\
-				  </d:Resolve>\
-			   </env:Body>\
-			</env:Envelope>",
 		// GetDeviceInformation
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
-			<env:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:dn=\"http://www.onvif.org/ver10/network/wsdl\" xmlns:env=\"http://www.w3.org/2003/05/soap-envelope\">\
+			<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
 				<env:Header>\
 					<wsa:Action>http://www.onvif.org/ver10/device/wsdl/GetDeviceInformation</wsa:Action>\
 				</env:Header>\

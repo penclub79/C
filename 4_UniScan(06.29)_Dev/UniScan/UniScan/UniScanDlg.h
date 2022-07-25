@@ -9,7 +9,7 @@
 #include "./Network/NetCommon.h"
 #include "./Network/NetScanVision.h"
 #include "./Network/NetScanMarkIn.h"
-#include "NetScanOnvif.h"
+#include "./Network/NetScanOnvif.h"
 
 #include "ConnectCheckThread.h"
 #include <vector>

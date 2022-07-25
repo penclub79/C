@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./Network/NetScanBase.h"
+#include "NetScanBase.h"
 
 
 typedef struct _ONVIFINFO

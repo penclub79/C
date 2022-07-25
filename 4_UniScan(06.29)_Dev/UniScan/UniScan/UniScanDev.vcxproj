@@ -111,9 +111,9 @@
     <ClInclude Include="LoginDlg.h" />
     <ClInclude Include="MessageQueue.h" />
     <ClInclude Include="NetCommon.h" />
-    <ClInclude Include="NetScanOnvif.h" />
     <ClInclude Include="Network\NetScanBase.h" />
     <ClInclude Include="Network\NetScanMarkIn.h" />
+    <ClInclude Include="Network\NetScanOnvif.h" />
     <ClInclude Include="Network\NetScanVision.h" />
     <ClInclude Include="OSDChangeDlg.h" />
     <ClInclude Include="OSDChangeThread.h" />
@@ -145,9 +145,9 @@
     <ClCompile Include="ListItem.cpp" />
     <ClCompile Include="LoginDlg.cpp" />
     <ClCompile Include="MessageQueue.cpp" />
-    <ClCompile Include="NetScanOnvif.cpp" />
     <ClCompile Include="Network\NetScanBase.cpp" />
     <ClCompile Include="Network\NetScanMarkIn.cpp" />
+    <ClCompile Include="Network\NetScanOnvif.cpp" />
     <ClCompile Include="Network\NetScanVision.cpp" />
     <ClCompile Include="OSDChangeDlg.cpp" />
     <ClCompile Include="OSDChangeThread.cpp" />
