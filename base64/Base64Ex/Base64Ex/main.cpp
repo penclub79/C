@@ -54,7 +54,7 @@ int base64_encoder(char* pszInput, int iInputSize, char* pszOutput, int iOutputS
 // Main
 void main() {
 	
-	char *str = "hello base64 !";
+	char *str = "111111";
 	char base64_code[128] = { 0, };
 	char text[128] = { 0, };
 	int ret = 0;
