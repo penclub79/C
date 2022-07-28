@@ -30,6 +30,79 @@ BOOL CNetScanOnvif::StartScan()
 	return TRUE;
 }
 
+BOOL CNetScanOnvif::CreateSocket()
+{
+	//struct in_addr localInterface = { 0 };
+	int			iError = 0;
+	char		szEnable = 0;
+	struct		ip_mreq mreq;
+	struct		in_addr localInterface;
+	int			reuse = 0;
+
+	if (NULL == m_hReceiveSock)
+	{
+		m_hReceiveSock = socket(AF_INET, SOCK_DGRAM, 0);
+
+		/*
+		* Disable loopback so you do not receive your own datagrams.
+		*/
+		if (SOCKET_ERROR == setsockopt(m_hReceiveSock, IPPROTO_IP, IP_MULTICAST_LOOP, (char*)&szEnable, sizeof(szEnable)))
+		{
+			iError = WSAGetLastError();
+			TRACE(_T("SetSocket Error = %d\n"), iError);
+			closesocket(m_hReceiveSock);
+			return FALSE;
+		}
+
+		/*
+		* Set local interface for outbound multicast datagrams.
+		* The IP address specified must be associated with a local,
+		* multicast-capable interface.
+		*/
+		localInterface.s_addr = m_ulBindAddress; //inet_addr("192.168.0.40");
+		if (SOCKET_ERROR == setsockopt(m_hReceiveSock, IPPROTO_IP, IP_MULTICAST_IF, (char*)&localInterface, sizeof(localInterface)))
+		{
+			iError = WSAGetLastError();
+			TRACE(_T("SetSocket Error = %d\n"), iError);
+			closesocket(m_hReceiveSock);
+			return FALSE;
+		}
+
+		/*
+		* Enable SO_REUSEADDR to allow multiple instances of this
+		* application to receive copies of the multicast datagrams.
+		*/
+		reuse = 1;
+		if (SOCKET_ERROR == setsockopt(m_hReceiveSock, SOL_SOCKET, SO_REUSEADDR, (char *)&reuse, sizeof(reuse)))
+		{
+			TRACE("getaddrinfo error = %d\n", WSAGetLastError());
+			closesocket(m_hReceiveSock);
+			m_hReceiveSock = NULL;
+			return FALSE;
+		}
+
+		/*
+		* Join the multicast group 225.1.1.1 on the local 9.5.1.1
+		* interface.  Note that this IP_ADD_MEMBERSHIP option must be
+		* called for each local interface over which the multicast
+		* datagrams are to be received.
+		*/
+		mreq.imr_multiaddr.s_addr = inet_addr("239.255.255.250"); //multi cast group
+		mreq.imr_interface.s_addr = m_ulBindAddress; // Local
+		//mreq.imr_interface.s_addr = htonl(INADDR_ANY); // INADDR_ANY도 가능
+
+		// 멀티캐스트 그룹 가입
+		if (SOCKET_ERROR == setsockopt(m_hReceiveSock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)))
+		{
+			iError = WSAGetLastError();
+			TRACE(_T("IP_ADD_MEMBERSHIP error=%d\n"), iError);
+			this->ThreadExit();
+		}
+	}
+
+	return TRUE;
+}
+
 void CNetScanOnvif::thrOnvifReceiver()
 {
 	BOOL		bIsSuccessBind		= FALSE;
@@ -47,9 +120,8 @@ void CNetScanOnvif::thrOnvifReceiver()
 	DWORD		dwLastError			= 0;
 	SCAN_INFO*	pScanInfo			= NULL;
 
-
 	m_pReceive_buffer = new char[SCAN_INFO_m_pReceive_buffer_SIZE];
-	memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_m_pReceive_buffer_SIZE);
+	memset(m_pReceive_buffer, 0, sizeof(char) * SCAN_INFO_m_pReceive_buffer_SIZE);
 
 	while (this->m_dwScanThreadID)
 	{
@@ -123,10 +195,10 @@ void CNetScanOnvif::thrOnvifReceiver()
 					strcpy(&aszIPAddress[0], lpIPAddress->value);
 					
 					this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
-					wsprintf(pScanInfo->szGateWay, _T("N/A"));
-					wsprintf(pScanInfo->szMAC, _T("N/A"));
-					wsprintf(pScanInfo->szModelName, _T("N/A"));
-					wsprintf(pScanInfo->szSwVersion, _T("N/A"));
+					wsprintf(pScanInfo->szGateWay,		_T("N/A"));
+					wsprintf(pScanInfo->szMAC,			_T("N/A"));
+					wsprintf(pScanInfo->szModelName,	_T("N/A"));
+					wsprintf(pScanInfo->szSwVersion,	_T("N/A"));
 					pScanInfo->iBasePort = 0;
 					pScanInfo->iVideoCnt = 0;
 					
@@ -140,8 +212,8 @@ void CNetScanOnvif::thrOnvifReceiver()
 			}
 		}
 
-		::OutputDebugStringA(m_pReceive_buffer);
-		::OutputDebugStringA("\n");
+		//::OutputDebugStringA(m_pReceive_buffer);
+		//::OutputDebugStringA("\n");
 
 	}
 	
@@ -152,79 +224,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 	}
 
 	return;
-}
-
-BOOL CNetScanOnvif::CreateSocket()
-{
-	//struct in_addr localInterface = { 0 };
-	int			iError = 0;
-	char		szEnable = 0;
-	struct		ip_mreq mreq;
-	struct		in_addr localInterface;
-	int			reuse = 0;
-
-	if (NULL == m_hReceiveSock)
-	{
-		m_hReceiveSock = socket(AF_INET, SOCK_DGRAM, 0);
-		
-		/*
-		* Disable loopback so you do not receive your own datagrams.
-		*/
-		if (SOCKET_ERROR == setsockopt(m_hReceiveSock, IPPROTO_IP, IP_MULTICAST_LOOP, (char*)&szEnable, sizeof(szEnable)))
-		{
-			iError = WSAGetLastError();
-			TRACE(_T("SetSocket Error = %d\n"), iError);
-			closesocket(m_hReceiveSock);
-			return FALSE;
-		}
-
-		/*
-		* Set local interface for outbound multicast datagrams.
-		* The IP address specified must be associated with a local,
-		* multicast-capable interface.
-		*/
-		localInterface.s_addr = m_ulBindAddress; //inet_addr("192.168.0.40");
-		if (SOCKET_ERROR == setsockopt( m_hReceiveSock, IPPROTO_IP, IP_MULTICAST_IF, (char*)&localInterface, sizeof(localInterface)) )
-		{
-			iError = WSAGetLastError();
-			TRACE(_T("SetSocket Error = %d\n"), iError);
-			closesocket(m_hReceiveSock);
-			return FALSE;
-		}
-
-		/*
-		* Enable SO_REUSEADDR to allow multiple instances of this
-		* application to receive copies of the multicast datagrams.
-		*/
-		reuse = 1;
-		if (SOCKET_ERROR == setsockopt( m_hReceiveSock, SOL_SOCKET, SO_REUSEADDR, (char *)&reuse, sizeof(reuse)) )
-		{
-			TRACE("getaddrinfo error = %d\n", WSAGetLastError());
-			closesocket(m_hReceiveSock);
-			m_hReceiveSock = NULL;
-			return FALSE;
-		}
-
-		/*
-		* Join the multicast group 225.1.1.1 on the local 9.5.1.1
-		* interface.  Note that this IP_ADD_MEMBERSHIP option must be
-		* called for each local interface over which the multicast
-		* datagrams are to be received.
-		*/
-		mreq.imr_multiaddr.s_addr = inet_addr("239.255.255.250"); //multi cast group
-		mreq.imr_interface.s_addr = m_ulBindAddress; // Local
-		//mreq.imr_interface.s_addr = htonl(INADDR_ANY); // INADDR_ANY도 가능
-
-		// 멀티캐스트 그룹 가입
-		if (SOCKET_ERROR == setsockopt( m_hReceiveSock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)) )
-		{
-			iError = WSAGetLastError();
-			TRACE(_T("IP_ADD_MEMBERSHIP error=%d\n"), iError);
-			this->ThreadExit();
-		}
-	}
-
-	return TRUE;
 }
 
 BOOL CNetScanOnvif::GenerateMsgID(char* szMessageID, int nBufferLen)
@@ -259,12 +258,9 @@ BOOL CNetScanOnvif::SendScanRequest()
 	int			iError				= 0;
 	char*		pszSendBuffer		= NULL;
 
-	enum { ENUM_PROBE_MSG };
-
-	const char* g_xmlSchs[3] =
-	{
-		// probe message
-		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+	// probe message
+	const char* g_xmlSchs =
+	"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
 			<Envelope xmlns:dn=\"http://www.onvif.org/ver10/network/wsdl\" xmlns=\"http://www.w3.org/2003/05/soap-envelope\">\
 			   <Header>\
 			      <wsa:MessageID xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">uuid:%s</wsa:MessageID>\
@@ -277,9 +273,8 @@ BOOL CNetScanOnvif::SendScanRequest()
 			         <Scopes />\
 			      </Probe>\
 			   </Body>\
-			</Envelope>"
-	};
-
+			</Envelope>";
+	
 	// 소켓 생성
 	if (NULL == m_hReceiveSock)
 	{
@@ -301,7 +296,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 	memset(pszSendBuffer, 0, 4000);
 
 	// 얻어온 UUID를 XML에 적용
-	sprintf_s(pszSendBuffer, 4000, g_xmlSchs[0], szMessageID);
+	sprintf_s(pszSendBuffer, 4000, g_xmlSchs, szMessageID);
 
 	iSize = strlen(pszSendBuffer);
 	if (SOCKET_ERROR == sendto(m_hReceiveSock, pszSendBuffer, iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
@@ -317,6 +312,8 @@ BOOL CNetScanOnvif::SendScanRequest()
 
 	m_bConnected = TRUE;
 
+	//SendSSDP(); // SSDP Request 함수
+
 	if (NULL != pszSendBuffer)
 	{
 		delete[] pszSendBuffer;
@@ -326,27 +323,70 @@ BOOL CNetScanOnvif::SendScanRequest()
 	return TRUE;
 }
 
+BOOL CNetScanOnvif::SendSSDP()
+{
+	sockaddr_in HTTPSendSock		= { 0 };
+	SOCKET		TcpSock;
+	SOCKADDR	stSockAddr;
+	int			iRevLen				= sizeof(sockaddr_in);
+	//char*		pszHost				= "239.255.255.250";
+	char*		pszHost				= "192.168.0.199";
+	int			iPort				= 1900;
+	int			iError				= 0;
+	int			iSendDataSize		= 0;
+	char		aszRecvBuffer[4096] = { 0 };
+	char		aszSendBuffer[1024]	= { 0 };
+
+	//char* aszReqSSDP = "M-SEARCH * HTTP/1.1\r\n\HOST: %s:%d\r\nMAN: \"ssdp:discover\"\r\nMX: 1\r\nST: urn:dial-multiscreen-org:service:dial:1\r\n\r\n";
+
+	//sprintf_s(aszSendBuffer, sizeof(char) * 1024, aszReqSSDP, pszHost, iPort);
+
+	TcpSock = socket(AF_INET, SOCK_DGRAM, 0);
+	HTTPSendSock.sin_family = AF_INET;
+	HTTPSendSock.sin_port = htons(3702);
+	HTTPSendSock.sin_addr.s_addr = inet_addr(pszHost);
+
+	iSendDataSize = strlen(aszSendBuffer);
+	if (SOCKET_ERROR == sendto(TcpSock, aszSendBuffer, iSendDataSize, 0, (struct sockaddr*)&HTTPSendSock, sizeof(HTTPSendSock)))
+	{
+		iError = WSAGetLastError();
+		TRACE(_T("TCP-HTTP send Error = %d\n"), iError);
+		closesocket(TcpSock);
+
+		return FALSE;
+	}
+
+	while (this->m_dwScanThreadID)
+	{
+		if (SOCKET_ERROR == recvfrom(TcpSock, aszRecvBuffer, sizeof(char)* 4096, 0, (SOCKADDR*)&stSockAddr, &iRevLen))
+		{
+			iError = WSAGetLastError();
+			TRACE(_T("TCP-HTTP recv Error = %d\n"), iError);
+			closesocket(TcpSock);
+
+			return FALSE;
+		}
+
+		::OutputDebugStringA(aszRecvBuffer);
+		::OutputDebugStringA("\n");
+	}
+	return TRUE;
+}
+
 BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 {
 	char*		pszSendBuffer		= NULL;
 	char		aszRecvBuffer[4096] = { 0 };
 	char		aszSendBuffer[1024] = { 0 };
-	char		aszIP[30]			= { 0 };
 	char		szMessageID[128]	= { 0 };
 	int			iSendDataSize		= 0;
 	int			iError				= 0;
 	sockaddr_in HTTPSendSock		= { 0 };
-	BOOL		bIsSuccessBind		= FALSE;
 	SOCKET		TcpSock;
+	XNode		stNode;
+	LPXNode		lpBody				= NULL;
 	
-	memcpy(aszIP, pszIP, sizeof(char) * 30);
-	char aszReqXML[1024] = "POST /onvif/device_service HTTP/1.1\r\n\Content-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetSystemDateAndTime\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
-
-	//char* pszReqXML = "POST /onvif/device_service HTTP/1.1\r\n\Content-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetNetworkInterfaces\"\r\n\Host: 192.168.0.134:80\r\nContent-Length: 0\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
-
-	/*
-	POST /onvif/device_service HTTP/1.1\r\n\Content-Type: appication/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetNetworkInterfaces\"\r\n\Host: 192.168.0.132:80\r\n
-	*/
+	char aszReqHTTP[1024] = "POST /onvif/device_service HTTP/1.1\r\n\Content-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetSystemDateAndTime\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
 
 	char aszXmlSchs[500] = 
 	{
@@ -358,39 +398,26 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 		</s:Envelope>"
 	};
 
-	sprintf_s(aszSendBuffer, 1024, aszReqXML, pszIP, strlen(aszXmlSchs));
+	sprintf_s(aszSendBuffer, 1024, aszReqHTTP, pszIP, strlen(aszXmlSchs));
 	strcat(aszSendBuffer, aszXmlSchs);
 
 	::OutputDebugStringA(aszSendBuffer);
 	::OutputDebugStringA("\n");
-
-	//const char* pszXmlSchs =
-	//{
-	//// GetDeviceInformation
-	//	"POST /onvif/device_service HTTP/1.1\r\n\Content-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetDNS\"\r\nContent-Length: 0\r\nHost: 192.168.0.134:80\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n<?xml version=\"1.0\" encoding=\"utf-8\"?>\
-	//		<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
-	//			<env:Header>\
-	//				<wsa:Action>http://www.onvif.org/ver10/device/wsdl/GetDeviceInformation</wsa:Action>\
-	//			</env:Header>\
-	//			<env:Body>\
-	//				<dn:GetDeviceInformation/>\
-	//			</env:Body>\
-	//		</env:Envelope>"
-	//};
 	
-
 	TcpSock = socket(PF_INET, SOCK_STREAM, 0);
 
 	HTTPSendSock.sin_family = AF_INET;
 	HTTPSendSock.sin_port = htons(80);
-	HTTPSendSock.sin_addr.s_addr = inet_addr("192.168.0.132");
+	HTTPSendSock.sin_addr.s_addr = inet_addr(pszIP);
 
 	if (SOCKET_ERROR == connect(TcpSock, (SOCKADDR*)&HTTPSendSock, sizeof(SOCKADDR)))
 	{
-		if (m_hNotifyWnd)
-			::PostMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_BIND);
+		//if (m_hNotifyWnd)
+		//	::PostMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_CONNECT);
+		iError = WSAGetLastError();
+		TRACE(_T("TCP-HTTP Connect Error = %d\n"), iError);
+		closesocket(TcpSock);
 
-		ThreadExit();
 		return FALSE;
 	}
 
@@ -404,7 +431,7 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 		return FALSE;
 	}
 
-	if (SOCKET_ERROR == recv(TcpSock, aszRecvBuffer, sizeof(char)* 4096, 0))
+	if (SOCKET_ERROR == recv(TcpSock, aszRecvBuffer, sizeof(char) * 4096, 0))
 	{
 		iError = WSAGetLastError();
 		TRACE(_T("TCP-HTTP recv Error = %d\n"), iError);
@@ -413,13 +440,15 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 		return FALSE;
 	}
 	::OutputDebugStringA("ONVIF DEVICE DATA -----------------------\n");
+	::OutputDebugStringA(pszIP);
+	::OutputDebugStringA("\n");
 	::OutputDebugStringA(aszRecvBuffer);
 	::OutputDebugStringA("\n");
 
-	//if (NULL != TcpSock)
+	//if ( strlen(aszRecvBuffer) )
 	//{
-	//	closesocket(TcpSock);
-	//	WSACleanup();
+	//	stNode.Load(aszRecvBuffer);
+	//	lpBody = stNode.GetChildArg("SOAP-ENV:Body", NULL);
 	//}
 
 	return TRUE;

@@ -22,7 +22,7 @@ protected:
 	static DWORD thrOnvifScanThread(LPVOID pParam);
 	void thrOnvifReceiver();
 	BOOL SendAuthentication(char* pszIP);
-
+	BOOL SendSSDP();
 	BOOL CreateSocket();
 	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
 
