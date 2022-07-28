@@ -202,7 +202,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 					pScanInfo->iBasePort = 0;
 					pScanInfo->iVideoCnt = 0;
 					
-					SendAuthentication(aszIPAddress);
+					//SendAuthentication(aszIPAddress);
 
 					if (this->m_hNotifyWnd)
 					{
@@ -254,25 +254,28 @@ BOOL CNetScanOnvif::SendScanRequest()
 	DWORD		dwFileSize			= 0;
 	int			iSize				= 0;
 	char		szMessageID[128]	= { 0 };
-	int			iReuse				= 1;
 	int			iError				= 0;
 	char*		pszSendBuffer		= NULL;
+	char*		pszOnvifURI[2]		= {"http://www.onvif.org/ver10/network/wsdl", "http://www.onvif.org/ver10/device/wsdl"};
+	char*		pszProbeType[3]		= { "dp0:NetworkVideoTransmitter", "dp0:NetworkVideoDisplay", "dp0:Device" };
 
 	// probe message
 	const char* g_xmlSchs =
-	"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
-			<Envelope xmlns:dn=\"http://www.onvif.org/ver10/network/wsdl\" xmlns=\"http://www.w3.org/2003/05/soap-envelope\">\
-			   <Header>\
-			      <wsa:MessageID xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">uuid:%s</wsa:MessageID>\
-			      <wsa:To xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">urn:schemas-xmlsoap-org:ws:2005:04:discovery</ wsa:To>\
-			      <wsa:Action xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe</wsa:Action>\
-			   </Header>\
-			   <Body>\
-			      <Probe xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=  \"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
-			         <Types>dn:NetworkVideoTransmitter</Types>\
-			         <Scopes />\
-			      </Probe>\
-			   </Body>\
+		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+			<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\
+				<s:Header>\
+					<a:Action s:mustUnderstand=\"1\">http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe</a:Action>\
+					<wsa:MessageID xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">uuid:%s</wsa:MessageID>\
+					<a:ReplyTo>\
+						<a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address>\
+					</a:ReplyTo>\
+					<a:To s:mustUnderstand=\"1\">urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To>\
+				</s:Header>\
+				<s:Body>\
+					<Probe xmlns=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
+						<d:Types xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\" xmlns:dp0=%s>%s</Types>\
+					</Probe>\
+				</s:Body>\
 			</Envelope>";
 	
 	// 소켓 생성
@@ -290,29 +293,45 @@ BOOL CNetScanOnvif::SendScanRequest()
 	OnvifSendSock.sin_port = htons(3702);
 	OnvifSendSock.sin_addr.s_addr = inet_addr("239.255.255.250"); // multicast group
 
-	// UUID 얻기
-	GenerateMsgID(szMessageID, 127);
 	pszSendBuffer = new char[4000];
 	memset(pszSendBuffer, 0, 4000);
 
-	// 얻어온 UUID를 XML에 적용
-	sprintf_s(pszSendBuffer, 4000, g_xmlSchs, szMessageID);
-
-	iSize = strlen(pszSendBuffer);
-	if (SOCKET_ERROR == sendto(m_hReceiveSock, pszSendBuffer, iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
+	int iTypeIdx = 0;
+	int iUriIdx = 0;
+	// Probe Type 배열 요소 갯수 만큼 Packet Send
+	while (iTypeIdx < sizeof(pszProbeType) / sizeof(pszProbeType[0]))
 	{
-		iError = WSAGetLastError();
-		TRACE(_T("sendto Error = %d\n"), iError);
-		closesocket(m_hReceiveSock);
+		// UUID 얻기
+		GenerateMsgID(szMessageID, 127);
 
-		delete[] pszSendBuffer;
-		pszSendBuffer = NULL;
-		return FALSE;
+		if (iTypeIdx > 1)
+			iUriIdx++;
+
+		// 얻어온 UUID를 XML에 적용
+		sprintf_s(pszSendBuffer, 4000, g_xmlSchs, szMessageID, pszOnvifURI[iUriIdx], pszProbeType[iTypeIdx]);
+
+		iSize = strlen(pszSendBuffer);
+		if (SOCKET_ERROR == sendto(m_hReceiveSock, pszSendBuffer, iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
+		{
+			iError = WSAGetLastError();
+			TRACE(_T("sendto Error = %d\n"), iError);
+			closesocket(m_hReceiveSock);
+
+			delete[] pszSendBuffer;
+			pszSendBuffer = NULL;
+			return FALSE;
+		}
+		
+		iTypeIdx++;
+
+		::OutputDebugStringA(pszSendBuffer);
+		::OutputDebugStringA("\n");
 	}
+	
 
 	m_bConnected = TRUE;
 
-	//SendSSDP(); // SSDP Request 함수
+	//SendSSDP();
 
 	if (NULL != pszSendBuffer)
 	{
@@ -323,55 +342,55 @@ BOOL CNetScanOnvif::SendScanRequest()
 	return TRUE;
 }
 
-BOOL CNetScanOnvif::SendSSDP()
-{
-	sockaddr_in HTTPSendSock		= { 0 };
-	SOCKET		TcpSock;
-	SOCKADDR	stSockAddr;
-	int			iRevLen				= sizeof(sockaddr_in);
-	//char*		pszHost				= "239.255.255.250";
-	char*		pszHost				= "192.168.0.199";
-	int			iPort				= 1900;
-	int			iError				= 0;
-	int			iSendDataSize		= 0;
-	char		aszRecvBuffer[4096] = { 0 };
-	char		aszSendBuffer[1024]	= { 0 };
-
-	//char* aszReqSSDP = "M-SEARCH * HTTP/1.1\r\n\HOST: %s:%d\r\nMAN: \"ssdp:discover\"\r\nMX: 1\r\nST: urn:dial-multiscreen-org:service:dial:1\r\n\r\n";
-
-	//sprintf_s(aszSendBuffer, sizeof(char) * 1024, aszReqSSDP, pszHost, iPort);
-
-	TcpSock = socket(AF_INET, SOCK_DGRAM, 0);
-	HTTPSendSock.sin_family = AF_INET;
-	HTTPSendSock.sin_port = htons(3702);
-	HTTPSendSock.sin_addr.s_addr = inet_addr(pszHost);
-
-	iSendDataSize = strlen(aszSendBuffer);
-	if (SOCKET_ERROR == sendto(TcpSock, aszSendBuffer, iSendDataSize, 0, (struct sockaddr*)&HTTPSendSock, sizeof(HTTPSendSock)))
-	{
-		iError = WSAGetLastError();
-		TRACE(_T("TCP-HTTP send Error = %d\n"), iError);
-		closesocket(TcpSock);
-
-		return FALSE;
-	}
-
-	while (this->m_dwScanThreadID)
-	{
-		if (SOCKET_ERROR == recvfrom(TcpSock, aszRecvBuffer, sizeof(char)* 4096, 0, (SOCKADDR*)&stSockAddr, &iRevLen))
-		{
-			iError = WSAGetLastError();
-			TRACE(_T("TCP-HTTP recv Error = %d\n"), iError);
-			closesocket(TcpSock);
-
-			return FALSE;
-		}
-
-		::OutputDebugStringA(aszRecvBuffer);
-		::OutputDebugStringA("\n");
-	}
-	return TRUE;
-}
+//BOOL CNetScanOnvif::SendSSDP()
+//{
+//	sockaddr_in HTTPSendSock		= { 0 };
+//	SOCKET		TcpSock;
+//	SOCKADDR	stSockAddr;
+//	int			iRevLen				= sizeof(sockaddr_in);
+//	char*		pszHost				= "239.255.255.250";
+//	//char*		pszHost				= "192.168.0.199";
+//	int			iPort				= 1900;
+//	int			iError				= 0;
+//	int			iSendDataSize		= 0;
+//	char		aszRecvBuffer[4096] = { 0 };
+//	char		aszSendBuffer[1024]	= { 0 };
+//
+//	char* aszReqSSDP = "M-SEARCH * HTTP/1.1\r\n\HOST: %s:%d\r\nMAN: \"ssdp:discover\"\r\nMX: 1\r\nST: urn:dial-multiscreen-org:service:dial:1\r\nUSER-AGENT: Google Chrome/103.0.5060.134 Windows\r\n\r\n";
+//
+//	sprintf_s(aszSendBuffer, sizeof(char) * 1024, aszReqSSDP, pszHost, iPort);
+//
+//	TcpSock = socket(AF_INET, SOCK_DGRAM, 0);
+//	HTTPSendSock.sin_family = AF_INET;
+//	HTTPSendSock.sin_port = htons(3702);
+//	HTTPSendSock.sin_addr.s_addr = inet_addr(pszHost);
+//
+//	iSendDataSize = strlen(aszSendBuffer);
+//	if (SOCKET_ERROR == sendto(TcpSock, aszSendBuffer, iSendDataSize, 0, (struct sockaddr*)&HTTPSendSock, sizeof(HTTPSendSock)))
+//	{
+//		iError = WSAGetLastError();
+//		TRACE(_T("TCP-HTTP send Error = %d\n"), iError);
+//		closesocket(TcpSock);
+//
+//		return FALSE;
+//	}
+//
+//	while (this->m_dwScanThreadID)
+//	{
+//		if (SOCKET_ERROR == recvfrom(TcpSock, aszRecvBuffer, sizeof(char)* 4096, 0, (SOCKADDR*)&stSockAddr, &iRevLen))
+//		{
+//			iError = WSAGetLastError();
+//			TRACE(_T("TCP-HTTP recv Error = %d\n"), iError);
+//			closesocket(TcpSock);
+//
+//			return FALSE;
+//		}
+//
+//		::OutputDebugStringA(aszRecvBuffer);
+//		::OutputDebugStringA("\n");
+//	}
+//	return TRUE;
+//}
 
 BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 {
@@ -400,9 +419,6 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 
 	sprintf_s(aszSendBuffer, 1024, aszReqHTTP, pszIP, strlen(aszXmlSchs));
 	strcat(aszSendBuffer, aszXmlSchs);
-
-	::OutputDebugStringA(aszSendBuffer);
-	::OutputDebugStringA("\n");
 	
 	TcpSock = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -412,8 +428,6 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 
 	if (SOCKET_ERROR == connect(TcpSock, (SOCKADDR*)&HTTPSendSock, sizeof(SOCKADDR)))
 	{
-		//if (m_hNotifyWnd)
-		//	::PostMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_CONNECT);
 		iError = WSAGetLastError();
 		TRACE(_T("TCP-HTTP Connect Error = %d\n"), iError);
 		closesocket(TcpSock);
@@ -439,11 +453,11 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 
 		return FALSE;
 	}
-	::OutputDebugStringA("ONVIF DEVICE DATA -----------------------\n");
-	::OutputDebugStringA(pszIP);
-	::OutputDebugStringA("\n");
-	::OutputDebugStringA(aszRecvBuffer);
-	::OutputDebugStringA("\n");
+	//::OutputDebugStringA("ONVIF DEVICE DATA -----------------------\n");
+	//::OutputDebugStringA(pszIP);
+	//::OutputDebugStringA("\n");
+	//::OutputDebugStringA(aszRecvBuffer);
+	//::OutputDebugStringA("\n");
 
 	//if ( strlen(aszRecvBuffer) )
 	//{
