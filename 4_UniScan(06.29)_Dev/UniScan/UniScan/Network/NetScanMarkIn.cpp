@@ -57,9 +57,9 @@ void CNetScanMarkIn::thrMarkInReceiver()
 	{
 		iSenderAddrLen = sizeof(SOCKADDR_IN);
 
-		m_pReceive_buffer = new char[SCAN_INFO_m_pReceive_buffer_SIZE];
+		m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
 		pReceive = (HEADER_BODY*)m_pReceive_buffer; // 할당 메모리 크기로 구조체 사용
-		memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_m_pReceive_buffer_SIZE);		// 초기화
+		memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE);		// 초기화
 
 		// Recev Data Thread live
 		while (this->m_dwScanThreadID)

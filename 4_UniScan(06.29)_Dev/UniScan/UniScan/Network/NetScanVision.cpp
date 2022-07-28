@@ -178,7 +178,7 @@ void CNetScanVision::thrReceiver()
 		// 서버의 응답을 기다린다
 		iSenderAddrLen = sizeof(SOCKADDR_IN);
 
-		m_pReceive_buffer = new char[SCAN_INFO_m_pReceive_buffer_SIZE]; // allocate 64 k bytes buffer
+		m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE]; // allocate 64 k bytes buffer
 		if (m_pReceive_buffer == NULL)
 		{
 			if (this->m_hNotifyWnd)
@@ -187,7 +187,7 @@ void CNetScanVision::thrReceiver()
 			this->ThreadExit();
 			return;
 		}
-		memset(m_pReceive_buffer, 0, SCAN_INFO_m_pReceive_buffer_SIZE);
+		memset(m_pReceive_buffer, 0, SCAN_INFO_RECEIVE_BUFFER_SIZE);
 
 		pReceive = (HEADER2*)m_pReceive_buffer;
 		iToRead = pReceive->body_size - sizeof(IPUTIL_INFO2);
@@ -195,7 +195,7 @@ void CNetScanVision::thrReceiver()
 
 		while (this->m_dwScanThreadID)
 		{
-			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, SCAN_INFO_m_pReceive_buffer_SIZE, 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
+			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, SCAN_INFO_RECEIVE_BUFFER_SIZE, 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
 			{
 				dwLastError = WSAGetLastError();
 				TRACE("Vision recvfrom error = %d\n", dwLastError);
