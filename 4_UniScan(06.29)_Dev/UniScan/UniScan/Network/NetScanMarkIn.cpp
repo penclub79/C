@@ -76,7 +76,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 			}
 
 			// Data Little Endian -> Big Endian all Change
-			pReceive->stPacket.uiCommand = htonl(pReceive->stPacket.uiCommand);
+			pReceive->stPacket.uiCommand = htonl(pReceive->stPacket.uiCommand); 
 			pReceive->stDevInfo.stNetwork_info.uiHttp_port = htonl(pReceive->stDevInfo.stNetwork_info.uiHttp_port);
 			pReceive->stDevInfo.stNetwork_info.uiBase_port = htonl(pReceive->stDevInfo.stNetwork_info.uiBase_port);
 

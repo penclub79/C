@@ -1,7 +1,7 @@
 #pragma once
 
 #include "NetScanBase.h"
-
+#include "../../UniScan/MD5.h"
 
 typedef struct _ONVIFINFO
 {
@@ -25,7 +25,7 @@ protected:
 	BOOL SendSSDP();
 	BOOL CreateSocket();
 	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
-
+	void MD5Function(char* pszStr, unsigned char* pszResult);
 	BOOL m_bConnected;
 
 private:

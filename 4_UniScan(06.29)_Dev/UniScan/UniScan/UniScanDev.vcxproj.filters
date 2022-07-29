@@ -31,6 +31,12 @@
     <Filter Include="헤더 파일\Dlg">
       <UniqueIdentifier>{b44ec8b7-f202-4b29-8697-40eb3a8e3323}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\MD5">
+      <UniqueIdentifier>{b50ba77a-84db-4654-b472-72daeb3c03e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\MD5">
+      <UniqueIdentifier>{92964263-1190-4401-b05e-e7475e2baaee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -135,6 +141,9 @@
     <ClInclude Include="Network\NetScanOnvif.h">
       <Filter>헤더 파일\Network</Filter>
     </ClInclude>
+    <ClInclude Include="MD5.h">
+      <Filter>헤더 파일\MD5</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -220,6 +229,9 @@
     </ClCompile>
     <ClCompile Include="Network\NetScanOnvif.cpp">
       <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="MD5.cpp">
+      <Filter>소스 파일\MD5</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

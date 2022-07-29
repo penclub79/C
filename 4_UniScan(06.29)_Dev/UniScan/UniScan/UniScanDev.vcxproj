@@ -109,6 +109,7 @@
     <ClInclude Include="IPChangeDlg2.h" />
     <ClInclude Include="ListItem.h" />
     <ClInclude Include="LoginDlg.h" />
+    <ClInclude Include="MD5.h" />
     <ClInclude Include="MessageQueue.h" />
     <ClInclude Include="NetCommon.h" />
     <ClInclude Include="Network\NetScanBase.h" />
@@ -144,6 +145,7 @@
     <ClCompile Include="IPChangeThread.cpp" />
     <ClCompile Include="ListItem.cpp" />
     <ClCompile Include="LoginDlg.cpp" />
+    <ClCompile Include="MD5.cpp" />
     <ClCompile Include="MessageQueue.cpp" />
     <ClCompile Include="Network\NetScanBase.cpp" />
     <ClCompile Include="Network\NetScanMarkIn.cpp" />

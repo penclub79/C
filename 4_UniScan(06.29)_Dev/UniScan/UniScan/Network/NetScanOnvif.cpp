@@ -353,10 +353,12 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 	XNode		stNode;
 	LPXNode		lpBody				= NULL;
 	char		aszTime[32]			= { 0 };
-	char*		pSendAuthBuff		= NULL;
-	char		aszUserID[32]		= { 0 };
+	char*		pszSendAuthBuff		= NULL;
+	char*		pszUserID			= { "admin" };
+	char*		pszUserPWD			= { "111111" };
+	unsigned char		pszDigest[16];
 
-	char aszReqHTTP[1024] = "POST /onvif/device_service HTTP/1.1\r\n\Content-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetSystemDateAndTime\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
+	char aszReqHTTP[1024] = "POST /onvif/device_service HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetSystemDateAndTime\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
 
 	char* paszXmlSchs[2] = 
 	{
@@ -365,7 +367,7 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 			<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
 				<GetSystemDateAndTime xmlns=\"http://www.onvif.org/ver10/device/wsdl\"/>\
 			</s:Body>\
-		</s:Envelope>",
+		</s:Envelope>", // GetSystemDate
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
 			<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
 				<s:Header>\
@@ -381,15 +383,14 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 				<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
 					<GetDeviceInformation xmlns=\"http://www.onvif.org/ver10/device/wsdl\"/>\
 				</s:Body>\
-			</s:Envelope>"
+			</s:Envelope>" // GetDeviceInfomation
 	};
 
-	int BuffSize = strlen(paszXmlSchs[0]) + strlen(aszUserID);
-	pSendAuthBuff = new char[BuffSize + 1];
-
 	sprintf_s(aszSendBuffer, 1024, aszReqHTTP, pszIP, strlen(paszXmlSchs[0]));
-	strcat(aszSendBuffer, paszXmlSchs[0]);
-	
+	strcat_s(aszSendBuffer, sizeof(char) * strlen(aszSendBuffer) + strlen(paszXmlSchs[0]) + 1, paszXmlSchs[0]);
+	//sprintf_s(aszSendBuffer, 1024, aszReqHTTP, pszIP, strlen(paszXmlSchs[0]));
+	//strcat(aszSendBuffer, paszXmlSchs[0]);
+
 	TcpSock = socket(PF_INET, SOCK_STREAM, 0);
 
 	HTTPSendSock.sin_family = AF_INET;
@@ -428,6 +429,14 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 	::OutputDebugStringA("\n");
 	::OutputDebugStringA(aszRecvBuffer);
 	::OutputDebugStringA("\n");
+
+	MD5Function(pszUserPWD, pszDigest);
+	char aszMD5[32] = { 0 };
+
+	for (int i = 0; i < 16; i++)
+	{
+		sprintf_s(aszMD5, "%s%02x", aszMD5, pszDigest[i]);
+	}
 
 	if ( 0 != strlen(aszRecvBuffer) )
 	{
@@ -473,9 +482,30 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 		}
 	}
 
+	//int BuffSize = strlen(paszXmlSchs[0]) + strlen(pszUserID) + strlen() + strlen() + strlen(aszTime);
+	//pszSendAuthBuff = new char[BuffSize + 1];
+
+	if (NULL != pszSendAuthBuff)
+	{
+		delete pszSendAuthBuff;
+		pszSendAuthBuff = NULL;
+	}
+
 
 	
 	return TRUE;
+}
+
+void CNetScanOnvif::MD5Function(char* pszStr, unsigned char* pszResult)
+{
+	char aszDigest[100] = { 0 };
+	MD5_CTX md5;
+
+	strcpy(aszDigest, pszStr);
+	MD5_Init(&md5);
+	MD5_Update(&md5, aszDigest, strlen(aszDigest));
+	MD5_Final(pszResult, &md5);
+	
 }
 
 
