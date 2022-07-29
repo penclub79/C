@@ -353,21 +353,42 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 	XNode		stNode;
 	LPXNode		lpBody				= NULL;
 	char		aszTime[32]			= { 0 };
-	
+	char*		pSendAuthBuff		= NULL;
+	char		aszUserID[32]		= { 0 };
+
 	char aszReqHTTP[1024] = "POST /onvif/device_service HTTP/1.1\r\n\Content-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetSystemDateAndTime\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
 
-	char aszXmlSchs[500] = 
+	char* paszXmlSchs[2] = 
 	{
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
 		<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
 			<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
 				<GetSystemDateAndTime xmlns=\"http://www.onvif.org/ver10/device/wsdl\"/>\
 			</s:Body>\
-		</s:Envelope>"
+		</s:Envelope>",
+		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+			<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
+				<s:Header>\
+					<Security s:mustUnderstand=\"1\" xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\
+						<UsernameToken>\
+							<Username>%s</Username>\
+							<Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">%s </Password>\
+							<Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">%s</Nonce>\
+							<Created xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">%s</Created>\
+						</UsernameToken>\
+					</Security>\
+				</s:Header>\
+				<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
+					<GetDeviceInformation xmlns=\"http://www.onvif.org/ver10/device/wsdl\"/>\
+				</s:Body>\
+			</s:Envelope>"
 	};
 
-	sprintf_s(aszSendBuffer, 1024, aszReqHTTP, pszIP, strlen(aszXmlSchs));
-	strcat(aszSendBuffer, aszXmlSchs);
+	int BuffSize = strlen(paszXmlSchs[0]) + strlen(aszUserID);
+	pSendAuthBuff = new char[BuffSize + 1];
+
+	sprintf_s(aszSendBuffer, 1024, aszReqHTTP, pszIP, strlen(paszXmlSchs[0]));
+	strcat(aszSendBuffer, paszXmlSchs[0]);
 	
 	TcpSock = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -410,66 +431,50 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 
 	if ( 0 != strlen(aszRecvBuffer) )
 	{
-		LPXNode		lpTime;
-		LPXNode		lpDate;
-		LPXNode		lpYear;
-		LPXNode		lpMonth;
-		LPXNode		lpDay;
-		LPXNode		lpHour;
-		LPXNode		lpMinute;
-		LPXNode		lpSecond;
+		LPXNode		lpaDateType[2]	= { 0 }; // CStringA
+		LPXNode		lpaTimeData[6]	= { 0 };
+		char*		paiDate[6]		= { 0 };
+		char*		paszDateType[2] = { "tt:Date", "tt:Time" };
+		char*		paszChild[6]	= { "tt:Year", "tt:Month", "tt:Day", "tt:Hour", "tt:Minute", "tt:Second" };
 
 		stNode.Load(aszRecvBuffer);
 		lpBody = stNode.GetChildArg("tt:UTCDateTime", NULL);
 		
 		if (lpBody)
 		{
-			lpDate = lpBody->GetChildArg("tt:Date", NULL);
-			lpYear = lpDate->GetChildArg("tt:Year", NULL);
-			lpMonth = lpDate->GetChildArg("tt:Month", NULL);
-			lpDay = lpDate->GetChildArg("tt:Day", NULL);
+			int index = 0;
+			int iArrLen = sizeof(lpaTimeData) / sizeof(lpaTimeData[0]);
 
-			lpTime = lpBody->GetChildArg("tt:Time", NULL);
-			lpHour = lpTime->GetChildArg("tt:Hour", NULL);
-			lpMinute = lpTime->GetChildArg("tt:Minute", NULL);
-			lpSecond = lpTime->GetChildArg("tt:Second", NULL);
-
+			while (index < iArrLen)
+			{
+				// 1~3 Date , 4~6 Time
+				if (index < iArrLen / 2)
+					lpaDateType[index] = lpBody->GetChildArg(paszDateType[0], NULL);
+				else
+					lpaDateType[index] = lpBody->GetChildArg(paszDateType[1], NULL);
+		
+				lpaTimeData[index] = lpaDateType[index]->GetChildArg(paszChild[index], NULL);
+				
+				if (NULL != lpaTimeData[index])
+				{
+					paiDate[index] = lpaTimeData[index]->value.GetBuffer(0);
+				}
+				index++;
+			}
 			sprintf_s(aszTime, sizeof(aszTime), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ",
-				_ttoi(lpYear->value.GetBuffer),
-				_ttoi(lpMonth->value.GetBuffer),
-				_ttoi(lpDay->value.GetBuffer),
-				_ttoi(lpHour->value.GetBuffer),
-				_ttoi(lpMinute->value.GetBuffer),
-				_ttoi(lpSecond->value.GetBuffer),
-				000
-				);
+					atoi(paiDate[0]),
+					atoi(paiDate[1]),
+					atoi(paiDate[2]),
+					atoi(paiDate[3]),
+					atoi(paiDate[4]),
+					atoi(paiDate[5]),
+					000
+					);
 		}
-		
-		
-
 	}
 
-	//struct timeb stMilliTime;
-	//struct tm* pstTime;
-	//char aszTime[32] = { 0 };
 
-	//ftime(&stMilliTime);
-	//pstTime = localtime(&stMilliTime.time);
-
-	////stTime = time(NULL);
-	////pstGlobalTime = gmtime(&stTime);
-	////
-	//sprintf_s(aszTime, sizeof(aszTime), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ",
-	//	pstTime->tm_year + 1900,
-	//	pstTime->tm_mon + 1,
-	//	pstTime->tm_mday,
-	//	pstTime->tm_hour - 9,
-	//	pstTime->tm_min,
-	//	pstTime->tm_sec,
-	//	stMilliTime.millitm / 10
-	//	);
 	
-
 	return TRUE;
 }
 
