@@ -431,9 +431,9 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 	::OutputDebugStringA("\n");
 
 	MD5Function(pszUserPWD, pszDigest);
-	char aszMD5[32] = { 0 };
+	char aszMD5[34] = { 0 };
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i <= 16; i++)
 	{
 		sprintf_s(aszMD5, "%s%02x", aszMD5, pszDigest[i]);
 	}
@@ -507,7 +507,6 @@ void CNetScanOnvif::MD5Function(char* pszStr, unsigned char* pszResult)
 	MD5_Final(pszResult, &md5);
 	
 }
-
 
 //BOOL CNetScanOnvif::SendSSDP()
 //{
