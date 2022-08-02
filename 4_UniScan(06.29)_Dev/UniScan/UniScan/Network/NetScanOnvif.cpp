@@ -111,16 +111,20 @@ void CNetScanOnvif::thrOnvifReceiver()
 	SOCKADDR	stSockAddr;
 	int			iRevLen				= sizeof(sockaddr_in);
 	XNode		stNode;
+	LPXNode		lpTypeCheck			= NULL;
 	LPXNode		lpBody				= NULL;
 	LPXNode		lpUUID				= NULL;
 	LPXNode		lpIPAddress			= NULL;
+	LPXNode		lpMAC				= NULL;
 	int			iHTTPPort			= 0;
 	char		aszUUID[128]		= { 0 };
 	char		aszData[128]		= { 0 };
-	char		aszIPAddress[32]	= { 0 };
+	char		aszIPAddress[32] = { 0 };
 	char*		pszSlice			= NULL;
 	DWORD		dwLastError			= 0;
 	SCAN_INFO*	pScanInfo			= NULL;
+	char*		pszProbeMatchType[2]	= { "wsdd:ProbeMatch", "d:ProbeMatch" };
+	char*		pszAddressType[2]		= { "wsdd:XAddrs", "d:XAddrs" };
 
 	m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
 	memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE);
@@ -168,13 +172,14 @@ void CNetScanOnvif::thrOnvifReceiver()
 		{
 			memset(pScanInfo, 0, sizeof(SCAN_INFO));
 			// IP Parsing
-			//lpBody = stNode.GetChildArg("wsdd:ProbeMatch", NULL);
-			lpBody = stNode.GetChildArg("d:ProbeMatch", NULL);
-			if (NULL != lpBody)
-			{
-				//lpIPAddress = lpBody->GetChildArg("wsdd:XAddrs", NULL);
-				lpIPAddress = lpBody->GetChildArg("d:XAddrs", NULL);
 
+			lpTypeCheck = stNode.GetChildArg("wsdd:ProbeMatch", NULL) ? stNode.GetChildArg("wsdd:ProbeMatch", NULL) : stNode.GetChildArg("d:ProbeMatch", NULL);
+			
+			if (NULL != lpTypeCheck)
+			{
+				lpIPAddress = lpTypeCheck->GetChildArg("wsdd:XAddrs", NULL) ? lpTypeCheck->GetChildArg("wsdd:XAddrs", NULL) : lpTypeCheck->GetChildArg("d:XAddrs", NULL);
+
+				// IP Address
 				if (NULL != lpIPAddress)
 				{
 					int iIndex = 0;
@@ -199,26 +204,35 @@ void CNetScanOnvif::thrOnvifReceiver()
 					lpIPAddress->value = lpIPAddress->value.Right(13);
 					strcpy(&aszIPAddress[0], lpIPAddress->value);
 					
-					this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
-					wsprintf(pScanInfo->szGateWay,		_T("N/A"));
-					wsprintf(pScanInfo->szMAC,			_T("N/A"));
-					wsprintf(pScanInfo->szModelName,	_T("N/A"));
-					wsprintf(pScanInfo->szSwVersion,	_T("N/A"));
-					pScanInfo->iBasePort = 0;
-					pScanInfo->iVideoCnt = 0;
-					
-					SendAuthentication(aszIPAddress);
-
-					if (this->m_hNotifyWnd)
+					if (strlen(aszIPAddress) > 0)
 					{
-						::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+						this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
 					}
+					
+					//SendAuthentication(aszIPAddress);
+				}
+
+				lpMAC = lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) ? lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) : lpTypeCheck->GetChildArg("d:Scopes", NULL);
+
+
+				//lpIPAddress = lpBody->GetChildArg("d:XAddrs", NULL);
+
+				//wsprintf(pScanInfo->szGateWay,	_T("N/A"));
+				//wsprintf(pScanInfo->szMAC,		_T("N/A"));
+				//wsprintf(pScanInfo->szModelName,	_T("N/A"));
+				//wsprintf(pScanInfo->szSwVersion,	_T("N/A"));
+				pScanInfo->iBasePort = 0;
+				pScanInfo->iVideoCnt = 0;
+
+				if (this->m_hNotifyWnd)
+				{
+					::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
 				}
 			}
 		}
 
-		//::OutputDebugStringA(m_pReceive_buffer);
-		//::OutputDebugStringA("\n");
+		::OutputDebugStringA(m_pReceive_buffer);
+		::OutputDebugStringA("\n");
 
 	}
 	
@@ -485,11 +499,11 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 	//int BuffSize = strlen(paszXmlSchs[0]) + strlen(pszUserID) + strlen() + strlen() + strlen(aszTime);
 	//pszSendAuthBuff = new char[BuffSize + 1];
 
-	if (NULL != pszSendAuthBuff)
-	{
-		delete pszSendAuthBuff;
-		pszSendAuthBuff = NULL;
-	}
+	//if (NULL != pszSendAuthBuff)
+	//{
+	//	delete pszSendAuthBuff;
+	//	pszSendAuthBuff = NULL;
+	//}
 
 
 	

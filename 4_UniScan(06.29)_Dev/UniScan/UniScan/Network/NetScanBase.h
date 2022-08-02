@@ -46,23 +46,23 @@ typedef struct tagSCAN_EXT_INFO_STRUCT
 
 typedef struct tagSCAN_STRUCT
 {
-	int		iScanType = 0; // 1 : Vision, 2 : MarkIn, 3 : Onvif
-	WCHAR	szAddr[30];
-	WCHAR	szMAC[30];
-	WCHAR	szGateWay[30];
-	WCHAR	szSwVersion[30]; // +추가
-	WCHAR	szModelName[30];
+	int				iScanType = 0; // 1 : Vision, 2 : MarkIn, 3 : Onvif
+	WCHAR			szAddr[30];
+	WCHAR			szMAC[30];
+	WCHAR			szGateWay[30];
+	WCHAR			szSwVersion[30]; // +추가
+	WCHAR			szModelName[30];
 
-	//int		nStreamPort;
-	int		iBasePort;
-	int		nHTTPPort;
-	int		version;
-	char	cIsDHCP; // 0 - static, 1 - DHCP
-	WCHAR	szSubnetMask[30];
-	int		nExtraFieldCount;
-	int		iVideoCnt; // +추가
-	time_t	tReceiveTime;
-	SCAN_EXT_INFO* pExtScanInfos;
+	//int				nStreamPort;
+	int				iBasePort;
+	int				nHTTPPort;
+	int				version;
+	char			cIsDHCP; // 0 - static, 1 - DHCP
+	WCHAR			szSubnetMask[30];
+	int				nExtraFieldCount;
+	int				iVideoCnt; // +추가
+	time_t			tReceiveTime;
+	SCAN_EXT_INFO*	pExtScanInfos;
 
 	tagSCAN_STRUCT()
 	{
