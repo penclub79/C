@@ -64,7 +64,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 		// Recev Data Thread live
 		while (this->m_dwScanThreadID)
 		{
-			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, sizeof(PACKET_HEADER)+sizeof(DEVICE_INFO), 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
+			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, sizeof(PACKET_HEADER) + sizeof(DEVICE_INFO), 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
 			{
 				dwLastError = WSAGetLastError();
 				TRACE("MarkIn recvfrom error = %d\n", dwLastError);

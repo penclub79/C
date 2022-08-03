@@ -107,22 +107,25 @@ BOOL CNetScanOnvif::CreateSocket()
 
 void CNetScanOnvif::thrOnvifReceiver()
 {
-	BOOL		bIsSuccessBind		= FALSE;
+	BOOL		bIsSuccessBind			= FALSE;
 	SOCKADDR	stSockAddr;
-	int			iRevLen				= sizeof(sockaddr_in);
+	int			iRevLen					= sizeof(sockaddr_in);
 	XNode		stNode;
-	LPXNode		lpTypeCheck			= NULL;
-	LPXNode		lpBody				= NULL;
-	LPXNode		lpUUID				= NULL;
-	LPXNode		lpIPAddress			= NULL;
-	LPXNode		lpMAC				= NULL;
-	int			iHTTPPort			= 0;
-	char		aszUUID[128]		= { 0 };
-	char		aszData[128]		= { 0 };
-	char		aszIPAddress[32] = { 0 };
-	char*		pszSlice			= NULL;
-	DWORD		dwLastError			= 0;
-	SCAN_INFO*	pScanInfo			= NULL;
+	LPXNode		lpTypeCheck				= NULL;
+	LPXNode		lpBody					= NULL;
+	LPXNode		lpUUID					= NULL;
+	LPXNode		lpIPAddress				= NULL;
+	LPXNode		lpScope					= NULL;
+	int			iHTTPPort				= 0;
+	char		aszUUID[128]			= { 0 };
+	char		aszIPData[128]			= { 0 };
+	char*		pszData					= { 0 };
+	char		aszIPAddress[32]		= { 0 };
+	char*		pszSlice				= NULL;
+	char*		pszNameSlice			= NULL;
+	char*		pszMacSlice				= NULL;
+	DWORD		dwLastError				= 0;
+	SCAN_INFO*	pScanInfo				= NULL;
 	char*		pszProbeMatchType[2]	= { "wsdd:ProbeMatch", "d:ProbeMatch" };
 	char*		pszAddressType[2]		= { "wsdd:XAddrs", "d:XAddrs" };
 
@@ -143,103 +146,131 @@ void CNetScanOnvif::thrOnvifReceiver()
 			TRACE(_T("recvfrom error=%d\n"), dwLastError);
 
 			if (this->m_hNotifyWnd && dwLastError != WSAEINTR && dwLastError != WSAEINVAL)
-			{
 				::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV);
-			}
-
+			
 			this->ThreadExit();
 			break;
 		}
 
-		// 파싱할 데이터
-		stNode.Load(m_pReceive_buffer);
-		lpBody = stNode.GetChildArg("SOAP-ENV:Body", NULL);
-		if (NULL != lpBody)
+		if ( 0 < strlen(m_pReceive_buffer) )
 		{
-			lpUUID = lpBody->GetChildArg("wsa:Address", NULL);
-			if (NULL != lpUUID)
+			// 파싱할 데이터
+			stNode.Load(m_pReceive_buffer);
+			lpBody = stNode.GetChildArg("SOAP-ENV:Body", NULL);
+			if (NULL != lpBody)
 			{
-				// urn:uuid:XXXXXX-XXXXXX-XXXX 에서 urn:uuid: 문자열을 자름
-				lpUUID->value = lpUUID->value.Right(36);
-				strcpy(&aszUUID[0], lpUUID->value);
-				// 배열에 uuid 쌓고 다 쌓았으면 uuid를Resolve Message에 담아서 다시 Send
-			}
-		}
-
-		// table input Data
-		pScanInfo = new SCAN_INFO;
-		if (pScanInfo)
-		{
-			memset(pScanInfo, 0, sizeof(SCAN_INFO));
-			// IP Parsing
-
-			lpTypeCheck = stNode.GetChildArg("wsdd:ProbeMatch", NULL) ? stNode.GetChildArg("wsdd:ProbeMatch", NULL) : stNode.GetChildArg("d:ProbeMatch", NULL);
-			
-			if (NULL != lpTypeCheck)
-			{
-				lpIPAddress = lpTypeCheck->GetChildArg("wsdd:XAddrs", NULL) ? lpTypeCheck->GetChildArg("wsdd:XAddrs", NULL) : lpTypeCheck->GetChildArg("d:XAddrs", NULL);
-
-				// IP Address
-				if (NULL != lpIPAddress)
+				lpUUID = lpBody->GetChildArg("wsa:Address", NULL);
+				if (NULL != lpUUID)
 				{
-					int iIndex = 0;
-					strcpy(&aszData[0], lpIPAddress->value);
-					pszSlice = strtok(aszData, ":");
-					while (NULL != pszSlice)
-					{
-						pszSlice = strtok(NULL, ":");
-						if (1 == iIndex)
-							break;
-						
-						iIndex++;
-					}
-					if (pszSlice)
-					{
-						pszSlice = strtok(pszSlice, "/");
-						iHTTPPort = atoi(pszSlice);
-						pScanInfo->nHTTPPort = iHTTPPort;
-					}
-
-					lpIPAddress->value = lpIPAddress->value.Left(20);
-					lpIPAddress->value = lpIPAddress->value.Right(13);
-					strcpy(&aszIPAddress[0], lpIPAddress->value);
-					
-					if (strlen(aszIPAddress) > 0)
-					{
-						this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
-					}
-					
-					//SendAuthentication(aszIPAddress);
-				}
-
-				lpMAC = lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) ? lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) : lpTypeCheck->GetChildArg("d:Scopes", NULL);
-
-
-				//lpIPAddress = lpBody->GetChildArg("d:XAddrs", NULL);
-
-				//wsprintf(pScanInfo->szGateWay,	_T("N/A"));
-				//wsprintf(pScanInfo->szMAC,		_T("N/A"));
-				//wsprintf(pScanInfo->szModelName,	_T("N/A"));
-				//wsprintf(pScanInfo->szSwVersion,	_T("N/A"));
-				pScanInfo->iBasePort = 0;
-				pScanInfo->iVideoCnt = 0;
-
-				if (this->m_hNotifyWnd)
-				{
-					::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+					// urn:uuid:XXXXXX-XXXXXX-XXXX 에서 urn:uuid: 문자열을 자름
+					lpUUID->value = lpUUID->value.Right(36);
+					strcpy(&aszUUID[0], lpUUID->value);
+					// 배열에 uuid 쌓고 다 쌓았으면 uuid를Resolve Message에 담아서 다시 Send
 				}
 			}
+
+			// table input Data
+			pScanInfo = new SCAN_INFO;
+			if (pScanInfo)
+			{
+				memset(pScanInfo, 0, sizeof(SCAN_INFO));
+				// IP Parsing
+
+				lpTypeCheck = ( NULL != stNode.GetChildArg("wsdd:ProbeMatch", NULL) ) ? stNode.GetChildArg("wsdd:ProbeMatch", NULL) : stNode.GetChildArg("d:ProbeMatch", NULL);
+
+				if (NULL != lpTypeCheck)
+				{
+					lpIPAddress = ( NULL != lpTypeCheck->GetChildArg("wsdd:XAddrs", NULL) ) ? lpTypeCheck->GetChildArg("wsdd:XAddrs", NULL) : lpTypeCheck->GetChildArg("d:XAddrs", NULL);
+
+					// IP Address
+					if (NULL != lpIPAddress)
+					{
+						int iIndex = 0;
+						strcpy(&aszIPData[0], lpIPAddress->value);
+						pszSlice = strtok(aszIPData, ":");
+						while (NULL != pszSlice)
+						{
+							pszSlice = strtok(NULL, ":");
+							if (1 == iIndex)
+								break;
+
+							iIndex++;
+						}
+						if (pszSlice)
+						{
+							pszSlice = strtok(pszSlice, "/");
+							iHTTPPort = atoi(pszSlice);
+							pScanInfo->nHTTPPort = iHTTPPort;
+						}
+
+						lpIPAddress->value = lpIPAddress->value.Left(20);
+						lpIPAddress->value = lpIPAddress->value.Right(13);
+						strcpy(&aszIPAddress[0], lpIPAddress->value);
+
+						if (strlen(aszIPAddress) > 0)
+						{
+							this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
+						}
+
+						//SendAuthentication(aszIPAddress);
+					}
+
+					lpScope = ( NULL != lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) ) ? lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) : lpTypeCheck->GetChildArg("d:Scopes", NULL);
+
+					if (NULL != lpScope)
+					{
+
+						pszData = new char[sizeof(char) * lpScope->value.GetLength() + 1];
+						strcpy(&pszData[0], lpScope->value);
+						::OutputDebugStringA(pszData);
+						::OutputDebugStringA("\n");
+						pszNameSlice = strstr(pszData, "name"); // return NULL
+						pszMacSlice = ( 0 == strstr(pszData, "macaddress") ? strstr(pszData, "macaddress") : strstr(pszData, "mac") );
+
+						if (NULL != pszNameSlice)
+						{
+							pszNameSlice = strtok(pszNameSlice, " ");
+							pszNameSlice = strncpy(pszNameSlice, pszNameSlice + 5, 20);
+
+							this->WideCopyStringFromAnsi(pScanInfo->szModelName, 30, pszNameSlice);
+						}
+						else
+							wsprintf(pScanInfo->szModelName, _T("N/A"));
+
+						if (NULL != pszMacSlice)
+						{
+							char* pszMacType = NULL;
+
+							pszMacSlice = strtok(pszMacSlice, " ");
+							pszMacType = strtok(pszMacSlice, "/");
+							( 0 == strcmp(pszMacType, "macaddress") ) ? pszMacSlice = strncpy(pszMacSlice, pszMacSlice + 11, 20) : pszMacSlice = strncpy(pszMacSlice, pszMacSlice + 4, 20);
+
+							this->WideCopyStringFromAnsi(pScanInfo->szMAC, 32, pszMacSlice);
+						}
+						else
+							wsprintf(pScanInfo->szMAC, _T("N/A"));
+
+					}
+					wsprintf(pScanInfo->szSwVersion, _T("N/A"));
+					wsprintf(pScanInfo->szGateWay,	_T("N/A"));
+					pScanInfo->iBasePort = 0;
+					pScanInfo->iVideoCnt = 0;
+
+					if (this->m_hNotifyWnd)
+						::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+
+				}
+			}
+
+			::OutputDebugStringA(m_pReceive_buffer);
+			::OutputDebugStringA("\n");
 		}
 
-		::OutputDebugStringA(m_pReceive_buffer);
-		::OutputDebugStringA("\n");
-
-	}
-	
-	if (NULL != pScanInfo)
-	{
-		delete pScanInfo;
-		pScanInfo = NULL;
+		if (NULL != pszData)
+		{
+			delete pszData;
+			pszData = NULL;
+		}
 	}
 
 	return;
