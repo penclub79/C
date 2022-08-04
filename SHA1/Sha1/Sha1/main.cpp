@@ -3,14 +3,14 @@
 #include <stdlib.h>
 #include <openssl/sha.h>
 
+
 void main() 
 {
-	char *str = "as7979";
-	char* base64_code = NULL;
-	char text[128] = { 0, };
-	int	ret = 0;
+	char*	str = "as7979";
+	char*	base64_code = NULL;
+	char	text[128] = { 0, };
+	int		ret = 0;
 	SHA_CTX sha;
-
 
 	SHA1_Init(&sha);
 	SHA1_Update(&sha, str, 7);
