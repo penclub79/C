@@ -1,18 +1,30 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <string>
+
+using namespace std;
+
 #include <openssl/sha.h>
-
-
-void main() 
+string sha256(const string str)
 {
-	char*	str = "as7979";
-	char*	base64_code = NULL;
-	char	text[128] = { 0, };
-	int		ret = 0;
-	SHA_CTX sha;
+	unsigned char hash[SHA256_DIGEST_LENGTH];
+	SHA_CTX sha256;
+	SHA1_Init(&sha256);
+	SHA1_Update(&sha256, str.c_str(), str.size());
+	SHA1_Final(hash, &sha256);
+	stringstream ss;
+	for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+	{
+		ss << hex << setw(2) << setfill('0') << (int)hash[i];
+	}
+	return ss.str();
+}
 
-	SHA1_Init(&sha);
-	SHA1_Update(&sha, str, 7);
-	SHA1_Final((unsigned char*)text, &sha);
+int main() {
+	cout << sha256("1234567890_1") << endl;
+	cout << sha256("1234567890_2") << endl;
+	cout << sha256("1234567890_3") << endl;
+	cout << sha256("1234567890_4") << endl;
+	return 0;
 }

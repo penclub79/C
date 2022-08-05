@@ -4,6 +4,8 @@
 #include "../xmlite/XMLite.h"
 #include <time.h>
 #include <sys/timeb.h>
+#include <openssl/sha.h>
+#include <time.h>
 
 CNetScanOnvif::CNetScanOnvif()
 {
@@ -121,6 +123,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 	char		aszIPData[128]			= { 0 };
 	char*		pszData					= { 0 };
 	char		aszIPAddress[32]		= { 0 };
+	char*		pszTestIP				= "192.168.0.134";
 	char*		pszSlice				= NULL;
 	char*		pszNameSlice			= NULL;
 	char*		pszMacSlice				= NULL;
@@ -199,8 +202,11 @@ void CNetScanOnvif::thrOnvifReceiver()
 						if (pszSlice)
 						{
 							pszSlice = strtok(pszSlice, "/");
-							iHTTPPort = atoi(pszSlice);
-							pScanInfo->nHTTPPort = iHTTPPort;
+							if (10 > strlen(pszSlice))
+							{
+								iHTTPPort = atoi(pszSlice);
+								pScanInfo->nHTTPPort = iHTTPPort;
+							}
 						}
 
 						lpIPAddress->value = lpIPAddress->value.Left(20);
@@ -212,7 +218,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 							this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
 						}
 
-						//SendAuthentication(aszIPAddress);
+						SendAuthentication(pszTestIP);
 					}
 
 					lpScope = ( NULL != lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) ) ? lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) : lpTypeCheck->GetChildArg("d:Scopes", NULL);
@@ -225,7 +231,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 						::OutputDebugStringA(pszData);
 						::OutputDebugStringA("\n");
 						pszNameSlice = strstr(pszData, "name"); // return NULL
-						pszMacSlice = ( 0 == strstr(pszData, "macaddress") ? strstr(pszData, "macaddress") : strstr(pszData, "mac") );
+						pszMacSlice = ( NULL != strstr(pszData, "macaddress" ) ? strstr(pszData, "macaddress") : strstr(pszData, "mac") );
 
 						if (NULL != pszNameSlice)
 						{
@@ -244,6 +250,8 @@ void CNetScanOnvif::thrOnvifReceiver()
 							pszMacSlice = strtok(pszMacSlice, " ");
 							pszMacType = strtok(pszMacSlice, "/");
 							( 0 == strcmp(pszMacType, "macaddress") ) ? pszMacSlice = strncpy(pszMacSlice, pszMacSlice + 11, 20) : pszMacSlice = strncpy(pszMacSlice, pszMacSlice + 4, 20);
+
+							strlwr(pszMacSlice); // 소문자로 변환
 
 							this->WideCopyStringFromAnsi(pScanInfo->szMAC, 32, pszMacSlice);
 						}
@@ -339,8 +347,8 @@ BOOL CNetScanOnvif::SendScanRequest()
 	OnvifSendSock.sin_port = htons(3702);
 	OnvifSendSock.sin_addr.s_addr = inet_addr("239.255.255.250"); // multicast group
 
-	pszSendBuffer = new char[4000];
-	memset(pszSendBuffer, 0, 4000);
+	pszSendBuffer = new char[4096];
+	memset(pszSendBuffer, 0, 4096);
 
 	int iTypeIdx = 0;
 	int iUriIdx = 0;
@@ -354,7 +362,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 			iUriIdx++;
 
 		// 얻어온 UUID를 XML에 적용
-		sprintf_s(pszSendBuffer, 4000, g_xmlSchs, szMessageID, pszOnvifURI[iUriIdx], pszProbeType[iTypeIdx]);
+		sprintf_s(pszSendBuffer, 4096, g_xmlSchs, szMessageID, pszOnvifURI[iUriIdx], pszProbeType[iTypeIdx]);
 
 		iSize = strlen(pszSendBuffer);
 		if (SOCKET_ERROR == sendto(m_hReceiveSock, pszSendBuffer, iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
@@ -387,23 +395,26 @@ BOOL CNetScanOnvif::SendScanRequest()
 
 BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 {
-	char*		pszSendBuffer		= NULL;
-	char		aszRecvBuffer[4096] = { 0 };
-	char		aszSendBuffer[1024] = { 0 };
-	char		szMessageID[128]	= { 0 };
-	int			iSendDataSize		= 0;
-	int			iError				= 0;
-	sockaddr_in HTTPSendSock		= { 0 };
-	SOCKET		TcpSock;
-	XNode		stNode;
-	LPXNode		lpBody				= NULL;
-	char		aszTime[32]			= { 0 };
-	char*		pszSendAuthBuff		= NULL;
-	char*		pszUserID			= { "admin" };
-	char*		pszUserPWD			= { "111111" };
-	unsigned char		pszDigest[16];
+	SOCKET				TcpSock;
+	XNode				stNode;
+	LPXNode				lpBody				= NULL;
+	char*				pszSendBuffer		= NULL;
+	char				aszRecvBuffer[4096] = { 0 };
+	char				aszSendBuffer[1024] = { 0 };
+	char				szMessageID[128]	= { 0 };
+	int					iSendDataSize		= 0;
+	int					iError				= 0;
+	sockaddr_in			HTTPSendSock		= { 0 };
+	char				aszTime[32]			= { 0 };
+	char*				pszSendAuthBuff		= NULL;
+	char*				pszUserID			= { "admin" };
+	char*				pszUserPWD			= { "111111" };
+	unsigned char		pszDigest[16]		= { 0 };
+	char				aszNow[32]			= { 0 };
+	char aszNonce[128] = { 0 };
+	time_t Timer;
 
-	char aszReqHTTP[1024] = "POST /onvif/device_service HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetSystemDateAndTime\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
+	char aszGetSystemTime[1024] = "POST /onvif/device_service HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetSystemDateAndTime\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
 
 	char* paszXmlSchs[2] = 
 	{
@@ -431,7 +442,7 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 			</s:Envelope>" // GetDeviceInfomation
 	};
 
-	sprintf_s(aszSendBuffer, 1024, aszReqHTTP, pszIP, strlen(paszXmlSchs[0]));
+	sprintf_s(aszSendBuffer, 1024, aszGetSystemTime, pszIP, strlen(paszXmlSchs[0]));
 	strcat_s(aszSendBuffer, sizeof(char) * strlen(aszSendBuffer) + strlen(paszXmlSchs[0]) + 1, paszXmlSchs[0]);
 	//sprintf_s(aszSendBuffer, 1024, aszReqHTTP, pszIP, strlen(paszXmlSchs[0]));
 	//strcat(aszSendBuffer, paszXmlSchs[0]);
@@ -475,13 +486,11 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 	::OutputDebugStringA(aszRecvBuffer);
 	::OutputDebugStringA("\n");
 
-	MD5Function(pszUserPWD, pszDigest);
-	char aszMD5[34] = { 0 };
+	DigestConvert(pszUserPWD, pszDigest);
 
-	for (int i = 0; i <= 16; i++)
-	{
-		sprintf_s(aszMD5, "%s%02x", aszMD5, pszDigest[i]);
-	}
+	time(&Timer);
+	sprintf_s(aszNow, sizeof(aszNow), "%s", ctime(&Timer)); // \n도 같이 출력된다.
+	Base64Encoding(aszNow, strlen(aszNow), aszNonce);
 
 	if ( 0 != strlen(aszRecvBuffer) )
 	{
@@ -513,6 +522,7 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 				{
 					paiDate[index] = lpaTimeData[index]->value.GetBuffer(0);
 				}
+
 				index++;
 			}
 			sprintf_s(aszTime, sizeof(aszTime), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ",
@@ -535,22 +545,113 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 	//	delete pszSendAuthBuff;
 	//	pszSendAuthBuff = NULL;
 	//}
-
-
 	
 	return TRUE;
 }
 
-void CNetScanOnvif::MD5Function(char* pszStr, unsigned char* pszResult)
-{
-	char aszDigest[100] = { 0 };
-	MD5_CTX md5;
 
-	strcpy(aszDigest, pszStr);
-	MD5_Init(&md5);
-	MD5_Update(&md5, aszDigest, strlen(aszDigest));
-	MD5_Final(pszResult, &md5);
+void CNetScanOnvif::DigestConvert(char* pszStr, unsigned char* puszResult)
+{
 	
+	char			aszDigest[MAX_PATH]				= { 0 };
+
+	//Nonce 생성
+
+	// 1. 현재 시간
+
+	
+
+	//MD5_Init(&md5);
+	//MD5_Update(&md5, aszDigest, strlen(aszDigest));
+	//MD5_Final(pszResult, &md5);	
+}
+
+void SHA1Encoding(char* pszStr, int iSize, char* pszResult)
+{
+	SHA_CTX			stSHA1;
+	int				iLen = 0;
+	wchar_t			awszUnicode[MAX_PATH]			= { 0 };	// Unicode
+	char			aszUtf8[MAX_PATH]				= { 0 };	// UTF-8 
+	char			aszSHA1Value[SHA_DIGEST_LENGTH] = { 0 };	// SHA1
+	unsigned char	auszHash[SHA_DIGEST_LENGTH]		= { 0 };
+
+
+	// MultiByte -> Unicode
+	iLen = MultiByteToWideChar(CP_ACP, 0, pszStr, strlen(pszStr), NULL, NULL);
+	MultiByteToWideChar(CP_ACP, 0, pszStr, strlen(pszStr), awszUnicode, iLen);
+
+	// Unicode -> UTF-8
+	iLen = WideCharToMultiByte(CP_UTF8, 0, awszUnicode, lstrlenW(awszUnicode), NULL, 0, NULL, NULL);
+	WideCharToMultiByte(CP_UTF8, 0, awszUnicode, lstrlenW(awszUnicode), aszUtf8, iLen, NULL, NULL);
+
+	// SHA1 Library
+	SHA1_Init(&stSHA1);
+	SHA1_Update(&stSHA1, aszUtf8, strlen(aszUtf8));
+	SHA1_Final(auszHash, &stSHA1);
+
+	for (int i = 0; i < SHA_DIGEST_LENGTH; i++)
+	{
+		sprintf_s(aszSHA1Value, "%02x", aszSHA1Value, auszHash[i]);
+	}
+
+	strcpy(pszResult, aszSHA1Value);
+}
+
+void Base64Encoding(char* pszStr, int iSize, char* pszResult)
+{
+	static const char MimeBase64[] = {
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+		'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+		'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+		'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+		'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+		'w', 'x', 'y', 'z', '0', '1', '2', '3',
+		'4', '5', '6', '7', '8', '9', '+', '/'
+	};
+
+	unsigned char input[3] = { 0 };
+	unsigned char output[4] = { 0 };
+	int index = 0;
+	int i = 0;
+	int j = 0;
+	int size = 0;
+	int	iLen = 0;
+	char *p = NULL, 
+	char *plen = NULL;
+	wchar_t strUnicode[256] = { 0 };
+	char strUtf8[256] = { 0 };
+
+	plen = pszStr + iSize - 1;
+	size = (4 * (iSize / 3)) + (iSize % 3 ? 4 : 0) + 1;
+	pszResult = (char*)malloc(size);
+
+	//// 유니코드로 변형 
+	//iLen = MultiByteToWideChar(CP_ACP, 0, pszResult, strlen(pszResult), NULL, NULL);
+	//MultiByteToWideChar(CP_ACP, 0, pszResult, strlen(pszResult), strUnicode, iLen);
+
+	//// 유니코드 -> utf-8
+	//iLen = WideCharToMultiByte(CP_UTF8, 0, strUnicode, lstrlenW(strUnicode), NULL, 0, NULL, NULL);
+	//WideCharToMultiByte(CP_UTF8, 0, strUnicode, lstrlenW(strUnicode), strUtf8, iLen, NULL, NULL);
+
+	j = 0;
+	for (i = 0, p = pszStr; p <= plen; i++, p++) {
+		index = i % 3;
+		input[index] = *p;
+		if (index == 2 || p == plen) {
+			output[0] = ((input[0] & 0xFC) >> 2);
+			output[1] = ((input[0] & 0x3) << 4) | ((input[1] & 0xF0) >> 4);
+			output[2] = ((input[1] & 0xF) << 2) | ((input[2] & 0xC0) >> 6);
+			output[3] = (input[2] & 0x3F);
+			pszResult[j++] = MimeBase64[output[0]];
+			pszResult[j++] = MimeBase64[output[1]];
+			pszResult[j++] = index == 0 ? '=' : MimeBase64[output[2]];
+			pszResult[j++] = index <  2 ? '=' : MimeBase64[output[3]];
+			input[0] = input[1] = input[2] = 0;
+		}
+	}
+
+	pszResult[j] = '\0';
 }
 
 //BOOL CNetScanOnvif::SendSSDP()

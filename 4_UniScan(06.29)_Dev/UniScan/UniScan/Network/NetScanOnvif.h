@@ -25,7 +25,9 @@ protected:
 	BOOL SendSSDP();
 	BOOL CreateSocket();
 	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
-	void MD5Function(char* pszStr, unsigned char* pszResult);
+	void DigestConvert(char* pszStr, unsigned char* puszResult);
+	void SHA1Encoding(char* pszStr, int iSize, char* pszResult);
+	void Base64Encoding(char* pszStr, int iSize, char* pszResult);
 	BOOL m_bConnected;
 
 private:
