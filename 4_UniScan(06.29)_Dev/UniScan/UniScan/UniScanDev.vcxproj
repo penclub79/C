@@ -148,7 +148,6 @@
     <ClCompile Include="IPChangeThread.cpp" />
     <ClCompile Include="ListItem.cpp" />
     <ClCompile Include="LoginDlg.cpp" />
-    <ClCompile Include="MD5.cpp" />
     <ClCompile Include="MessageQueue.cpp" />
     <ClCompile Include="Network\NetScanBase.cpp" />
     <ClCompile Include="Network\NetScanMarkIn.cpp" />

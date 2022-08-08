@@ -26,7 +26,7 @@ protected:
 	BOOL CreateSocket();
 	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
 	void DigestConvert(char* pszStr, unsigned char* puszResult);
-	void SHA1Encoding(char* pszStr, int iSize, char* pszResult);
+	void MD5Encoding(char* pszStr, int iSize, char* pszResult);
 	void Base64Encoding(char* pszStr, int iSize, char* pszResult);
 	BOOL m_bConnected;
 
