@@ -111,10 +111,10 @@ BOOL CNetScanOnvif::CreateSocket()
 
 void CNetScanOnvif::thrOnvifReceiver()
 {
-	BOOL		bIsSuccessBind			= FALSE;
 	SOCKADDR	stSockAddr;
-	int			iRevLen					= sizeof(sockaddr_in);
 	XNode		stNode;
+	BOOL		bIsSuccessBind			= FALSE;
+	int			iRevLen					= sizeof(sockaddr_in);
 	LPXNode		lpTypeCheck				= NULL;
 	LPXNode		lpBody					= NULL;
 	LPXNode		lpUUID					= NULL;
@@ -125,7 +125,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 	char		aszIPData[128]			= { 0 };
 	char*		pszData					= NULL;
 	char		aszIPAddress[32]		= { 0 };
-	char*		pszTestIP				= "192.168.0.135";
+	char*		pszTestIP				= "192.168.0.134";
 	char*		pszSlice				= NULL;
 	char*		pszNameSlice			= NULL;
 	char*		pszMacSlice				= NULL;
@@ -135,7 +135,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 	char*		pszAddressType[2]		= { "wsdd:XAddrs", "d:XAddrs" };
 
 	m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
-	memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE);
+	memset(m_pReceive_buffer, 0, sizeof(char) * SCAN_INFO_RECEIVE_BUFFER_SIZE);
 
 	while (this->m_dwScanThreadID)
 	{
@@ -220,14 +220,16 @@ void CNetScanOnvif::thrOnvifReceiver()
 							this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
 						}
 
-						SendAuthentication(pszTestIP);
+
+						// ProbeMatch에서 받은 IP갯수 만큼 반복문으로 돌릴 예정 - 지금은 1개로 테스트 중
+						SendDeviceInfo(pszTestIP);
+
 					}
 
 					lpScope = ( NULL != lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) ) ? lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) : lpTypeCheck->GetChildArg("d:Scopes", NULL);
 
 					if (NULL != lpScope)
 					{
-
 						pszData = new char[sizeof(char) * lpScope->value.GetLength() + 1];
 						strcpy(&pszData[0], lpScope->value);
 						::OutputDebugStringA(pszData);
@@ -333,7 +335,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 				</s:Header>\
 				<s:Body>\
 					<Probe xmlns=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
-						<d:Types xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\" xmlns:dp0=%s>%s</Types>\
+						<d:Types xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\"xmlns:dp0=%s>%s</Types>\
 					</Probe>\
 				</s:Body>\
 			</Envelope>";
@@ -395,7 +397,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 	return TRUE;
 }
 
-BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
+BOOL CNetScanOnvif::SendDeviceInfo(char* pszIP)
 {
 	SOCKET				TcpSock;
 	XNode				stNode;
@@ -409,16 +411,16 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 	sockaddr_in			HTTPSendSock		= { 0 };
 	char				aszTime[32]			= { 0 };
 	char*				pszSendAuthBuff		= NULL;
-	char*				pszUserID			= "admin" ;
+	//char				aszUserID[10]		= "admin" ;
 	char*				pszUserPWD			= "111111" ;
 	unsigned char		pszDigest[16]		= { 0 };
 	char				aszNow[32]			= { 0 };
 	char				aszNonce[128]		= { 0 };
 	time_t Timer;
 
-	//char aszGetSystemTime[1024] = "POST /onvif/device_service HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetSystemDateAndTime\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
+	char aszGetSystemTime[1024] = "POST /onvif/device_service HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetSystemDateAndTime\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
 
-	char* paszXmlSchs[2] = 
+	char* paszXmlSchs[3] = 
 	{
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
 		<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
@@ -426,15 +428,21 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 				<GetSystemDateAndTime xmlns=\"http://www.onvif.org/ver10/device/wsdl\"/>\
 			</s:Body>\
 		</s:Envelope>", // GetSystemDate
+		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\
+			<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:tds=\"http://www.onvif.org/ver10/device/wsdl\">\
+				<SOAP-ENV:Body>\
+					<tds:GetDeviceInformation/>\
+				</SOAP-ENV:Body>\
+			</SOAP-ENV:Envelope>",// GetDeviceInfomation
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
 			<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
 				<s:Header>\
 					<Security s:mustUnderstand=\"1\" xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\
 						<UsernameToken>\
 							<Username>admin</Username>\
-							<Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">111111</Password>\
-							<Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">AuofUoRWc0GO+tcVcscxpjYBAAAAAA==</Nonce>\
-							<Created xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">2022-08-08T03:26:36.138Z</Created>\
+							<Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">%s</Password>\
+							<Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">%s</Nonce>\
+							<Created xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">%s</Created>\
 						</UsernameToken>\
 					</Security>\
 				</s:Header>\
@@ -444,11 +452,8 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 			</s:Envelope>" // GetDeviceInfomation
 	};
 
-	//sprintf_s(aszSendBuffer, 1024, aszGetSystemTime, pszIP, strlen(paszXmlSchs[0]));
-	//strcat_s(aszSendBuffer, sizeof(char) * strlen(aszSendBuffer) + strlen(paszXmlSchs[0]) + 1, paszXmlSchs[0]);
-	char aszRequest[1024] = "POST /onvif/Events HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8\r\nHost: %s\r\nContent-Length: %d\r\n\r\n";
-	sprintf_s(aszSendBuffer, 1024, aszRequest, pszIP, strlen(paszXmlSchs[0]));
-	strcat_s(aszSendBuffer, sizeof(char)* strlen(aszSendBuffer) + strlen(paszXmlSchs[0]) + 1, paszXmlSchs[0]);
+	sprintf_s(aszSendBuffer, 1024, aszGetSystemTime, pszIP, strlen(paszXmlSchs[1]));
+	strcat_s(aszSendBuffer, sizeof(char) * strlen(aszSendBuffer) + strlen(paszXmlSchs[1]) + 1, paszXmlSchs[1]);
 
 	TcpSock = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -456,7 +461,9 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 	HTTPSendSock.sin_port = htons(80);
 	HTTPSendSock.sin_addr.s_addr = inet_addr(pszIP);
 
-	if (SOCKET_ERROR == connect(TcpSock, (SOCKADDR*)&HTTPSendSock, sizeof(SOCKADDR)))
+	// --------------------------------------------------------------------------------
+	// GetSystemDate Send & Recv 로직
+	if ( SOCKET_ERROR == connect(TcpSock, (SOCKADDR*)&HTTPSendSock, sizeof(SOCKADDR)) )
 	{
 		iError = WSAGetLastError();
 		TRACE(_T("TCP-HTTP Connect Error = %d\n"), iError);
@@ -466,7 +473,7 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 	}
 
 	iSendDataSize = strlen(aszSendBuffer);
-	if (SOCKET_ERROR == send(TcpSock, aszSendBuffer, iSendDataSize, 0))
+	if ( SOCKET_ERROR == send(TcpSock, aszSendBuffer, iSendDataSize, 0) )
 	{
 		iError = WSAGetLastError();
 		TRACE(_T("TCP-HTTP send Error = %d\n"), iError);
@@ -475,7 +482,7 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 		return FALSE;
 	}
 
-	if (SOCKET_ERROR == recv(TcpSock, aszRecvBuffer, sizeof(char) * 4096, 0))
+	if ( SOCKET_ERROR == recv(TcpSock, aszRecvBuffer, sizeof(char) * 4096, 0) )
 	{
 		iError = WSAGetLastError();
 		TRACE(_T("TCP-HTTP recv Error = %d\n"), iError);
@@ -489,65 +496,175 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 	::OutputDebugStringA(aszRecvBuffer);
 	::OutputDebugStringA("\n");
 
-	time(&Timer);
-	sprintf_s(aszNow, sizeof(aszNow), "%s", ctime(&Timer)); // \n도 같이 출력된다.
-	Base64Encoding(aszNow, strlen(aszNow), &aszNonce[0]); // Nonce 생성 -> Base64[현재 날짜] Encoding
-	
-	if ( 0 != strlen(aszRecvBuffer) )
+	if (0 < strlen(aszRecvBuffer))
 	{
-		LPXNode		lpaDateType[2]	= { 0 }; // CStringA
-		LPXNode		lpaTimeData[6]	= { 0 };
-		char*		paiDate[6]		= { 0 };
+		char*		pszSlice = NULL;
+		char*		pszSliceNonce = NULL;
+		char		aszNonceBase64[128] = { 0 };
+		int			iHTTPStatus = 0;
+		char*		pszStrCompare = "nonce";
+		LPXNode		lpaDateType[2] = { 0 }; // CStringA
+		LPXNode		lpaTimeData[6] = { 0 };
+		char*		paiDate[6] = { 0 };
 		char*		paszDateType[2] = { "tt:Date", "tt:Time" };
-		char*		paszChild[6]	= { "tt:Year", "tt:Month", "tt:Day", "tt:Hour", "tt:Minute", "tt:Second" };
+		char*		paszChild[6] = { "tt:Year", "tt:Month", "tt:Day", "tt:Hour", "tt:Minute", "tt:Second" };
+
 
 		stNode.Load(aszRecvBuffer);
-		lpBody = stNode.GetChildArg("tt:UTCDateTime", NULL);
-		
-		if (lpBody)
+
+		// 401 Status 찾기
+		pszSlice = strtok(aszRecvBuffer, " ");
+		pszSlice = strtok(NULL, " ");
+		iHTTPStatus = atoi(pszSlice);
+
+		if (Unauthorized == iHTTPStatus)
 		{
-			int index = 0;
-			int iArrLen = sizeof(lpaTimeData) / sizeof(lpaTimeData[0]);
-
-			while (index < iArrLen)
+			while (NULL != aszRecvBuffer)
 			{
-				// 1~3 Date , 4~6 Time
-				if (index < iArrLen / 2)
-					lpaDateType[index] = lpBody->GetChildArg(paszDateType[0], NULL);
-				else
-					lpaDateType[index] = lpBody->GetChildArg(paszDateType[1], NULL);
-		
-				lpaTimeData[index] = lpaDateType[index]->GetChildArg(paszChild[index], NULL);
-				
-				if (NULL != lpaTimeData[index])
+				// nonce 찾기
+				pszSlice = strtok(NULL, ",%s=");
+				if (0 == strcmp(pszSlice, pszStrCompare))
 				{
-					paiDate[index] = lpaTimeData[index]->value.GetBuffer(0);
+					// Hash 값 얻기
+					pszSliceNonce = strtok(NULL, "\" \"");
+					Base64Encoding(pszSliceNonce, strlen(pszSliceNonce), &aszNonceBase64[0]); // nonce값 Base64로 인코딩
+					break;
 				}
-
-				index++;
 			}
-			sprintf_s(aszTime, sizeof(aszTime), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ",
-					atoi(paiDate[0]),
-					atoi(paiDate[1]),
-					atoi(paiDate[2]),
-					atoi(paiDate[3]),
-					atoi(paiDate[4]),
-					atoi(paiDate[5]),
-					000
-					);
 		}
 	}
 
-	// 다이제스트
-	DigestConvert(pszUserPWD, &pszDigest[0]);
+	//	lpBody = stNode.GetChildArg("tt:UTCDateTime", NULL);
 
-	//int BuffSize = strlen(paszXmlSchs[0]) + strlen(pszUserID) + strlen() + strlen() + strlen(aszTime);
-	//pszSendAuthBuff = new char[BuffSize + 1];
+	//	if (lpBody)
+	//	{
+	//		int index = 0;
+	//		int iArrLen = sizeof(lpaTimeData) / sizeof(lpaTimeData[0]);
 
-	//if (NULL != pszSendAuthBuff)
-	//{
-	//	delete pszSendAuthBuff;
-	//	pszSendAuthBuff = NULL;
+	//		while (index < iArrLen)
+	//		{
+	//			// 1~3 Date , 4~6 Time
+	//			if (index < iArrLen / 2)
+	//				lpaDateType[index] = lpBody->GetChildArg(paszDateType[0], NULL);
+	//			else
+	//				lpaDateType[index] = lpBody->GetChildArg(paszDateType[1], NULL);
+
+	//			lpaTimeData[index] = lpaDateType[index]->GetChildArg(paszChild[index], NULL);
+
+	//			if (NULL != lpaTimeData[index])
+	//			{
+	//				paiDate[index] = lpaTimeData[index]->value.GetBuffer(0);
+	//			}
+	//			index++;
+	//		}
+	//		sprintf_s(aszTime, sizeof(aszTime), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ",
+	//			atoi(paiDate[0]),
+	//			atoi(paiDate[1]),
+	//			atoi(paiDate[2]),
+	//			atoi(paiDate[3]),
+	//			atoi(paiDate[4]),
+	//			atoi(paiDate[5]),
+	//			000
+	//			);
+	//	} // Created 날짜 가져오기 
+
+	//	DigestConvert(pszUserPWD, &pszDigest[0]);
+
+	//}
+	////if (m_bIsGetDate)
+	////{
+	//	// --------------------------------------------------------------------------------
+	//	// 다이제스트 생성 로직
+
+	//	time(&Timer);
+	//	sprintf_s(aszNow, sizeof(aszNow), "%s", ctime(&Timer)); // \n도 같이 출력된다.
+	//	strtok(aszNow, "%[^\n]"); // \n 제거
+	//	Base64Encoding(aszNow, strlen(aszNow), &aszNonce[0]); // Nonce 생성 -> Base64[현재 날짜] Encoding
+	//	//Base64Encoding(pszNow, strlen(pszNow), &aszNonce[0]);
+
+	//	if (0 != strlen(aszRecvBuffer))
+	//	{
+
+
+	//		stNode.Load(aszRecvBuffer);
+	//		lpBody = stNode.GetChildArg("tt:UTCDateTime", NULL);
+
+	//		if (lpBody)
+	//		{
+	//			int index = 0;
+	//			int iArrLen = sizeof(lpaTimeData) / sizeof(lpaTimeData[0]);
+
+	//			while (index < iArrLen)
+	//			{
+	//				// 1~3 Date , 4~6 Time
+	//				if (index < iArrLen / 2)
+	//					lpaDateType[index] = lpBody->GetChildArg(paszDateType[0], NULL);
+	//				else
+	//					lpaDateType[index] = lpBody->GetChildArg(paszDateType[1], NULL);
+
+	//				lpaTimeData[index] = lpaDateType[index]->GetChildArg(paszChild[index], NULL);
+
+	//				if (NULL != lpaTimeData[index])
+	//				{
+	//					paiDate[index] = lpaTimeData[index]->value.GetBuffer(0);
+	//				}
+	//				index++;
+	//			}
+	//			sprintf_s(aszTime, sizeof(aszTime), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ",
+	//				atoi(paiDate[0]),
+	//				atoi(paiDate[1]),
+	//				atoi(paiDate[2]),
+	//				atoi(paiDate[3]),
+	//				atoi(paiDate[4]),
+	//				atoi(paiDate[5]),
+	//				000
+	//				);
+	//		}
+	//	//}
+
+	//	int iXMLLen = strlen(paszXmlSchs[1]);
+	//	int iNonceLen = strlen(aszNonce);
+	//	int iTimeLen = strlen(aszTime);
+
+	//	// 다이제스트 Function
+	//	DigestConvert(pszUserPWD, &pszDigest[0]);
+
+	//	// --------------------------------------------------------------------------------
+
+	//	int BuffSize = strlen((char*)pszDigest);
+	//	pszSendAuthBuff = new char[BuffSize + 1];
+	//	memset(&pszSendAuthBuff[0], 0, sizeof(char)* BuffSize + 1);
+
+	//	sprintf_s(pszSendAuthBuff, sizeof(char)* BuffSize + 1, paszXmlSchs[1], pszDigest, aszNonce, aszTime);
+	//	::OutputDebugStringA(pszSendAuthBuff);
+	//	::OutputDebugStringA("\n");
+	//	strcat_s(pszSendAuthBuff, sizeof(char)* (strlen(pszSendAuthBuff) + strlen(paszXmlSchs[1]) + 1), paszXmlSchs[1]);
+	//	::OutputDebugStringA(pszSendAuthBuff);
+	//	::OutputDebugStringA("\n");
+
+	//	int iSendAuthBuffSize = 0;
+	//	iSendAuthBuffSize = strlen(pszSendAuthBuff);
+	//	if (SOCKET_ERROR == send(TcpSock, pszSendAuthBuff, iSendAuthBuffSize, 0))
+	//	{
+	//		iError = WSAGetLastError();
+	//		TRACE(_T("TCP-HTTP send Error = %d\n"), iError);
+	//		closesocket(TcpSock);
+
+	//		return FALSE;
+	//	}
+
+	//	::OutputDebugStringA("ONVIF DEVICE DATA -----------------------\n");
+	//	::OutputDebugStringA(pszIP);
+	//	::OutputDebugStringA("\n");
+	//	::OutputDebugStringA(pszSendAuthBuff);
+	//	::OutputDebugStringA("\n");
+
+
+	//	if (NULL != pszSendAuthBuff)
+	//	{
+	//		delete pszSendAuthBuff;
+	//		pszSendAuthBuff = NULL;
+	//	}
 	//}
 	
 	return TRUE;
@@ -557,22 +674,21 @@ BOOL CNetScanOnvif::SendAuthentication(char* pszIP)
 void CNetScanOnvif::DigestConvert(char* pszStr, unsigned char* puszResult)
 {
 	char aszDigest[MAX_PATH] = { 0 };
-	char aszOutput[16] = { 0 };
+	char aszOutput[SHA_DIGEST_LENGTH * 2 + 1] = { 0 };
 
-	MD5Encoding(pszStr, strlen(pszStr), aszOutput);
+	SHA1Encoding(pszStr, aszOutput);
 	Base64Encoding(aszOutput, strlen(aszOutput), &aszDigest[0]);
 	strcpy((char*)puszResult, aszDigest);
 }
 
-void CNetScanOnvif::MD5Encoding(char* pszStr, int iSize, char* pszResult)
+void CNetScanOnvif::SHA1Encoding(char* pszStr, char* pszResult)
 {
 	SHA_CTX			stSHA1;
-	//MD5_CTX			stMD5;
 	int				iLen = 0;
 	wchar_t			awszUnicode[MAX_PATH]			= { 0 };	// Unicode
 	char			aszUtf8[MAX_PATH]				= { 0 };	// UTF-8 
-	char			aszSHA1Value[SHA_DIGEST_LENGTH] = { 0 };	// SHA1
-	//unsigned char	auszMD5Value[MD5_DIGEST_LENGTH] = { 0 };
+	//char			aszSHA1Value[SHA_DIGEST_LENGTH * 2 + 1] = { 0 };	// SHA1
+	char			aszSHA1Value[MAX_PATH] = { 0 };	// SHA1
 	unsigned char	auszHash[SHA_DIGEST_LENGTH]		= { 0 };
 	//unsigned char	auszHash[1024]					= { 0 };
 
@@ -591,22 +707,13 @@ void CNetScanOnvif::MD5Encoding(char* pszStr, int iSize, char* pszResult)
 
 	for (int i = 0; i < SHA_DIGEST_LENGTH; i++)
 	{
-		sprintf_s(aszSHA1Value, "%02x", aszSHA1Value, auszHash[i]);
+		sprintf_s(&aszSHA1Value[i * 2], SHA_DIGEST_LENGTH * 2 + 1, "%02x", auszHash[i]);
 	}
 
-	//MD5_Init(&stMD5);
-	//MD5_Update(&stMD5, auszHash, strlen(aszUtf8));
-	//MD5_Final(auszMD5Value, &stMD5);
-
-	//for (int i = 0; i < MD5_DIGEST_LENGTH; i++)
-	//{
-	//	sprintf((char*)auszMD5Value, "%02x", auszMD5Value, auszHash[i]);
-	//}
-
-	strcpy(pszResult, aszSHA1Value);
-	//strcpy(pszResult, (char*)auszMD5Value);
+	strcpy_s(pszResult, SHA_DIGEST_LENGTH * 2 + 1, aszSHA1Value);
 }
 
+// 128bit 
 void CNetScanOnvif::Base64Encoding(char* pszStr, int iSize, char* pszResult)
 {
 	static const char MimeBase64[] = {
@@ -620,30 +727,31 @@ void CNetScanOnvif::Base64Encoding(char* pszStr, int iSize, char* pszResult)
 		'4', '5', '6', '7', '8', '9', '+', '/'
 	};
 
-	unsigned char input[3] = { 0 };
+	unsigned char input[3]	= { 0 };
 	unsigned char output[4] = { 0 };
-	int index = 0;
-	int i = 0;
-	int j = 0;
-	int iDataSize = 0;
-	int	iLen = 0;
-	char* p = NULL;
-	char* plen = NULL;
-	//wchar_t strUnicode[256] = { 0 };
-	//char strUtf8[256] = { 0 };
-	char* pszBuffer = NULL;
+	int index				= 0;
+	int i					= 0;
+	int j					= 0;
+	int iDataSize			= 0;
+	int	iLen				= 0;
+	char* p					= NULL;
+	char* plen				= NULL;
+	wchar_t strUnicode[256] = { 0 };
+	char strUtf8[256]		= { 0 };
+	char* pszBuffer			= NULL;
 
 	plen = pszStr + iSize - 1;
 	iDataSize = (4 * (iSize / 3)) + (iSize % 3 ? 4 : 0) + 1;
 	pszBuffer = new char[iDataSize];
 	memset(&pszBuffer[0], 0, sizeof(char) * iDataSize);
-	//// 유니코드로 변형 
-	//iLen = MultiByteToWideChar(CP_ACP, 0, pszResult, strlen(pszResult), NULL, NULL);
-	//MultiByteToWideChar(CP_ACP, 0, pszResult, strlen(pszResult), strUnicode, iLen);
+	
+	// 유니코드로 변형 
+	iLen = MultiByteToWideChar(CP_ACP, 0, pszStr, strlen(pszStr), NULL, NULL);
+	MultiByteToWideChar(CP_ACP, 0, pszStr, strlen(pszStr), strUnicode, iLen);
 
-	//// 유니코드 -> utf-8
-	//iLen = WideCharToMultiByte(CP_UTF8, 0, strUnicode, lstrlenW(strUnicode), NULL, 0, NULL, NULL);
-	//WideCharToMultiByte(CP_UTF8, 0, strUnicode, lstrlenW(strUnicode), strUtf8, iLen, NULL, NULL);
+	// 유니코드 -> utf-8
+	iLen = WideCharToMultiByte(CP_UTF8, 0, strUnicode, lstrlenW(strUnicode), NULL, 0, NULL, NULL);
+	WideCharToMultiByte(CP_UTF8, 0, strUnicode, lstrlenW(strUnicode), strUtf8, iLen, NULL, NULL);
 
 	j = 0;
 	for (i = 0, p = pszStr; p <= plen; i++, p++) {
