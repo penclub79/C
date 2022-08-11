@@ -82,7 +82,7 @@ int base64_encode(char *text, int numBytes, char **encodedText)
 	size = (4 * (numBytes / 3)) + (numBytes % 3 ? 4 : 0) + 1;
 	(*encodedText) = (char*)malloc(size);
 	
-	// 유니코드로 변형
+	// 유니코드로 변형 
 	iLen = MultiByteToWideChar(CP_ACP, 0, *encodedText, strlen(*encodedText), NULL, NULL);
 	MultiByteToWideChar(CP_ACP, 0, *encodedText, strlen(*encodedText), strUnicode, iLen);
 	
