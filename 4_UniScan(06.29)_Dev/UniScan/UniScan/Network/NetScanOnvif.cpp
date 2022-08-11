@@ -232,7 +232,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 	char*		pszProbeMatchType[2]	= { "wsdd:ProbeMatch", "d:ProbeMatch" };
 	char*		pszAddressType[2]		= { "wsdd:XAddrs", "d:XAddrs" };
 	BOOL		bIsTCPConnect			= FALSE;
-	char		aszTestIP[24]			= "192.168.0.134";
+	char		aszTestIP[24]			= "192.168.0.129";
 	char		aszUserPWD[16]			= "111111" ;
 	char		aszDigest[48]			= { 0 };
 	char		aszNonceResult[128]		= { 0 }; // Base64로 인코딩된 16바이트여야 한다.
@@ -328,21 +328,12 @@ void CNetScanOnvif::thrOnvifReceiver()
 							this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
 						}
 
-						unsigned int uiSum = 0;
-						unsigned int uiBinary = 0;
+						
 						//// ProbeMatch에서 받은 IP갯수 만큼 반복문으로 돌릴 예정 - 지금은 1개로 테스트 중
 						bIsGetAuthData = GetAuthenticateData(aszTestIP, &aszDateResult[0], &aszNonceResult[0]); // Device 날짜 얻기
 						if (TRUE == bIsGetAuthData)
 						{
-							sprintf_s(aszPwdDigest, sizeof(aszPwdDigest), "%d", aszNonceResult);
-							uiSum += atoi(aszPwdDigest);
-							sprintf_s(aszPwdDigest, sizeof(aszPwdDigest), "%d", aszDateResult);
-							uiSum += atoi(aszPwdDigest);
-							sprintf_s(aszPwdDigest, sizeof(aszPwdDigest), "%d", aszUserPWD);
-							uiSum += atoi(aszPwdDigest);
-
-							uiBinary = binaryConvert(uiSum);
-
+							sprintf_s(aszPwdDigest, sizeof(aszPwdDigest), "%s%s%s", aszNonceResult, aszDateResult, aszUserPWD);
 							SHA1Encoding(aszPwdDigest, &aszPwdShaHash[0]);
 							Base64Encoding(aszPwdShaHash, strlen(aszPwdShaHash), &aszPwdBaseHash[0]);
 
@@ -410,39 +401,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 	}
 
 	return;
-}
-
-int CNetScanOnvif::binaryConvert(unsigned int uiData)
-{
-	int aiBinary[128] = { 0 };
-	int iResult = 0;
-
-	int idx = 0;
-	while (1)
-	{
-		aiBinary[idx] = uiData % 2;
-		uiData = uiData / 2;
-
-		idx++;
-
-		if (uiData == 0)
-			break;
-	}
-
-	for (int i = idx - 1; i >= 0; i--)
-	{
-		TRACE(_T("%d"), aiBinary[i]);
-	}
-	//if (uiData < 2)
-	//	sprintf_s(szBinary, sizeof(szBinary), (char)uiData);
-	//else
-	//{
-	//	binaryConvert(uiData / 2);
-	//	sprintf_s(szBinary, sizeof(szBinary), "%d", uiData % 2);
-	//}
-	//iResult = atoi(szBinary);
-
-	return iResult;
 }
 
 
@@ -575,7 +533,7 @@ BOOL CNetScanOnvif::SendDeviceInfo(char* pszIP, char* pszNonceResult)
 				while (NULL != pszRecvBuffer)
 				{
 					// nonce 찾기
-					pszSlice = strtok(NULL, ",%s=");
+					pszSlice = strtok(NULL, ", =");
 					if (0 == strcmp(pszSlice, pszStrCompare))
 					{
 						// Hash 값 얻기
