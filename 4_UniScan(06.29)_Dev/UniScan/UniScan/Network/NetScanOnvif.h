@@ -42,6 +42,7 @@ protected:
 	void DigestConvert(char* pszStr, char* puszResult);
 	void SHA1Encoding(char* pszStr, char* pszResult);
 	void Base64Encoding(char* pszStr, int iSize, char* pszResult);
+	int Base64Decoding(char* pszStr, unsigned char* puszResult, int iSize);
 	BOOL m_bConnected;
 	SOCKET m_TcpSocket;
 
