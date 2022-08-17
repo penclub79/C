@@ -328,11 +328,19 @@ void CNetScanOnvif::thrOnvifReceiver()
 						{
 							this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
 						}
-						char aszUserPWD[16] = "111111";
+						char aszUserPwd[16] = "111111";
+						char aszUserPwd2[16] = "iLoveDogs";
+						char aszUtfPwd[16] = { 0 };
 						char aszDate[32] = "2010-09-16T07:50:45Z";
+						char aszDate2[32] = "2014-06-21T12:43:21.791Z";
+						char aszUtfDate[32] = { 0 };
 						char aszNonce[36] = "LKqI6G/AikKCQrN0zqZFlg==";
-						char aszNonce2[36] = "ZjNhMTg2MWJkZDEwOWQzNDNmMDc=";
+						char aszNonce2[36] = "0TBQcVnd9H4uGi1jGxqJWg==";
 						char aszResult[64] = { 0 };
+						char aszDecodeHex[64] = { 0 };
+						char aszRand[20] = { 0 };
+
+					
 						//// ProbeMatch에서 받은 IP갯수 만큼 반복문으로 돌릴 예정 - 지금은 1개로 테스트 중
 						bIsGetAuthData = GetAuthenticateData(aszTestIP, &aszDateResult[0], &aszNonceResult[0]); // Device 날짜 얻기
 
@@ -341,9 +349,14 @@ void CNetScanOnvif::thrOnvifReceiver()
 						{
 					
 							//Base64Encoding(aszUserPWD, strlen(aszUserPWD), &aszResult[0]);
-							Base64Decoding(aszNonceBase64, &auszNonceDecode[0], sizeof(auszNonceDecode));
+							Base64Decoding(aszNonceResult, &auszNonceDecode[0], sizeof(auszNonceDecode));
+							
+							//UtfConvert(aszDateResult, &aszUtfDate[0]);
+							//UtfConvert(aszUserPwd, &aszUtfPwd[0]);
 
-							sprintf_s(aszPwdDigest, sizeof(aszPwdDigest), "%s%s%s", auszNonceDecode, aszDate, aszUserPWD);
+							//sprintf_s(aszPwdDigest, sizeof(aszPwdDigest), "%s%s%s", auszNonceDecode, aszUtfDate, aszUtfPwd);
+							sprintf_s(aszPwdDigest, sizeof(aszPwdDigest), "%s%s%s", aszNonceBase64, aszDateResult, aszUserPwd);
+
 							SHA1Encoding(aszPwdDigest, &aszPwdShaHash[0]);
 							Base64Encoding(aszPwdShaHash, strlen(aszPwdShaHash), &aszPwdBaseHash[0]);
 
@@ -411,6 +424,21 @@ void CNetScanOnvif::thrOnvifReceiver()
 	}
 
 	return;
+}
+
+void CNetScanOnvif::UtfConvert(char* pszStr, char* pszResult)
+{
+	//wchar_t awszUnicode[128] = { 0 };
+	wchar_t awszUnicode[2048] = { 0 };
+	int iLen = 0;
+
+	// MultiByte -> Unicode
+	iLen = MultiByteToWideChar(CP_ACP, 0, pszStr, strlen(pszStr), NULL, NULL);
+	MultiByteToWideChar(CP_ACP, 0, pszStr, strlen(pszStr), awszUnicode, iLen);
+
+	// Unicode -> UTF-8
+	iLen = WideCharToMultiByte(CP_UTF8, 0, awszUnicode, lstrlenW(awszUnicode), NULL, 0, NULL, NULL);
+	WideCharToMultiByte(CP_UTF8, 0, awszUnicode, lstrlenW(awszUnicode), pszResult, iLen, NULL, NULL);
 }
 
 
@@ -756,11 +784,13 @@ void CNetScanOnvif::SendAuthentication(char* pszIP, char* pszDigest, char* pszNo
 	memset(&pszSendBuffer[0], 0, iPacketSize + 1);
 	sprintf_s(pszSendBuffer, sizeof(char)* iPacketSize, pszPacketBuffer, pszIP, iContentLen, pszDigest, pszNonceResult, pszDateResult);
 
+	char aszResult[2048] = { 0 };
+	UtfConvert(pszSendBuffer, aszResult);
 	//sprintf_s(pszSendBuffer, sizeof(char)* iSendBufferSize, aszDeviceInformationXML, pszDigest, pszNonceResult, pszDateResult);
 
-	TRACE("%s\n", pszSendBuffer);
+	TRACE("%s\n", aszResult);
 
-	::OutputDebugStringA(pszSendBuffer);
+	::OutputDebugStringA(aszResult);
 	::OutputDebugStringA("\n");
 
 
@@ -771,8 +801,7 @@ void CNetScanOnvif::SendAuthentication(char* pszIP, char* pszDigest, char* pszNo
 
 	//if (CONNECT_SUCCESS == bIsConnect)
 	//{
-
-	if (SOCKET_ERROR == send(m_TcpSocket, pszSendBuffer, iPacketSize, 0))
+		if (SOCKET_ERROR == send(m_TcpSocket, aszResult, iPacketSize, 0))
 		{
 			iError = WSAGetLastError();
 			TRACE(_T("TCP-HTTP send Error = %d\n"), iError);
@@ -826,18 +855,9 @@ void CNetScanOnvif::SHA1Encoding(char* pszStr, char* pszResult)
 {
 	SHA_CTX			stSHA1;
 	int				iLen = 0;
-	wchar_t			awszUnicode[MAX_PATH]		= { 0 };	// Unicode
-	char			aszUtf8[MAX_PATH]			= { 0 };	// UTF-8 
-	char			aszSHA1Value[82]		= { 0 };	// SHA1
-	unsigned char	auszHash[SHA_DIGEST_LENGTH]	= { 0 };
+	unsigned char	auszSHA1Value[80] = { 0 };	// SHA1
+	unsigned char	auszHash[SHA_DIGEST_LENGTH]			= { 0 };
 
-	//// MultiByte -> Unicode
-	//iLen = MultiByteToWideChar(CP_ACP, 0, pszStr, strlen(pszStr), NULL, NULL);
-	//MultiByteToWideChar(CP_ACP, 0, pszStr, strlen(pszStr), awszUnicode, iLen);
-
-	//// Unicode -> UTF-8
-	//iLen = WideCharToMultiByte(CP_UTF8, 0, awszUnicode, lstrlenW(awszUnicode), NULL, 0, NULL, NULL);
-	//WideCharToMultiByte(CP_UTF8, 0, awszUnicode, lstrlenW(awszUnicode), aszUtf8, iLen, NULL, NULL);
 
 	// SHA1 Library
 	SHA1_Init(&stSHA1);
@@ -846,11 +866,11 @@ void CNetScanOnvif::SHA1Encoding(char* pszStr, char* pszResult)
 
 	for (int i = 0; i < SHA_DIGEST_LENGTH; i++)
 	{
-		sprintf_s(&aszSHA1Value[i * 2], SHA_DIGEST_LENGTH * 2 + 1, "%02x", auszHash[i]);
+		sprintf_s((char*)&auszSHA1Value[i * 2], SHA_DIGEST_LENGTH * 2, "%02x", auszHash[i]);
 	}
 
 	//strcpy_s(pszResult, SHA_DIGEST_LENGTH * 2 + 1, aszSHA1Value);
-	memcpy( pszResult, aszSHA1Value, sizeof(char) * (SHA_DIGEST_LENGTH * 2 + 1) );
+	memcpy(pszResult, auszSHA1Value, sizeof(char)* (SHA_DIGEST_LENGTH * 2));
 }
 
 // 128bit 

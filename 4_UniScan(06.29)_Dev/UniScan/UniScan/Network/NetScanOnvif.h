@@ -38,7 +38,7 @@ protected:
 	BOOL CreateMultiCastSocket();
 	BOOL ConnectTCPSocket(char* pszIP);
 	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
-	int binaryConvert(unsigned int uiData);
+	void UtfConvert(char* pszStr, char* pszResult);
 	void DigestConvert(char* pszStr, char* puszResult);
 	void SHA1Encoding(char* pszStr, char* pszResult);
 	void Base64Encoding(char* pszStr, int iSize, char* pszResult);
