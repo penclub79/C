@@ -31,9 +31,9 @@ public:
 protected:
 	static DWORD thrOnvifScanThread(LPVOID pParam);
 	void thrOnvifReceiver();
-	BOOL SendDeviceInfo(char* pszIP, char* pszNonceResult);
-	BOOL GetAuthenticateData(char* pszIP, char* pszDateResult, char* pszNonceResult);
-	void SendAuthentication(char* pszIP, char* pszDigest, char* pszNonceResult, char* pszDateResult);
+	void SendDeviceInfo(char* pszIP, char* pszNonceResult, char* pszGetData);
+	void GetAuthenticateData(char* pszIP, char* pszDateResult, char* pszNonceResult, char* pszGetData);
+	void SendAuthentication(char* pszIP, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
 	BOOL SendSSDP();
 	BOOL CreateMultiCastSocket();
 	BOOL ConnectTCPSocket(char* pszIP);

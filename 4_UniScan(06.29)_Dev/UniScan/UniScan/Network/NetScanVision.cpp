@@ -258,14 +258,14 @@ void CNetScanVision::thrReceiver()
 							}
 
 							// read data into array
-							pExtField = (BYTE*)(m_pReceive_buffer + sizeof(HEADER2)+sizeof(IPUTIL_INFO2)); // reset pointer
+							pExtField = (BYTE*)(m_pReceive_buffer + sizeof(HEADER2) + sizeof(IPUTIL_INFO2)); // reset pointer
 							if (nItemCount > 0)
 							{
-								iToRead = pReceive->body_size - (sizeof(HEADER2)+sizeof(IPUTIL_INFO2));
+								iToRead = pReceive->body_size - (sizeof(HEADER2) + sizeof(IPUTIL_INFO2));
 								pExtInfos = new SCAN_EXT_INFO[nItemCount];
 								if (pExtInfos)
 								{
-									memset(pExtInfos, 0, sizeof(SCAN_EXT_INFO)* nItemCount);
+									memset(pExtInfos, 0, sizeof(SCAN_EXT_INFO) * nItemCount);
 									i = 0;
 									while (iToRead > 0)
 									{

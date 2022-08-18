@@ -150,7 +150,6 @@ typedef struct tagSCAN_STRUCT
 		return TRUE;
 	}
 
-
 	void	SetReceiveTime();
 	int     _PrintValues();
 	CString _ReadValue(WCHAR* aszCaption);
