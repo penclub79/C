@@ -253,12 +253,12 @@ BOOL CUniScanDlg::OnInitDialog()
 	strItem += str;
 	m_cSvrList.InsertColumn(SUBITEM_PORTHTTP, strItem, LVCFMT_CENTER, 138, 0);
 
-	strItem = L"Upgrade ";
-	strItem += str;
-	m_cSvrList.InsertColumn(SUBITEM_PORTUPGRADE, strItem, LVCFMT_CENTER, 138, 0);
+	//strItem = L"Upgrade ";
+	//strItem += str;
+	//m_cSvrList.InsertColumn(SUBITEM_PORTUPGRADE, strItem, LVCFMT_CENTER, 138, 0);
 
-	strItem.LoadString(IDS_BASE_PORT);
-	m_cSvrList.InsertColumn(SUBITEM_PORTBASE, strItem, LVCFMT_CENTER, 138, 0);
+	//strItem.LoadString(IDS_BASE_PORT);
+	//m_cSvrList.InsertColumn(SUBITEM_PORTBASE, strItem, LVCFMT_CENTER, 138, 0);
 
 	//strItem.LoadString(IDS_SERVER_NAME);
 	//m_cSvrList.InsertColumn(SUBITEM_SYSTEMNAME		, strItem, LVCFMT_CENTER, 150, 0 );
@@ -383,8 +383,8 @@ void CUniScanDlg::OnBnClickedScanBtn()
 	CString strMsg;
 	CString strUser;
 	CString strPassword;
-	char aszUsername[16] = "admin";
-	char aszPassword[16] = "111111";
+	char aszUsername[16] = { 0 };
+	char aszPassword[16] = { 0 };
 
 	if (!m_bScanning) // SCANÀ» ´­·¶À» ¶§
 	{
@@ -405,8 +405,8 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		GetDlgItem(IDC_EDIT_LOGIN)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_LOGINPWD)->EnableWindow(FALSE);
 
-		//strcpy_s(aszUsername, sizeof(char) * sizeof(aszUsername), CT2A(strUser));
-		//strcpy_s(aszPassword, sizeof(char) * sizeof(aszPassword), CT2A(strPassword));
+		strcpy_s(aszUsername, sizeof(char) * sizeof(aszUsername), CT2A(strUser));
+		strcpy_s(aszPassword, sizeof(char) * sizeof(aszPassword), CT2A(strPassword));
 		m_apScanner[2]->SetUserInfo(aszUsername, aszPassword);
 
 		// start set
@@ -751,12 +751,12 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		m_cSvrList.SetItem(&item);
 
-		strTemp.Format(_T("%d"), pScanInfo->iBasePort);
-		item.mask = LVIF_TEXT;
-		item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-		item.iSubItem = SUBITEM_PORTBASE;
-		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		m_cSvrList.SetItem(&item);
+		//strTemp.Format(_T("%d"), pScanInfo->iBasePort);
+		//item.mask = LVIF_TEXT;
+		//item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
+		//item.iSubItem = SUBITEM_PORTBASE;
+		//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
+		//m_cSvrList.SetItem(&item);
 
 		strTemp.Format(_T("%s"), pScanInfo->szSwVersion);
 		item.mask = LVIF_TEXT;
@@ -779,12 +779,12 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		m_cSvrList.SetItem(&item);
 
-		strTemp.LoadString(IDS_N_AND_A);
-		item.mask = LVIF_TEXT;
-		item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-		item.iSubItem = SUBITEM_PORTUPGRADE;
-		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		m_cSvrList.SetItem(&item);
+		//strTemp.LoadString(IDS_N_AND_A);
+		//item.mask = LVIF_TEXT;
+		//item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
+		//item.iSubItem = SUBITEM_PORTUPGRADE;
+		//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
+		//m_cSvrList.SetItem(&item);
 
 		strTemp.Format(_T("%s"), pScanInfo->szFirmwareVer);
 		item.mask = LVIF_TEXT;
@@ -1863,9 +1863,9 @@ int  CUniScanDlg::CompareScanInfo(int nItemColumn, tagSCAN_STRUCT* pInfo1, tagSC
 	case CUniScanDlg::SUBITEM_PORTHTTP:   // Http Port 4
 		nResult = pInfo1->nHTTPPort - pInfo2->nHTTPPort;
 		break;
-	case CUniScanDlg::SUBITEM_PORTUPGRADE: // upgrade port 5
-		nResult = pInfo1->_ReadValue(L"Upgrade Port") - pInfo2->_ReadValue(L"Upgrade Port");
-		break;
+	//case CUniScanDlg::SUBITEM_PORTUPGRADE: // upgrade port 5
+	//	nResult = pInfo1->_ReadValue(L"Upgrade Port") - pInfo2->_ReadValue(L"Upgrade Port");
+	//	break;
 		//case CUniScanDlg::SUBITEM_SYSTEMNAME: // Server Name 6
 		//	nResult = pInfo1->_ReadValue(L"System Name").Compare(pInfo2->_ReadValue(L"System Name"));
 		//	break;
