@@ -52,8 +52,7 @@ typedef struct tagSCAN_STRUCT
 	WCHAR			szGateWay[30];
 	WCHAR			szSwVersion[30]; // +Ãß°¡
 	WCHAR			szModelName[30];
-
-	//int				nStreamPort;
+	WCHAR			szFirmwareVer[50];
 	int				iBasePort;
 	int				nHTTPPort;
 	int				version;
@@ -87,6 +86,7 @@ typedef struct tagSCAN_STRUCT
 		wcscpy_s(this->szSubnetMask, 30, src.szSubnetMask);
 		wcscpy_s(this->szSwVersion, 30, src.szSwVersion);
 		wcscpy_s(this->szModelName, 30, src.szModelName);
+		wcscpy_s(this->szFirmwareVer, 50, src.szFirmwareVer);
 
 		//this->nStreamPort	= src.nStreamPort;
 		this->nHTTPPort = src.nHTTPPort;
@@ -129,6 +129,7 @@ typedef struct tagSCAN_STRUCT
 		if (0 != wcscmp(this->szSubnetMask, src.szSubnetMask))	return FALSE;
 		if (0 != wcscmp(this->szSwVersion, src.szSwVersion))	return FALSE;
 		if (0 != wcscmp(this->szModelName, src.szModelName))	return FALSE;
+		if (0 != wcscmp(this->szFirmwareVer, src.szFirmwareVer))	return FALSE;
 
 		//if( this->nStreamPort			!= src.nStreamPort		)			return FALSE;
 		if (this->nHTTPPort != src.nHTTPPort)					return FALSE;
@@ -150,6 +151,7 @@ typedef struct tagSCAN_STRUCT
 		return TRUE;
 	}
 
+
 	void	SetReceiveTime();
 	int     _PrintValues();
 	CString _ReadValue(WCHAR* aszCaption);
@@ -162,7 +164,7 @@ typedef struct tagSCAN_STRUCT
 	// | 7           8             9            10           11            12
 	// | Resolution| Video format| AIN cnt     | AOUT cnt   | Audio in    | Audio out
 	// ----------------------------------------------------------------------------------------------------
-	static int     _CompareScanInfo(int nItemColumn, tagSCAN_STRUCT* pInfo1, tagSCAN_STRUCT* pInfo2);
+	//static int     _CompareScanInfo(int nItemColumn, tagSCAN_STRUCT* pInfo1, tagSCAN_STRUCT* pInfo2);
 
 }SCAN_INFO, *LPSCAN_INFO;
 
@@ -181,7 +183,6 @@ protected:
 	HWND			m_hCloseMsgRecvWnd; 
 	LONG			m_lCloseMsg;
 	SOCKET			m_hReceiveSock;
-	//SOCKET			m_hVisionSock;
 	char*			m_pReceive_buffer;
 	int				m_iRevPort;
 	BOOL			m_bUserCancel;
@@ -192,7 +193,7 @@ protected:
 
 	//////////////////////////////////////////////////////////// Function
 	BOOL	StartScanF(LPTHREAD_START_ROUTINE _pThreadFunc);
-	BOOL	SendScanRequestF(int _iPort, char* pData, int iLength);
+	//BOOL	SendScanRequestF(int _iPort, char* _pData, int _iLength);
 	void	WideCopyStringFromAnsi(WCHAR* _pwszString, int _iMaxBufferLen, char* _pszString);
 	BOOL	SocketBind();
 	//////////////////////////////////////////////////////////// ---------/
@@ -204,7 +205,8 @@ public:
 	//////////////////////////////////////////////////////////// Function
 	virtual BOOL StartScan() = 0;
 	virtual BOOL SendScanRequest() = 0;
-	
+
+	void	SetUserInfo(char* _pszUserName, char* _pszPassword);
 	BOOL	StopScan();
 	void	SetBindAddress(ULONG _ulBindAddress);
 	void	SetNotifyWindow(HWND _hWnd, LONG _msg);
@@ -212,4 +214,6 @@ public:
 	void	ThreadExit();
 	//////////////////////////////////////////////////////////// ---------/
 
+	char m_aszUserName[16];
+	char m_aszPassword[16];
 };

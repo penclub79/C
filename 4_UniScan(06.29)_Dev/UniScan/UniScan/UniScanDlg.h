@@ -166,5 +166,5 @@ public:
 	//afx_msg void OnCbnSelchangeProtocalCombo();
 	afx_msg void OnClickedOpenXml();
 	afx_msg void OnBnClickedButton1();
-	afx_msg void OnClickedButtonLogin();	// 로그인 버튼
+	//afx_msg void OnClickedButtonLogin();	// 로그인 버튼
 };

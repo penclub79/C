@@ -72,63 +72,63 @@ CString tagSCAN_STRUCT::_ReadValues() // 모든 값을 읽여서 Caption : Value 값으로
 // ----------------------------------------------------------------------------------------------------
 // FIX ME : Display column 항목을 추가하거나 변경 시 하기 함수를 같이 변경해야한다.
 // static
-int  tagSCAN_STRUCT::_CompareScanInfo(int nItemColumn, tagSCAN_STRUCT* pInfo1, tagSCAN_STRUCT* pInfo2)
-{
-	ASSERT(0); // 쓰지마세요. main dialog에서 필드를 변경 할 수 있으므로 여기서 비교하지 않도록 적용합니다
-	int nResult = 0;
-	switch(nItemColumn)
-	{
-	//case 0: // IP
-	//	nResult = _CompareIP(pInfo1->szAddr, pInfo2->szAddr);
-	//	break;
-	//case 1: // MAC
-	//	nResult = wcscmp(pInfo1->szMAC, pInfo2->szMAC);
-	//	break;
-	//case 2: // Stream Port
-	//	nResult = pInfo1->nStreamPort - pInfo2->nStreamPort;
-	//	break;
-	//case 3: // Http Port
-	//	nResult = pInfo1->nHTTPPort - pInfo2->nHTTPPort;
-	//	break;
-	//case 4: // Server Name
-	//	nResult = pInfo1->_ReadValue(L"System Name").Compare(pInfo2->_ReadValue(L"System Name"));
-	//	break;
-	//case 5: // Model
-	//	nResult = pInfo1->_ReadValue(L"Model Type").Compare(pInfo2->_ReadValue(L"Model Type"));
-	//	break;
-	//case 6: // Firmware Version
-	//	nResult = pInfo1->_ReadValue(L"Firmware Version").Compare(pInfo2->_ReadValue(L"Firmware Version"));
-	//	break;
-	//case 7: // Video Count
-	//	nResult = pInfo1->_ReadValue(L"S/W Version").Compare(pInfo2->_ReadValue(L"S/W Version"));
-	//	break;
-	//case 8: // Video Count
-	//	nResult = pInfo1->_ReadValue(L"Video Count").Compare(pInfo2->_ReadValue(L"Video Count"));
-	//	break;
-	//case 7: // Resolution
-	//	nResult = pInfo1->_ReadValue(L"Support Resolution").Compare(pInfo2->_ReadValue(L"Support Resolution"));
-	//	break;
-	//case 8: // Video format
-	//	nResult = pInfo1->_ReadValue(L"Video Format").Compare(pInfo2->_ReadValue(L"Video Format"));
-	//	break;
-	//case 9: // Alarm in count
-	//	nResult = pInfo1->_ReadValue(L"Alarm In Count").Compare(pInfo2->_ReadValue(L"Alarm In Count"));
-	//	break;
-	//case 10:// Alarm out count
-	//	nResult = pInfo1->_ReadValue(L"Alarm Out Count").Compare(pInfo2->_ReadValue(L"Alarm Out Count"));
-	//	break;
-	//case 11: // Audio in count
-	//	nResult = pInfo1->_ReadValue(L"Audio In Count").Compare(pInfo2->_ReadValue(L"Audio In Count"));
-	//	break;
-	//case 12: // Audio out count
-	//	nResult = pInfo1->_ReadValue(L"Audio Out Count").Compare(pInfo2->_ReadValue(L"Audio Out Count"));
-	//	break;
-	default:
-		ASSERT(0); // column added?
-		nResult = 0;
-	}
-	return nResult;
-}
+//int  tagSCAN_STRUCT::_CompareScanInfo(int nItemColumn, tagSCAN_STRUCT* pInfo1, tagSCAN_STRUCT* pInfo2)
+//{
+//	ASSERT(0); // 쓰지마세요. main dialog에서 필드를 변경 할 수 있으므로 여기서 비교하지 않도록 적용합니다
+//	int nResult = 0;
+//	switch(nItemColumn)
+//	{
+//	//case 0: // IP
+//	//	nResult = _CompareIP(pInfo1->szAddr, pInfo2->szAddr);
+//	//	break;
+//	//case 1: // MAC
+//	//	nResult = wcscmp(pInfo1->szMAC, pInfo2->szMAC);
+//	//	break;
+//	//case 2: // Stream Port
+//	//	nResult = pInfo1->nStreamPort - pInfo2->nStreamPort;
+//	//	break;
+//	//case 3: // Http Port
+//	//	nResult = pInfo1->nHTTPPort - pInfo2->nHTTPPort;
+//	//	break;
+//	//case 4: // Server Name
+//	//	nResult = pInfo1->_ReadValue(L"System Name").Compare(pInfo2->_ReadValue(L"System Name"));
+//	//	break;
+//	//case 5: // Model
+//	//	nResult = pInfo1->_ReadValue(L"Model Type").Compare(pInfo2->_ReadValue(L"Model Type"));
+//	//	break;
+//	//case 6: // Firmware Version
+//	//	nResult = pInfo1->_ReadValue(L"Firmware Version").Compare(pInfo2->_ReadValue(L"Firmware Version"));
+//	//	break;
+//	//case 7: // Video Count
+//	//	nResult = pInfo1->_ReadValue(L"S/W Version").Compare(pInfo2->_ReadValue(L"S/W Version"));
+//	//	break;
+//	//case 8: // Video Count
+//	//	nResult = pInfo1->_ReadValue(L"Video Count").Compare(pInfo2->_ReadValue(L"Video Count"));
+//	//	break;
+//	//case 7: // Resolution
+//	//	nResult = pInfo1->_ReadValue(L"Support Resolution").Compare(pInfo2->_ReadValue(L"Support Resolution"));
+//	//	break;
+//	//case 8: // Video format
+//	//	nResult = pInfo1->_ReadValue(L"Video Format").Compare(pInfo2->_ReadValue(L"Video Format"));
+//	//	break;
+//	//case 9: // Alarm in count
+//	//	nResult = pInfo1->_ReadValue(L"Alarm In Count").Compare(pInfo2->_ReadValue(L"Alarm In Count"));
+//	//	break;
+//	//case 10:// Alarm out count
+//	//	nResult = pInfo1->_ReadValue(L"Alarm Out Count").Compare(pInfo2->_ReadValue(L"Alarm Out Count"));
+//	//	break;
+//	//case 11: // Audio in count
+//	//	nResult = pInfo1->_ReadValue(L"Audio In Count").Compare(pInfo2->_ReadValue(L"Audio In Count"));
+//	//	break;
+//	//case 12: // Audio out count
+//	//	nResult = pInfo1->_ReadValue(L"Audio Out Count").Compare(pInfo2->_ReadValue(L"Audio Out Count"));
+//	//	break;
+//	default:
+//		ASSERT(0); // column added?
+//		nResult = 0;
+//	}
+//	return nResult;
+//}
 
 DWORD CNetScanVision::thrScanThread(LPVOID pParam)
 {
@@ -261,11 +261,11 @@ void CNetScanVision::thrReceiver()
 							pExtField = (BYTE*)(m_pReceive_buffer + sizeof(HEADER2) + sizeof(IPUTIL_INFO2)); // reset pointer
 							if (nItemCount > 0)
 							{
-								iToRead = pReceive->body_size - (sizeof(HEADER2) + sizeof(IPUTIL_INFO2));
+								iToRead = pReceive->body_size - (sizeof(HEADER2)+sizeof(IPUTIL_INFO2));
 								pExtInfos = new SCAN_EXT_INFO[nItemCount];
 								if (pExtInfos)
 								{
-									memset(pExtInfos, 0, sizeof(SCAN_EXT_INFO) * nItemCount);
+									memset(pExtInfos, 0, sizeof(SCAN_EXT_INFO)* nItemCount);
 									i = 0;
 									while (iToRead > 0)
 									{

@@ -46,6 +46,7 @@ protected:
 	BOOL m_bConnected;
 	SOCKET m_TcpSocket;
 
+
 private:
 
 };

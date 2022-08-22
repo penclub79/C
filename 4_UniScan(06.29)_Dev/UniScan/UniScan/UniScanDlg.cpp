@@ -134,13 +134,13 @@ CUniScanDlg::CUniScanDlg(CWnd* pParent /*=NULL*/)
 void CUniScanDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_SVR_LIST, m_cSvrList);
-	DDX_Control(pDX, IDC_SCAN_BTN, m_btnScan);
-	DDX_Control(pDX, IDC_CLEAR_BTN, m_btnClearList);
-	DDX_Control(pDX, IDC_CHANGEIP_BTN, m_btnChangeIP);
+	DDX_Control(pDX, IDC_SVR_LIST,		m_cSvrList);
+	DDX_Control(pDX, IDC_SCAN_BTN,		m_btnScan);
+	DDX_Control(pDX, IDC_CLEAR_BTN,		m_btnClearList);
+	DDX_Control(pDX, IDC_CHANGEIP_BTN,	m_btnChangeIP);
+	DDX_Control(pDX, IDC_ADAPTOR_CMB,	m_cmbNetAdaptor);
 	//DDX_Control(pDX, IDC_UPGRADE_BTN	, m_btnUpgrade);
 	//DDX_Control(pDX, IDC_PROTOCAL_COMBO	, m_cmbProtocol);
-	DDX_Control(pDX, IDC_ADAPTOR_CMB, m_cmbNetAdaptor);
 }
 
 BEGIN_MESSAGE_MAP(CUniScanDlg, CDialog)
@@ -175,7 +175,7 @@ BEGIN_MESSAGE_MAP(CUniScanDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_ADAPTOR_CMB,			&CUniScanDlg::OnCbnSelchangeAdaptorCmb)
 	//ON_COMMAND(IDC_PROTOCAL_COMBO, &CUniScanDlg::OnProtocalCombo)
 	ON_BN_CLICKED(IDC_OPEN_XML,					&CUniScanDlg::OnClickedOpenXml)
-	ON_BN_CLICKED(IDC_BUTTON_LOGIN,				&CUniScanDlg::OnClickedButtonLogin)
+	//ON_BN_CLICKED(IDC_BUTTON_LOGIN,				&CUniScanDlg::OnClickedButtonLogin)
 END_MESSAGE_MAP()
 
 
@@ -380,7 +380,11 @@ void CUniScanDlg::OnBnClickedCancel()
 
 void CUniScanDlg::OnBnClickedScanBtn()
 {
-	CString msg;
+	CString strMsg;
+	CString strUser;
+	CString strPassword;
+	char aszUsername[16] = "admin";
+	char aszPassword[16] = "111111";
 
 	if (!m_bScanning) // SCAN을 눌렀을 때
 	{
@@ -388,30 +392,39 @@ void CUniScanDlg::OnBnClickedScanBtn()
 
 		m_bScanning = TRUE;
 
-		msg.LoadString(IDS_STOP);
-		m_btnScan.SetWindowText(msg);
+		strMsg.LoadString(IDS_STOP);
+		m_btnScan.SetWindowText(strMsg);
 
 		// view status
-		msg.LoadString(IDS_STATUS_SCANNING);
-		SetStatusMsg(msg);
+		strMsg.LoadString(IDS_STATUS_SCANNING);
+		SetStatusMsg(strMsg);
+
+		// User && PWD Edit Disable
+		GetDlgItemText(IDC_EDIT_LOGIN, strUser);
+		GetDlgItemText(IDC_EDIT_LOGINPWD, strPassword);
+		GetDlgItem(IDC_EDIT_LOGIN)->EnableWindow(FALSE);
+		GetDlgItem(IDC_EDIT_LOGINPWD)->EnableWindow(FALSE);
+
+		//strcpy_s(aszUsername, sizeof(char) * sizeof(aszUsername), CT2A(strUser));
+		//strcpy_s(aszPassword, sizeof(char) * sizeof(aszPassword), CT2A(strPassword));
+		m_apScanner[2]->SetUserInfo(aszUsername, aszPassword);
 
 		// start set
 		//for (int i = 0; i < 2; i++)
-		for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-		{
-			if (m_apScanner[i])
-			{
-				m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
-				m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-				m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-				m_apScanner[i]->StartScan();
-			}
-		}
-		//m_apScanner[2]->SetBindAddress(m_ulAcceptAddress);
-		//m_apScanner[2]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-		//m_apScanner[2]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-		//m_apScanner[2]->StartScan();
-		
+		//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+		//{
+		//	if (m_apScanner[i])
+		//	{
+		//		m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
+		//		m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+		//		m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+		//		m_apScanner[i]->StartScan();
+		//	}
+		//}
+		m_apScanner[2]->SetBindAddress(m_ulAcceptAddress);
+		m_apScanner[2]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+		m_apScanner[2]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+		m_apScanner[2]->StartScan();
 		m_nScanAniCount = 0;
 		SetTimer(TM_SCANNING_ANI, 1000, NULL);
 	}
@@ -421,12 +434,16 @@ void CUniScanDlg::OnBnClickedScanBtn()
 
 		m_bScanning = FALSE;
 
-		msg.LoadString(IDS_SCAN);
-		m_btnScan.SetWindowText(msg);
+		strMsg.LoadString(IDS_SCAN);
+		m_btnScan.SetWindowText(strMsg);
+
+		// User && PWD Edit Enable
+		GetDlgItem(IDC_EDIT_LOGIN)->EnableWindow(TRUE);
+		GetDlgItem(IDC_EDIT_LOGINPWD)->EnableWindow(TRUE);
 
 		// view status
-		msg.LoadString(IDS_STATUS_STOP);
-		SetStatusMsg(msg);
+		strMsg.LoadString(IDS_STATUS_STOP);
+		SetStatusMsg(strMsg);
 
 		// stop
 		for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
@@ -769,44 +786,50 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		m_cSvrList.SetItem(&item);
 
-		strTemp.LoadString(IDS_N_AND_A);
+		strTemp.Format(_T("%s"), pScanInfo->szFirmwareVer);
 		item.mask = LVIF_TEXT;
 		item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
 		item.iSubItem = SUBITEM_FIRMWAREVERSION;
 		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		m_cSvrList.SetItem(&item);
+		//strTemp.LoadString(IDS_N_AND_A);
+		//item.mask = LVIF_TEXT;
+		//item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
+		//item.iSubItem = SUBITEM_FIRMWAREVERSION;
+		//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
+		//m_cSvrList.SetItem(&item);
 
 		// extended infomation printout
-		if (pScanInfo->nExtraFieldCount)
-		{
-			strTemp = pScanInfo->_ReadValue(L"Upgrade Port");
-			item.mask = LVIF_TEXT;
-			item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-			item.iSubItem = SUBITEM_PORTUPGRADE;
-			item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-			m_cSvrList.SetItem(&item);
+		//if (pScanInfo->nExtraFieldCount)
+		//{
+		//	//strTemp = pScanInfo->_ReadValue(L"Upgrade Port");
+		//	//item.mask = LVIF_TEXT;
+		//	//item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
+		//	//item.iSubItem = SUBITEM_PORTUPGRADE;
+		//	//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
+		//	//m_cSvrList.SetItem(&item);
 
-			strTemp = pScanInfo->_ReadValue(L"Model Type");
-			item.mask = LVIF_TEXT;
-			item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-			item.iSubItem = SUBITEM_MODELTYPE;
-			item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-			m_cSvrList.SetItem(&item);
+		//	strTemp = pScanInfo->_ReadValue(L"Model Type");
+		//	item.mask = LVIF_TEXT;
+		//	item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
+		//	item.iSubItem = SUBITEM_MODELTYPE;
+		//	item.pszText = (LPTSTR)(LPCTSTR)strTemp;
+		//	m_cSvrList.SetItem(&item);
 
-			strTemp = pScanInfo->_ReadValue(L"Firmware Version");
-			item.mask = LVIF_TEXT;
-			item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-			item.iSubItem = SUBITEM_FIRMWAREVERSION;
-			item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-			m_cSvrList.SetItem(&item);
+		//	strTemp = pScanInfo->_ReadValue(L"Firmware Version");
+		//	item.mask = LVIF_TEXT;
+		//	item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
+		//	item.iSubItem = SUBITEM_FIRMWAREVERSION;
+		//	item.pszText = (LPTSTR)(LPCTSTR)strTemp;
+		//	m_cSvrList.SetItem(&item);
 
-			strTemp.LoadString(IDS_N_AND_A);
-			item.mask = LVIF_TEXT;
-			item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-			item.iSubItem = SUBITEM_SW_VERSION;
-			item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-			m_cSvrList.SetItem(&item);
-		}
+		//	strTemp.LoadString(IDS_N_AND_A);
+		//	item.mask = LVIF_TEXT;
+		//	item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
+		//	item.iSubItem = SUBITEM_SW_VERSION;
+		//	item.pszText = (LPTSTR)(LPCTSTR)strTemp;
+		//	m_cSvrList.SetItem(&item);
+		//}
 
 		//if (strTemp.IsEmpty())
 		//{
@@ -2111,26 +2134,3 @@ void CUniScanDlg::OnClickedOpenXml()
 	//}
 }
 
-
-void CUniScanDlg::OnClickedButtonLogin()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CLoginDlg* pLoginDlg = NULL;
-
-	if (NULL == pLoginDlg)
-	{
-		pLoginDlg = new CLoginDlg();
-	}
-	
-	if (IDOK == pLoginDlg->DoModal())
-	{
-		SetDlgItemText(IDC_EDIT_LOGIN, pLoginDlg->m_strUsername);
-	}
-
-	if (NULL != pLoginDlg)
-	{
-		delete pLoginDlg;
-		pLoginDlg = NULL;
-	}
-
-}

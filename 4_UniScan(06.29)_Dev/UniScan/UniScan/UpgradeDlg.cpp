@@ -282,41 +282,41 @@ LRESULT CUpgradeDlg::OnUpgradeMsg(WPARAM wParam, LPARAM lParam)
 
 							  switch (lParam)
 							  {
-							  case _UPGRADE_STATUS_CONNECTING:	wsprintf(szMessage, L"Attempt to connect");	break;
-							  case _UPGRADE_STATUS_FILE_TRANSFERING: 	wsprintf(szMessage, L"Software file transfering");	break;
-							  case _UPGRADE_STATUS_READY_UPGRADE: 	wsprintf(szMessage, L"Ready to upgrade");	break;
-							  case _UPGRADE_STATUS_UPGRADE_OS: 	wsprintf(szMessage, L"Upgrade OS");	break;
-							  case _UPGRADE_STATUS_UPGRADE_APPLICATION: 	wsprintf(szMessage, L"Upgrade application");	break;
-							  case _UPGRADE_STATUS_UPGRADE_APPLICATION_WEB: 	wsprintf(szMessage, L"Upgrading Web Application");	break;
-							  case _UPGRADE_STATUS_FILE_RETRANSFERING:  	wsprintf(szMessage, L"Re-request file transfering");	break;
-							  case _UPGRADE_STATUS_COMPLETE: 	wsprintf(szMessage, L"Completed");	break;
-							  case _UPGRADE_STATUS_UPGRADE_PROGRESS: 	wsprintf(szMessage, L"");	break;
+							  case _UPGRADE_STATUS_CONNECTING:						wsprintf(szMessage, L"Attempt to connect");	break;
+							  case _UPGRADE_STATUS_FILE_TRANSFERING: 				wsprintf(szMessage, L"Software file transfering");	break;
+							  case _UPGRADE_STATUS_READY_UPGRADE: 					wsprintf(szMessage, L"Ready to upgrade");	break;
+							  case _UPGRADE_STATUS_UPGRADE_OS: 						wsprintf(szMessage, L"Upgrade OS");	break;
+							  case _UPGRADE_STATUS_UPGRADE_APPLICATION: 			wsprintf(szMessage, L"Upgrade application");	break;
+							  case _UPGRADE_STATUS_UPGRADE_APPLICATION_WEB: 		wsprintf(szMessage, L"Upgrading Web Application");	break;
+							  case _UPGRADE_STATUS_FILE_RETRANSFERING:  			wsprintf(szMessage, L"Re-request file transfering");	break;
+							  case _UPGRADE_STATUS_COMPLETE: 						wsprintf(szMessage, L"Completed");	break;
+							  case _UPGRADE_STATUS_UPGRADE_PROGRESS: 				wsprintf(szMessage, L"");	break;
 							  case _UPGRADE_STATUS_READY_TO_SW_FILE_TRANSFERRING: 	wsprintf(szMessage, L"Ready to S/W file transfering");	break;
 							  case _UPGRADE_STATUS_READY_TO_MCU_FILE_TRANSFERRING: 	wsprintf(szMessage, L"Ready to MCU file transfering");	break;
-							  case _UPGRADE_STATUS_PREPARE_UPGRADING: 	wsprintf(szMessage, L"");	break;
-							  case _UPGRADE_STATUS_RESTARTING_ERROR: 	wsprintf(szMessage, L"Wait for rebooting");	break;
-							  case _UPGRADE_STATUS_RESTARTING_SW: 	wsprintf(szMessage, L"Wait for retry S/W upgrade");	break;
-							  case _UPGRADE_STATUS_RESTARTING_MCU: 	wsprintf(szMessage, L"Wait for retry MCU upgrade");	break;
-							  case _UPGRADE_STATUS_MCU_FILE_TRANSFERING: 	wsprintf(szMessage, L"MCU file transfering");	break;
-							  case _UPGRADE_STATUS_UPGRADE_MCU: 	wsprintf(szMessage, L"Upgrade MCU");	break;
+							  case _UPGRADE_STATUS_PREPARE_UPGRADING: 				wsprintf(szMessage, L"");	break;
+							  case _UPGRADE_STATUS_RESTARTING_ERROR: 				wsprintf(szMessage, L"Wait for rebooting");	break;
+							  case _UPGRADE_STATUS_RESTARTING_SW: 					wsprintf(szMessage, L"Wait for retry S/W upgrade");	break;
+							  case _UPGRADE_STATUS_RESTARTING_MCU: 					wsprintf(szMessage, L"Wait for retry MCU upgrade");	break;
+							  case _UPGRADE_STATUS_MCU_FILE_TRANSFERING: 			wsprintf(szMessage, L"MCU file transfering");	break;
+							  case _UPGRADE_STATUS_UPGRADE_MCU: 					wsprintf(szMessage, L"Upgrade MCU");	break;
 							  case _UPGRADE_STATUS_WAITFOR_REBOOT:
 							  {
-																	 wsprintf(szMessage, L"Wait for rebooting");
-																	 for (int i = 0; i<m_iRebootCheck % 30 / 3; i++)
-																	 {
-																		 wcscat_s(szMessage, L".");
-																	 }
-																	 m_iRebootCheck++;
+																					 wsprintf(szMessage, L"Wait for rebooting");
+																					 for (int i = 0; i<m_iRebootCheck % 30 / 3; i++)
+																					 {
+																						 wcscat_s(szMessage, L".");
+																					 }
+																					 m_iRebootCheck++;
 							  }
 								  break;
 							  case _UPGRADE_STATUS_ATTEMPT_REBOOT:
 							  {
-																	 wsprintf(szMessage, L"Attempts to connect");
-																	 for (int i = 0; i<m_iRebootCheck % 10; i++)
-																	 {
-																		 wcscat_s(szMessage, L".");
-																	 }
-																	 m_iRebootCheck++;
+																					 wsprintf(szMessage, L"Attempts to connect");
+																					 for (int i = 0; i<m_iRebootCheck % 10; i++)
+																					 {
+																						 wcscat_s(szMessage, L".");
+																					 }
+																					 m_iRebootCheck++;
 							  }
 								  break;
 							  case _UPGRADE_STATUS_ATTEMPT_RETRY:

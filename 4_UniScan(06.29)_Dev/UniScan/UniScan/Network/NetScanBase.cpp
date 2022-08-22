@@ -19,6 +19,11 @@ NetScanBase::NetScanBase()
 
 NetScanBase::~NetScanBase()
 {
+	if (NULL != m_pReceive_buffer)
+	{
+		delete[] m_pReceive_buffer;
+		m_pReceive_buffer = NULL;
+	}
 }
 
 BOOL NetScanBase::StartScanF(LPTHREAD_START_ROUTINE _pThreadFunc)
@@ -65,7 +70,6 @@ BOOL NetScanBase::StopScan()
 		CloseHandle(m_hScanThread);
 		m_hScanThread = NULL;
 	}
-
 	return TRUE;
 }
 
@@ -79,11 +83,10 @@ BOOL NetScanBase::SocketBind()
 	if (SOCKET_ERROR == setsockopt(m_hReceiveSock, SOL_SOCKET, SO_BROADCAST, (char*)&bEnable, sizeof(bEnable)))
 	{
 		TRACE("2.setsocketopt error = %d\n", WSAGetLastError());
-		if (m_hNotifyWnd)
-		{
-			::PostMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_SOCKET_OPT);
-		}
 
+		if (m_hNotifyWnd)
+			::PostMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_SOCKET_OPT);
+		
 		ThreadExit();
 		return FALSE;
 	}
@@ -128,6 +131,16 @@ void NetScanBase::SetCloseMsgRecvWindow(HWND _hWnd, LONG _msg/* = WM_CLOSE*/)
 	m_hCloseMsgRecvWnd = _hWnd;
 	m_lCloseMsg = _msg;
 }
+
+void NetScanBase::SetUserInfo(char* _pszUserName, char* _pszPassword)
+{
+	if (0 < strlen(_pszUserName) && 0 < strlen(_pszPassword))
+	{
+		strcpy(m_aszUserName, _pszUserName);
+		strcpy(m_aszPassword, _pszPassword);
+	}
+}
+
 
 // char -> WCHAR 복사 공통
 void NetScanBase::WideCopyStringFromAnsi(WCHAR* _pwszString, int _iMaxBufferLen, char* _pszString)

@@ -195,12 +195,12 @@ void CFactoryDefaultDlg::AddData()
 		// extended infomation printout
 		if(m_pScanInfo[i].nExtraFieldCount)
 		{
-			strTemp = m_pScanInfo[i]._ReadValue(L"Upgrade Port");
-			item.mask = LVIF_TEXT;
-			item.iItem = i;
-			item.iSubItem = SUBITEM_UPGRADE_PORT; // indexing bug fix
-			item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-			m_cSvrList.SetItem(&item);
+			//strTemp = m_pScanInfo[i]._ReadValue(L"Upgrade Port");
+			//item.mask = LVIF_TEXT;
+			//item.iItem = i;
+			//item.iSubItem = SUBITEM_UPGRADE_PORT; // indexing bug fix
+			//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
+			//m_cSvrList.SetItem(&item);
 
 			strTemp = m_pScanInfo[i]._ReadValue(L"System Name");
 			item.mask = LVIF_TEXT;
