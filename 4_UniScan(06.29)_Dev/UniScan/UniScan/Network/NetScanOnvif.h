@@ -31,12 +31,13 @@ public:
 protected:
 	static DWORD thrOnvifScanThread(LPVOID pParam);
 	void thrOnvifReceiver();
-	void SendDeviceInfo(char* pszIP, char* pszNonceResult, char* pszGetData);
-	void GetAuthenticateData(char* pszIP, char* pszDateResult, char* pszNonceResult, char* pszGetData);
-	void SendAuthentication(char* pszIP, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
+	void SendDeviceInfo(char* pszIP, int iPort, char* pszNonceResult, char* pszGetData);
+	void GetAuthenticateData(char* pszIP, int iPort, char* pszDateResult, char* pszNonceResult, char* pszGetData);
+	void SendAuthentication(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
+	void SendNetworkInterface(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
 	BOOL SendSSDP();
 	BOOL CreateMultiCastSocket();
-	BOOL ConnectTCPSocket(char* pszIP);
+	BOOL ConnectTCPSocket(char* pszIP, int iPort);
 	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
 	void UtfConvert(char* pszStr, char* pszResult);
 	void DigestConvert(char* pszStr, char* puszResult);
