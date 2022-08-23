@@ -183,7 +183,7 @@ BOOL CNetScanMarkIn::SendScanRequest()
 	SOCKET hSendSock = NULL;
 	PACKET_HEADER* pSendHeader = NULL;
 
-	TRACE(_T("Send Broadcast Ping Request\n"));
+	//TRACE(_T("Send Broadcast Ping Request\n"));
 	hSendSock = socket(AF_INET, SOCK_DGRAM, 0);
 	if (SOCKET_ERROR == setsockopt(hSendSock, SOL_SOCKET, SO_BROADCAST, (char*)&bEnable, sizeof(bEnable)))
 	{

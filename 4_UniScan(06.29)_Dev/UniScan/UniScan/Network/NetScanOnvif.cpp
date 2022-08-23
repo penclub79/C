@@ -136,7 +136,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 			<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\
 				<s:Header>\
 					<a:Action s:mustUnderstand=\"1\">http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe</a:Action>\
-					<wsa:MessageID xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">uuid:%s</wsa:MessageID>\
+					<a:MessageID>uuid:%s</a:MessageID>\
 					<a:ReplyTo>\
 						<a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address>\
 					</a:ReplyTo>\
@@ -168,6 +168,8 @@ BOOL CNetScanOnvif::SendScanRequest()
 	{
 		// UUID 얻기
 		GenerateMsgID(szMessageID, 127);
+		strlwr(szMessageID);
+
 
 		if (iTypeIdx > 1)
 			iUriIdx++;
@@ -249,7 +251,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 	unsigned char	auszNonceDecode[64]		= { 0 };
 	char*			pszDeviceInfoData		= NULL;
 	char*			pszNetworkInfoData		= NULL;
-	char* pszOnvifVerData = NULL;
+	char*			pszOnvifVerData			= NULL;
 	char*			pszMacType				= NULL;
 	char			aszFirmwareVer[50]		= { 0 };
 
@@ -292,11 +294,12 @@ void CNetScanOnvif::thrOnvifReceiver()
 					// 배열에 uuid 쌓고 다 쌓았으면 uuid를Resolve Message에 담아서 다시 Send
 				}
 			}
-			//::OutputDebugStringA("ONVIF RECEIVE DEVICE DATA -----------------------\n");
+
+			::OutputDebugStringA("ONVIF RECEIVE DEVICE DATA -----------------------\n");
 			//::OutputDebugStringA(aszIPAddress);
 			//::OutputDebugStringA("\n");
-			//::OutputDebugStringA(m_pReceive_buffer);
-			//::OutputDebugStringA("\n");
+			::OutputDebugStringA(m_pReceive_buffer);
+			::OutputDebugStringA("\n");
 
 			// table input Data
 			pScanInfo = new SCAN_INFO;
@@ -389,6 +392,8 @@ void CNetScanOnvif::thrOnvifReceiver()
 							sprintf_s(&aszVersion[0], sizeof(char) * 8, "%d.%d", atoi(aszMajor), atoi(aszMinor));
 							this->WideCopyStringFromAnsi(pScanInfo->szSwVersion, 30, aszVersion);
 						}
+						else
+							wsprintf(pScanInfo->szSwVersion, _T("N/A"));
 
 
 						// 인증 로직
@@ -432,6 +437,10 @@ void CNetScanOnvif::thrOnvifReceiver()
 
 								case UNAUTHORIZED:
 									wsprintf(pScanInfo->szMAC, _T("UNAUTHORIZED"));
+									break;
+
+								case NOT_DATA:
+									wsprintf(pScanInfo->szMAC, _T("N/A"));
 									break;
 
 								default:
@@ -515,7 +524,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 					//	//	wsprintf(pScanInfo->szMAC, _T("N/A"));
 
 					//wsprintf(pScanInfo->szSwVersion, _T("N/A"));
-					wsprintf(pScanInfo->szGateWay,	_T("N/A"));
 					pScanInfo->iBasePort = 0;
 					pScanInfo->iVideoCnt = 0;
 
@@ -667,11 +675,11 @@ void CNetScanOnvif::SendDeviceInfo(char* pszIP, int iPort, char* pszNonceResult,
 			closesocket(m_TcpSocket);
 		}
 
-		::OutputDebugStringA("ONVIF RECEIVE DEVICE DATA -----------------------\n");
-		::OutputDebugStringA(pszIP);
-		::OutputDebugStringA("\n");
-		::OutputDebugStringA(pszRecvBuffer);
-		::OutputDebugStringA("\n");
+		//::OutputDebugStringA("ONVIF RECEIVE DEVICE DATA -----------------------\n");
+		//::OutputDebugStringA(pszIP);
+		//::OutputDebugStringA("\n");
+		//::OutputDebugStringA(pszRecvBuffer);
+		//::OutputDebugStringA("\n");
 		
 		if (0 < strlen(pszRecvBuffer))
 		{

@@ -18,6 +18,10 @@ typedef enum _HTTPCODE{
 	UNAUTHORIZED	= 401
 };
 
+typedef enum _STATUSCODE{
+	NOT_DATA = 0
+};
+
 
 class CNetScanOnvif : public NetScanBase
 {

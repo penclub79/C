@@ -380,11 +380,16 @@ void CUniScanDlg::OnBnClickedCancel()
 
 void CUniScanDlg::OnBnClickedScanBtn()
 {
+	enum
+	{
+		ONVIF = 2
+	};
 	CString strMsg;
 	CString strUser;
 	CString strPassword;
 	char aszUsername[16] = { 0 };
 	char aszPassword[16] = { 0 };
+	int iScanIdx = 0;
 
 	if (!m_bScanning) // SCAN을 눌렀을 때
 	{
@@ -407,24 +412,45 @@ void CUniScanDlg::OnBnClickedScanBtn()
 
 		strcpy_s(aszUsername, sizeof(char) * sizeof(aszUsername), CT2A(strUser));
 		strcpy_s(aszPassword, sizeof(char) * sizeof(aszPassword), CT2A(strPassword));
-		m_apScanner[2]->SetUserInfo(aszUsername, aszPassword);
+		m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
 
 		// start set
-		//for (int i = 0; i < 2; i++)
-		//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+		//do
 		//{
-		//	if (m_apScanner[i])
+		//	if (iScanIdx == 0)
 		//	{
-		//		m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
-		//		m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-		//		m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-		//		m_apScanner[i]->StartScan();
+		//		m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
+		//		m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+		//		m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+		//		m_apScanner[ONVIF]->StartScan();
 		//	}
-		//}
-		m_apScanner[2]->SetBindAddress(m_ulAcceptAddress);
-		m_apScanner[2]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-		m_apScanner[2]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-		m_apScanner[2]->StartScan();
+		//	else
+		//	{
+		//		m_apScanner[iScanIdx]->SetBindAddress(m_ulAcceptAddress);
+		//		m_apScanner[iScanIdx]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+		//		m_apScanner[iScanIdx]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+		//		m_apScanner[iScanIdx]->StartScan();
+		//	}
+		//	
+		//	iScanIdx++;
+		//} while (iScanIdx < COUNT_SCAN_CLIENT);
+
+		for (int i = 0; i < 2; i++)
+		{
+			if (m_apScanner[i])
+			{
+				m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
+				m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+				m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+				m_apScanner[i]->StartScan();
+			}
+		}
+
+		//m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
+		//m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+		//m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+		//m_apScanner[ONVIF]->StartScan();
+
 		m_nScanAniCount = 0;
 		SetTimer(TM_SCANNING_ANI, 1000, NULL);
 	}
@@ -644,36 +670,36 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		{
 			pOldScanInfo = (SCAN_INFO*)m_cSvrList.GetItemData(i);
 			//if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0) // 원래 코드
-			if (wcscmp(pOldScanInfo->szAddr, pScanInfo->szAddr) == 0) // if founded then
+
+			if (wcscmp(pOldScanInfo->szAddr, pScanInfo->szAddr) == 0) // IP 같으면
 			{	
 				delete pScanInfo;
 				pScanInfo = NULL;
 				_Unlock();
 				return 0;
 
-				if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0)
-				{
-					pOldScanInfo->SetReceiveTime();
+				//if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0)
+				//{
+				//	pOldScanInfo->SetReceiveTime();
 
-					if (*pOldScanInfo == *pScanInfo)
-					{
-						delete pScanInfo;
-						pScanInfo = NULL;
-						_Unlock();
-						return 0;
-					}
-					else
-					{
-						// 이전 아이피 정보와 현재의 데이터가 다르다면 업데이트 시킨다. 
-						pScanInfo->SetReceiveTime();
-						m_cSvrList.SetItemData(i, (DWORD_PTR)pScanInfo);
+				//	if (*pOldScanInfo == *pScanInfo)
+				//	{
+				//		delete pScanInfo;
+				//		pScanInfo = NULL;
+				//		_Unlock();
+				//		return 0;
+				//	}
+				//	else
+				//	{
+				//		// 이전 아이피 정보와 현재의 데이터가 다르다면 업데이트 시킨다. 
+				//		pScanInfo->SetReceiveTime();
+				//		m_cSvrList.SetItemData(i, (DWORD_PTR)pScanInfo);
 
-						delete pOldScanInfo;
-						nCurrentItem = i;
-						break;
-					}
-				}
-
+				//		delete pOldScanInfo;
+				//		nCurrentItem = i;
+				//		break;
+				//	}
+				//}
 				//if (wcslen(pOldScanInfo->szMAC) < 4 || wcslen(pScanInfo->szMAC) < 4)
 				//{
 				//	//pScanInfo->SetReceiveTime();
@@ -685,6 +711,17 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 				//	return 0;
 				//}
 			}
+
+			
+
+			//int test = wcslen(pScanInfo->szFirmwareVer);
+			//if (0 == wcslen(pScanInfo->szFirmwareVer) || 0 == wcslen(pScanInfo->szModelName))
+			//{
+			//	delete pScanInfo;
+			//	pScanInfo = NULL;
+			//	_Unlock();
+			//	return 0;
+			//}
 		}
 		//}}
 		//{{ 중복제거 //////////////////////////
