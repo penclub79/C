@@ -40,6 +40,7 @@ protected:
 	void GetAuthenticateData(char* pszIP, int iPort, char* pszDateResult, char* pszNonceResult, char* pszGetData);
 	void GetDeviceInfo(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
 	void GetNetworkInterface(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
+	void GetVideoSource(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
 	BOOL SendSSDP();
 	BOOL CreateMultiCastSocket();
 	BOOL ConnectTCPSocket(char* pszIP, int iPort);

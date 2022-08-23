@@ -407,12 +407,74 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		// User && PWD Edit Disable
 		GetDlgItemText(IDC_EDIT_LOGIN, strUser);
 		GetDlgItemText(IDC_EDIT_LOGINPWD, strPassword);
+		if (0 == wcslen(strUser) && 0 == wcslen(strPassword))
+		{
+			m_bScanning = FALSE;
+			strMsg.LoadString(IDS_SCAN);
+			m_btnScan.SetWindowText(strMsg);
+			MessageBox(_T("ID를 입력해주세요."));
+			return;
+		}
+		else if (0 == wcslen(strUser))
+		{
+			m_bScanning = FALSE;
+			strMsg.LoadString(IDS_SCAN);
+			m_btnScan.SetWindowText(strMsg);
+			MessageBox(_T("ID를 입력해주세요."));
+			return;
+		}
+		else if (0 == wcslen(strPassword))
+		{
+			m_bScanning = FALSE;
+			strMsg.LoadString(IDS_SCAN);
+			m_btnScan.SetWindowText(strMsg);
+			MessageBox(_T("Password를 입력해주세요."));
+			return;
+		}
+		else
+		{
+			strcpy_s(aszUsername, sizeof(char)* sizeof(aszUsername), CT2A(strUser));
+			strcpy_s(aszPassword, sizeof(char)* sizeof(aszPassword), CT2A(strPassword));
+
+			m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
+
+			//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+			//{
+			//	if (m_apScanner[i])
+			//	{
+			//		m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
+			//		m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+			//		m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+			//		m_apScanner[i]->StartScan();
+			//	}
+			//}
+			m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
+			m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+			m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+			m_apScanner[ONVIF]->StartScan();
+
+			m_nScanAniCount = 0;
+			SetTimer(TM_SCANNING_ANI, 1000, NULL);
+		}
+
 		GetDlgItem(IDC_EDIT_LOGIN)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_LOGINPWD)->EnableWindow(FALSE);
 
-		strcpy_s(aszUsername, sizeof(char) * sizeof(aszUsername), CT2A(strUser));
-		strcpy_s(aszPassword, sizeof(char) * sizeof(aszPassword), CT2A(strPassword));
-		m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
+		//if (0 != wcslen(strUser) && 0 != wcslen(strPassword))
+		//{
+		//	strcpy_s(aszUsername, sizeof(char)* sizeof(aszUsername), CT2A(strUser));
+		//	strcpy_s(aszPassword, sizeof(char)* sizeof(aszPassword), CT2A(strPassword));
+
+		//	m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
+		//	
+		//	m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
+		//	m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+		//	m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+		//	m_apScanner[ONVIF]->StartScan();
+
+		//	m_nScanAniCount = 0;
+		//	SetTimer(TM_SCANNING_ANI, 1000, NULL);
+		//}
 
 		// start set
 		//do
@@ -435,24 +497,16 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		//	iScanIdx++;
 		//} while (iScanIdx < COUNT_SCAN_CLIENT);
 
-		for (int i = 0; i < 2; i++)
-		{
-			if (m_apScanner[i])
-			{
-				m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
-				m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-				m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-				m_apScanner[i]->StartScan();
-			}
-		}
-
-		//m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
-		//m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-		//m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-		//m_apScanner[ONVIF]->StartScan();
-
-		m_nScanAniCount = 0;
-		SetTimer(TM_SCANNING_ANI, 1000, NULL);
+		//for (int i = 0; i < 2; i++)
+		//{
+		//	if (m_apScanner[i])
+		//	{
+		//		m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
+		//		m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+		//		m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+		//		m_apScanner[i]->StartScan();
+		//	}
+		//}
 	}
 	else // Stop을 눌렀을 때
 	{
