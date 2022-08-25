@@ -300,7 +300,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 	char			aszPwdBaseHash[56]		= { 0 };
 	char			aszNonceBase64[BASE64_SIZE] = { 0 };
 	char			aszUserPwd[16]			= "111111";
-	char aszIP[20] = "192.168.0.115";
+	char aszIP[20] = "192.168.0.209";
 	unsigned char	auszNonceDecode[64]		= { 0 };
 	char*			pszDeviceInfoData		= NULL;
 	char*			pszNetworkInfoData		= NULL;
@@ -425,6 +425,15 @@ void CNetScanOnvif::thrOnvifReceiver()
 						//// ProbeMatch에서 받은 IP갯수 만큼 반복문으로 돌릴 예정 - 지금은 1개로 테스트 중
 						GetAuthenticateData(aszIPAddress, iHTTPPort, &aszDateResult[0], &aszNonceResult[0], &pszDeviceInfoData[0]); // Device 날짜 얻기
 						
+						if (0 == strlen(aszNonceResult))
+						{
+							char caNonceTest[20] = { 0x9E, 0xBD, 0xBB, 0x53, 0x7C, 0x96, 0xB4, 0xC1, 0xCE, 0xEB,
+								0xFB, 0x06, 0x17, 0x31, 0x41, 0x4E, 0x5B, 0x68, 0x86, 0x93 };
+
+							strcpy(aszNonceResult, caNonceTest);
+						}
+
+
 						::OutputDebugStringA(pszDeviceInfoData);
 						::OutputDebugStringA("\n");
 
@@ -1098,8 +1107,8 @@ void CNetScanOnvif::GetDeviceInfo(char* pszIP, int iPort, char* pszDigest, char*
 
 		//::OutputDebugStringA("ONVIF RECEIVE DEVICE DATA -----------------------\n");
 		//::OutputDebugStringA(pszIP);
-		//::OutputDebugStringA("\n");
-		//::OutputDebugStringA(pszRecvBuffer);
+		::OutputDebugStringA("\n");
+		::OutputDebugStringA(pszRecvBuffer);
 		//::OutputDebugStringA("\n");
 
 
@@ -1227,8 +1236,8 @@ void CNetScanOnvif::GetNetworkInterface(char* pszIP, int iPort, char* pszDigest,
 		}
 		//::OutputDebugStringA("ONVIF RECEIVE DEVICE DATA -----------------------\n");
 		//::OutputDebugStringA(pszIP);
-		//::OutputDebugStringA("\n");
-		//::OutputDebugStringA(pszRecvBuffer);
+		::OutputDebugStringA("\n");
+		::OutputDebugStringA(pszRecvBuffer);
 		//::OutputDebugStringA("\n");
 
 		if (0 < strlen(pszRecvBuffer))
@@ -1302,39 +1311,38 @@ void CNetScanOnvif::GetProfile(char* pszIP, int iPort, char* pszDigest, char* ps
 	
 	char aszDeviceInfoHeader[] = "POST /onvif/media_service HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/media/wsdl/GetProfiles\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
 
-	//char aszDeviceInformationXML[] = 
-	//{
-	//	"<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
-	//		<s:Header>\
-	//			<Security s:mustUnderstand=\"1\" xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\
-	//				<UsernameToken>\
-	//					<Username>ADMIN</Username>\
-	//					<Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">%s</Password>\
-	//					<Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">%s</Nonce>\
-	//					<Created xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">%s</Created>\
-	//				</UsernameToken>\
-	//			</Security>\
-	//		</s:Header>\
-	//		<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
-	//			<GetProfiles xmlns=\"http://www.onvif.org/ver10/media/wsdl\"/>\
-	//		</s:Body>\
-	//	</s:Envelope>" // UserToken Header - GetVideoSource Body
-	//};
 	char aszDeviceInformationXML[] = 
 	{
 		"<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
-				<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
-					<GetProfiles xmlns=\"http://www.onvif.org/ver10/media/wsdl\"/>\
-				</s:Body>\
-			</s:Envelope>" // UserToken Header - GetVideoSource Body
+			<s:Header>\
+				<Security s:mustUnderstand=\"1\" xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\
+					<UsernameToken>\
+						<Username>ADMIN</Username>\
+						<Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">%s</Password>\
+						<Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">%s</Nonce>\
+						<Created xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">%s</Created>\
+					</UsernameToken>\
+				</Security>\
+			</s:Header>\
+			<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
+				<GetProfiles xmlns=\"http://www.onvif.org/ver10/media/wsdl\"/>\
+			</s:Body>\
+		</s:Envelope>" // UserToken Header - GetVideoSource Body
 	};
+	//char aszDeviceInformationXML[] = 
+	//{
+	//	"<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
+	//			<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
+	//				<GetProfiles xmlns=\"http://www.onvif.org/ver10/media/wsdl\"/>\
+	//			</s:Body>\
+	//		</s:Envelope>" // UserToken Header - GetVideoSource Body
+	//};
 
 	bIsConnect = ConnectTCPSocket(pszIP, iPort);
 
 	iHeaderSize = strlen(aszDeviceInfoHeader) + strlen(pszIP) + DATALEN;
 	//iBodySize = strlen(aszDeviceInformationXML) + strlen(pszDigest) + strlen(pszNonceResult) + strlen(pszDateResult) + strlen(m_aszUserName);
 	iBodySize = strlen(aszDeviceInformationXML) + strlen(pszDigest) + strlen(pszNonceResult) + strlen(pszDateResult);
-	iBodySize = strlen(aszDeviceInformationXML);
 	iPacketSize = iHeaderSize + iBodySize;
 	iContentLen = iBodySize;
 
