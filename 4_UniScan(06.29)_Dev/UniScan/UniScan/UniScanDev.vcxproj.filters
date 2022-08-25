@@ -141,6 +141,9 @@
     <ClInclude Include="MD5.h">
       <Filter>헤더 파일\MD5</Filter>
     </ClInclude>
+    <ClInclude Include="XMLform.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

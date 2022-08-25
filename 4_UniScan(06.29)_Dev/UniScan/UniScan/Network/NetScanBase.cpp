@@ -142,6 +142,8 @@ void NetScanBase::SetUserInfo(char* _pszUserName, char* _pszPassword)
 }
 
 
+
+
 // char -> WCHAR 복사 공통
 void NetScanBase::WideCopyStringFromAnsi(WCHAR* _pwszString, int _iMaxBufferLen, char* _pszString)
 {

@@ -2,24 +2,53 @@
 
 #include "NetScanBase.h"
 #include "../../UniScan/MD5.h"
+#include "../xmlite/XMLite.h"
+#include "../../UniScan/XMLform.h"
 
-typedef struct _ONVIFINFO
+#define NOT_DATA	0
+#define SHA_SIZE	41
+#define BASE64_SIZE	56
+#define UUID_SIZE	128
+#define DIGEST_SIZE 64
+
+typedef struct tagONVIFINFO
 {
-	char szInfo[SCAN_INFO_RECEIVE_BUFFER_SIZE];
-}ONVIFINFO;
+	char	aszIP[24];
+	int		iPort;
+	char	aszDigest[DIGEST_SIZE];
+	char	aszNonce[36];
+	char	aszDate[56];
+	char*	pszGetData;
+}ONVIF_INFO;
+
+typedef struct tagNODECHILD
+{
+	LPXNode lpBody;
+	LPXNode	lpDeviceInfoBody;
+	LPXNode lpUUID;
+	LPXNode lpIPAddress;
+	LPXNode lpMAC;
+	LPXNode lpMajor;
+	LPXNode lpMinor;
+}NODECHILD;
+
+typedef struct tagNODE
+{
+	XNode	stNode;
+	XNode	stDeviceInfoNode;
+	XNode	stNetworkInfoNode;
+	XNode	stOnvifVersionNode;
+}NODE;
 
 typedef enum _TCPCODE{
-	CONNECT_SUCCESS = 1,
+	CONNECT_FAIL	= 0,
+	CONNECT_SUCCESS,
 };
 
 typedef enum _HTTPCODE{
 	RES_SUCCESS		= 200,
 	BAD_REQUEST		= 400,
 	UNAUTHORIZED	= 401
-};
-
-typedef enum _STATUSCODE{
-	NOT_DATA = 0
 };
 
 
@@ -40,7 +69,7 @@ protected:
 	void GetAuthenticateData(char* pszIP, int iPort, char* pszDateResult, char* pszNonceResult, char* pszGetData);
 	void GetDeviceInfo(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
 	void GetNetworkInterface(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
-	void GetVideoSource(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
+	void GetProfile(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
 	BOOL SendSSDP();
 	BOOL CreateMultiCastSocket();
 	BOOL ConnectTCPSocket(char* pszIP, int iPort);
@@ -50,7 +79,10 @@ protected:
 	void SHA1Encoding(char* pszStr, char* pszResult);
 	void Base64Encoding(char* pszStr, int iSize, char* pszResult);
 	int Base64Decoding(char* pszStr, unsigned char* puszResult, int iSize);
+	
+
 	BOOL m_bConnected;
+	BOOL m_bIsProbeRev;
 	SOCKET m_TcpSocket;
 
 

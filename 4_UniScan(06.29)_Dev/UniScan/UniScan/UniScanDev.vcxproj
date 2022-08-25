@@ -136,6 +136,7 @@
     <ClInclude Include="UpgradeThreadHttp.h" />
     <ClInclude Include="UpgradeThreadTcp.h" />
     <ClInclude Include="VHNetworkAdaptorInfo.h" />
+    <ClInclude Include="XMLform.h" />
     <ClInclude Include="xmlite\XMLite.h" />
   </ItemGroup>
   <ItemGroup>

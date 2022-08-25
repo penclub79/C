@@ -212,6 +212,7 @@ public:
 	void	SetNotifyWindow(HWND _hWnd, LONG _msg);
 	void	SetCloseMsgRecvWindow(HWND _hWnd, LONG _msg/* = WM_CLOSE*/);
 	void	ThreadExit();
+	void	DeduplicationData();  // 중복 제거 함수 구현
 	//////////////////////////////////////////////////////////// ---------/
 
 	char m_aszUserName[16];

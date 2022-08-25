@@ -385,8 +385,8 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		ONVIF = 2
 	};
 	CString strMsg;
-	CString strUser;
-	CString strPassword;
+	CString strUser = _T("ADMIN");
+	CString strPassword = _T("111111");
 	char aszUsername[16] = { 0 };
 	char aszPassword[16] = { 0 };
 	int iScanIdx = 0;
@@ -405,17 +405,9 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		SetStatusMsg(strMsg);
 
 		// User && PWD Edit Disable
-		GetDlgItemText(IDC_EDIT_LOGIN, strUser);
-		GetDlgItemText(IDC_EDIT_LOGINPWD, strPassword);
-		if (0 == wcslen(strUser) && 0 == wcslen(strPassword))
-		{
-			m_bScanning = FALSE;
-			strMsg.LoadString(IDS_SCAN);
-			m_btnScan.SetWindowText(strMsg);
-			MessageBox(_T("ID를 입력해주세요."));
-			return;
-		}
-		else if (0 == wcslen(strUser))
+		//GetDlgItemText(IDC_EDIT_LOGIN, strUser);
+		//GetDlgItemText(IDC_EDIT_LOGINPWD, strPassword);
+		if (0 == wcslen(strUser) && 0 == wcslen(strPassword) || 0 == wcslen(strUser))
 		{
 			m_bScanning = FALSE;
 			strMsg.LoadString(IDS_SCAN);
@@ -433,8 +425,8 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		}
 		else
 		{
-			strcpy_s(aszUsername, sizeof(char)* sizeof(aszUsername), CT2A(strUser));
-			strcpy_s(aszPassword, sizeof(char)* sizeof(aszPassword), CT2A(strPassword));
+			strcpy_s(aszUsername, sizeof(char) * sizeof(aszUsername), CT2A(strUser));
+			strcpy_s(aszPassword, sizeof(char) * sizeof(aszPassword), CT2A(strPassword));
 
 			m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
 
@@ -460,53 +452,6 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		GetDlgItem(IDC_EDIT_LOGIN)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_LOGINPWD)->EnableWindow(FALSE);
 
-		//if (0 != wcslen(strUser) && 0 != wcslen(strPassword))
-		//{
-		//	strcpy_s(aszUsername, sizeof(char)* sizeof(aszUsername), CT2A(strUser));
-		//	strcpy_s(aszPassword, sizeof(char)* sizeof(aszPassword), CT2A(strPassword));
-
-		//	m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
-		//	
-		//	m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
-		//	m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-		//	m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-		//	m_apScanner[ONVIF]->StartScan();
-
-		//	m_nScanAniCount = 0;
-		//	SetTimer(TM_SCANNING_ANI, 1000, NULL);
-		//}
-
-		// start set
-		//do
-		//{
-		//	if (iScanIdx == 0)
-		//	{
-		//		m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
-		//		m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-		//		m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-		//		m_apScanner[ONVIF]->StartScan();
-		//	}
-		//	else
-		//	{
-		//		m_apScanner[iScanIdx]->SetBindAddress(m_ulAcceptAddress);
-		//		m_apScanner[iScanIdx]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-		//		m_apScanner[iScanIdx]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-		//		m_apScanner[iScanIdx]->StartScan();
-		//	}
-		//	
-		//	iScanIdx++;
-		//} while (iScanIdx < COUNT_SCAN_CLIENT);
-
-		//for (int i = 0; i < 2; i++)
-		//{
-		//	if (m_apScanner[i])
-		//	{
-		//		m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
-		//		m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-		//		m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-		//		m_apScanner[i]->StartScan();
-		//	}
-		//}
 	}
 	else // Stop을 눌렀을 때
 	{
