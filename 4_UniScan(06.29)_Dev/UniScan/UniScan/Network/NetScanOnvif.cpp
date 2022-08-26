@@ -125,7 +125,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 	char		szMessageID[128]	= { 0 };
 	int			iError				= 0;
 	int			iSendBufferSize		= 0;
-	char*		pszProbeSendBuffer		= NULL;
+	char*		pszProbeSendBuffer	= NULL;
 	char*		pszResolveSendBuffer = NULL;
 	//char*		paszOnvifURI[2]		= {"http://www.onvif.org/ver10/network/wsdl", "http://www.onvif.org/ver10/device/wsdl"};
 	//char*		paszProbeType[3]	= { "dp0:Device", "dp0:NetworkVideoDisplay", "dp0:NetworkVideoTransmitter" };
@@ -224,29 +224,6 @@ BOOL CNetScanOnvif::SendScanRequest()
 
 		iTypeIdx++;
 	}
-
-	// Resolve Message Send
-	//iSendBufferSize = strlen(aszResolveXml) + strlen(szMessageID) + 300;
-	//pszResolveSendBuffer = new char[iSendBufferSize + 1];
-	//memset(pszResolveSendBuffer, 0, iSendBufferSize + 1);
-	//
-	//if (TRUE == m_bIsProbeRev)
-	//{
-	//	sprintf_s(pszResolveSendBuffer, iSendBufferSize, aszResolveXml, szMessageID);
-
-	//	iSize = strlen(pszResolveSendBuffer);
-	//	if (SOCKET_ERROR == sendto(m_hReceiveSock, pszResolveSendBuffer, iSize, 0, (struct sockaddr*)&OnvifSendSock, sizeof(OnvifSendSock)))
-	//	{
-	//		iError = WSAGetLastError();
-	//		TRACE(_T("sendto Error = %d\n"), iError);
-	//		closesocket(m_hReceiveSock);
-
-	//		delete[] pszResolveSendBuffer;
-	//		pszResolveSendBuffer = NULL;
-	//		return FALSE;
-	//	}
-	//	::OutputDebugStringA("########################################################################################-----------------------\n");
-	//}
 
 	m_bConnected = TRUE;
 
@@ -427,10 +404,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 						
 						if (0 == strlen(aszNonceResult))
 						{
-							char caNonceTest[20] = { 0x9E, 0xBD, 0xBB, 0x53, 0x7C, 0x96, 0xB4, 0xC1, 0xCE, 0xEB,
-								0xFB, 0x06, 0x17, 0x31, 0x41, 0x4E, 0x5B, 0x68, 0x86, 0x93 };
-
-							strcpy(aszNonceResult, caNonceTest);
+							strcpy(aszNonceResult, __aszNonce);
 						}
 
 
