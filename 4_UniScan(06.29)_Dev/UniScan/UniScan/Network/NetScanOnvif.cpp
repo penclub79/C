@@ -558,20 +558,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 						else
 							wsprintf(pScanInfo->szModelName, _T("N/A"));
 					}
-					//	//if (NULL != pszMacSlice)
-					//	//{
-					//	//	pszMacSlice = strtok(pszMacSlice, " ");
-					//	//	pszMacType = strtok(pszMacSlice, "/");
-					//	//	( 0 == strcmp(pszMacType, "macaddress") ) ? pszMacSlice = strncpy(pszMacSlice, pszMacSlice + 11, 20) : pszMacSlice = strncpy(pszMacSlice, pszMacSlice + 4, 20);
 
-					//	//	strlwr(pszMacSlice); // 소문자로 변환
-
-					//	//	this->WideCopyStringFromAnsi(pScanInfo->szMAC, 32, pszMacSlice);
-					//	//}
-					//	//else
-					//	//	wsprintf(pScanInfo->szMAC, _T("N/A"));
-
-					//wsprintf(pScanInfo->szSwVersion, _T("N/A"));
 					pScanInfo->iBasePort = 0;
 					pScanInfo->iVideoCnt = 0;
 
