@@ -14,11 +14,14 @@
 typedef struct tagONVIFINFO
 {
 	char	aszIP[24];
+	char	aszMAC[30];
 	int		iPort;
 	char	aszDigest[DIGEST_SIZE];
 	char	aszNonce[36];
 	char	aszDate[56];
 	char*	pszGetData;
+	char   aszVersion[8];
+
 }ONVIF_INFO;
 
 typedef struct tagNODECHILD
@@ -38,7 +41,17 @@ typedef struct tagNODE
 	XNode	stDeviceInfoNode;
 	XNode	stNetworkInfoNode;
 	XNode	stOnvifVersionNode;
+	NODECHILD stChild;
 }NODE;
+
+typedef enum 
+{
+	PROBEMATCH = 0,
+	DEVICEINFO,
+	VERSIONINFO,
+	NETWORKINFO,
+	PROFILEINFO
+};
 
 typedef enum _TCPCODE{
 	CONNECT_FAIL	= 0,
@@ -78,8 +91,10 @@ protected:
 	void DigestConvert(char* pszStr, char* puszResult);
 	void SHA1Encoding(char* pszStr, char* pszResult);
 	void Base64Encoding(char* pszStr, int iSize, char* pszResult);
-	int Base64Decoding(char* pszStr, unsigned char* puszResult, int iSize);
-	
+	int	Base64Decoding(char* pszStr, unsigned char* puszResult, int iSize);
+	//void RecvStatus(char* pszRecvData, int iLabel);						// Pre-treat's Status Value
+	//void RecvDataParsing(NODE* pNode, char* pszRecvData, int iLabel);			// Recieve Data Pre-treat Func
+	//void RecvFault(int iLabel, int iHTTPStatus);
 
 	BOOL m_bConnected;
 	BOOL m_bIsProbeRev;
