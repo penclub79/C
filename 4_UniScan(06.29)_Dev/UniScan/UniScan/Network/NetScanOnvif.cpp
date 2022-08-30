@@ -125,7 +125,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 	char		szMessageID[128]	= { 0 };
 	int			iError				= 0;
 	int			iSendBufferSize		= 0;
-	char*		pszProbeSendBuffer		= NULL;
+	char*		pszProbeSendBuffer	= NULL;
 	char*		pszResolveSendBuffer = NULL;
 	char*		paszOnvifURI[2]		= {"http://www.onvif.org/ver10/network/wsdl", "http://www.onvif.org/ver10/device/wsdl"};
 	char*		paszProbeType[3]	= { "dp0:Device", "dp0:NetworkVideoDisplay", "dp0:NetworkVideoTransmitter" };
