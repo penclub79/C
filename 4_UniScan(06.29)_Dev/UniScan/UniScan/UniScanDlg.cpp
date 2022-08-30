@@ -233,15 +233,19 @@ BOOL CUniScanDlg::OnInitDialog()
 	// FIX ME : display 할 항목 변경 시 밑에 있는 CompareScanInfo 함수도 같이 변경 할 것
 	CString str;
 	CString strItem;
+	CRect cRec;
+	GetWindowRect(&cRec);
+
+	int iColumnCnt = 8;
 
 	str.LoadString(IDS_ADDRESS);
 	strItem = L"IP " + str;
-	m_cSvrList.InsertColumn(SUBITEM_IPADDRESS, strItem, LVCFMT_CENTER, 138, 0);
+	m_cSvrList.InsertColumn(SUBITEM_IPADDRESS, strItem, LVCFMT_CENTER, cRec.Width() / iColumnCnt, 0);
 	strItem = L"MAC " + str;
-	m_cSvrList.InsertColumn(SUBITEM_MACADDRESS, strItem, LVCFMT_CENTER, 138, 0);
+	m_cSvrList.InsertColumn(SUBITEM_MACADDRESS, strItem, LVCFMT_CENTER, cRec.Width() / iColumnCnt, 0);
 
 	strItem.LoadString(IDS_IP_TYPE);
-	m_cSvrList.InsertColumn(SUBITEM_IS_DHCP, strItem, LVCFMT_CENTER, 138, 0);
+	m_cSvrList.InsertColumn(SUBITEM_IS_DHCP, strItem, LVCFMT_CENTER, cRec.Width() / iColumnCnt, 0);
 
 	str.LoadString(IDS_PORT);
 	strItem.LoadString(IDS_STREAM);
@@ -251,7 +255,7 @@ BOOL CUniScanDlg::OnInitDialog()
 
 	strItem = L"HTTP ";
 	strItem += str;
-	m_cSvrList.InsertColumn(SUBITEM_PORTHTTP, strItem, LVCFMT_CENTER, 138, 0);
+	m_cSvrList.InsertColumn(SUBITEM_PORTHTTP, strItem, LVCFMT_CENTER, cRec.Width() / iColumnCnt, 0);
 
 	//strItem = L"Upgrade ";
 	//strItem += str;
@@ -264,17 +268,17 @@ BOOL CUniScanDlg::OnInitDialog()
 	//m_cSvrList.InsertColumn(SUBITEM_SYSTEMNAME		, strItem, LVCFMT_CENTER, 150, 0 );
 
 	strItem.LoadString(IDS_MODEL);
-	m_cSvrList.InsertColumn(SUBITEM_MODELTYPE, strItem, LVCFMT_CENTER, 138, 0);
+	m_cSvrList.InsertColumn(SUBITEM_MODELTYPE, strItem, LVCFMT_CENTER, cRec.Width() / iColumnCnt, 0);
 	// InsertColumn(컬럼생성 순서, 컬럼 이름, 글씨 정렬, width값);
 
 	strItem.LoadString(IDS_FIRMWARE_VERSION);
-	m_cSvrList.InsertColumn(SUBITEM_FIRMWAREVERSION, strItem, LVCFMT_CENTER, 138, 0);
+	m_cSvrList.InsertColumn(SUBITEM_FIRMWAREVERSION, strItem, LVCFMT_CENTER, cRec.Width() / iColumnCnt, 0);
 
 	strItem.LoadString(IDS_SW_VERSION);
-	m_cSvrList.InsertColumn(SUBITEM_SW_VERSION, strItem, LVCFMT_CENTER, 138, 0);
+	m_cSvrList.InsertColumn(SUBITEM_SW_VERSION, strItem, LVCFMT_CENTER, (cRec.Width() / iColumnCnt), 0);
 
 	strItem.LoadString(IDS_VIDEO_COUNT);
-	m_cSvrList.InsertColumn(SUBITEM_VIDEOCOUNT, strItem, LVCFMT_CENTER, 138, 0);
+	m_cSvrList.InsertColumn(SUBITEM_VIDEOCOUNT, strItem, LVCFMT_CENTER, cRec.Width() / iColumnCnt - 32, 0);
 
 	m_cSvrList.Init();
 
@@ -405,8 +409,8 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		SetStatusMsg(strMsg);
 
 		// User && PWD Edit Disable
-		//GetDlgItemText(IDC_EDIT_LOGIN, strUser);
-		//GetDlgItemText(IDC_EDIT_LOGINPWD, strPassword);
+		GetDlgItemText(IDC_EDIT_LOGIN, strUser);
+		GetDlgItemText(IDC_EDIT_LOGINPWD, strPassword);
 		if (0 == wcslen(strUser) && 0 == wcslen(strPassword) || 0 == wcslen(strUser))
 		{
 			m_bScanning = FALSE;
@@ -430,20 +434,21 @@ void CUniScanDlg::OnBnClickedScanBtn()
 
 			m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
 
-			//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-			//{
-			//	if (m_apScanner[i])
-			//	{
-			//		m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
-			//		m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			//		m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			//		m_apScanner[i]->StartScan();
-			//	}
-			//}
-			m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
-			m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			m_apScanner[ONVIF]->StartScan();
+			for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+			{
+				if (m_apScanner[i])
+				{
+					m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
+					m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+					m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+					m_apScanner[i]->StartScan();
+				}
+			}
+			
+			//m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
+			//m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+			//m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+			//m_apScanner[ONVIF]->StartScan();
 
 			m_nScanAniCount = 0;
 			SetTimer(TM_SCANNING_ANI, 1000, NULL);
@@ -794,6 +799,8 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		//m_cSvrList.SetItem(&item);
 
+		if (0 == wcslen(pScanInfo->szSwVersion))
+			wsprintf(pScanInfo->szSwVersion, _T("N/A"));
 		strTemp.Format(_T("%s"), pScanInfo->szSwVersion);
 		item.mask = LVIF_TEXT;
 		item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
@@ -808,6 +815,8 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		m_cSvrList.SetItem(&item);
 
+		if (0 == wcslen(pScanInfo->szModelName))
+			wsprintf(pScanInfo->szModelName, _T("N/A"));
 		strTemp.Format(_T("%s"), pScanInfo->szModelName);
 		item.mask = LVIF_TEXT;
 		item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
@@ -822,6 +831,8 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		//m_cSvrList.SetItem(&item);
 
+		if (0 == wcslen(pScanInfo->szFirmwareVer))
+			wsprintf(pScanInfo->szFirmwareVer, _T("N/A"));
 		strTemp.Format(_T("%s"), pScanInfo->szFirmwareVer);
 		item.mask = LVIF_TEXT;
 		item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;

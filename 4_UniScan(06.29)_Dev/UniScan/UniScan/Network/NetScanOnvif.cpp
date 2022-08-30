@@ -153,25 +153,25 @@ BOOL CNetScanOnvif::SendScanRequest()
 			</Envelope>"
 	};
 
-	char aszResolveXml[] =
-	{
-		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
-			<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\
-				<s:Header>\
-					<a:Action s:mustUnderstand=\"1\">http://schemas.xmlsoap.org/ws/2005/04/discovery/Resolve</a:Action>\
-					<a:MessageID>uuid:%s</a:MessageID>\
-					<a:ReplyTo>\
-						<a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address>\
-					</a:ReplyTo>\
-					<a:To s:mustUnderstand=\"1\">urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To>\
-				</s:Header>\
-				<s:Body>\
-					<d:Resolve xmlns=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
-						<a:ReferenceProperties>%s</a:ReferenceProperties>\
-					</d:Resolve>\
-				</s:Body>\
-			</Envelope>"
-	};
+	//char aszResolveXml[] =
+	//{
+	//	"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+	//		<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\
+	//			<s:Header>\
+	//				<a:Action s:mustUnderstand=\"1\">http://schemas.xmlsoap.org/ws/2005/04/discovery/Resolve</a:Action>\
+	//				<a:MessageID>uuid:%s</a:MessageID>\
+	//				<a:ReplyTo>\
+	//					<a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address>\
+	//				</a:ReplyTo>\
+	//				<a:To s:mustUnderstand=\"1\">urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To>\
+	//			</s:Header>\
+	//			<s:Body>\
+	//				<d:Resolve xmlns=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
+	//					<a:ReferenceProperties>%s</a:ReferenceProperties>\
+	//				</d:Resolve>\
+	//			</s:Body>\
+	//		</Envelope>"
+	//};
 
 
 	// 소켓 생성
@@ -249,7 +249,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 	LPXNode			lpTypeCheck				= NULL;
 	LPXNode			lpBody					= NULL;
 	LPXNode			lpDeviceInfoBody		= NULL;
-	LPXNode	lpProfileBody = NULL;
+	LPXNode			lpProfileBody = NULL;
 	LPXNode			lpUUID					= NULL;
 	LPXNode			lpIPAddress				= NULL;
 	LPXNode			lpMAC					= NULL;
@@ -260,7 +260,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 	int				iHTTPPort				= 0;
 	char			aszUUID[UUID_SIZE]		= { 0 };
 	char			aszIPData[128]			= { 0 };
-	char			aszMAC[30]				= { 0 };
+	char			aszMAC[32]				= { 0 };
 	char*			pszData					= NULL;
 	char			aszIPAddress[32]		= { 0 };
 	char*			pszSlice				= NULL;
@@ -271,22 +271,20 @@ void CNetScanOnvif::thrOnvifReceiver()
 	char*			pszProbeMatchType[2]	= { "wsdd:ProbeMatch", "d:ProbeMatch" };
 	char*			pszAddressType[2]		= { "wsdd:XAddrs", "d:XAddrs" };
 	BOOL			bIsTCPConnect			= FALSE;
-	char			aszDigest[48]			= { 0 };
 	char			aszNonceResult[36]		= { 0 }; // Base64로 인코딩된 16바이트여야 한다.
 	char			aszDateResult[56]		= { 0 };
 	char			aszPwdDigest[DIGEST_SIZE] = { 0 };
 	char			aszPwdShaHash[41]		= { 0 };
 	char			aszPwdBaseHash[56]		= { 0 };
 	char			aszNonceBase64[BASE64_SIZE] = { 0 };
-	char			aszUserPwd[16]			= "111111";
-	//char aszIP[20] = "192.168.0.213";
+	char aszIP[20] = "192.168.0.200";
 	unsigned char	auszNonceDecode[64]		= { 0 };
 	char*			pszDeviceInfoData		= NULL;
 	char*			pszNetworkInfoData		= NULL;
 	char*			pszOnvifVerData			= NULL;
 	char*			pszVideoSourceData		= NULL;
 	char*			pszMacType				= NULL;
-	char			aszFirmwareVer[50]		= { 0 };
+	char			aszFirmwareVer[32]		= { 0 };
 
 	m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
 	memset(m_pReceive_buffer, 0, sizeof(char) * SCAN_INFO_RECEIVE_BUFFER_SIZE);
@@ -383,6 +381,11 @@ void CNetScanOnvif::thrOnvifReceiver()
 						strcpy(&aszIPAddress[0], lpIPAddress->value);
 						//strcpy(&aszIPAddress[0], aszIP);
 
+						if (0 == strcmp(aszIP, aszIPAddress))
+						{
+							TRACE(_T("TRUE"));
+						}
+
 						if (strlen(aszIPAddress) > 0)
 						{
 							this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIPAddress);
@@ -400,7 +403,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 						pszVideoSourceData = new char[sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE];
 						memset(&pszVideoSourceData[0], 0, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE);
 
-
 						//// ProbeMatch에서 받은 IP갯수 만큼 반복문으로 돌릴 예정 - 지금은 1개로 테스트 중
 						GetAuthenticateData(aszIPAddress, iHTTPPort, &aszDateResult[0], &aszNonceResult[0], &pszDeviceInfoData[0]); // Device 날짜 얻기
 						
@@ -408,7 +410,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 						{
 							strcpy(aszNonceResult, __aszNonce);
 						}
-
 
 						::OutputDebugStringA(pszDeviceInfoData);
 						::OutputDebugStringA("\n");
@@ -465,11 +466,24 @@ void CNetScanOnvif::thrOnvifReceiver()
 						{
 							stNetworkInfoNode.Load(pszNetworkInfoData);
 							lpMAC = stNetworkInfoNode.GetChildArg("tt:HwAddress", NULL);
-
-							if (NULL != lpMAC)
+							if (NULL != lpMAC )
 							{
-								strcpy(&aszMAC[0], lpMAC->value);
-								this->WideCopyStringFromAnsi(pScanInfo->szMAC, 30, aszMAC);
+								if (1 < lpMAC->value.GetLength())
+								{
+									strcpy(&aszMAC[0], lpMAC->value);
+									
+									for (int i = 0; i < strlen(aszMAC); i++)
+									{
+										if (aszMAC[i] >= 'A' && aszMAC[i] <= 'Z')
+										{
+											aszMAC[i] += 32;
+										}
+									}
+
+									this->WideCopyStringFromAnsi(pScanInfo->szMAC, 32, aszMAC);
+								}	
+								else
+									wsprintf(pScanInfo->szMAC, _T("N/A"));
 							}
 							else
 							{
@@ -489,12 +503,11 @@ void CNetScanOnvif::thrOnvifReceiver()
 								case NOT_DATA:
 									wsprintf(pScanInfo->szMAC, _T("N/A"));
 									break;
-
-								default:
-									break;
 								}
 							}
 						}
+						else
+							wsprintf(pScanInfo->szMAC, _T("N/A"));
 
 						if (0 < strlen(pszDeviceInfoData))
 						{
@@ -507,11 +520,13 @@ void CNetScanOnvif::thrOnvifReceiver()
 							// FirwareVersion Value Check
 							if (NULL != lpDeviceInfoBody)
 							{
-								if (0 < lpDeviceInfoBody->value.GetLength())
+								if (1 < lpDeviceInfoBody->value.GetLength())
 								{
 									strcpy(&aszFirmwareVer[0], lpDeviceInfoBody->value);
-									this->WideCopyStringFromAnsi(pScanInfo->szFirmwareVer, 50, aszFirmwareVer);
+									this->WideCopyStringFromAnsi(pScanInfo->szFirmwareVer, 32, aszFirmwareVer);
 								}
+								else
+									wsprintf(pScanInfo->szFirmwareVer, _T("N/A"));
 							}
 							else
 							{
@@ -528,7 +543,8 @@ void CNetScanOnvif::thrOnvifReceiver()
 									wsprintf(pScanInfo->szFirmwareVer, _T("UNAUTHORIZED"));
 									break;
 
-								default:
+								case NOT_DATA:
+									wsprintf(pScanInfo->szFirmwareVer, _T("N/A"));
 									break;
 								}
 							}
@@ -539,15 +555,14 @@ void CNetScanOnvif::thrOnvifReceiver()
 						// Channel Cnt 가져오기
 						//GetProfile(aszIPAddress, iHTTPPort, aszPwdBaseHash, aszNonceBase64, aszDateResult, &pszVideoSourceData[0]);
 
-						if (0 < pszVideoSourceData)
-						{
-							LPXNode lpToken = NULL;
-							stVideoInfoNode.Load(pszVideoSourceData);
-							//lpProfileBody = stVideoInfoNode.GetChildArg("trt:GetProfilesResponse", NULL);
-							//lpToken = lpProfileBody->GetChildArg("trt:Profiles", NULL);
-							//lpToken = lpProfileBody->GetChildArg("trt:Profiles", NULL);
-
-						}
+						//if (0 < pszVideoSourceData)
+						//{
+						//	LPXNode lpToken = NULL;
+						//	stVideoInfoNode.Load(pszVideoSourceData);
+						//	//lpProfileBody = stVideoInfoNode.GetChildArg("trt:GetProfilesResponse", NULL);
+						//	//lpToken = lpProfileBody->GetChildArg("trt:Profiles", NULL);
+						//	//lpToken = lpProfileBody->GetChildArg("trt:Profiles", NULL);
+						//}
 						
 					}
 
@@ -792,12 +807,6 @@ void CNetScanOnvif::SendDeviceInfo(char* pszIP, int iPort, char* pszNonceResult,
 		pszRecvBuffer = NULL;
 	}
 
-	if (NULL != m_TcpSocket)
-	{
-		closesocket(m_TcpSocket);
-		m_TcpSocket = NULL;
-	}
-
 }
 
 void CNetScanOnvif::GetOnvifVersion(char* pszIP, int iPort, char* pszGetData)
@@ -997,12 +1006,6 @@ void CNetScanOnvif::GetAuthenticateData(char* pszIP, int iPort, char* pszDateRes
 	{
 		delete[] pszRecvBuffer;
 		pszRecvBuffer = NULL;
-	}
-
-	if (NULL != m_TcpSocket)
-	{
-		closesocket(m_TcpSocket);
-		m_TcpSocket = NULL;
 	}
 }
 
@@ -1491,7 +1494,7 @@ void CNetScanOnvif::Base64Encoding(char* pszStr, int iSize, char* pszResult)
 
 	if (NULL != pszBuffer)
 	{
-		delete pszBuffer;
+		delete[] pszBuffer;
 		pszBuffer = NULL;
 	}
 }

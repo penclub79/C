@@ -48,11 +48,11 @@ typedef struct tagSCAN_STRUCT
 {
 	int				iScanType = 0; // 1 : Vision, 2 : MarkIn, 3 : Onvif
 	WCHAR			szAddr[30];
-	WCHAR			szMAC[30];
+	WCHAR			szMAC[32];
 	WCHAR			szGateWay[30];
 	WCHAR			szSwVersion[30]; // +Ãß°¡
 	WCHAR			szModelName[30];
-	WCHAR			szFirmwareVer[50];
+	WCHAR			szFirmwareVer[32];
 	int				iBasePort;
 	int				nHTTPPort;
 	int				version;
@@ -81,12 +81,12 @@ typedef struct tagSCAN_STRUCT
 	tagSCAN_STRUCT& operator = (tagSCAN_STRUCT& src)
 	{
 		wcscpy_s(this->szAddr, 30, src.szAddr);
-		wcscpy_s(this->szMAC, 30, src.szMAC);
+		wcscpy_s(this->szMAC, 32, src.szMAC);
 		wcscpy_s(this->szGateWay, 30, src.szGateWay);
 		wcscpy_s(this->szSubnetMask, 30, src.szSubnetMask);
 		wcscpy_s(this->szSwVersion, 30, src.szSwVersion);
 		wcscpy_s(this->szModelName, 30, src.szModelName);
-		wcscpy_s(this->szFirmwareVer, 50, src.szFirmwareVer);
+		wcscpy_s(this->szFirmwareVer, 32, src.szFirmwareVer);
 
 		//this->nStreamPort	= src.nStreamPort;
 		this->nHTTPPort = src.nHTTPPort;

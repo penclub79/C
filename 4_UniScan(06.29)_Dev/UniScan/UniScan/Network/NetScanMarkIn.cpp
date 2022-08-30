@@ -49,7 +49,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 	SOCKADDR			stSockAddr;
 	int					iMacLen				= 0;
 	int					iValIdx				= 0;
-
+	char				aszFirmwareVer[30] = { 0 };
 
 	bIsSuccessBind = SocketBind();
 
@@ -96,6 +96,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 							sprintf_s(aszModelName, 30, "%s", pReceive->stDevInfo.aszModel_name);
 							//ConversionModelName(pReceive->stDevInfo.aszModel_name, &aszModelName[0]);
 
+
 						//// IP - info
 						if (0 < pReceive->stDevInfo.stNetwork_info.aszIp[0])
 						{
@@ -108,6 +109,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						else
 							wsprintf(pScanInfo->szAddr, _T("N/A"));
 
+
 						//// Gateway
 						if (0 < pReceive->stDevInfo.stNetwork_info.aszGateway[0])
 						{
@@ -119,6 +121,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						}
 						else
 							wsprintf(pScanInfo->szGateWay, _T("N/A"));
+
 
 						//// MAC
 						if (0 < strlen(pReceive->stDevInfo.stNetwork_info.szMac_address))
@@ -140,6 +143,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						else
 							wsprintf(pScanInfo->szMAC, _T("N/A"));
 
+
 						//// SW Version
 						if (0 < pReceive->stDevInfo.stSw_version.szMajor)
 						{
@@ -149,11 +153,21 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						else
 							wsprintf(pScanInfo->szSwVersion, _T("N/A"));
 
+
+						//// HW Version
+						if (0 != pReceive->stDevInfo.stHw_version.szMajor)
+						{
+							sprintf_s(aszFirmwareVer, 30, "%d.%d.%d", pReceive->stDevInfo.stSw_version.szMajor, pReceive->stDevInfo.stSw_version.szMinor, pReceive->stDevInfo.stSw_version.szRevision);
+						}
+						else
+							wsprintf(pScanInfo->szFirmwareVer, _T("N/A"));
+
 						this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIpAddress);
 						this->WideCopyStringFromAnsi(pScanInfo->szGateWay, 32, aszGateWay);
 						this->WideCopyStringFromAnsi(pScanInfo->szMAC, 30, aszMacAdrs);
 						this->WideCopyStringFromAnsi(pScanInfo->szSwVersion, 30, aszVersion);
 						this->WideCopyStringFromAnsi(pScanInfo->szModelName, 30, aszModelName);
+						this->WideCopyStringFromAnsi(pScanInfo->szFirmwareVer, 30, aszFirmwareVer);
 						pScanInfo->nHTTPPort = pReceive->stDevInfo.stNetwork_info.uiHttp_port;
 						pScanInfo->iBasePort = pReceive->stDevInfo.stNetwork_info.uiBase_port;
 						pScanInfo->iVideoCnt = pReceive->stDevInfo.szMax_channel;
