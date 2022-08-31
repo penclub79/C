@@ -184,6 +184,7 @@ protected:
 	LONG			m_lCloseMsg;
 	SOCKET			m_hReceiveSock;
 	char*			m_pReceive_buffer;
+	char*			m_pVideoRev_buffer;
 	int				m_iRevPort;
 	BOOL			m_bUserCancel;
 	ULONG			m_ulBindAddress;

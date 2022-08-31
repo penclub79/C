@@ -31,13 +31,13 @@ DWORD CNetScanOnvif::thrOnvifScanThread(LPVOID pParam)
 		return 0;
 
 	pThis->thrOnvifReceiver();
-
 	return 0;
 }
 
 BOOL CNetScanOnvif::StartScan()
 {
 	this->StartScanF((LPTHREAD_START_ROUTINE)thrOnvifScanThread);
+	
 	return TRUE;
 }
 
@@ -153,26 +153,6 @@ BOOL CNetScanOnvif::SendScanRequest()
 			</Envelope>"
 	};
 
-	//char aszResolveXml[] =
-	//{
-	//	"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
-	//		<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\
-	//			<s:Header>\
-	//				<a:Action s:mustUnderstand=\"1\">http://schemas.xmlsoap.org/ws/2005/04/discovery/Resolve</a:Action>\
-	//				<a:MessageID>uuid:%s</a:MessageID>\
-	//				<a:ReplyTo>\
-	//					<a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address>\
-	//				</a:ReplyTo>\
-	//				<a:To s:mustUnderstand=\"1\">urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To>\
-	//			</s:Header>\
-	//			<s:Body>\
-	//				<d:Resolve xmlns=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
-	//					<a:ReferenceProperties>%s</a:ReferenceProperties>\
-	//				</d:Resolve>\
-	//			</s:Body>\
-	//		</Envelope>"
-	//};
-
 
 	// 소켓 생성
 	if (NULL == m_hReceiveSock)
@@ -277,7 +257,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 	char			aszPwdShaHash[41]		= { 0 };
 	char			aszPwdBaseHash[56]		= { 0 };
 	char			aszNonceBase64[BASE64_SIZE] = { 0 };
-	char aszIP[20] = "192.168.0.200";
+	char aszIP[20] = "192.168.0.230";
 	unsigned char	auszNonceDecode[64]		= { 0 };
 	char*			pszDeviceInfoData		= NULL;
 	char*			pszNetworkInfoData		= NULL;
@@ -378,8 +358,8 @@ void CNetScanOnvif::thrOnvifReceiver()
 
 						lpIPAddress->value = lpIPAddress->value.Left(20);
 						lpIPAddress->value = lpIPAddress->value.Right(13);
-						strcpy(&aszIPAddress[0], lpIPAddress->value);
-						//strcpy(&aszIPAddress[0], aszIP);
+						//strcpy(&aszIPAddress[0], lpIPAddress->value);
+						strcpy(&aszIPAddress[0], aszIP);
 
 						if (0 == strcmp(aszIP, aszIPAddress))
 						{
@@ -553,16 +533,57 @@ void CNetScanOnvif::thrOnvifReceiver()
 							wsprintf(pScanInfo->szFirmwareVer, _T("N/A"));
 
 						// Channel Cnt 가져오기
-						//GetProfile(aszIPAddress, iHTTPPort, aszPwdBaseHash, aszNonceBase64, aszDateResult, &pszVideoSourceData[0]);
+						int		iContentSize		= 0;
+						int		iRevBodySize		= 0;
+						char*	pszContentLenSlice	= NULL;
+						char*	pszLenthSlice		= NULL;
+						BOOL	bDelSuccess = FALSE;
 
-						//if (0 < pszVideoSourceData)
-						//{
-						//	LPXNode lpToken = NULL;
-						//	stVideoInfoNode.Load(pszVideoSourceData);
-						//	//lpProfileBody = stVideoInfoNode.GetChildArg("trt:GetProfilesResponse", NULL);
-						//	//lpToken = lpProfileBody->GetChildArg("trt:Profiles", NULL);
-						//	//lpToken = lpProfileBody->GetChildArg("trt:Profiles", NULL);
-						//}
+						m_pVideoRev_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
+						memset(&m_pVideoRev_buffer[0], 0, SCAN_INFO_RECEIVE_BUFFER_SIZE);
+
+						SendProfileMsg(aszIPAddress, iHTTPPort, aszPwdBaseHash, aszNonceBase64, aszDateResult, &pszVideoSourceData[0]);
+						GetProfile();
+
+						//pszContentLenSlice = strstr(m_pVideoRev_buffer, "Content-Length:");
+						//pszContentLenSlice = strtok(pszContentLenSlice, "=\r=\n");
+						//pszLenthSlice = strchr(pszContentLenSlice, ' ');
+						//iContentSize = atoi(pszLenthSlice);
+						//iRevBodySize = strlen(m_pVideoRev_buffer);
+						//iContentSize = iContentSize - iRevBodySize;
+						
+						if (0 < strlen(m_pVideoRev_buffer))
+						{
+							LPXNode lpPTZ = NULL;
+							LPXNode lpRes = NULL;
+							BOOL bIsDel = FALSE;
+							int iChannelCnt = 0;
+
+							stVideoInfoNode.Load(m_pVideoRev_buffer);
+							lpRes = stVideoInfoNode.GetChildArg("trt:GetProfilesResponse", NULL);
+
+							while (NULL != lpRes)
+							{
+								// 삭제해서 PTZ 갯수를 센다
+								// 반복문으로 tt:PTZConfiguration 이 값을 count하면 채널 갯수를 알수있음
+								lpProfileBody = lpRes->GetChildArg("trt:Profiles", NULL);
+								if (NULL != lpProfileBody)
+								{
+									lpPTZ = lpProfileBody->GetChildArg("tt:PTZConfiguration", NULL);
+									if (NULL != lpPTZ)
+										iChannelCnt++;
+									
+									lpProfileBody = lpProfileBody->parent;
+									bIsDel = lpProfileBody->RemoveChild(lpProfileBody->Find("trt:Profiles"));
+								}
+								else
+									break;
+							}
+							if (0 < iChannelCnt)
+							{
+								pScanInfo->iVideoCnt = iChannelCnt;
+							}
+						}
 						
 					}
 
@@ -631,6 +652,86 @@ void CNetScanOnvif::thrOnvifReceiver()
 	return;
 }
 
+void CNetScanOnvif::GetProfile()
+{
+	int iError = 0;
+
+	Sleep(100);
+	if (SOCKET_ERROR == recv(m_TcpSocket, m_pVideoRev_buffer, SCAN_INFO_RECEIVE_BUFFER_SIZE, 0))
+	{
+		iError = WSAGetLastError();
+		TRACE(_T("TCP-HTTP recv Error = %d\n"), iError);
+		closesocket(m_TcpSocket);
+	}
+
+	::OutputDebugStringA(m_pVideoRev_buffer);
+	::OutputDebugStringA("\n");
+
+	//iContentSize = iContentSize - iRevBodySize;
+
+	return;
+	//strcpy_s(pszGetData, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE, pszRecvBuffer);
+}
+
+//void CNetScanOnvif::thrOnvifVideoReceiver()
+//{
+//	int		iError = 0;
+//	XNode	stVideoInfoNode;
+//	LPXNode	lpProfileBody = NULL;
+//
+//	m_pVideoRev_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
+//	memset(&m_pVideoRev_buffer[0], 0, SCAN_INFO_RECEIVE_BUFFER_SIZE);
+//
+//	while (this->m_dwScanThreadID)
+//	{
+//		if (SOCKET_ERROR == recv(m_TcpSocket, m_pVideoRev_buffer, SCAN_INFO_RECEIVE_BUFFER_SIZE, 0))
+//		{
+//			iError = WSAGetLastError();
+//			TRACE(_T("TCP-HTTP recv Error = %d\n"), iError);
+//			closesocket(m_TcpSocket);
+//		}
+//
+//		::OutputDebugStringA(m_pVideoRev_buffer);
+//		::OutputDebugStringA("\n");
+//
+//		char*	pszContentLenSlice = NULL;
+//		char*	pszLenthSlice = NULL;
+//		int		iContentSize = 0;
+//		int		iRevBodySize = 0;
+//		char*	pszCopyBuffer = NULL;
+//
+//		pszContentLenSlice = strstr(m_pVideoRev_buffer, "Content-Length:");
+//		pszContentLenSlice = strtok(pszContentLenSlice, "=\r=\n");
+//		pszLenthSlice = strchr(pszContentLenSlice, ' ');
+//		iContentSize = atoi(pszLenthSlice);
+//		iRevBodySize = strlen(m_pVideoRev_buffer);
+//		iContentSize = iContentSize - iRevBodySize;
+//
+//		if (0 < strlen(m_pVideoRev_buffer))
+//		{
+//			LPXNode lpProfile = NULL;
+//			stVideoInfoNode.Load(m_pVideoRev_buffer);
+//			::OutputDebugStringA(m_pVideoRev_buffer);
+//			::OutputDebugStringA("\n");
+//			lpProfileBody = stVideoInfoNode.GetChildArg("trt:GetProfilesResponse", NULL);
+//			int i = 0;
+//			while (NULL != lpProfileBody)
+//			{
+//				lpProfileBody = lpProfileBody->GetChildArg("tt:PTZConfiguration", NULL);
+//				// 반복문으로 tt:PTZConfiguration 이 값을 count하면 채널 갯수를 알수있음
+//				i++;
+//			}
+//			//lpToken = lpProfileBody->GetChildArg("trt:Profiles", NULL);
+//			//lpToken = lpProfileBody->GetChildArg("trt:Profiles", NULL);
+//		}
+//
+//
+//	}
+//
+//	return;
+//	//strcpy_s(pszGetData, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE, pszRecvBuffer);
+//}
+
 
 BOOL CNetScanOnvif::GenerateMsgID(char* szMessageID, int nBufferLen)
 {
@@ -661,7 +762,7 @@ BOOL CNetScanOnvif::ConnectTCPSocket(char* pszIP, int iPort)
 	m_TcpSocket = socket(PF_INET, SOCK_STREAM, 0);
 
 	HTTPSendSock.sin_family = AF_INET;
-	HTTPSendSock.sin_port = htons(iPort);
+	HTTPSendSock.sin_port = htons(8080);
 	HTTPSendSock.sin_addr.s_addr = inet_addr(pszIP);
 
 	// --------------------------------------------------------------------------------
@@ -1268,147 +1369,134 @@ void CNetScanOnvif::GetNetworkInterface(char* pszIP, int iPort, char* pszDigest,
 	}
 }
 
-//void CNetScanOnvif::GetProfile(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData)
-//{
-//	BOOL		bIsConnect			= FALSE;
-//	char*		pszRecvBuffer		= NULL;
-//	char*		pszPacketBuffer		= NULL;
-//	char*		pszSendBuffer		= NULL;
-//	char*		pszSlice			= NULL;
-//	int			iHeaderSize			= 0;
-//	int			iBodySize			= 0;
-//	int			iPacketSize			= 0;
-//	int			iError				= 0;
-//	int			iContentLen			= 0;
-//	int			iHTTPStatus			= 0;
-//	char		aszCopyBuffer[20]	= { 0 };
-//	enum 
-//	{
-//		DATALEN = 8  // port's len + content-leng's len
-//	};
-//	
-//	char aszDeviceInfoHeader[] = "POST /onvif/media_service HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/media/wsdl/GetProfiles\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
-//
-//	char aszDeviceInformationXML[] = 
-//	{
-//		"<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
-//			<s:Header>\
-//				<Security s:mustUnderstand=\"1\" xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\
-//					<UsernameToken>\
-//						<Username>ADMIN</Username>\
-//						<Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">%s</Password>\
-//						<Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">%s</Nonce>\
-//						<Created xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">%s</Created>\
-//					</UsernameToken>\
-//				</Security>\
-//			</s:Header>\
-//			<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
-//				<GetProfiles xmlns=\"http://www.onvif.org/ver10/media/wsdl\"/>\
-//			</s:Body>\
-//		</s:Envelope>" // UserToken Header - GetVideoSource Body
-//	};
-//
-//	bIsConnect = ConnectTCPSocket(pszIP, iPort);
-//
-//	iHeaderSize = strlen(aszDeviceInfoHeader) + strlen(pszIP) + DATALEN;
-//	//iBodySize = strlen(aszDeviceInformationXML) + strlen(pszDigest) + strlen(pszNonceResult) + strlen(pszDateResult) + strlen(m_aszUserName);
-//	iBodySize = strlen(aszDeviceInformationXML) + strlen(pszDigest) + strlen(pszNonceResult) + strlen(pszDateResult);
-//	iPacketSize = iHeaderSize + iBodySize;
-//	iContentLen = iBodySize;
-//
-//	pszPacketBuffer = new char[iPacketSize + 1];
-//	memset(&pszPacketBuffer[0], 0, iPacketSize + 1);
-//
-//	sprintf_s(pszPacketBuffer, sizeof(char)* iHeaderSize, "%s", aszDeviceInfoHeader);
-//	strcat_s(pszPacketBuffer, sizeof(char)* iPacketSize, aszDeviceInformationXML);
-//
-//	pszSendBuffer = new char[iPacketSize + 1];
-//	memset(&pszSendBuffer[0], 0, iPacketSize + 1);
-//	//sprintf_s(pszSendBuffer, sizeof(char)* iPacketSize, pszPacketBuffer, pszIP, iPort, iContentLen, m_aszUserName, pszDigest, pszNonceResult, pszDateResult);
-//	sprintf_s(pszSendBuffer, sizeof(char)* iPacketSize, pszPacketBuffer, pszIP, iContentLen, pszDigest, pszNonceResult, pszDateResult);
-//
-//	::OutputDebugStringA(pszSendBuffer);
-//	::OutputDebugStringA("\n");
-//
-//	pszRecvBuffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
-//	memset(&pszRecvBuffer[0], 0, SCAN_INFO_RECEIVE_BUFFER_SIZE);
-//
-//	if (CONNECT_SUCCESS == bIsConnect)
-//	{
-//		if (SOCKET_ERROR == send(m_TcpSocket, pszSendBuffer, iPacketSize, 0))
-//		{
-//			iError = WSAGetLastError();
-//			TRACE(_T("TCP-HTTP send Error = %d\n"), iError);
-//			closesocket(m_TcpSocket);
-//		}
-//		int i = 0;
-//		while (i < 10)
-//		{
-//			if (SOCKET_ERROR == recv(m_TcpSocket, pszRecvBuffer, SCAN_INFO_RECEIVE_BUFFER_SIZE, 0))
-//			{
-//				iError = WSAGetLastError();
-//				TRACE(_T("TCP-HTTP recv Error = %d\n"), iError);
-//				closesocket(m_TcpSocket);
-//			}
-//			i++;
-//		}
-//		
-//
-//		::OutputDebugStringA("ONVIF RECEIVE DEVICE DATA -----------------------\n");
-//		::OutputDebugStringA(pszIP);
-//		::OutputDebugStringA("\n");
-//		::OutputDebugStringA(pszRecvBuffer);
-//		::OutputDebugStringA("\n");
-//
-//		if (0 < strlen(pszRecvBuffer))
-//		{
-//			memcpy(&aszCopyBuffer[0], pszRecvBuffer, 20);
-//			pszSlice = strstr(aszCopyBuffer, " ");
-//			if (NULL != pszSlice)
-//			{
-//				pszSlice = strtok(pszSlice, " ");
-//				iHTTPStatus = atoi(pszSlice);
-//
-//				switch (iHTTPStatus)
-//				{
-//				case RES_SUCCESS:
-//					strcpy_s(pszGetData, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE, pszRecvBuffer);
-//					break;
-//
-//				case BAD_REQUEST:
-//					sprintf_s(pszGetData, sizeof(int), "%d", BAD_REQUEST);
-//					break;
-//
-//				case UNAUTHORIZED:
-//					sprintf_s(pszGetData, sizeof(int), "%d", UNAUTHORIZED);
-//					break;
-//
-//				default:
-//					break;
-//				}
-//			}
-//		}
-//	}
-//
-//
-//	if (NULL != pszPacketBuffer)
-//	{
-//		delete[] pszPacketBuffer;
-//		pszPacketBuffer = NULL;
-//	}
-//
-//	if (NULL != pszSendBuffer)
-//	{
-//		delete[] pszSendBuffer;
-//		pszSendBuffer = NULL;
-//	}
-//
-//	if (NULL != pszRecvBuffer)
-//	{
-//		delete[] pszRecvBuffer;
-//		pszRecvBuffer = NULL;
-//	}
-//}
+void CNetScanOnvif::SendProfileMsg(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData)
+{
+	BOOL		bIsConnect			= FALSE;
+	char*		pszRecvBuffer		= NULL;
+	char*		pszPacketBuffer		= NULL;
+	char*		pszSendBuffer		= NULL;
+	char*		pszSlice			= NULL;
+	int			iHeaderSize			= 0;
+	int			iBodySize			= 0;
+	int			iPacketSize			= 0;
+	int			iError				= 0;
+	int			iContentLen			= 0;
+	int			iHTTPStatus			= 0;
+	char		aszCopyBuffer[20]	= { 0 };
+	enum 
+	{
+		DATALEN = 8  // port's len + content-leng's len
+	};
+	
+	char aszDeviceInfoHeader[] = "POST /onvif/media_service HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/media/wsdl/GetProfiles\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n";
+
+	//char aszDeviceInfoHeader[] = "GET / HTTP/1.1\r\nHost: %s:%d\r\nConnection: Close\r\n\r\n";
+	char aszDeviceInformationXML[] = 
+	{
+		"<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
+			<s:Header>\
+				<Security s:mustUnderstand=\"1\" xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\
+					<UsernameToken>\
+						<Username>ADMIN</Username>\
+						<Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">%s</Password>\
+						<Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">%s</Nonce>\
+						<Created xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">%s</Created>\
+					</UsernameToken>\
+				</Security>\
+			</s:Header>\
+			<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
+				<GetProfiles xmlns=\"http://www.onvif.org/ver10/media/wsdl\"/>\
+			</s:Body>\
+		</s:Envelope>" // UserToken Header - GetVideoSource Body
+	};
+
+	bIsConnect = ConnectTCPSocket(pszIP, iPort);
+
+	iHeaderSize = strlen(aszDeviceInfoHeader) + strlen(pszIP) + DATALEN;
+	iBodySize = strlen(aszDeviceInformationXML) + strlen(pszDigest) + strlen(pszNonceResult) + strlen(pszDateResult) + strlen(m_aszUserName);
+	iPacketSize = iHeaderSize + iBodySize;
+	iContentLen = iBodySize;
+
+	pszPacketBuffer = new char[iPacketSize + 1];
+	memset(&pszPacketBuffer[0], 0, iPacketSize + 1);
+
+	sprintf_s(pszPacketBuffer, sizeof(char)* iHeaderSize, "%s", aszDeviceInfoHeader);
+	strcat_s(pszPacketBuffer, sizeof(char)* iPacketSize, aszDeviceInformationXML);
+
+	pszSendBuffer = new char[iPacketSize + 1];
+	memset(&pszSendBuffer[0], 0, iPacketSize + 1);
+	//sprintf_s(pszSendBuffer, sizeof(char)* iPacketSize, pszPacketBuffer, pszIP, iContentLen, m_aszUserName, pszDigest, pszNonceResult, pszDateResult);
+	sprintf_s(pszSendBuffer, sizeof(char)* iPacketSize, pszPacketBuffer, pszIP, iContentLen, pszDigest, pszNonceResult, pszDateResult);
+
+	::OutputDebugStringA(pszSendBuffer);
+	::OutputDebugStringA("\n");
+
+	//pszRecvBuffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
+	//memset(&pszRecvBuffer[0], 0, SCAN_INFO_RECEIVE_BUFFER_SIZE);
+
+	if (CONNECT_SUCCESS == bIsConnect)
+	{
+		if (SOCKET_ERROR == send(m_TcpSocket, pszSendBuffer, iPacketSize, 0))
+		{
+			iError = WSAGetLastError();
+			TRACE(_T("TCP-HTTP send Error = %d\n"), iError);
+			closesocket(m_TcpSocket);
+		}
+		//::OutputDebugStringA("ONVIF RECEIVE DEVICE DATA -----------------------\n");
+		//::OutputDebugStringA(pszIP);
+		//::OutputDebugStringA("\n");
+		//::OutputDebugStringA(pszRecvBuffer);
+		//::OutputDebugStringA("\n");
+
+		//if (0 < strlen(pszRecvBuffer))
+		//{
+		//	memcpy(&aszCopyBuffer[0], pszRecvBuffer, 20);
+		//	pszSlice = strstr(aszCopyBuffer, " ");
+		//	if (NULL != pszSlice)
+		//	{
+		//		pszSlice = strtok(pszSlice, " ");
+		//		iHTTPStatus = atoi(pszSlice);
+
+		//		switch (iHTTPStatus)
+		//		{
+		//		case RES_SUCCESS:
+		//			strcpy_s(pszGetData, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE, pszRecvBuffer);
+		//			break;
+
+		//		case BAD_REQUEST:
+		//			sprintf_s(pszGetData, sizeof(int), "%d", BAD_REQUEST);
+		//			break;
+
+		//		case UNAUTHORIZED:
+		//			sprintf_s(pszGetData, sizeof(int), "%d", UNAUTHORIZED);
+		//			break;
+
+		//		default:
+		//			break;
+		//		}
+		//	}
+		//}
+	}
+
+
+	if (NULL != pszPacketBuffer)
+	{
+		delete[] pszPacketBuffer;
+		pszPacketBuffer = NULL;
+	}
+
+	if (NULL != pszSendBuffer)
+	{
+		delete[] pszSendBuffer;
+		pszSendBuffer = NULL;
+	}
+
+	//if (NULL != pszRecvBuffer)
+	//{
+	//	delete[] pszRecvBuffer;
+	//	pszRecvBuffer = NULL;
+	//}
+}
 
 
 void CNetScanOnvif::DigestConvert(char* pszStr, char* puszResult)

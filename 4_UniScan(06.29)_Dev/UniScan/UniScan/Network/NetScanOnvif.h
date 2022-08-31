@@ -77,12 +77,13 @@ public:
 protected:
 	static DWORD thrOnvifScanThread(LPVOID pParam);
 	void thrOnvifReceiver();
+	void GetProfile();
 	void SendDeviceInfo(char* pszIP, int iPort, char* pszNonceResult, char* pszGetData);
 	void GetOnvifVersion(char* pszIP, int iPort, char* pszGetData);
 	void GetAuthenticateData(char* pszIP, int iPort, char* pszDateResult, char* pszNonceResult, char* pszGetData);
 	void GetDeviceInfo(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
 	void GetNetworkInterface(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
-	//void GetProfile(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
+	void SendProfileMsg(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
 	BOOL SendSSDP();
 	BOOL CreateMultiCastSocket();
 	BOOL ConnectTCPSocket(char* pszIP, int iPort);
