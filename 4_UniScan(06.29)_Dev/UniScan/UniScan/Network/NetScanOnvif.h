@@ -5,7 +5,6 @@
 #include "../xmlite/XMLite.h"
 #include "../../UniScan/XMLform.h"
 
-#define NOT_DATA	0
 #define SHA_SIZE	41
 #define BASE64_SIZE	56
 #define UUID_SIZE	128
@@ -16,33 +15,24 @@ typedef struct tagONVIFINFO
 	char	aszIP[32];
 	char	aszMAC[30];
 	int		iHttpPort;
+	int		iChannelCnt;
 	char	aszDigest[DIGEST_SIZE];
 	char	aszNonce[36];
 	char	aszDate[56];
-	char*	pszGetData;
-	char   aszVersion[8];
-
+	char	aszModelName[30];
+	char	aszVersion[8];
+	char	aszFirmwareVer[32];
 }ONVIF_INFO;
 
-typedef struct tagNODECHILD
-{
-	LPXNode lpBody;
-	LPXNode	lpDeviceInfoBody;
-	LPXNode lpUUID;
-	LPXNode lpIPAddress;
-	LPXNode lpMAC;
-	LPXNode lpMajor;
-	LPXNode lpMinor;
-}NODECHILD;
-
-typedef enum 
-{
-	PROBEMATCH = 0,
-	DEVICEINFO,
-	VERSIONINFO,
-	NETWORKINFO,
-	PROFILEINFO
-};
+//typedef enum 
+//{
+//	PROBEMATCH = 0,
+//	SYSTEMDATE,
+//	DEVICEINFO,
+//	VERSIONINFO,
+//	NETWORKINFO,
+//	PROFILEINFO
+//};
 
 typedef enum _TCPCODE{
 	CONNECT_FAIL	= 0,
@@ -68,19 +58,18 @@ public:
 protected:
 	static DWORD thrOnvifScanThread(LPVOID pParam);
 	void thrOnvifReceiver();
-	void SendDeviceInfo(char* pszIP, int iPort, char* pszNonceResult, char* pszGetData);
-	void GetOnvifVersion(char* pszIP, int iPort, char* pszGetData);
-	void GetAuthenticateData(char* pszIP, int iPort, char* pszDateResult, char* pszNonceResult, char* pszGetData);
-	void GetDeviceInfo(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
-	void GetNetworkInterface(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
-	void SendProfileMsg(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult);
-	void DataParsing(int iMessageType, char* pszParsingData, ONVIF_INFO* pstOnvif);
+	void SendDeviceInfo(ONVIF_INFO* pstOnvifInfo);
+	void SendOnvifVersion(ONVIF_INFO* pstOnvifInfo);
+	void SendAuthenticate(ONVIF_INFO* pstOnvifInfo);
+	void GetDeviceInfo(ONVIF_INFO* pstOnvifInfo, char* pszNonceResult);
+	void GetNetworkInterface(ONVIF_INFO* pstOnvifInfo, char* pszNonceResult);
+	void GetIPAndModelName(ONVIF_INFO* pstOnvifInfo);
+	void DataParsing(ONVIF_INFO* pstOnvifInfo, SCAN_INFO* pstScanInfo);
 	BOOL SendSSDP();
 	BOOL CreateMultiCastSocket();
 	BOOL ConnectTCPSocket(char* pszIP, int iPort);
 	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
-	void DataPreProcessing();
-
+	void DataPreProcessing(); // ±¸Çö °èÈ¹
 
 	BOOL m_bConnected;
 	SOCKET m_TcpSocket;
