@@ -13,9 +13,9 @@
 
 typedef struct tagONVIFINFO
 {
-	char	aszIP[24];
+	char	aszIP[32];
 	char	aszMAC[30];
-	int		iPort;
+	int		iHttpPort;
 	char	aszDigest[DIGEST_SIZE];
 	char	aszNonce[36];
 	char	aszDate[56];
@@ -34,15 +34,6 @@ typedef struct tagNODECHILD
 	LPXNode lpMajor;
 	LPXNode lpMinor;
 }NODECHILD;
-
-typedef struct tagNODE
-{
-	XNode	stNode;
-	XNode	stDeviceInfoNode;
-	XNode	stNetworkInfoNode;
-	XNode	stOnvifVersionNode;
-	NODECHILD stChild;
-}NODE;
 
 typedef enum 
 {
@@ -77,22 +68,21 @@ public:
 protected:
 	static DWORD thrOnvifScanThread(LPVOID pParam);
 	void thrOnvifReceiver();
-	void GetProfile(char* pszGetData);
 	void SendDeviceInfo(char* pszIP, int iPort, char* pszNonceResult, char* pszGetData);
 	void GetOnvifVersion(char* pszIP, int iPort, char* pszGetData);
 	void GetAuthenticateData(char* pszIP, int iPort, char* pszDateResult, char* pszNonceResult, char* pszGetData);
 	void GetDeviceInfo(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
 	void GetNetworkInterface(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
 	void SendProfileMsg(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult);
+	void DataParsing(int iMessageType, char* pszParsingData, ONVIF_INFO* pstOnvif);
 	BOOL SendSSDP();
 	BOOL CreateMultiCastSocket();
 	BOOL ConnectTCPSocket(char* pszIP, int iPort);
 	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
-
+	void DataPreProcessing();
 
 
 	BOOL m_bConnected;
-	BOOL m_bIsProbeRev;
 	SOCKET m_TcpSocket;
 
 
