@@ -45,7 +45,8 @@ const char __aszResolveXml[] =
 		</Envelope>"
 };
 
-const char __aszXmlForm[] = 
+// DeviceInfo -> HTTP 400 Code Response
+const char __aszDeviceInfoXml[] = 
 {
 	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\
 			<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:tds=\"http://www.onvif.org/ver10/device/wsdl\">\
@@ -53,4 +54,91 @@ const char __aszXmlForm[] =
 					<tds:GetDeviceInformation/>\
 				</SOAP-ENV:Body>\
 			</SOAP-ENV:Envelope>"
+};
+
+
+// VersionInfo message
+const char __aszVersionXml[] = 
+{
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\
+			<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:tds=\"http://www.onvif.org/ver10/device/wsdl\">\
+				<SOAP-ENV:Body>\
+					<tds:GetCapabilities>\
+						<tds:Category>All</tds:Category>\
+					</tds:GetCapabilities>\
+				</SOAP-ENV:Body>\
+			</SOAP-ENV:Envelope>"
+};
+
+// SystemDate message
+const char __aszSystemDateXml[] = 
+{
+	"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+		<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
+			<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
+				<GetSystemDateAndTime xmlns=\"http://www.onvif.org/ver10/device/wsdl\"/>\
+			</s:Body>\
+		</s:Envelope>"
+};
+
+
+// Digest  - DevieceInfo message
+const char __aszDeviceInfoDigestXml[] = 
+{
+	"<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
+			<s:Header>\
+				<Security s:mustUnderstand=\"1\" xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\
+					<UsernameToken>\
+						<Username>%s</Username>\
+						<Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">%s</Password>\
+						<Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">%s</Nonce>\
+						<Created xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">%s</Created>\
+					</UsernameToken>\
+				</Security>\
+			</s:Header>\
+			<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
+				<GetDeviceInformation xmlns=\"http://www.onvif.org/ver10/device/wsdl\"/>\
+			</s:Body>\
+		</s:Envelope>"
+};
+
+// Digest  - NetworkInfo message
+const char __aszNetworkInfoDigestXml[] =
+{
+	"<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
+			<s:Header>\
+				<Security s:mustUnderstand=\"1\" xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\
+					<UsernameToken>\
+						<Username>%s</Username>\
+						<Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">%s</Password>\
+						<Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">%s</Nonce>\
+						<Created xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">%s</Created>\
+					</UsernameToken>\
+				</Security>\
+			</s:Header>\
+			<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
+				<GetNetworkInterfaces xmlns=\"http://www.onvif.org/ver10/device/wsdl\"/>\
+			</s:Body>\
+		</s:Envelope>"
+};
+
+
+// Digest  - ProfileInfo message
+const char __aszProfileDigestXml[] =
+{
+	"<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">\
+			<s:Header>\
+				<Security s:mustUnderstand=\"1\" xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\
+					<UsernameToken>\
+						<Username>%s</Username>\
+						<Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">%s</Password>\
+						<Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">%s</Nonce>\
+						<Created xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">%s</Created>\
+					</UsernameToken>\
+				</Security>\
+			</s:Header>\
+			<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\
+				<GetProfiles xmlns=\"http://www.onvif.org/ver10/media/wsdl\"/>\
+			</s:Body>\
+		</s:Envelope>"
 };

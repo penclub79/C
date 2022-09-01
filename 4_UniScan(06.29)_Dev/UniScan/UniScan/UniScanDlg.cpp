@@ -389,8 +389,8 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		ONVIF = 2
 	};
 	CString strMsg;
-	CString strUser = _T("ADMIN");
-	CString strPassword = _T("111111");
+	CString strUser;
+	CString strPassword;
 	char aszUsername[16] = { 0 };
 	char aszPassword[16] = { 0 };
 	int iScanIdx = 0;
@@ -434,21 +434,21 @@ void CUniScanDlg::OnBnClickedScanBtn()
 
 			m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
 
-			for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-			{
-				if (m_apScanner[i])
-				{
-					m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
-					m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-					m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-					m_apScanner[i]->StartScan();
-				}
-			}
+			//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+			//{
+			//	if (m_apScanner[i])
+			//	{
+			//		m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
+			//		m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+			//		m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+			//		m_apScanner[i]->StartScan();
+			//	}
+			//}
 			
-			//m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
-			//m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			//m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			//m_apScanner[ONVIF]->StartScan();
+			m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
+			m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+			m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+			m_apScanner[ONVIF]->StartScan();
 
 			m_nScanAniCount = 0;
 			SetTimer(TM_SCANNING_ANI, 1000, NULL);

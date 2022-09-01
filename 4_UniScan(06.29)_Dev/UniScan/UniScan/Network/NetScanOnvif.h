@@ -77,25 +77,19 @@ public:
 protected:
 	static DWORD thrOnvifScanThread(LPVOID pParam);
 	void thrOnvifReceiver();
-	void GetProfile();
+	void GetProfile(char* pszGetData);
 	void SendDeviceInfo(char* pszIP, int iPort, char* pszNonceResult, char* pszGetData);
 	void GetOnvifVersion(char* pszIP, int iPort, char* pszGetData);
 	void GetAuthenticateData(char* pszIP, int iPort, char* pszDateResult, char* pszNonceResult, char* pszGetData);
 	void GetDeviceInfo(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
 	void GetNetworkInterface(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
-	void SendProfileMsg(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult, char* pszGetData);
+	void SendProfileMsg(char* pszIP, int iPort, char* pszDigest, char* pszNonceResult, char* pszDateResult);
 	BOOL SendSSDP();
 	BOOL CreateMultiCastSocket();
 	BOOL ConnectTCPSocket(char* pszIP, int iPort);
 	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
-	void UtfConvert(char* pszStr, char* pszResult);
-	void DigestConvert(char* pszStr, char* puszResult);
-	void SHA1Encoding(char* pszStr, char* pszResult);
-	void Base64Encoding(char* pszStr, int iSize, char* pszResult);
-	int	Base64Decoding(char* pszStr, unsigned char* puszResult, int iSize);
-	//void RecvStatus(char* pszRecvData, int iLabel);						// Pre-treat's Status Value
-	//void RecvDataParsing(NODE* pNode, char* pszRecvData, int iLabel);			// Recieve Data Pre-treat Func
-	//void RecvFault(int iLabel, int iHTTPStatus);
+
+
 
 	BOOL m_bConnected;
 	BOOL m_bIsProbeRev;
@@ -103,5 +97,9 @@ protected:
 
 
 private:
-
+	void Base64Encoding(char* pszStr, int iSize, char* pszResult);
+	int	Base64Decoding(char* pszStr, unsigned char* puszResult, int iSize);
+	void UtfConvert(char* pszStr, char* pszResult);
+	void DigestConvert(char* pszStr, char* puszResult);
+	void SHA1Encoding(char* pszStr, char* pszResult);
 };
