@@ -22,17 +22,18 @@ typedef struct tagONVIFINFO
 	char	aszModelName[30];
 	char	aszVersion[8];
 	char	aszFirmwareVer[32];
+
 }ONVIF_INFO;
 
-//typedef enum 
-//{
-//	PROBEMATCH = 0,
-//	SYSTEMDATE,
-//	DEVICEINFO,
-//	VERSIONINFO,
-//	NETWORKINFO,
-//	PROFILEINFO
-//};
+typedef enum 
+{
+	PROBEMATCH = 0,
+	SYSTEMDATE,
+	DEVICEINFO,
+	VERSIONINFO,
+	NETWORKINFO,
+	PROFILEINFO
+};
 
 typedef enum _TCPCODE{
 	CONNECT_FAIL	= 0,
@@ -54,6 +55,7 @@ public:
 
 	virtual BOOL StartScan();
 	virtual BOOL SendScanRequest();
+	
 
 protected:
 	static DWORD thrOnvifScanThread(LPVOID pParam);
@@ -68,8 +70,10 @@ protected:
 	BOOL SendSSDP();
 	BOOL CreateMultiCastSocket();
 	BOOL ConnectTCPSocket(char* pszIP, int iPort);
-	BOOL GenerateMsgID(char* szMessageID, int nBufferLen);
+	BOOL GenerateMsgID(char* pszMessageID, int iBufferLen);
 	void DataPreProcessing(); // ±¸Çö °èÈ¹
+	void RequestMessage(ONVIF_INFO* pstOnvifInfo, int iMessageSize);
+
 
 	BOOL m_bConnected;
 	SOCKET m_TcpSocket;
@@ -81,4 +85,5 @@ private:
 	void UtfConvert(char* pszStr, char* pszResult);
 	void DigestConvert(char* pszStr, char* puszResult);
 	void SHA1Encoding(char* pszStr, char* pszResult);
+	//std::vector<ONVIF_INFO*>m_vcOnvifList;
 };

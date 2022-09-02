@@ -282,6 +282,7 @@ BOOL CUniScanDlg::OnInitDialog()
 
 	m_cSvrList.Init();
 
+	m_pstAddrList = new ADDRLIST(); // 중복체크를 위한 IP 리스트
 	m_apScanner[0] = new CNetScanMarkIn();
 	m_apScanner[1] = new CNetScanVision();
 	m_apScanner[2] = new CNetScanOnvif();
@@ -444,7 +445,10 @@ void CUniScanDlg::OnBnClickedScanBtn()
 			//		m_apScanner[i]->StartScan();
 			//	}
 			//}
-			
+			m_apScanner[0]->SetBindAddress(m_ulAcceptAddress);
+			m_apScanner[0]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+			m_apScanner[0]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+			m_apScanner[0]->StartScan();
 			m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
 			m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
 			m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
@@ -621,6 +625,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 	CString		strTemp;
 	SCAN_INFO*	pScanInfo = NULL;
 	SCAN_INFO*	pOldScanInfo = NULL;
+	//WCHAR* paszIpList[] = { 0 };
 	int			nCurrentItem = -1;
 	int			i = 0;
 
@@ -641,6 +646,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 	//	delete pScanInfo; 
 	//	return 0L;
 	//}
+
 	_Lock();
 
 	if (pScanInfo)
@@ -669,52 +675,66 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		//{{ 중복제거 //////////////////////////
 
 		// 시나리오상 IP가 중복될 수도 있음
-
+		m_pstAddrList->pawzAddressList[0] = pScanInfo->szAddr;
 		for (i = 0; i < m_cSvrList.GetItemCount(); i++)
 		{
 			pOldScanInfo = (SCAN_INFO*)m_cSvrList.GetItemData(i);
 			//if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0) // 원래 코드
 
-			if (wcscmp(pOldScanInfo->szAddr, pScanInfo->szAddr) == 0) // IP 같으면
-			{	
+			if (0 == wcscmp(m_pstAddrList->pawzAddressList[i], pScanInfo->szAddr))
+			{
 				delete pScanInfo;
 				pScanInfo = NULL;
-				_Unlock();
-				return 0;
-
-				//if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0)
-				//{
-				//	pOldScanInfo->SetReceiveTime();
-
-				//	if (*pOldScanInfo == *pScanInfo)
-				//	{
-				//		delete pScanInfo;
-				//		pScanInfo = NULL;
-				//		_Unlock();
-				//		return 0;
-				//	}
-				//	else
-				//	{
-				//		// 이전 아이피 정보와 현재의 데이터가 다르다면 업데이트 시킨다. 
-				//		pScanInfo->SetReceiveTime();
-				//		m_cSvrList.SetItemData(i, (DWORD_PTR)pScanInfo);
-
-				//		delete pOldScanInfo;
-				//		nCurrentItem = i;
-				//		break;
-				//	}
-				//}
-				//if (wcslen(pOldScanInfo->szMAC) < 4 || wcslen(pScanInfo->szMAC) < 4)
-				//{
-				//	//pScanInfo->SetReceiveTime();
-				//	//m_cSvrList.SetItemData(i, (DWORD_PTR)pOldScanInfo);
-
-				//	delete pOldScanInfo;
-				//	pScanInfo = NULL;
-				//	_Unlock();
-				//	return 0;
-				//}
 			}
+			else
+			{
+				if (m_pstAddrList->pawzAddressList[m_cSvrList.GetItemCount()])
+				{
+					m_pstAddrList->pawzAddressList[m_cSvrList.GetItemCount() + 1] = pScanInfo->szAddr;
+				}
+			}
+
+
+			//if (wcscmp(pOldScanInfo->szAddr, pScanInfo->szAddr) == 0) // IP 같으면
+			//{	
+			//	delete pScanInfo;
+			//	pScanInfo = NULL;
+			//	_Unlock();
+			//	return 0;
+
+			//	//if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0)
+			//	//{
+			//	//	pOldScanInfo->SetReceiveTime();
+
+			//	//	if (*pOldScanInfo == *pScanInfo)
+			//	//	{
+			//	//		delete pScanInfo;
+			//	//		pScanInfo = NULL;
+			//	//		_Unlock();
+			//	//		return 0;
+			//	//	}
+			//	//	else
+			//	//	{
+			//	//		// 이전 아이피 정보와 현재의 데이터가 다르다면 업데이트 시킨다. 
+			//	//		pScanInfo->SetReceiveTime();
+			//	//		m_cSvrList.SetItemData(i, (DWORD_PTR)pScanInfo);
+
+			//	//		delete pOldScanInfo;
+			//	//		nCurrentItem = i;
+			//	//		break;
+			//	//	}
+			//	//}
+			//	//if (wcslen(pOldScanInfo->szMAC) < 4 || wcslen(pScanInfo->szMAC) < 4)
+			//	//{
+			//	//	//pScanInfo->SetReceiveTime();
+			//	//	//m_cSvrList.SetItemData(i, (DWORD_PTR)pOldScanInfo);
+
+			//	//	delete pOldScanInfo;
+			//	//	pScanInfo = NULL;
+			//	//	_Unlock();
+			//	//	return 0;
+			//	//}
+			//}
 
 			
 
@@ -904,8 +924,6 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 
 		//iCount = m_nScanAniCount + m_nScanMarkInCount;
 		SetCountMsg(m_nListItemCount);
-		//delete pScanInfo;
-		pScanInfo = NULL;
 
 		// 현재 선택된 Index 앞으로 아이템을 집어 넣은 경우, 현재 선택 값에 +1을 해준다
 		if (nCurrentItem < 0 && nInsertIndex <= m_nCurSvrListSel)
@@ -913,9 +931,17 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 			//OutputDebugString(L"Item++\n");
 			m_nCurSvrListSel++;
 		}
+
+	}
+	_Unlock();
+
+	if (pScanInfo)
+	{
+		delete pScanInfo;
+		pScanInfo = NULL;
 	}
 
-	_Unlock();
+	TRACE(_T("cccccccccccccccccccccccccccccccccccccccccccc\n"));
 
 	return 0;
 }

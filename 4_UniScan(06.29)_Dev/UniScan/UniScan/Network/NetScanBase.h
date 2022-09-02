@@ -168,6 +168,10 @@ typedef struct tagSCAN_STRUCT
 
 }SCAN_INFO, *LPSCAN_INFO;
 
+typedef struct tagONVIF_LIST
+{
+	WCHAR* paszIpList[];
+}ONVIF_LIST;
 
 class NetScanBase
 {
@@ -184,7 +188,6 @@ protected:
 	LONG			m_lCloseMsg;
 	SOCKET			m_hReceiveSock;
 	char*			m_pReceive_buffer;
-	char*			m_pVideoRev_buffer;
 	int				m_iRevPort;
 	BOOL			m_bUserCancel;
 	ULONG			m_ulBindAddress;
@@ -213,7 +216,6 @@ public:
 	void	SetNotifyWindow(HWND _hWnd, LONG _msg);
 	void	SetCloseMsgRecvWindow(HWND _hWnd, LONG _msg/* = WM_CLOSE*/);
 	void	ThreadExit();
-	void	DeduplicationData();  // 중복 제거 함수 구현
 	//////////////////////////////////////////////////////////// ---------/
 
 	char m_aszUserName[16];

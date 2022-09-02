@@ -19,6 +19,12 @@
 
 #define COUNT_SCAN_CLIENT	3
 
+
+typedef struct tagADDRLIST
+{
+	WCHAR*  pawzAddressList[];
+}ADDRLIST, *LPADDRLIST;
+
 // CUniScanDlg 대화 상자
 class CUniScanDlg : public CDialog
 {
@@ -80,6 +86,7 @@ protected:
 	int		m_nScanAniCount;
 	int		m_nCurSvrListSel;
 	BOOL    m_bInit;
+	ADDRLIST* m_pstAddrList;
 
 	/*
 	윈도우 쓰레드 동기화
@@ -139,6 +146,7 @@ public:
 	afx_msg void OnBnClickedClose();
 	afx_msg void OnClose();
 	afx_msg void OnBnClickedClearBtn();
+	//afx_msg LRESULT OnScanMsg(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnScanMsg(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnScanCloseDlgMsg(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

@@ -15,6 +15,7 @@ NetScanBase::NetScanBase()
 	m_iRevPort			= 0;
 	m_lCloseMsg			= 0;
 	m_hReceiveSock		= 0;
+
 }
 
 NetScanBase::~NetScanBase()
@@ -24,7 +25,9 @@ NetScanBase::~NetScanBase()
 		delete[] m_pReceive_buffer;
 		m_pReceive_buffer = NULL;
 	}
+
 }
+
 
 BOOL NetScanBase::StartScanF(LPTHREAD_START_ROUTINE _pThreadFunc)
 {
