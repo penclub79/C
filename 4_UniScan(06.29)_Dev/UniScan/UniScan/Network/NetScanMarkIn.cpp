@@ -10,6 +10,7 @@ CNetScanMarkIn::CNetScanMarkIn()
 
 CNetScanMarkIn::~CNetScanMarkIn(void)
 {
+
 }
 
 // static

@@ -22,7 +22,7 @@
 
 typedef struct tagADDRLIST
 {
-	WCHAR*  pawzAddressList[];
+	wchar_t  awzAddressList[MAX_PATH];
 }ADDRLIST, *LPADDRLIST;
 
 // CUniScanDlg 대화 상자

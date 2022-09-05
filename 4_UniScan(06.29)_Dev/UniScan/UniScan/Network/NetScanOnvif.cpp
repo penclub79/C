@@ -20,7 +20,7 @@ CNetScanOnvif::~CNetScanOnvif(void)
 	{
 		closesocket(m_TcpSocket);
 		m_TcpSocket = NULL;
-	}	
+	}
 }
 
 DWORD CNetScanOnvif::thrOnvifScanThread(LPVOID pParam)
@@ -280,7 +280,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 				//_Lock();
 				TRACE(_T("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"));
 				if (this->m_hNotifyWnd)
-					::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+					::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
 				//_Unlock();
 				
 			}
@@ -916,7 +916,6 @@ void CNetScanOnvif::GetDeviceInfo(ONVIF_INFO* pstOnvifInfo, char* pszNonceResult
 				}
 			}
 		}
-
 	}
 
 	if (NULL != pszPacketBuffer)

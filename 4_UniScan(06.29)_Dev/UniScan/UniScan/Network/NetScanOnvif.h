@@ -85,5 +85,4 @@ private:
 	void UtfConvert(char* pszStr, char* pszResult);
 	void DigestConvert(char* pszStr, char* puszResult);
 	void SHA1Encoding(char* pszStr, char* pszResult);
-	//std::vector<ONVIF_INFO*>m_vcOnvifList;
 };

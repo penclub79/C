@@ -25,7 +25,6 @@ NetScanBase::~NetScanBase()
 		delete[] m_pReceive_buffer;
 		m_pReceive_buffer = NULL;
 	}
-
 }
 
 
@@ -34,9 +33,8 @@ BOOL NetScanBase::StartScanF(LPTHREAD_START_ROUTINE _pThreadFunc)
 	m_bUserCancel = FALSE;
 
 	if (NULL != m_hScanThread)
-	{
 		return TRUE;
-	}
+	
 
 	m_hScanThread = ::CreateThread(NULL, 0, _pThreadFunc, this, 0, &m_dwScanThreadID);
 
