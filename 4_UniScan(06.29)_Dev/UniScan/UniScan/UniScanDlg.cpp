@@ -282,7 +282,6 @@ BOOL CUniScanDlg::OnInitDialog()
 
 	m_cSvrList.Init();
 
-	m_pstAddrList = new ADDRLIST(); // 중복체크를 위한 IP 리스트
 	m_apScanner[0] = new CNetScanMarkIn();
 	m_apScanner[1] = new CNetScanVision();
 	m_apScanner[2] = new CNetScanOnvif();
@@ -412,28 +411,29 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		// User && PWD Edit Disable
 		GetDlgItemText(IDC_EDIT_LOGIN, strUser);
 		GetDlgItemText(IDC_EDIT_LOGINPWD, strPassword);
-		if (0 == wcslen(strUser) && 0 == wcslen(strPassword) || 0 == wcslen(strUser))
-		{
-			m_bScanning = FALSE;
-			strMsg.LoadString(IDS_SCAN);
-			m_btnScan.SetWindowText(strMsg);
-			MessageBox(_T("ID를 입력해주세요."));
-			return;
-		}
-		else if (0 == wcslen(strPassword))
-		{
-			m_bScanning = FALSE;
-			strMsg.LoadString(IDS_SCAN);
-			m_btnScan.SetWindowText(strMsg);
-			MessageBox(_T("Password를 입력해주세요."));
-			return;
-		}
-		else
-		{
+		//if (0 == wcslen(strUser) && 0 == wcslen(strPassword) || 0 == wcslen(strUser))
+		//{
+		//	m_bScanning = FALSE;
+		//	strMsg.LoadString(IDS_SCAN);
+		//	m_btnScan.SetWindowText(strMsg);
+		//	MessageBox(_T("ID를 입력해주세요."));
+		//	return;
+		//}
+		//else if (0 == wcslen(strPassword))
+		//{
+		//	m_bScanning = FALSE;
+		//	strMsg.LoadString(IDS_SCAN);
+		//	m_btnScan.SetWindowText(strMsg);
+		//	MessageBox(_T("Password를 입력해주세요."));
+		//	return;
+		//}
+		//else
+		//{
 			strcpy_s(aszUsername, sizeof(char) * sizeof(aszUsername), CT2A(strUser));
 			strcpy_s(aszPassword, sizeof(char) * sizeof(aszPassword), CT2A(strPassword));
 
-			m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
+			//m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
+			m_apScanner[ONVIF]->SetUserInfo("admin", "111111");
 
 			//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
 			//{
@@ -445,10 +445,10 @@ void CUniScanDlg::OnBnClickedScanBtn()
 			//		m_apScanner[i]->StartScan();
 			//	}
 			//}
-			m_apScanner[0]->SetBindAddress(m_ulAcceptAddress);
-			m_apScanner[0]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			m_apScanner[0]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			m_apScanner[0]->StartScan();
+			//m_apScanner[0]->SetBindAddress(m_ulAcceptAddress);
+			//m_apScanner[0]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+			//m_apScanner[0]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+			//m_apScanner[0]->StartScan();
 			m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
 			m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
 			m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
@@ -456,7 +456,7 @@ void CUniScanDlg::OnBnClickedScanBtn()
 
 			m_nScanAniCount = 0;
 			SetTimer(TM_SCANNING_ANI, 1000, NULL);
-		}
+		//}
 
 		GetDlgItem(IDC_EDIT_LOGIN)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_LOGINPWD)->EnableWindow(FALSE);
@@ -480,13 +480,15 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		SetStatusMsg(strMsg);
 
 		// stop
-		for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-		{
-			if (m_apScanner[i])
-			{
-				m_apScanner[i]->StopScan();
-			}
-		}
+		//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+		//{
+		//	if (m_apScanner[i])
+		//	{
+		//		m_apScanner[i]->StopScan();
+		//	}
+		//}
+		m_apScanner[0]->StopScan();
+		//m_apScanner[ONVIF]->StopScan();
 	}
 }
 
@@ -604,6 +606,7 @@ void CUniScanDlg::OnClose()
 		}
 	}
 	
+
 	ClearScanList();
 
 	CDialog::OnClose();
@@ -625,10 +628,9 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 	CString		strTemp;
 	SCAN_INFO*	pScanInfo = NULL;
 	SCAN_INFO*	pOldScanInfo = NULL;
-	//WCHAR* paszIpList[] = { 0 };
 	int			nCurrentItem = -1;
 	int			i = 0;
-
+	long		iIsDelScanData = lParam;
 
 	pScanInfo = (SCAN_INFO*)wParam;
 
@@ -642,7 +644,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 
 	//if( m_iSelectVersion != pScanInfo->version )
 	//{
-	//	// 선택되어 있는 버젼과 받은 버젼이 틀리다면 삭제한다. 
+	//	// 선택되어 있는 버젼과 받은 버젼이 틀리다면 삭제한다.
 	//	delete pScanInfo; 
 	//	return 0L;
 	//}
@@ -652,7 +654,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 	if (pScanInfo)
 	{
 		//////////////////////////////////////////
-		//// 응답없는 아이템 리스트에서 삭제 /////
+		//// 응답없는 아이템 리스트에서 삭제 ///////
 		//time_t		tCurrentTime	= GetCurrentTime();
 		//for(i = m_cSvrList.GetItemCount()-1; i>=0 ; i--)
 		//{
@@ -667,85 +669,60 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		//		SetCountMsg(m_nListItemCount);
 		//	}
 		//}
-		//// 응답없는 아이템 리스트에서 삭제 /////
+		//// 응답없는 아이템 리스트에서 삭제 ////////
 		//////////////////////////////////////////
-
 
 		////////////////////////////////////////
 		//{{ 중복제거 //////////////////////////
 
 		// 시나리오상 IP가 중복될 수도 있음
-		m_pstAddrList->pawzAddressList[0] = pScanInfo->szAddr;
 		for (i = 0; i < m_cSvrList.GetItemCount(); i++)
 		{
 			pOldScanInfo = (SCAN_INFO*)m_cSvrList.GetItemData(i);
 			//if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0) // 원래 코드
 
-			if (0 == wcscmp(m_pstAddrList->pawzAddressList[i], pScanInfo->szAddr))
+			if (wcscmp(pOldScanInfo->szAddr, pScanInfo->szAddr) == 0) // IP 같으면
 			{
 				delete pScanInfo;
 				pScanInfo = NULL;
+				//pScanInfo->bIsDel = TRUE;
+				_Unlock();
+				return 0;
+
+				//	//if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0)
+				//	//{
+				//	//	pOldScanInfo->SetReceiveTime();
+
+				//	//	if (*pOldScanInfo == *pScanInfo)
+				//	//	{
+				//	//		delete pScanInfo;
+				//	//		pScanInfo = NULL;
+				//	//		_Unlock();
+				//	//		return 0;
+				//	//	}
+				//	//	else
+				//	//	{
+				//	//		// 이전 아이피 정보와 현재의 데이터가 다르다면 업데이트 시킨다. 
+				//	//		pScanInfo->SetReceiveTime();
+				//	//		m_cSvrList.SetItemData(i, (DWORD_PTR)pScanInfo);
+
+				//	//		delete pOldScanInfo;
+				//	//		nCurrentItem = i;
+				//	//		break;
+				//	//	}
+				//	//}
+				//	//if (wcslen(pOldScanInfo->szMAC) < 4 || wcslen(pScanInfo->szMAC) < 4)
+				//	//{
+				//	//	//pScanInfo->SetReceiveTime();
+				//	//	//m_cSvrList.SetItemData(i, (DWORD_PTR)pOldScanInfo);
+
+				//	//	delete pOldScanInfo;
+				//	//	pScanInfo = NULL;
+				//	//	_Unlock();
+				//	//	return 0;
+				//	//}
+				//}
 			}
-			else
-			{
-				if (m_pstAddrList->pawzAddressList[m_cSvrList.GetItemCount()])
-				{
-					m_pstAddrList->pawzAddressList[m_cSvrList.GetItemCount() + 1] = pScanInfo->szAddr;
-				}
-			}
-
-
-			//if (wcscmp(pOldScanInfo->szAddr, pScanInfo->szAddr) == 0) // IP 같으면
-			//{	
-			//	delete pScanInfo;
-			//	pScanInfo = NULL;
-			//	_Unlock();
-			//	return 0;
-
-			//	//if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0)
-			//	//{
-			//	//	pOldScanInfo->SetReceiveTime();
-
-			//	//	if (*pOldScanInfo == *pScanInfo)
-			//	//	{
-			//	//		delete pScanInfo;
-			//	//		pScanInfo = NULL;
-			//	//		_Unlock();
-			//	//		return 0;
-			//	//	}
-			//	//	else
-			//	//	{
-			//	//		// 이전 아이피 정보와 현재의 데이터가 다르다면 업데이트 시킨다. 
-			//	//		pScanInfo->SetReceiveTime();
-			//	//		m_cSvrList.SetItemData(i, (DWORD_PTR)pScanInfo);
-
-			//	//		delete pOldScanInfo;
-			//	//		nCurrentItem = i;
-			//	//		break;
-			//	//	}
-			//	//}
-			//	//if (wcslen(pOldScanInfo->szMAC) < 4 || wcslen(pScanInfo->szMAC) < 4)
-			//	//{
-			//	//	//pScanInfo->SetReceiveTime();
-			//	//	//m_cSvrList.SetItemData(i, (DWORD_PTR)pOldScanInfo);
-
-			//	//	delete pOldScanInfo;
-			//	//	pScanInfo = NULL;
-			//	//	_Unlock();
-			//	//	return 0;
-			//	//}
-			//}
-
-			
-
-			//int test = wcslen(pScanInfo->szFirmwareVer);
-			//if (0 == wcslen(pScanInfo->szFirmwareVer) || 0 == wcslen(pScanInfo->szModelName))
-			//{
-			//	delete pScanInfo;
-			//	pScanInfo = NULL;
-			//	_Unlock();
-			//	return 0;
-			//}
 		}
 		//}}
 		//{{ 중복제거 //////////////////////////
@@ -798,26 +775,12 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		m_cSvrList.SetItem(&item);
 
-		//strTemp.Format(_T("%d"), pScanInfo->nStreamPort);
-		//item.mask = LVIF_TEXT;
-		//item.iItem = (nCurrentItem < 0)?nInsertIndex:nCurrentItem;
-		//item.iSubItem = SUBITEM_PORTSTREAM;
-		//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		//m_cSvrList.SetItem(&item);
-
 		strTemp.Format(_T("%d"), pScanInfo->nHTTPPort);
 		item.mask = LVIF_TEXT;
 		item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
 		item.iSubItem = SUBITEM_PORTHTTP;
 		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		m_cSvrList.SetItem(&item);
-
-		//strTemp.Format(_T("%d"), pScanInfo->iBasePort);
-		//item.mask = LVIF_TEXT;
-		//item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-		//item.iSubItem = SUBITEM_PORTBASE;
-		//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		//m_cSvrList.SetItem(&item);
 
 		if (0 == wcslen(pScanInfo->szSwVersion))
 			wsprintf(pScanInfo->szSwVersion, _T("N/A"));
@@ -844,13 +807,6 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		m_cSvrList.SetItem(&item);
 
-		//strTemp.LoadString(IDS_N_AND_A);
-		//item.mask = LVIF_TEXT;
-		//item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-		//item.iSubItem = SUBITEM_PORTUPGRADE;
-		//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		//m_cSvrList.SetItem(&item);
-
 		if (0 == wcslen(pScanInfo->szFirmwareVer))
 			wsprintf(pScanInfo->szFirmwareVer, _T("N/A"));
 		strTemp.Format(_T("%s"), pScanInfo->szFirmwareVer);
@@ -859,68 +815,11 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		item.iSubItem = SUBITEM_FIRMWAREVERSION;
 		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		m_cSvrList.SetItem(&item);
-		//strTemp.LoadString(IDS_N_AND_A);
-		//item.mask = LVIF_TEXT;
-		//item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-		//item.iSubItem = SUBITEM_FIRMWAREVERSION;
-		//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		//m_cSvrList.SetItem(&item);
-
-		// extended infomation printout
-		//if (pScanInfo->nExtraFieldCount)
-		//{
-		//	//strTemp = pScanInfo->_ReadValue(L"Upgrade Port");
-		//	//item.mask = LVIF_TEXT;
-		//	//item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-		//	//item.iSubItem = SUBITEM_PORTUPGRADE;
-		//	//item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		//	//m_cSvrList.SetItem(&item);
-
-		//	strTemp = pScanInfo->_ReadValue(L"Model Type");
-		//	item.mask = LVIF_TEXT;
-		//	item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-		//	item.iSubItem = SUBITEM_MODELTYPE;
-		//	item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		//	m_cSvrList.SetItem(&item);
-
-		//	strTemp = pScanInfo->_ReadValue(L"Firmware Version");
-		//	item.mask = LVIF_TEXT;
-		//	item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-		//	item.iSubItem = SUBITEM_FIRMWAREVERSION;
-		//	item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		//	m_cSvrList.SetItem(&item);
-
-		//	strTemp.LoadString(IDS_N_AND_A);
-		//	item.mask = LVIF_TEXT;
-		//	item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem;
-		//	item.iSubItem = SUBITEM_SW_VERSION;
-		//	item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		//	m_cSvrList.SetItem(&item);
-		//}
-
-		//if (strTemp.IsEmpty())
-		//{
-		//	strTemp.LoadString(IDS_N_AND_A);
-		//	//for(i = SUBITEM_PORTUPGRADE; i <= SUBITEM_AUDIOOUTCOUNT; i ++)
-		//	//{
-		//	//	item.mask = LVIF_TEXT;
-		//	//	item.iItem = (nCurrentItem < 0)?nInsertIndex:nCurrentItem;
-		//	//	item.iSubItem = i;
-		//	//	item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		//	//	m_cSvrList.SetItem(&item);
-		//	//}
-		//	for (i = SUBITEM_PORTUPGRADE; i <= SUBITEM_VIDEOCOUNT; i++)
-		//	{
-		//		item.mask = LVIF_TEXT;
-		//		item.iItem = (nCurrentItem < 0)?nInsertIndex:nCurrentItem;
-		//		item.iSubItem = i;
-		//		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
-		//		m_cSvrList.SetItem(&item);
-		//	}
-		//}
 
 		// update count;
 		m_nListItemCount++;
+
+		// Complete!!! -> delete ScanInfo structure
 
 		//iCount = m_nScanAniCount + m_nScanMarkInCount;
 		SetCountMsg(m_nListItemCount);
@@ -931,17 +830,12 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 			//OutputDebugString(L"Item++\n");
 			m_nCurSvrListSel++;
 		}
-
 	}
+	//pScanInfo->bIsDel = TRUE;
 	_Unlock();
 
-	if (pScanInfo)
-	{
-		delete pScanInfo;
-		pScanInfo = NULL;
-	}
-
 	TRACE(_T("cccccccccccccccccccccccccccccccccccccccccccc\n"));
+	
 
 	return 0;
 }

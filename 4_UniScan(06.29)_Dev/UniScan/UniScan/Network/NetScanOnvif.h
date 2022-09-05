@@ -5,10 +5,17 @@
 #include "../xmlite/XMLite.h"
 #include "../../UniScan/XMLform.h"
 
+#define IP_SIZE		32
+#define NONCE_SIZE	36
 #define SHA_SIZE	41
 #define BASE64_SIZE	56
-#define UUID_SIZE	128
+#define DATE_SIZE	56
 #define DIGEST_SIZE 64
+#define UUID_SIZE	128
+
+
+
+
 
 typedef struct tagONVIFINFO
 {
@@ -31,8 +38,9 @@ typedef enum
 	SYSTEMDATE,
 	DEVICEINFO,
 	VERSIONINFO,
-	NETWORKINFO,
-	PROFILEINFO
+	DEVICEINFO_DIGEST,
+	NETWORKINFO_DIGEST,
+	PROFILEINFO_DIGEST
 };
 
 typedef enum _TCPCODE{
@@ -72,9 +80,12 @@ protected:
 	BOOL ConnectTCPSocket(char* pszIP, int iPort);
 	BOOL GenerateMsgID(char* pszMessageID, int iBufferLen);
 	void DataPreProcessing(); // ±¸Çö °èÈ¹
-	void RequestMessage(ONVIF_INFO* pstOnvifInfo, int iMessageSize);
+	void SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iContentSize);
 
-
+	char m_aszDigest[DIGEST_SIZE];
+	char m_aszBase64[NONCE_SIZE];
+	char m_aszDate[DATE_SIZE];
+	char m_aszIP[IP_SIZE];
 	BOOL m_bConnected;
 	SOCKET m_TcpSocket;
 
@@ -85,5 +96,4 @@ private:
 	void UtfConvert(char* pszStr, char* pszResult);
 	void DigestConvert(char* pszStr, char* puszResult);
 	void SHA1Encoding(char* pszStr, char* pszResult);
-	//std::vector<ONVIF_INFO*>m_vcOnvifList;
 };

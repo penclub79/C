@@ -61,6 +61,7 @@ typedef struct tagSCAN_STRUCT
 	int				nExtraFieldCount;
 	int				iVideoCnt; // +Ãß°¡
 	time_t			tReceiveTime;
+	BOOL			bIsDel;
 	SCAN_EXT_INFO*	pExtScanInfos;
 
 	tagSCAN_STRUCT()
@@ -94,6 +95,7 @@ typedef struct tagSCAN_STRUCT
 		this->cIsDHCP = src.cIsDHCP;
 		this->tReceiveTime = src.tReceiveTime;
 		this->iVideoCnt = src.iVideoCnt;
+		this->bIsDel = src.bIsDel;
 
 		SAFE_DELETEA(this->pExtScanInfos);
 		this->nExtraFieldCount = src.nExtraFieldCount;
@@ -124,11 +126,11 @@ typedef struct tagSCAN_STRUCT
 
 	BOOL operator == (tagSCAN_STRUCT& src)
 	{
-		if (0 != wcscmp(this->szMAC, src.szMAC))				return FALSE;
-		if (0 != wcscmp(this->szGateWay, src.szGateWay))		return FALSE;
-		if (0 != wcscmp(this->szSubnetMask, src.szSubnetMask))	return FALSE;
-		if (0 != wcscmp(this->szSwVersion, src.szSwVersion))	return FALSE;
-		if (0 != wcscmp(this->szModelName, src.szModelName))	return FALSE;
+		if (0 != wcscmp(this->szMAC,		src.szMAC))				return FALSE;
+		if (0 != wcscmp(this->szGateWay,	src.szGateWay))			return FALSE;
+		if (0 != wcscmp(this->szSubnetMask, src.szSubnetMask))		return FALSE;
+		if (0 != wcscmp(this->szSwVersion,	src.szSwVersion))		return FALSE;
+		if (0 != wcscmp(this->szModelName,	src.szModelName))		return FALSE;
 		if (0 != wcscmp(this->szFirmwareVer, src.szFirmwareVer))	return FALSE;
 
 		//if( this->nStreamPort			!= src.nStreamPort		)			return FALSE;
@@ -138,6 +140,7 @@ typedef struct tagSCAN_STRUCT
 		if (this->nExtraFieldCount != src.nExtraFieldCount)		return FALSE;
 		if (this->iBasePort != src.iBasePort)					return FALSE;
 		if (this->iVideoCnt != src.iVideoCnt)					return FALSE;
+		if (this->bIsDel != src.bIsDel)							return FALSE;
 
 		for (int i = 0; i < src.nExtraFieldCount; i++)
 		{
@@ -215,6 +218,8 @@ public:
 	void	SetBindAddress(ULONG _ulBindAddress);
 	void	SetNotifyWindow(HWND _hWnd, LONG _msg);
 	void	SetCloseMsgRecvWindow(HWND _hWnd, LONG _msg/* = WM_CLOSE*/);
+	void	SetScanIP(SCAN_INFO* _pstScanInfo);
+	void	DelBuff();
 	void	ThreadExit();
 	//////////////////////////////////////////////////////////// ---------/
 

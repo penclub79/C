@@ -20,23 +20,25 @@ NetScanBase::NetScanBase()
 
 NetScanBase::~NetScanBase()
 {
+	DelBuff();
+}
+
+void NetScanBase::DelBuff()
+{
 	if (NULL != m_pReceive_buffer)
 	{
 		delete[] m_pReceive_buffer;
 		m_pReceive_buffer = NULL;
 	}
-
 }
-
 
 BOOL NetScanBase::StartScanF(LPTHREAD_START_ROUTINE _pThreadFunc)
 {
 	m_bUserCancel = FALSE;
 
 	if (NULL != m_hScanThread)
-	{
 		return TRUE;
-	}
+	
 
 	m_hScanThread = ::CreateThread(NULL, 0, _pThreadFunc, this, 0, &m_dwScanThreadID);
 
@@ -169,5 +171,16 @@ void NetScanBase::ThreadExit()
 		::PostMessage(m_hCloseMsgRecvWnd, m_lCloseMsg, 0, 0);
 		TRACE("Thread Exit\n");
 		m_bUserCancel = FALSE;
+	}
+}
+
+void NetScanBase::SetScanIP(SCAN_INFO* _pstScanInfo)
+{
+	SCAN_INFO* pScanInfo = (SCAN_INFO*)_pstScanInfo;
+
+	if (0 != m_dwScanThreadID)
+	{
+		if (this->m_hNotifyWnd)
+			::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
 	}
 }

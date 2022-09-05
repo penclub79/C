@@ -10,6 +10,7 @@ CNetScanMarkIn::CNetScanMarkIn()
 
 CNetScanMarkIn::~CNetScanMarkIn(void)
 {
+
 }
 
 // static
@@ -69,7 +70,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 				dwLastError = WSAGetLastError();
 				TRACE("MarkIn recvfrom error = %d\n", dwLastError);
 				if (this->m_hNotifyWnd && dwLastError != 10004)
-					::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV);
+					::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV);
 
 				this->ThreadExit();
 				break;
@@ -174,10 +175,25 @@ void CNetScanMarkIn::thrMarkInReceiver()
 
 						//_Lock();
 						TRACE(_T("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"));
-						if (this->m_hNotifyWnd)
-							::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+						if (0 != m_dwScanThreadID)
+						{
+							if (this->m_hNotifyWnd)
+								::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+						}
+
+						
+						//SetScanIP(pScanInfo);
 						//_Unlock();
 					}
+				}
+			}
+
+			if (TRUE == pScanInfo->bIsDel)
+			{
+				if (NULL != pScanInfo)
+				{
+					delete pScanInfo;
+					pScanInfo = NULL;
 				}
 			}
 		}
@@ -187,6 +203,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 		TRACE("Bind Fail = %d\n", WSAGetLastError());
 		return;
 	}
+	
 	
 	return;
 }
