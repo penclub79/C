@@ -445,14 +445,14 @@ void CUniScanDlg::OnBnClickedScanBtn()
 			//		m_apScanner[i]->StartScan();
 			//	}
 			//}
-			//m_apScanner[0]->SetBindAddress(m_ulAcceptAddress);
-			//m_apScanner[0]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			//m_apScanner[0]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			//m_apScanner[0]->StartScan();
-			m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
-			m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			m_apScanner[ONVIF]->StartScan();
+			m_apScanner[0]->SetBindAddress(m_ulAcceptAddress);
+			m_apScanner[0]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+			m_apScanner[0]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+			m_apScanner[0]->StartScan();
+			//m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
+			//m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+			//m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+			//m_apScanner[ONVIF]->StartScan();
 
 			m_nScanAniCount = 0;
 			SetTimer(TM_SCANNING_ANI, 1000, NULL);

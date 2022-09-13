@@ -14,9 +14,6 @@
 #define UUID_SIZE	128
 
 
-
-
-
 typedef struct tagONVIFINFO
 {
 	char	aszIP[32];
@@ -81,6 +78,8 @@ protected:
 	BOOL GenerateMsgID(char* pszMessageID, int iBufferLen);
 	void DataPreProcessing(); // ±¸Çö °èÈ¹
 	void SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iContentSize);
+	void GetDeviceInfo(ONVIF_INFO* pstOnvifInfo);
+	void GetNetworkInterface(ONVIF_INFO* pstOnvifInfo);
 
 	char m_aszDigest[DIGEST_SIZE];
 	char m_aszBase64[NONCE_SIZE];
@@ -88,7 +87,6 @@ protected:
 	char m_aszIP[IP_SIZE];
 	BOOL m_bConnected;
 	SOCKET m_TcpSocket;
-
 
 private:
 	void Base64Encoding(char* pszStr, int iSize, char* pszResult);

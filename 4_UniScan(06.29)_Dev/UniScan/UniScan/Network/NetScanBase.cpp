@@ -160,12 +160,6 @@ void NetScanBase::ThreadExit()
 	closesocket(m_hReceiveSock);
 	m_hReceiveSock = NULL;
 
-	if (m_pReceive_buffer)
-	{
-		delete[] m_pReceive_buffer;
-		m_pReceive_buffer = NULL;
-	}
-
 	if (m_bUserCancel && m_hCloseMsgRecvWnd && ::IsWindow(m_hCloseMsgRecvWnd))
 	{
 		::PostMessage(m_hCloseMsgRecvWnd, m_lCloseMsg, 0, 0);
