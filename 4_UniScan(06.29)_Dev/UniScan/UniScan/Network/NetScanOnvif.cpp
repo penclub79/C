@@ -11,12 +11,13 @@
 
 CNetScanOnvif::CNetScanOnvif()
 {
-	m_bConnected = FALSE;
-	m_TcpSocket = NULL;
+	m_bConnected	= FALSE;
+	m_TcpSocket		= NULL;
 	m_aszIP[IP_SIZE] = { 0 };
 	m_aszDigest[DIGEST_SIZE] = { 0 };
 	m_aszBase64[NONCE_SIZE] = { 0 };
 	m_aszDate[DATE_SIZE] = { 0 };
+	m_pScanInfo = NULL;
 }
 
 CNetScanOnvif::~CNetScanOnvif(void)
@@ -26,6 +27,7 @@ CNetScanOnvif::~CNetScanOnvif(void)
 		closesocket(m_TcpSocket);
 		m_TcpSocket = NULL;
 	}
+
 }
 
 DWORD CNetScanOnvif::thrOnvifScanThread(LPVOID pParam)
@@ -131,8 +133,8 @@ BOOL CNetScanOnvif::SendScanRequest()
 	int			iSendBufferSize = 0;
 	char*		pszProbeSendBuffer = NULL;
 	char*		pszResolveSendBuffer = NULL;
-	char*		paszOnvifURI[2] = { "http://www.onvif.org/ver10/network/wsdl", "http://www.onvif.org/ver10/device/wsdl" };
-	char*		paszProbeType[3] = { "dp0:Device", "dp0:NetworkVideoDisplay", "dp0:NetworkVideoTransmitter" };
+	char*		paszOnvifURI[2]		= { "http://www.onvif.org/ver10/network/wsdl", "http://www.onvif.org/ver10/device/wsdl" };
+	char*		paszProbeType[3]	= { "dp0:Device", "dp0:NetworkVideoDisplay", "dp0:NetworkVideoTransmitter" };
 
 	// 소켓 생성
 	if (NULL == m_hReceiveSock)
@@ -147,6 +149,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 
 	int iTypeIdx = 0;
 	int iUriIdx = 0;
+
 	// Probe Type 배열 요소 갯수 만큼 Packet Send
 	while (iTypeIdx < sizeof(paszProbeType) / sizeof(paszProbeType[0]))
 	{
@@ -212,6 +215,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 
 	while (this->m_dwScanThreadID)
 	{
+		m_bIsRunThr = FALSE;
 		if (NULL == m_hReceiveSock || FALSE == m_bConnected)
 		{
 			Sleep(100);
@@ -224,12 +228,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 
 		m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
 		memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE);
-
-		pScanInfo = new SCAN_INFO;
-		memset(pScanInfo, 0, sizeof(SCAN_INFO));
-
-		pOnvifInfo = new ONVIF_INFO;
-		memset(pOnvifInfo, 0, sizeof(ONVIF_INFO));
 
 		if (SOCKET_ERROR == recvfrom(m_hReceiveSock, m_pReceive_buffer, SCAN_INFO_RECEIVE_BUFFER_SIZE, 0, (SOCKADDR*)&stSockAddr, &iRevLen))
 		{
@@ -245,6 +243,12 @@ void CNetScanOnvif::thrOnvifReceiver()
 
 		if (NULL != m_pReceive_buffer)
 		{
+			pScanInfo = new SCAN_INFO; // 472
+			memset(pScanInfo, 0, sizeof(SCAN_INFO));
+
+			pOnvifInfo = new ONVIF_INFO;
+			memset(pOnvifInfo, 0, sizeof(ONVIF_INFO));
+
 			GetIPAndModelName(pOnvifInfo);
 
 			// table input Data
@@ -254,9 +258,8 @@ void CNetScanOnvif::thrOnvifReceiver()
 
 				// Client 난수 생성
 				if (0 == strlen(pOnvifInfo->aszNonce))
-				{
 					strcpy(pOnvifInfo->aszNonce, __aszNonce);
-				}
+				
 
 				// Onvif Version 얻어오기
 				SendOnvifVersion(pOnvifInfo);
@@ -279,16 +282,24 @@ void CNetScanOnvif::thrOnvifReceiver()
 				// MAC 어드레스 가져오기
 				GetNetworkInterface(pOnvifInfo);
 
-				DataParsing(pOnvifInfo, pScanInfo);
-				//pScanInfo->iVideoCnt = 0; 이거때문에 channel data가 안받아짐
+				// Channel 가져오기
+				SendProfile(pOnvifInfo);
 
-				TRACE(_T("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"));
+				DataParsing(pOnvifInfo, pScanInfo);
+
 				if (0 != m_dwScanThreadID)
 				{
 					if (this->m_hNotifyWnd)
 						::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
 				}
-
+				else
+				{
+					if (NULL != pScanInfo)
+					{
+						delete pScanInfo;
+						pScanInfo = NULL;
+					}
+				}
 			}
 		}
 
@@ -334,6 +345,9 @@ void CNetScanOnvif::DataParsing(ONVIF_INFO* pstOnvifInfo, SCAN_INFO* pstScanInfo
 	else
 		wsprintf(pScanInfo->szModelName, _T("N/A"));
 
+	wsprintf(pScanInfo->szGateWay, _T("N/A"));
+	
+
 	pScanInfo->iVideoCnt = pOnvifInfo->iChannelCnt;
 	pScanInfo->nHTTPPort = pOnvifInfo->iHttpPort;
 
@@ -376,6 +390,13 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 		sprintf_s(pszCopyBuffer, sizeof(char)* iHttpHeaderSize, "%s", __aszDeviceHeader);
 		strcat_s(pszCopyBuffer, sizeof(char)* iSendDataSize, __aszDeviceInfoDigestXml);
 		sprintf_s(pszSendBuffer, sizeof(char)* iSendDataSize, pszCopyBuffer, m_aszIP, iContentSize, m_aszUserName, m_aszDigest, m_aszBase64, m_aszDate);
+
+		if (NULL != pszCopyBuffer)
+		{
+			delete[] pszCopyBuffer;
+			pszCopyBuffer = NULL;
+		}
+
 		break;
 
 	case NETWORKINFO_DIGEST:
@@ -385,9 +406,30 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 		sprintf_s(pszCopyBuffer, sizeof(char)* iHttpHeaderSize, "%s", __aszNetworkHeader);
 		strcat_s(pszCopyBuffer, sizeof(char)* iSendDataSize, __aszNetworkInfoDigestXml);
 		sprintf_s(pszSendBuffer, sizeof(char)* iSendDataSize, pszCopyBuffer, m_aszIP, iContentSize, m_aszUserName, m_aszDigest, m_aszBase64, m_aszDate);
+
+		if (NULL != pszCopyBuffer)
+		{
+			delete[] pszCopyBuffer;
+			pszCopyBuffer = NULL;
+		}
+
 		break;
 
-	default:
+
+	case PROFILEINFO_DIGEST:
+		pszCopyBuffer = new char[iSendDataSize + 1];
+		memset(&pszCopyBuffer[0], 0, iSendDataSize + 1);
+
+		sprintf_s(pszCopyBuffer, sizeof(char)* iHttpHeaderSize, "%s", __aszMediaHeader);
+		strcat_s(pszCopyBuffer, sizeof(char)* iSendDataSize, __aszProfileDigestXml);
+		sprintf_s(pszSendBuffer, sizeof(char)* iSendDataSize, pszCopyBuffer, m_aszIP, iContentSize, m_aszUserName, m_aszDigest, m_aszBase64, m_aszDate);
+
+		if (NULL != pszCopyBuffer)
+		{
+			delete[] pszCopyBuffer;
+			pszCopyBuffer = NULL;
+		}
+
 		break;
 	}
 
@@ -405,6 +447,8 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 		closesocket(m_TcpSocket);
 	}
 
+	//::OutputDebugStringA(m_pReceive_buffer);
+	//::OutputDebugStringA("\n");
 
 	if (NULL != pszSendBuffer)
 	{
@@ -412,10 +456,31 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 		pszSendBuffer = NULL;
 	}
 
-	if (NULL != pszCopyBuffer)
+
+}
+
+void CNetScanOnvif::SendProfile(ONVIF_INFO* pstOnvifInfo)
+{
+	BOOL bIsConnect = FALSE;
+	ONVIF_INFO* pOnvifInfo = (ONVIF_INFO*)pstOnvifInfo;
+	int iHttpHeaderSize = 0;
+	int iContentSize = 0;
+
+	bIsConnect = ConnectTCPSocket(m_aszIP, pOnvifInfo->iHttpPort);
+
+	if (0 < strlen(m_pReceive_buffer))
+		memset(&m_pReceive_buffer[0], 0, sizeof(SCAN_INFO_RECEIVE_BUFFER_SIZE));
+
+	if (CONNECT_SUCCESS == bIsConnect)
 	{
-		delete[] pszCopyBuffer;
-		pszCopyBuffer = NULL;
+		iHttpHeaderSize = strlen(__aszMediaHeader) + strlen(m_aszIP) + 4;
+		iContentSize = strlen(__aszProfileDigestXml) + strlen(m_aszDigest) + strlen(m_aszBase64) + strlen(m_aszDate) + strlen(m_aszUserName);
+		SoapRequestMessage(PROFILEINFO_DIGEST, iHttpHeaderSize, iContentSize);
+
+		//if (0 < strlen(m_pReceive_buffer))
+		//{
+		//	memcpy(&);
+		//}
 	}
 
 }
@@ -431,6 +496,7 @@ void CNetScanOnvif::GetIPAndModelName(ONVIF_INFO* pstOnvifInfo)
 	LPXNode			lpIPAddress		= NULL;
 	char			aszUUID[UUID_SIZE] = { 0 };
 	char			aszIPData[128]	= { 0 };
+	char			aszIPSlice[MAX_PATH] = { 0 };
 	char*			pszSlice		= NULL;
 	char*			pszNameSlice	= NULL;
 	char*			pszBuffer		= NULL;
@@ -485,11 +551,13 @@ void CNetScanOnvif::GetIPAndModelName(ONVIF_INFO* pstOnvifInfo)
 			else
 				pOnvifInfo->iHttpPort = 80;
 
-			lpIPAddress->value = lpIPAddress->value.Left(20);
-			lpIPAddress->value = lpIPAddress->value.Right(13);
-			//strcpy(&pOnvifInfo->aszIP[0], lpIPAddress->value);
-			strcpy(&m_aszIP[0], lpIPAddress->value);
+			strcpy(&aszIPSlice[0], lpIPAddress->value);
+			pszSlice = strtok(aszIPSlice, ":");
+			pszSlice = strtok(NULL, ":");
+			pszSlice = strtok(pszSlice, "//");
+			strcpy(&m_aszIP[0], pszSlice);
 		}
+		
 
 		// ModelName
 		lpScope = (NULL != lpTypeCheck->GetChildArg("wsdd:Scopes", NULL)) ? lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) : lpTypeCheck->GetChildArg("d:Scopes", NULL);
@@ -643,7 +711,6 @@ void CNetScanOnvif::SendDeviceInfo(ONVIF_INFO* pstOnvifInfo)
 			}
 		}
 	}
-
 }
 
 void CNetScanOnvif::SendOnvifVersion(ONVIF_INFO* pstOnvifInfo)
@@ -810,9 +877,12 @@ void CNetScanOnvif::GetDeviceInfo(ONVIF_INFO* pstOnvifInfo)
 
 	if (CONNECT_SUCCESS == bIsConnect)
 	{
-
 		if (NULL != m_pReceive_buffer)
 		{
+
+			//::OutputDebugStringA(m_pReceive_buffer);
+			//::OutputDebugStringA("\n");
+
 			memcpy(&aszCopyBuffer[0], m_pReceive_buffer, 20);
 			pszSlice = strstr(aszCopyBuffer, " ");
 			if (NULL != pszSlice)
@@ -881,7 +951,6 @@ void CNetScanOnvif::GetNetworkInterface(ONVIF_INFO* pstOnvifInfo)
 
 	if (CONNECT_SUCCESS == bIsConnect)
 	{
-
 		if (NULL != m_pReceive_buffer)
 		{
 			memcpy(&aszCopyBuffer[0], m_pReceive_buffer, 20);

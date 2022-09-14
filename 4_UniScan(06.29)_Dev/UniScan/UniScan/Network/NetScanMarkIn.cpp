@@ -187,15 +187,6 @@ void CNetScanMarkIn::thrMarkInReceiver()
 					}
 				}
 			}
-
-			if (TRUE == pScanInfo->bIsDel)
-			{
-				if (NULL != pScanInfo)
-				{
-					delete pScanInfo;
-					pScanInfo = NULL;
-				}
-			}
 		}
 	}
 	else

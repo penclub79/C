@@ -12,6 +12,11 @@ const char __aszNetworkHeader[] =
 	"POST /onvif/device_service HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/device/wsdl/GetNetworkInterfaces\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n"
 };
 
+const char __aszMediaHeader[] =
+{
+	"POST /onvif/media_service HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/media/wsdl/GetProfiles\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n"
+};
+
 const char __aszSoap[] =
 {
 	"<?xml version=\"1.0\" encoding=\"utf-8\"?>\

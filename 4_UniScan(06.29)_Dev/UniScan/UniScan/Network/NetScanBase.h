@@ -171,11 +171,6 @@ typedef struct tagSCAN_STRUCT
 
 }SCAN_INFO, *LPSCAN_INFO;
 
-typedef struct tagONVIF_LIST
-{
-	WCHAR* paszIpList[];
-}ONVIF_LIST;
-
 class NetScanBase
 {
 private:

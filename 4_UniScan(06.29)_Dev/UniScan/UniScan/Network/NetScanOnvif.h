@@ -68,6 +68,7 @@ protected:
 	void SendDeviceInfo(ONVIF_INFO* pstOnvifInfo);
 	void SendOnvifVersion(ONVIF_INFO* pstOnvifInfo);
 	void SendAuthenticate(ONVIF_INFO* pstOnvifInfo);
+	void SendProfile(ONVIF_INFO* pstOnvifInfo);
 	void GetDeviceInfo(ONVIF_INFO* pstOnvifInfo, char* pszNonceResult);
 	void GetNetworkInterface(ONVIF_INFO* pstOnvifInfo, char* pszNonceResult);
 	void GetIPAndModelName(ONVIF_INFO* pstOnvifInfo);
@@ -86,7 +87,9 @@ protected:
 	char m_aszDate[DATE_SIZE];
 	char m_aszIP[IP_SIZE];
 	BOOL m_bConnected;
+	BOOL m_bIsRunThr;
 	SOCKET m_TcpSocket;
+	SCAN_INFO* m_pScanInfo;
 
 private:
 	void Base64Encoding(char* pszStr, int iSize, char* pszResult);

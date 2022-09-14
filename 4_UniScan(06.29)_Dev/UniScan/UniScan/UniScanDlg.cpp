@@ -445,14 +445,14 @@ void CUniScanDlg::OnBnClickedScanBtn()
 			//		m_apScanner[i]->StartScan();
 			//	}
 			//}
-			m_apScanner[0]->SetBindAddress(m_ulAcceptAddress);
-			m_apScanner[0]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			m_apScanner[0]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			m_apScanner[0]->StartScan();
-			//m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
-			//m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			//m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			//m_apScanner[ONVIF]->StartScan();
+			//m_apScanner[0]->SetBindAddress(m_ulAcceptAddress);
+			//m_apScanner[0]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+			//m_apScanner[0]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+			//m_apScanner[0]->StartScan();
+			m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
+			m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+			m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+			m_apScanner[ONVIF]->StartScan();
 
 			m_nScanAniCount = 0;
 			SetTimer(TM_SCANNING_ANI, 1000, NULL);
@@ -487,8 +487,8 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		//		m_apScanner[i]->StopScan();
 		//	}
 		//}
-		m_apScanner[0]->StopScan();
-		//m_apScanner[ONVIF]->StopScan();
+		//m_apScanner[0]->StopScan();
+		m_apScanner[ONVIF]->StopScan();
 	}
 }
 
@@ -749,6 +749,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		*/
 		LV_ITEM item;
 
+		
 		memset(&item, 0, sizeof(item));
 		item.mask = LVIF_TEXT | LVIF_PARAM;
 		item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem; // Update의 경우에는 찾은 인덱스(nCurrentItem으로)
@@ -831,7 +832,6 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 			m_nCurSvrListSel++;
 		}
 	}
-	//pScanInfo->bIsDel = TRUE;
 	_Unlock();
 
 	TRACE(_T("cccccccccccccccccccccccccccccccccccccccccccc\n"));
