@@ -182,7 +182,7 @@ void CNetScanVision::thrReceiver()
 		if (m_pReceive_buffer == NULL)
 		{
 			if (this->m_hNotifyWnd)
-				::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_MEMORY); // PostMessage to MainWindow
+				::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_MEMORY); // PostMessage to MainWindow
 
 			this->ThreadExit();
 			return;
@@ -200,7 +200,7 @@ void CNetScanVision::thrReceiver()
 				dwLastError = WSAGetLastError();
 				TRACE("Vision recvfrom error = %d\n", dwLastError);
 				if (this->m_hNotifyWnd && dwLastError != 10004)
-					::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV); // PostMessage to MainWindow
+					::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV); // PostMessage to MainWindow
 
 				this->ThreadExit();
 				break;
@@ -319,7 +319,7 @@ void CNetScanVision::thrReceiver()
 						if (this->m_hNotifyWnd)
 						{
 							// PostMessage to MainWindow
-							::PostMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+							::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
 						}
 					}
 				}

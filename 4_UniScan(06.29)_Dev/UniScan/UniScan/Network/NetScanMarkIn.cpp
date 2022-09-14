@@ -154,7 +154,6 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						else
 							wsprintf(pScanInfo->szSwVersion, _T("N/A"));
 
-
 						//// HW Version
 						if (0 != pReceive->stDevInfo.stHw_version.szMajor)
 						{
@@ -174,16 +173,11 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						pScanInfo->iVideoCnt = pReceive->stDevInfo.szMax_channel;
 
 						//_Lock();
-						TRACE(_T("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"));
 						if (0 != m_dwScanThreadID)
 						{
 							if (this->m_hNotifyWnd)
 								::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
 						}
-
-						
-						//SetScanIP(pScanInfo);
-						//_Unlock();
 					}
 				}
 			}

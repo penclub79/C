@@ -17,7 +17,6 @@ CNetScanOnvif::CNetScanOnvif()
 	m_aszDigest[DIGEST_SIZE] = { 0 };
 	m_aszBase64[NONCE_SIZE] = { 0 };
 	m_aszDate[DATE_SIZE] = { 0 };
-	m_pScanInfo = NULL;
 }
 
 CNetScanOnvif::~CNetScanOnvif(void)
@@ -283,7 +282,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 				GetNetworkInterface(pOnvifInfo);
 
 				// Channel 가져오기
-				SendProfile(pOnvifInfo);
+				//SendProfile(pOnvifInfo);
 
 				DataParsing(pOnvifInfo, pScanInfo);
 
@@ -415,23 +414,22 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 		break;
 
 
-	case PROFILEINFO_DIGEST:
-		pszCopyBuffer = new char[iSendDataSize + 1];
-		memset(&pszCopyBuffer[0], 0, iSendDataSize + 1);
+	//case PROFILEINFO_DIGEST:
+	//	pszCopyBuffer = new char[iSendDataSize + 1];
+	//	memset(&pszCopyBuffer[0], 0, iSendDataSize + 1);
 
-		sprintf_s(pszCopyBuffer, sizeof(char)* iHttpHeaderSize, "%s", __aszMediaHeader);
-		strcat_s(pszCopyBuffer, sizeof(char)* iSendDataSize, __aszProfileDigestXml);
-		sprintf_s(pszSendBuffer, sizeof(char)* iSendDataSize, pszCopyBuffer, m_aszIP, iContentSize, m_aszUserName, m_aszDigest, m_aszBase64, m_aszDate);
+	//	sprintf_s(pszCopyBuffer, sizeof(char)* iHttpHeaderSize, "%s", __aszMediaHeader);
+	//	strcat_s(pszCopyBuffer, sizeof(char)* iSendDataSize, __aszProfileDigestXml);
+	//	sprintf_s(pszSendBuffer, sizeof(char)* iSendDataSize, pszCopyBuffer, m_aszIP, iContentSize, m_aszUserName, m_aszDigest, m_aszBase64, m_aszDate);
 
-		if (NULL != pszCopyBuffer)
-		{
-			delete[] pszCopyBuffer;
-			pszCopyBuffer = NULL;
-		}
+	//	if (NULL != pszCopyBuffer)
+	//	{
+	//		delete[] pszCopyBuffer;
+	//		pszCopyBuffer = NULL;
+	//	}
 
-		break;
+	//	break;
 	}
-
 
 	if (SOCKET_ERROR == send(m_TcpSocket, pszSendBuffer, iSendDataSize, 0))
 	{
@@ -447,72 +445,15 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 		closesocket(m_TcpSocket);
 	}
 
-	::OutputDebugStringA(m_pReceive_buffer);
-	::OutputDebugStringA("\n");
+	//::OutputDebugStringA(m_pReceive_buffer);
+	//::OutputDebugStringA("\n");
 
 	if (NULL != pszSendBuffer)
 	{
 		delete[] pszSendBuffer;
 		pszSendBuffer = NULL;
 	}
-
-
 }
-
-void CNetScanOnvif::SendProfile(ONVIF_INFO* pstOnvifInfo)
-{
-	BOOL bIsConnect = FALSE;
-	ONVIF_INFO* pOnvifInfo = (ONVIF_INFO*)pstOnvifInfo;
-	int iHttpHeaderSize = 0;
-	int iContentSize = 0;
-	LPXNode lpPTZ = NULL;
-	LPXNode lpRes = NULL;
-	LPXNode lpProfileBody = NULL;
-	XNode stVideoInfoNode;
-	int iChannelCnt = 0;
-	BOOL bIsDel = FALSE;
-
-	bIsConnect = ConnectTCPSocket(m_aszIP, pOnvifInfo->iHttpPort);
-
-	if (0 < strlen(m_pReceive_buffer))
-		memset(&m_pReceive_buffer[0], 0, sizeof(SCAN_INFO_RECEIVE_BUFFER_SIZE));
-
-	if (CONNECT_SUCCESS == bIsConnect)
-	{
-		iHttpHeaderSize = strlen(__aszMediaHeader) + strlen(m_aszIP) + 4;
-		iContentSize = strlen(__aszProfileDigestXml) + strlen(m_aszDigest) + strlen(m_aszBase64) + strlen(m_aszDate) + strlen(m_aszUserName);
-		SoapRequestMessage(PROFILEINFO_DIGEST, iHttpHeaderSize, iContentSize);
-
-		if (0 < strlen(m_pReceive_buffer))
-		{
-			stVideoInfoNode.Load(m_pReceive_buffer);
-			lpRes = stVideoInfoNode.GetChildArg("trt:GetProfilesResponse", NULL);
-
-			while (NULL != lpRes)
-			{
-				lpProfileBody = lpRes->GetChildArg("trt:Profiles", NULL);
-
-				if (NULL != lpProfileBody)
-				{
-					lpPTZ = lpProfileBody->GetChildArg("tt:VideoSourceConfiguration", NULL);
-					if (NULL != lpPTZ)
-						iChannelCnt++;
-
-					lpProfileBody = lpProfileBody->parent;
-					bIsDel = lpProfileBody->RemoveChild(lpProfileBody->Find("trt:Profiles"));
-				}
-				else
-					break;
-			}
-			if (0 < iChannelCnt)
-			{
-				pOnvifInfo->iChannelCnt = iChannelCnt;
-			}
-
-		}
-	}
-}
-
 
 void CNetScanOnvif::GetIPAndModelName(ONVIF_INFO* pstOnvifInfo)
 {
