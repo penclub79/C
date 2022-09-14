@@ -310,7 +310,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 		}
 
 		DelBuff();
-
 	}
 	return;
 }
@@ -433,6 +432,7 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 		break;
 	}
 
+
 	if (SOCKET_ERROR == send(m_TcpSocket, pszSendBuffer, iSendDataSize, 0))
 	{
 		iError = WSAGetLastError();
@@ -447,8 +447,8 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 		closesocket(m_TcpSocket);
 	}
 
-	//::OutputDebugStringA(m_pReceive_buffer);
-	//::OutputDebugStringA("\n");
+	::OutputDebugStringA(m_pReceive_buffer);
+	::OutputDebugStringA("\n");
 
 	if (NULL != pszSendBuffer)
 	{
@@ -465,6 +465,12 @@ void CNetScanOnvif::SendProfile(ONVIF_INFO* pstOnvifInfo)
 	ONVIF_INFO* pOnvifInfo = (ONVIF_INFO*)pstOnvifInfo;
 	int iHttpHeaderSize = 0;
 	int iContentSize = 0;
+	LPXNode lpPTZ = NULL;
+	LPXNode lpRes = NULL;
+	LPXNode lpProfileBody = NULL;
+	XNode stVideoInfoNode;
+	int iChannelCnt = 0;
+	BOOL bIsDel = FALSE;
 
 	bIsConnect = ConnectTCPSocket(m_aszIP, pOnvifInfo->iHttpPort);
 
@@ -477,12 +483,34 @@ void CNetScanOnvif::SendProfile(ONVIF_INFO* pstOnvifInfo)
 		iContentSize = strlen(__aszProfileDigestXml) + strlen(m_aszDigest) + strlen(m_aszBase64) + strlen(m_aszDate) + strlen(m_aszUserName);
 		SoapRequestMessage(PROFILEINFO_DIGEST, iHttpHeaderSize, iContentSize);
 
-		//if (0 < strlen(m_pReceive_buffer))
-		//{
-		//	memcpy(&);
-		//}
-	}
+		if (0 < strlen(m_pReceive_buffer))
+		{
+			stVideoInfoNode.Load(m_pReceive_buffer);
+			lpRes = stVideoInfoNode.GetChildArg("trt:GetProfilesResponse", NULL);
 
+			while (NULL != lpRes)
+			{
+				lpProfileBody = lpRes->GetChildArg("trt:Profiles", NULL);
+
+				if (NULL != lpProfileBody)
+				{
+					lpPTZ = lpProfileBody->GetChildArg("tt:VideoSourceConfiguration", NULL);
+					if (NULL != lpPTZ)
+						iChannelCnt++;
+
+					lpProfileBody = lpProfileBody->parent;
+					bIsDel = lpProfileBody->RemoveChild(lpProfileBody->Find("trt:Profiles"));
+				}
+				else
+					break;
+			}
+			if (0 < iChannelCnt)
+			{
+				pOnvifInfo->iChannelCnt = iChannelCnt;
+			}
+
+		}
+	}
 }
 
 

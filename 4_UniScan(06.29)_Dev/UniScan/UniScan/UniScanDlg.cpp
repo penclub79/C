@@ -433,7 +433,7 @@ void CUniScanDlg::OnBnClickedScanBtn()
 			strcpy_s(aszPassword, sizeof(char) * sizeof(aszPassword), CT2A(strPassword));
 
 			//m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
-			m_apScanner[ONVIF]->SetUserInfo("admin", "111111");
+			m_apScanner[ONVIF]->SetUserInfo("ADMIN", "111111");
 
 			//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
 			//{
