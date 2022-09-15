@@ -822,7 +822,6 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		}
 	}
 	_Unlock();
-
 	return 0;
 }
 

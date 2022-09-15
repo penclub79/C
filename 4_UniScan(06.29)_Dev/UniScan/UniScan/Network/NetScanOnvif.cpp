@@ -152,7 +152,7 @@ BOOL CNetScanOnvif::SendScanRequest()
 	// Probe Type 배열 요소 갯수 만큼 Packet Send
 	while (iTypeIdx < sizeof(paszProbeType) / sizeof(paszProbeType[0]))
 	{
-		// UUID 얻기
+		// Get - UUID
 		GenerateMsgID(szMessageID, 127);
 		strlwr(szMessageID);
 
@@ -212,14 +212,17 @@ void CNetScanOnvif::thrOnvifReceiver()
 	//char			aszNonceBase64[BASE64_SIZE] = { 0 };
 	char			aszClientNonce[NONCE_SIZE] = { 0 };
 
+	
 	while (this->m_dwScanThreadID)
 	{
-		m_bIsRunThr = FALSE;
+		
 		if (NULL == m_hReceiveSock || FALSE == m_bConnected)
 		{
 			Sleep(100);
 			continue;
 		}
+
+		TRACE(_T("ONVIF Start\n"));
 
 		m_aszDigest[DIGEST_SIZE] = { 0 };
 		m_aszBase64[BASE64_SIZE] = { 0 };
@@ -255,11 +258,11 @@ void CNetScanOnvif::thrOnvifReceiver()
 			{
 				SendAuthenticate(pOnvifInfo); // Device 날짜 얻기
 
-				// Client 난수 생성
+				// Create - Client Nonce
 				if (0 == strlen(pOnvifInfo->aszNonce))
 					strcpy(pOnvifInfo->aszNonce, __aszNonce);
-				
-				// Onvif Version 얻어오기
+
+				// Get - Onvif Version
 				SendOnvifVersion(pOnvifInfo);
 
 				// 인증 로직
@@ -277,10 +280,10 @@ void CNetScanOnvif::thrOnvifReceiver()
 					GetDeviceInfo(pOnvifInfo);
 				}
 
-				// MAC 어드레스 가져오기
+				// Get - MAC address Data
 				GetNetworkInterface(pOnvifInfo);
 
-				// Channel 가져오기
+				// Get - Channel Data
 				//SendProfile(pOnvifInfo);
 
 				DataParsing(pOnvifInfo, pScanInfo);
@@ -289,9 +292,9 @@ void CNetScanOnvif::thrOnvifReceiver()
 				{
 					if (this->m_hNotifyWnd)
 					{
-						::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+						SendDlgData(pScanInfo);
 					}
-						
+
 				}
 				else
 				{
@@ -309,9 +312,9 @@ void CNetScanOnvif::thrOnvifReceiver()
 			delete pOnvifInfo;
 			pOnvifInfo = NULL;
 		}
-
-		DelBuff();
+		this->DelBuff();
 	}
+	
 	return;
 }
 
@@ -415,22 +418,6 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 
 		break;
 
-
-	//case PROFILEINFO_DIGEST:
-	//	pszCopyBuffer = new char[iSendDataSize + 1];
-	//	memset(&pszCopyBuffer[0], 0, iSendDataSize + 1);
-
-	//	sprintf_s(pszCopyBuffer, sizeof(char)* iHttpHeaderSize, "%s", __aszMediaHeader);
-	//	strcat_s(pszCopyBuffer, sizeof(char)* iSendDataSize, __aszProfileDigestXml);
-	//	sprintf_s(pszSendBuffer, sizeof(char)* iSendDataSize, pszCopyBuffer, m_aszIP, iContentSize, m_aszUserName, m_aszDigest, m_aszBase64, m_aszDate);
-
-	//	if (NULL != pszCopyBuffer)
-	//	{
-	//		delete[] pszCopyBuffer;
-	//		pszCopyBuffer = NULL;
-	//	}
-
-	//	break;
 	}
 
 	if (SOCKET_ERROR == send(m_TcpSocket, pszSendBuffer, iSendDataSize, 0))

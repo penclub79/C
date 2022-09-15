@@ -77,18 +77,6 @@ BOOL NetScanBase::StopScan()
 	return TRUE;
 }
 
-void NetScanBase::_Lock()
-{
-	// Critical Section에 진입.
-	EnterCriticalSection(&m_mt);
-}
-
-void NetScanBase::_Unlock()
-{
-	// Critical Section에서 빠져나옴
-	LeaveCriticalSection(&m_mt);
-}
-
 BOOL NetScanBase::SocketBind()
 {
 	BOOL bEnable = FALSE;
@@ -179,13 +167,7 @@ void NetScanBase::ThreadExit()
 	}
 }
 
-void NetScanBase::SetScanIP(SCAN_INFO* _pstScanInfo)
+void NetScanBase::SendDlgData(SCAN_INFO* _pScanInfo)
 {
-	SCAN_INFO* pScanInfo = (SCAN_INFO*)_pstScanInfo;
-
-	if (0 != m_dwScanThreadID)
-	{
-		if (this->m_hNotifyWnd)
-			::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
-	}
+	::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)_pScanInfo, 0);
 }

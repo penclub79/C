@@ -10,7 +10,7 @@ CNetScanVision::CNetScanVision()
 
 CNetScanVision::~CNetScanVision(void)
 {
-
+	
 }
 
 void tagSCAN_STRUCT::SetReceiveTime()
@@ -195,6 +195,8 @@ void CNetScanVision::thrReceiver()
 
 		while (this->m_dwScanThreadID)
 		{
+			
+			TRACE(_T("Vision Start\n"));
 			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, SCAN_INFO_RECEIVE_BUFFER_SIZE, 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
 			{
 				dwLastError = WSAGetLastError();
@@ -258,7 +260,7 @@ void CNetScanVision::thrReceiver()
 							}
 
 							// read data into array
-							pExtField = (BYTE*)(m_pReceive_buffer + sizeof(HEADER2) + sizeof(IPUTIL_INFO2)); // reset pointer
+							pExtField = (BYTE*)(m_pReceive_buffer + sizeof(HEADER2)+sizeof(IPUTIL_INFO2)); // reset pointer
 							if (nItemCount > 0)
 							{
 								iToRead = pReceive->body_size - (sizeof(HEADER2)+sizeof(IPUTIL_INFO2));
@@ -318,8 +320,7 @@ void CNetScanVision::thrReceiver()
 
 						if (this->m_hNotifyWnd)
 						{
-							// PostMessage to MainWindow
-							::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+							SendDlgData(pScanInfo);
 						}
 					}
 				}
@@ -370,6 +371,8 @@ void CNetScanVision::thrReceiver()
 		TRACE("Bind Fail = %d\n", WSAGetLastError());
 		return;
 	}
+
+	
 	
 	return;
 }

@@ -63,9 +63,11 @@ void CNetScanMarkIn::thrMarkInReceiver()
 		memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE);		// ÃÊ±âÈ­
 
 		// Recev Data Thread live
+
 		while (this->m_dwScanThreadID)
 		{
-			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, sizeof(PACKET_HEADER) + sizeof(DEVICE_INFO), 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
+			
+			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, sizeof(PACKET_HEADER)+sizeof(DEVICE_INFO), 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
 			{
 				dwLastError = WSAGetLastError();
 				TRACE("MarkIn recvfrom error = %d\n", dwLastError);
@@ -77,7 +79,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 			}
 
 			// Data Little Endian -> Big Endian all Change
-			pReceive->stPacket.uiCommand = htonl(pReceive->stPacket.uiCommand); 
+			pReceive->stPacket.uiCommand = htonl(pReceive->stPacket.uiCommand);
 			pReceive->stDevInfo.stNetwork_info.uiHttp_port = htonl(pReceive->stDevInfo.stNetwork_info.uiHttp_port);
 			pReceive->stDevInfo.stNetwork_info.uiBase_port = htonl(pReceive->stDevInfo.stNetwork_info.uiBase_port);
 
@@ -95,7 +97,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						//// Model Name
 						if (0 < strlen(pReceive->stDevInfo.aszModel_name))
 							sprintf_s(aszModelName, 30, "%s", pReceive->stDevInfo.aszModel_name);
-							//ConversionModelName(pReceive->stDevInfo.aszModel_name, &aszModelName[0]);
+						//ConversionModelName(pReceive->stDevInfo.aszModel_name, &aszModelName[0]);
 
 
 						//// IP - info
@@ -106,7 +108,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 								pReceive->stDevInfo.stNetwork_info.aszIp[1],
 								pReceive->stDevInfo.stNetwork_info.aszIp[2],
 								pReceive->stDevInfo.stNetwork_info.aszIp[3]);
-						}	
+						}
 						else
 							wsprintf(pScanInfo->szAddr, _T("N/A"));
 
@@ -177,7 +179,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						{
 							if (this->m_hNotifyWnd)
 							{
-								::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+								SendDlgData(pScanInfo);
 							}
 						}
 					}
