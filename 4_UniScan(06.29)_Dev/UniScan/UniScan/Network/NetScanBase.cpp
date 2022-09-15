@@ -15,7 +15,6 @@ NetScanBase::NetScanBase()
 	m_iRevPort			= 0;
 	m_lCloseMsg			= 0;
 	m_hReceiveSock		= 0;
-
 }
 
 NetScanBase::~NetScanBase()
@@ -78,6 +77,18 @@ BOOL NetScanBase::StopScan()
 	return TRUE;
 }
 
+void NetScanBase::_Lock()
+{
+	// Critical Section에 진입.
+	EnterCriticalSection(&m_mt);
+}
+
+void NetScanBase::_Unlock()
+{
+	// Critical Section에서 빠져나옴
+	LeaveCriticalSection(&m_mt);
+}
+
 BOOL NetScanBase::SocketBind()
 {
 	BOOL bEnable = FALSE;
@@ -90,7 +101,7 @@ BOOL NetScanBase::SocketBind()
 		TRACE("2.setsocketopt error = %d\n", WSAGetLastError());
 
 		if (m_hNotifyWnd)
-			::PostMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_SOCKET_OPT);
+			::SendMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_SOCKET_OPT);
 		
 		ThreadExit();
 		return FALSE;
@@ -107,7 +118,7 @@ BOOL NetScanBase::SocketBind()
 		//TRACE("Bind Error = %d\n", WSAGetLastError());
 		if (m_hNotifyWnd)
 		{
-			::PostMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_BIND);
+			::SendMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_BIND);
 		}
 
 		ThreadExit();

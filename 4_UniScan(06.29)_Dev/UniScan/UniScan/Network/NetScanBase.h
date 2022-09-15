@@ -208,6 +208,9 @@ public:
 	virtual BOOL StartScan() = 0;
 	virtual BOOL SendScanRequest() = 0;
 
+
+	void _Lock();
+	void _Unlock();
 	void	SetUserInfo(char* _pszUserName, char* _pszPassword);
 	BOOL	StopScan();
 	void	SetBindAddress(ULONG _ulBindAddress);
@@ -217,7 +220,7 @@ public:
 	void	DelBuff();
 	void	ThreadExit();
 	//////////////////////////////////////////////////////////// ---------/
-
+	CRITICAL_SECTION m_mt;
 	char m_aszUserName[16];
 	char m_aszPassword[16];
 };

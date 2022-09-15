@@ -172,11 +172,13 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						pScanInfo->iBasePort = pReceive->stDevInfo.stNetwork_info.uiBase_port;
 						pScanInfo->iVideoCnt = pReceive->stDevInfo.szMax_channel;
 
-						//_Lock();
+
 						if (0 != m_dwScanThreadID)
 						{
 							if (this->m_hNotifyWnd)
+							{
 								::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+							}
 						}
 					}
 				}

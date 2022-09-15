@@ -11,12 +11,12 @@
 
 CNetScanOnvif::CNetScanOnvif()
 {
-	m_bConnected	= FALSE;
-	m_TcpSocket		= NULL;
-	m_aszIP[IP_SIZE] = { 0 };
+	m_bConnected			= FALSE;
+	m_TcpSocket				= NULL;
+	m_aszIP[IP_SIZE]		= { 0 };
 	m_aszDigest[DIGEST_SIZE] = { 0 };
 	m_aszBase64[NONCE_SIZE] = { 0 };
-	m_aszDate[DATE_SIZE] = { 0 };
+	m_aszDate[DATE_SIZE]	= { 0 };
 }
 
 CNetScanOnvif::~CNetScanOnvif(void)
@@ -122,15 +122,15 @@ BOOL CNetScanOnvif::CreateMultiCastSocket()
 // Probe Message Request
 BOOL CNetScanOnvif::SendScanRequest()
 {
-	sockaddr_in OnvifSendSock = { 0 };
-	sockaddr_in	multicast_addr = { 0 };
-	SOCKET		hSendSock = NULL;
-	DWORD		dwFileSize = 0;
-	int			iSize = 0;
-	char		szMessageID[128] = { 0 };
-	int			iError = 0;
-	int			iSendBufferSize = 0;
-	char*		pszProbeSendBuffer = NULL;
+	sockaddr_in OnvifSendSock		= { 0 };
+	sockaddr_in	multicast_addr		= { 0 };
+	SOCKET		hSendSock			= NULL;
+	DWORD		dwFileSize			= 0;
+	int			iSize				= 0;
+	char		szMessageID[128]	= { 0 };
+	int			iError				= 0;
+	int			iSendBufferSize		= 0;
+	char*		pszProbeSendBuffer	= NULL;
 	char*		pszResolveSendBuffer = NULL;
 	char*		paszOnvifURI[2]		= { "http://www.onvif.org/ver10/network/wsdl", "http://www.onvif.org/ver10/device/wsdl" };
 	char*		paszProbeType[3]	= { "dp0:Device", "dp0:NetworkVideoDisplay", "dp0:NetworkVideoTransmitter" };
@@ -225,7 +225,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 		m_aszBase64[BASE64_SIZE] = { 0 };
 		m_aszDate[DATE_SIZE] = { 0 };
 
-		m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
+		m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE]; // 65255 size
 		memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE);
 
 		if (SOCKET_ERROR == recvfrom(m_hReceiveSock, m_pReceive_buffer, SCAN_INFO_RECEIVE_BUFFER_SIZE, 0, (SOCKADDR*)&stSockAddr, &iRevLen))
@@ -242,10 +242,10 @@ void CNetScanOnvif::thrOnvifReceiver()
 
 		if (NULL != m_pReceive_buffer)
 		{
-			pScanInfo = new SCAN_INFO; // 472
+			pScanInfo = new SCAN_INFO; // 472 size
 			memset(pScanInfo, 0, sizeof(SCAN_INFO));
 
-			pOnvifInfo = new ONVIF_INFO;
+			pOnvifInfo = new ONVIF_INFO; // 300 size
 			memset(pOnvifInfo, 0, sizeof(ONVIF_INFO));
 
 			GetIPAndModelName(pOnvifInfo);
@@ -259,7 +259,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 				if (0 == strlen(pOnvifInfo->aszNonce))
 					strcpy(pOnvifInfo->aszNonce, __aszNonce);
 				
-
 				// Onvif Version 얻어오기
 				SendOnvifVersion(pOnvifInfo);
 
@@ -289,7 +288,10 @@ void CNetScanOnvif::thrOnvifReceiver()
 				if (0 != m_dwScanThreadID)
 				{
 					if (this->m_hNotifyWnd)
+					{
 						::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+					}
+						
 				}
 				else
 				{
@@ -527,7 +529,6 @@ void CNetScanOnvif::GetIPAndModelName(ONVIF_INFO* pstOnvifInfo)
 			strcpy(&m_aszIP[0], pszSlice);
 		}
 		
-
 		// ModelName
 		lpScope = (NULL != lpTypeCheck->GetChildArg("wsdd:Scopes", NULL)) ? lpTypeCheck->GetChildArg("wsdd:Scopes", NULL) : lpTypeCheck->GetChildArg("d:Scopes", NULL);
 
