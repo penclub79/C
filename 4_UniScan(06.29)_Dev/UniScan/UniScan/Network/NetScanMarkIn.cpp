@@ -21,7 +21,7 @@ DWORD CNetScanMarkIn::thrMarkInScanThread(LPVOID pParam)
 		return 0;
 
 	pThis->thrMarkInReceiver();
-
+	TRACE(_T("return markin\n"));
 	return 0;
 }
 
@@ -66,7 +66,6 @@ void CNetScanMarkIn::thrMarkInReceiver()
 
 		while (this->m_dwScanThreadID)
 		{
-			
 			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, sizeof(PACKET_HEADER)+sizeof(DEVICE_INFO), 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
 			{
 				dwLastError = WSAGetLastError();
@@ -77,7 +76,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 				this->ThreadExit();
 				break;
 			}
-
+			
 			// Data Little Endian -> Big Endian all Change
 			pReceive->stPacket.uiCommand = htonl(pReceive->stPacket.uiCommand);
 			pReceive->stDevInfo.stNetwork_info.uiHttp_port = htonl(pReceive->stDevInfo.stNetwork_info.uiHttp_port);
@@ -88,6 +87,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 			{
 				if (pReceive)
 				{
+					
 					pScanInfo = new SCAN_INFO;
 					if (pScanInfo)
 					{
@@ -112,7 +112,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						else
 							wsprintf(pScanInfo->szAddr, _T("N/A"));
 
-
+						
 						//// Gateway
 						if (0 < pReceive->stDevInfo.stNetwork_info.aszGateway[0])
 						{
@@ -146,7 +146,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						else
 							wsprintf(pScanInfo->szMAC, _T("N/A"));
 
-
+						
 						//// SW Version
 						if (0 < pReceive->stDevInfo.stSw_version.szMajor)
 						{
@@ -174,18 +174,24 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						pScanInfo->iBasePort = pReceive->stDevInfo.stNetwork_info.uiBase_port;
 						pScanInfo->iVideoCnt = pReceive->stDevInfo.szMax_channel;
 
-
-						if (0 != m_dwScanThreadID)
-						{
-							if (this->m_hNotifyWnd)
-							{
-								SendDlgData(pScanInfo);
-							}
-						}
 					}
 				}
 			}
+			if (0 != m_dwScanThreadID)
+			{
+				if (this->m_hNotifyWnd)
+				{
+					SendDlgData(pScanInfo);
+
+				}
+			}
+			else
+			{
+				TRACE(_T("End\n"));
+				return;
+			}
 		}
+
 	}
 	else
 	{

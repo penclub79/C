@@ -26,7 +26,6 @@ CNetScanOnvif::~CNetScanOnvif(void)
 		closesocket(m_TcpSocket);
 		m_TcpSocket = NULL;
 	}
-
 }
 
 DWORD CNetScanOnvif::thrOnvifScanThread(LPVOID pParam)
@@ -36,6 +35,7 @@ DWORD CNetScanOnvif::thrOnvifScanThread(LPVOID pParam)
 		return 0;
 
 	pThis->thrOnvifReceiver();
+	TRACE(_T("return Onvif\n"));
 	return 0;
 }
 
@@ -215,14 +215,11 @@ void CNetScanOnvif::thrOnvifReceiver()
 	
 	while (this->m_dwScanThreadID)
 	{
-		
 		if (NULL == m_hReceiveSock || FALSE == m_bConnected)
 		{
 			Sleep(100);
 			continue;
 		}
-
-		TRACE(_T("ONVIF Start\n"));
 
 		m_aszDigest[DIGEST_SIZE] = { 0 };
 		m_aszBase64[BASE64_SIZE] = { 0 };
@@ -230,7 +227,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 
 		m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE]; // 65255 size
 		memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE);
-
+		
 		if (SOCKET_ERROR == recvfrom(m_hReceiveSock, m_pReceive_buffer, SCAN_INFO_RECEIVE_BUFFER_SIZE, 0, (SOCKADDR*)&stSockAddr, &iRevLen))
 		{
 			dwLastError = WSAGetLastError();
@@ -242,12 +239,12 @@ void CNetScanOnvif::thrOnvifReceiver()
 			this->ThreadExit();
 			break;
 		}
-
+		
 		if (NULL != m_pReceive_buffer)
 		{
 			pScanInfo = new SCAN_INFO; // 472 size
 			memset(pScanInfo, 0, sizeof(SCAN_INFO));
-
+			
 			pOnvifInfo = new ONVIF_INFO; // 300 size
 			memset(pOnvifInfo, 0, sizeof(ONVIF_INFO));
 
@@ -264,7 +261,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 
 				// Get - Onvif Version
 				SendOnvifVersion(pOnvifInfo);
-
+				
 				// 인증 로직
 				if (0 < strlen(pOnvifInfo->aszNonce))
 				{
@@ -279,7 +276,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 					// Firmware Version 얻어오기
 					GetDeviceInfo(pOnvifInfo);
 				}
-
+				
 				// Get - MAC address Data
 				GetNetworkInterface(pOnvifInfo);
 
@@ -303,6 +300,16 @@ void CNetScanOnvif::thrOnvifReceiver()
 						delete pScanInfo;
 						pScanInfo = NULL;
 					}
+
+					if (NULL != pOnvifInfo)
+					{
+						delete pOnvifInfo;
+						pOnvifInfo = NULL;
+					}
+
+					this->DelBuff();
+
+					return;
 				}
 			}
 		}
@@ -415,9 +422,7 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 			delete[] pszCopyBuffer;
 			pszCopyBuffer = NULL;
 		}
-
 		break;
-
 	}
 
 	if (SOCKET_ERROR == send(m_TcpSocket, pszSendBuffer, iSendDataSize, 0))
@@ -425,6 +430,10 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 		iError = WSAGetLastError();
 		TRACE(_T("TCP-HTTP send Error = %d\n"), iError);
 		closesocket(m_TcpSocket);
+		if (0 == m_dwScanThreadID)
+		{
+			return;
+		}
 	}
 
 	if (SOCKET_ERROR == recv(m_TcpSocket, m_pReceive_buffer, SCAN_INFO_RECEIVE_BUFFER_SIZE, 0))
@@ -432,6 +441,10 @@ void CNetScanOnvif::SoapRequestMessage(int iReqType, int iHttpHeaderSize, int iC
 		iError = WSAGetLastError();
 		TRACE(_T("TCP-HTTP recv Error = %d\n"), iError);
 		closesocket(m_TcpSocket);
+		if (0 == m_dwScanThreadID)
+		{
+			return;
+		}
 	}
 
 	//::OutputDebugStringA(m_pReceive_buffer);
@@ -584,6 +597,10 @@ BOOL CNetScanOnvif::ConnectTCPSocket(char* pszIP, int iPort)
 		TRACE(_T("TCP-HTTP Connect Error = %d\n"), iError);
 		closesocket(m_TcpSocket);
 
+		if (0 == m_dwScanThreadID)
+		{
+			return FALSE;
+		}
 		return FALSE;
 	}
 
@@ -724,7 +741,7 @@ void CNetScanOnvif::SendOnvifVersion(ONVIF_INFO* pstOnvifInfo)
 					if (NULL != lpMinor)
 						strcpy(aszMinor, lpMinor->value);
 				}
-				sprintf_s(&pOnvifInfo->aszVersion[0], sizeof(char)* 8, "%d.%d", atoi(aszMajor), atoi(aszMinor));
+				sprintf_s(&pOnvifInfo->aszVersion[0], sizeof(char) * 8, "%d.%d", atoi(aszMajor), atoi(aszMinor));
 			}
 		}
 	}

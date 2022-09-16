@@ -137,7 +137,7 @@ DWORD CNetScanVision::thrScanThread(LPVOID pParam)
 		return 0;
 
 	pThis->thrReceiver();
-
+	TRACE(_T("return vision\n"));
 	return 0;
 }
 
@@ -195,8 +195,7 @@ void CNetScanVision::thrReceiver()
 
 		while (this->m_dwScanThreadID)
 		{
-			
-			TRACE(_T("Vision Start\n"));
+
 			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, SCAN_INFO_RECEIVE_BUFFER_SIZE, 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
 			{
 				dwLastError = WSAGetLastError();
@@ -207,7 +206,6 @@ void CNetScanVision::thrReceiver()
 				this->ThreadExit();
 				break;
 			}
-
 			if (pReceive->magic == MAGIC2_CODE)
 			{
 				// parsing and update list
@@ -236,7 +234,7 @@ void CNetScanVision::thrReceiver()
 							//WideCopyStringFromAnsi(pScanInfo->szGateWay, 30, pInfo2->szGatewayIP);
 							WideCopyStringFromAnsi(pScanInfo->szSubnetMask, 30, pInfo2->szSubnetmask);
 						}
-
+	
 						pExtField = NULL;
 						// read extended field
 						if (pReceive->body_size > sizeof(IPUTIL_INFO2))
@@ -258,7 +256,7 @@ void CNetScanVision::thrReceiver()
 								iToRead -= (sizeof(CAPTION_HEADER)+lpCapt->nDataLen);
 								nItemCount++;
 							}
-
+							
 							// read data into array
 							pExtField = (BYTE*)(m_pReceive_buffer + sizeof(HEADER2)+sizeof(IPUTIL_INFO2)); // reset pointer
 							if (nItemCount > 0)
@@ -283,7 +281,7 @@ void CNetScanVision::thrReceiver()
 
 										memset(pszTemp, 0, sizeof(CHAR)*(pExtInfos[i].nValueLen));
 										memcpy(pszTemp, (char*)(pExtField + sizeof(CAPTION_HEADER)), lpCapt->nDataLen);
-
+										
 										pExtInfos[i].lpszValue = new WCHAR[pExtInfos[i].nValueLen];
 										memset(pExtInfos[i].lpszValue, 0, sizeof(WCHAR)*(pExtInfos[i].nValueLen));
 
@@ -293,7 +291,7 @@ void CNetScanVision::thrReceiver()
 											//{
 											//	//int it = 0;
 											//}
-
+											
 											// FIX ME: A2W가 문제될 거 같은데?
 											WideCopyStringFromAnsi(pExtInfos[i].lpszValue, pExtInfos[i].nValueLen, pszTemp);
 
@@ -304,7 +302,7 @@ void CNetScanVision::thrReceiver()
 										pExtField = pExtField + (sizeof(CAPTION_HEADER)+lpCapt->nDataLen);
 										iToRead -= (sizeof(CAPTION_HEADER)+lpCapt->nDataLen);
 										i++;
-
+										
 										if (NULL != pszTemp)
 										{
 											delete[] pszTemp;
@@ -317,10 +315,19 @@ void CNetScanVision::thrReceiver()
 								}
 							}
 						}
-
-						if (this->m_hNotifyWnd)
+						
+						if (0 != m_dwScanThreadID)
 						{
-							SendDlgData(pScanInfo);
+							if (this->m_hNotifyWnd)
+							{
+								// PostMessage to MainWindow
+								SendDlgData(pScanInfo);
+							}
+						}
+						else
+						{
+							TRACE(_T("End\n"));
+							return;
 						}
 					}
 				}

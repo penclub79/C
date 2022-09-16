@@ -236,6 +236,10 @@ BOOL CUniScanDlg::OnInitDialog()
 	CRect cRec;
 	GetWindowRect(&cRec);
 
+	//CWnd* pWnd = AfxGetMainWnd();
+	//HWND hWnd = pWnd->m_hWnd;
+	//m_hInst = AfxGetInstanceHandle();
+
 	int iColumnCnt = 8;
 
 	str.LoadString(IDS_ADDRESS);
@@ -621,6 +625,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 	int			nCurrentItem = -1;
 	int			i = 0;
 	long		iIsDelScanData = lParam;
+	CUniScanDlg* pMainDlg = (CUniScanDlg*)AfxGetMainWnd();
 
 	pScanInfo = (SCAN_INFO*)wParam;
 
@@ -631,7 +636,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		AfxMessageBox(strTemp, MB_ICONWARNING);
 		return 0L;
 	}
-
+	
 	//if( m_iSelectVersion != pScanInfo->version )
 	//{
 	//	// 선택되어 있는 버젼과 받은 버젼이 틀리다면 삭제한다.
@@ -640,6 +645,17 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 	//}
 
 	_Lock();
+
+	TRACE(_T("1"));
+	Sleep(1000);
+	TRACE(_T("1"));
+	Sleep(1000);
+	TRACE(_T("1"));
+	Sleep(1000);
+	TRACE(_T("1"));
+	Sleep(1000);
+	TRACE(_T("1"));
+	Sleep(1000);
 
 	if (pScanInfo)
 	{
