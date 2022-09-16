@@ -236,6 +236,10 @@ BOOL CUniScanDlg::OnInitDialog()
 	CRect cRec;
 	GetWindowRect(&cRec);
 
+	//CWnd* pWnd = AfxGetMainWnd();
+	//HWND hWnd = pWnd->m_hWnd;
+	//m_hInst = AfxGetInstanceHandle();
+
 	int iColumnCnt = 8;
 
 	str.LoadString(IDS_ADDRESS);
@@ -411,52 +415,44 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		// User && PWD Edit Disable
 		GetDlgItemText(IDC_EDIT_LOGIN, strUser);
 		GetDlgItemText(IDC_EDIT_LOGINPWD, strPassword);
-		//if (0 == wcslen(strUser) && 0 == wcslen(strPassword) || 0 == wcslen(strUser))
-		//{
-		//	m_bScanning = FALSE;
-		//	strMsg.LoadString(IDS_SCAN);
-		//	m_btnScan.SetWindowText(strMsg);
-		//	MessageBox(_T("ID를 입력해주세요."));
-		//	return;
-		//}
-		//else if (0 == wcslen(strPassword))
-		//{
-		//	m_bScanning = FALSE;
-		//	strMsg.LoadString(IDS_SCAN);
-		//	m_btnScan.SetWindowText(strMsg);
-		//	MessageBox(_T("Password를 입력해주세요."));
-		//	return;
-		//}
-		//else
-		//{
+		if (0 == wcslen(strUser) && 0 == wcslen(strPassword) || 0 == wcslen(strUser))
+		{
+			m_bScanning = FALSE;
+			strMsg.LoadString(IDS_SCAN);
+			m_btnScan.SetWindowText(strMsg);
+			MessageBox(_T("ID를 입력해주세요."));
+			return;
+		}
+		else if (0 == wcslen(strPassword))
+		{
+			m_bScanning = FALSE;
+			strMsg.LoadString(IDS_SCAN);
+			m_btnScan.SetWindowText(strMsg);
+			MessageBox(_T("Password를 입력해주세요."));
+			return;
+		}
+		else
+		{
 			strcpy_s(aszUsername, sizeof(char) * sizeof(aszUsername), CT2A(strUser));
 			strcpy_s(aszPassword, sizeof(char) * sizeof(aszPassword), CT2A(strPassword));
 
 			//m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
 			m_apScanner[ONVIF]->SetUserInfo("ADMIN", "111111");
 
-			//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-			//{
-			//	if (m_apScanner[i])
-			//	{
-			//		m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
-			//		m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			//		m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			//		m_apScanner[i]->StartScan();
-			//	}
-			//}
-			//m_apScanner[0]->SetBindAddress(m_ulAcceptAddress);
-			//m_apScanner[0]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			//m_apScanner[0]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			//m_apScanner[0]->StartScan();
-			m_apScanner[ONVIF]->SetBindAddress(m_ulAcceptAddress);
-			m_apScanner[ONVIF]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			m_apScanner[ONVIF]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			m_apScanner[ONVIF]->StartScan();
+			for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+			{
+				if (m_apScanner[i])
+				{
+					m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
+					m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+					m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+					m_apScanner[i]->StartScan();
+				}
+			}
 
 			m_nScanAniCount = 0;
 			SetTimer(TM_SCANNING_ANI, 1000, NULL);
-		//}
+		}
 
 		GetDlgItem(IDC_EDIT_LOGIN)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_LOGINPWD)->EnableWindow(FALSE);
@@ -480,15 +476,13 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		SetStatusMsg(strMsg);
 
 		// stop
-		//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-		//{
-		//	if (m_apScanner[i])
-		//	{
-		//		m_apScanner[i]->StopScan();
-		//	}
-		//}
-		//m_apScanner[0]->StopScan();
-		m_apScanner[ONVIF]->StopScan();
+		for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+		{
+			if (m_apScanner[i])
+			{
+				m_apScanner[i]->StopScan();
+			}
+		}
 	}
 }
 
@@ -631,6 +625,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 	int			nCurrentItem = -1;
 	int			i = 0;
 	long		iIsDelScanData = lParam;
+	CUniScanDlg* pMainDlg = (CUniScanDlg*)AfxGetMainWnd();
 
 	pScanInfo = (SCAN_INFO*)wParam;
 
@@ -641,7 +636,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		AfxMessageBox(strTemp, MB_ICONWARNING);
 		return 0L;
 	}
-
+	
 	//if( m_iSelectVersion != pScanInfo->version )
 	//{
 	//	// 선택되어 있는 버젼과 받은 버젼이 틀리다면 삭제한다.
@@ -749,7 +744,6 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		*/
 		LV_ITEM item;
 
-		
 		memset(&item, 0, sizeof(item));
 		item.mask = LVIF_TEXT | LVIF_PARAM;
 		item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem; // Update의 경우에는 찾은 인덱스(nCurrentItem으로)
@@ -833,10 +827,6 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		}
 	}
 	_Unlock();
-
-	TRACE(_T("cccccccccccccccccccccccccccccccccccccccccccc\n"));
-	
-
 	return 0;
 }
 
@@ -844,7 +834,7 @@ LRESULT CUniScanDlg::OnScanCloseDlgMsg(WPARAM wParam, LPARAM lParam)
 {
 	//	TRACE(_T("Scanning ended some error\n"));
 	TRACE(_T("Close SendMessage 반환함\n"));
-
+		
 	return 0;
 }
 

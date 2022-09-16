@@ -76,15 +76,6 @@ const char __paszProbeBody[] =
 
 
 
-
-
-
-
-
-
-
-
-
 // probe message
 const char __aszProbeXml[] =
 {

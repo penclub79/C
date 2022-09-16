@@ -213,11 +213,10 @@ public:
 	void	SetBindAddress(ULONG _ulBindAddress);
 	void	SetNotifyWindow(HWND _hWnd, LONG _msg);
 	void	SetCloseMsgRecvWindow(HWND _hWnd, LONG _msg/* = WM_CLOSE*/);
-	void	SetScanIP(SCAN_INFO* _pstScanInfo);
+	void	SendDlgData(SCAN_INFO* _pScanInfo);
 	void	DelBuff();
 	void	ThreadExit();
 	//////////////////////////////////////////////////////////// ---------/
-
 	char m_aszUserName[16];
 	char m_aszPassword[16];
 };

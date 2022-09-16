@@ -20,7 +20,6 @@ typedef struct tagONVIFINFO
 	char	aszMAC[30];
 	int		iHttpPort;
 	int		iChannelCnt;
-	char	aszDigest[DIGEST_SIZE];
 	char	aszNonce[36];
 	char	aszDate[56];
 	char	aszModelName[30];
@@ -68,7 +67,6 @@ protected:
 	void SendDeviceInfo(ONVIF_INFO* pstOnvifInfo);
 	void SendOnvifVersion(ONVIF_INFO* pstOnvifInfo);
 	void SendAuthenticate(ONVIF_INFO* pstOnvifInfo);
-	void SendProfile(ONVIF_INFO* pstOnvifInfo);
 	void GetDeviceInfo(ONVIF_INFO* pstOnvifInfo, char* pszNonceResult);
 	void GetNetworkInterface(ONVIF_INFO* pstOnvifInfo, char* pszNonceResult);
 	void GetIPAndModelName(ONVIF_INFO* pstOnvifInfo);
@@ -89,7 +87,6 @@ protected:
 	BOOL m_bConnected;
 	BOOL m_bIsRunThr;
 	SOCKET m_TcpSocket;
-	SCAN_INFO* m_pScanInfo;
 
 private:
 	void Base64Encoding(char* pszStr, int iSize, char* pszResult);

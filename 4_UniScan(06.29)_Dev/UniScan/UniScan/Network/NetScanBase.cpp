@@ -15,7 +15,6 @@ NetScanBase::NetScanBase()
 	m_iRevPort			= 0;
 	m_lCloseMsg			= 0;
 	m_hReceiveSock		= 0;
-
 }
 
 NetScanBase::~NetScanBase()
@@ -90,7 +89,7 @@ BOOL NetScanBase::SocketBind()
 		TRACE("2.setsocketopt error = %d\n", WSAGetLastError());
 
 		if (m_hNotifyWnd)
-			::PostMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_SOCKET_OPT);
+			::SendMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_SOCKET_OPT);
 		
 		ThreadExit();
 		return FALSE;
@@ -107,7 +106,7 @@ BOOL NetScanBase::SocketBind()
 		//TRACE("Bind Error = %d\n", WSAGetLastError());
 		if (m_hNotifyWnd)
 		{
-			::PostMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_BIND);
+			::SendMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_BIND);
 		}
 
 		ThreadExit();
@@ -168,13 +167,7 @@ void NetScanBase::ThreadExit()
 	}
 }
 
-void NetScanBase::SetScanIP(SCAN_INFO* _pstScanInfo)
+void NetScanBase::SendDlgData(SCAN_INFO* _pScanInfo)
 {
-	SCAN_INFO* pScanInfo = (SCAN_INFO*)_pstScanInfo;
-
-	if (0 != m_dwScanThreadID)
-	{
-		if (this->m_hNotifyWnd)
-			::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
-	}
+	::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)_pScanInfo, 0);
 }

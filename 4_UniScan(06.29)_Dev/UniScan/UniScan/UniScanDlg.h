@@ -118,8 +118,6 @@ protected:
 	// 구현입니다.
 protected:
 	HICON			m_hIcon;
-
-	//void AddProtocolToCombo();
 	void SetStatusMsg(WCHAR* szMsg);
 	void SetStatusMsg(CString& strMsg);
 	void SetCountMsg(int nCount);
