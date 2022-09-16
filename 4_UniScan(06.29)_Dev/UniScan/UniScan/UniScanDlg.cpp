@@ -646,17 +646,6 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 
 	_Lock();
 
-	TRACE(_T("1"));
-	Sleep(1000);
-	TRACE(_T("1"));
-	Sleep(1000);
-	TRACE(_T("1"));
-	Sleep(1000);
-	TRACE(_T("1"));
-	Sleep(1000);
-	TRACE(_T("1"));
-	Sleep(1000);
-
 	if (pScanInfo)
 	{
 		//////////////////////////////////////////
