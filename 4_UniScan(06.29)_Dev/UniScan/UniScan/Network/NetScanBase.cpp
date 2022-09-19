@@ -10,6 +10,7 @@ NetScanBase::NetScanBase()
 	m_hNotifyWnd		= NULL;
 	m_pReceive_buffer	= NULL;
 	m_bUserCancel		= FALSE;
+	m_bIsFinish			= FALSE;
 	m_lNotifyMsg		= 0;
 	m_ulBindAddress		= 0;
 	m_iRevPort			= 0;
@@ -24,6 +25,9 @@ NetScanBase::~NetScanBase()
 
 void NetScanBase::DelBuff()
 {
+	closesocket(m_hReceiveSock);
+	m_hReceiveSock = NULL;
+
 	if (NULL != m_pReceive_buffer)
 	{
 		delete[] m_pReceive_buffer;
@@ -89,9 +93,14 @@ BOOL NetScanBase::SocketBind()
 		TRACE("2.setsocketopt error = %d\n", WSAGetLastError());
 
 		if (m_hNotifyWnd)
+		{
+			m_bIsFinish = FALSE;
 			::SendMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_SOCKET_OPT);
+			m_bIsFinish = TRUE;
+		}
+			
 		
-		ThreadExit();
+		//ThreadExit();
 		return FALSE;
 	}
 
@@ -106,10 +115,12 @@ BOOL NetScanBase::SocketBind()
 		//TRACE("Bind Error = %d\n", WSAGetLastError());
 		if (m_hNotifyWnd)
 		{
+			m_bIsFinish = FALSE;
 			::SendMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_BIND);
+			m_bIsFinish = TRUE;
 		}
 
-		ThreadExit();
+		//ThreadExit();
 		return FALSE;
 	}
 
@@ -154,18 +165,21 @@ void NetScanBase::WideCopyStringFromAnsi(WCHAR* _pwszString, int _iMaxBufferLen,
 }
 
 // receive 함수에 쓰임
-void NetScanBase::ThreadExit()
-{
-	closesocket(m_hReceiveSock);
-	m_hReceiveSock = NULL;
-
-	if (m_bUserCancel && m_hCloseMsgRecvWnd && ::IsWindow(m_hCloseMsgRecvWnd))
-	{
-		::PostMessage(m_hCloseMsgRecvWnd, m_lCloseMsg, 0, 0);
-		TRACE("Thread Exit\n");
-		m_bUserCancel = FALSE;
-	}
-}
+//void NetScanBase::ThreadExit()
+//{
+//	closesocket(m_hReceiveSock);
+//	m_hReceiveSock = NULL;
+//
+//	if (m_bUserCancel && m_hCloseMsgRecvWnd && ::IsWindow(m_hCloseMsgRecvWnd))
+//	{
+//		while (TRUE == m_bIsFinish)
+//		{
+//			::SendMessage(m_hCloseMsgRecvWnd, m_lCloseMsg, 0, 0);
+//			TRACE("Thread Exit\n");
+//			m_bUserCancel = FALSE;
+//		}
+//	}
+//}
 
 void NetScanBase::SendDlgData(SCAN_INFO* _pScanInfo)
 {

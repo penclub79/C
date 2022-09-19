@@ -190,6 +190,7 @@ protected:
 	BOOL			m_bUserCancel;
 	ULONG			m_ulBindAddress;
 	DWORD			m_dwScanThreadID;
+	BOOL m_bIsFinish;
 	//////////////////////////////////////////////////////////// ---------/
 
 
@@ -215,7 +216,7 @@ public:
 	void	SetCloseMsgRecvWindow(HWND _hWnd, LONG _msg/* = WM_CLOSE*/);
 	void	SendDlgData(SCAN_INFO* _pScanInfo);
 	void	DelBuff();
-	void	ThreadExit();
+	//void	ThreadExit();
 	//////////////////////////////////////////////////////////// ---------/
 	char m_aszUserName[16];
 	char m_aszPassword[16];

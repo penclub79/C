@@ -184,7 +184,7 @@ void CNetScanVision::thrReceiver()
 			if (this->m_hNotifyWnd)
 				::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_MEMORY); // PostMessage to MainWindow
 
-			this->ThreadExit();
+			//this->ThreadExit();
 			return;
 		}
 		memset(m_pReceive_buffer, 0, SCAN_INFO_RECEIVE_BUFFER_SIZE);
@@ -202,8 +202,8 @@ void CNetScanVision::thrReceiver()
 				TRACE("Vision recvfrom error = %d\n", dwLastError);
 				if (this->m_hNotifyWnd && dwLastError != 10004)
 					::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV); // PostMessage to MainWindow
-
-				this->ThreadExit();
+				TRACE(_T("Vision Thread Exit Func"));
+				//this->ThreadExit();
 				break;
 			}
 			if (pReceive->magic == MAGIC2_CODE)

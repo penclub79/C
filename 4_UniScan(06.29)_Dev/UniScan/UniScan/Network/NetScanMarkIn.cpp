@@ -61,7 +61,6 @@ void CNetScanMarkIn::thrMarkInReceiver()
 		m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
 		pReceive = (HEADER_BODY*)m_pReceive_buffer; // 할당 메모리 크기로 구조체 사용
 		memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE);		// 초기화
-
 		// Recev Data Thread live
 
 		while (this->m_dwScanThreadID)
@@ -71,12 +70,13 @@ void CNetScanMarkIn::thrMarkInReceiver()
 				dwLastError = WSAGetLastError();
 				TRACE("MarkIn recvfrom error = %d\n", dwLastError);
 				if (this->m_hNotifyWnd && dwLastError != 10004)
+				{
 					::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV);
-
-				this->ThreadExit();
+				}
+				TRACE(_T("MarkIn Thread Exit Func"));
+				//this->ThreadExit();
 				break;
 			}
-			
 			// Data Little Endian -> Big Endian all Change
 			pReceive->stPacket.uiCommand = htonl(pReceive->stPacket.uiCommand);
 			pReceive->stDevInfo.stNetwork_info.uiHttp_port = htonl(pReceive->stDevInfo.stNetwork_info.uiHttp_port);
@@ -87,7 +87,6 @@ void CNetScanMarkIn::thrMarkInReceiver()
 			{
 				if (pReceive)
 				{
-					
 					pScanInfo = new SCAN_INFO;
 					if (pScanInfo)
 					{
@@ -98,7 +97,6 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						if (0 < strlen(pReceive->stDevInfo.aszModel_name))
 							sprintf_s(aszModelName, 30, "%s", pReceive->stDevInfo.aszModel_name);
 						//ConversionModelName(pReceive->stDevInfo.aszModel_name, &aszModelName[0]);
-
 
 						//// IP - info
 						if (0 < pReceive->stDevInfo.stNetwork_info.aszIp[0])
@@ -111,7 +109,6 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						}
 						else
 							wsprintf(pScanInfo->szAddr, _T("N/A"));
-
 						
 						//// Gateway
 						if (0 < pReceive->stDevInfo.stNetwork_info.aszGateway[0])
@@ -125,11 +122,9 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						else
 							wsprintf(pScanInfo->szGateWay, _T("N/A"));
 
-
 						//// MAC
 						if (0 < strlen(pReceive->stDevInfo.stNetwork_info.szMac_address))
 						{
-
 							iMacLen = strlen(pReceive->stDevInfo.stNetwork_info.szMac_address);
 							iValIdx = 2;
 							for (int i = 0; i < iMacLen / 2; i++)
@@ -145,7 +140,6 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						}
 						else
 							wsprintf(pScanInfo->szMAC, _T("N/A"));
-
 						
 						//// SW Version
 						if (0 < pReceive->stDevInfo.stSw_version.szMajor)
@@ -155,7 +149,6 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						}
 						else
 							wsprintf(pScanInfo->szSwVersion, _T("N/A"));
-
 						//// HW Version
 						if (0 != pReceive->stDevInfo.stHw_version.szMajor)
 						{
@@ -163,7 +156,6 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						}
 						else
 							wsprintf(pScanInfo->szFirmwareVer, _T("N/A"));
-
 						this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIpAddress);
 						this->WideCopyStringFromAnsi(pScanInfo->szGateWay, 32, aszGateWay);
 						this->WideCopyStringFromAnsi(pScanInfo->szMAC, 30, aszMacAdrs);
@@ -173,7 +165,6 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						pScanInfo->nHTTPPort = pReceive->stDevInfo.stNetwork_info.uiHttp_port;
 						pScanInfo->iBasePort = pReceive->stDevInfo.stNetwork_info.uiBase_port;
 						pScanInfo->iVideoCnt = pReceive->stDevInfo.szMax_channel;
-
 					}
 				}
 			}
@@ -182,13 +173,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 				if (this->m_hNotifyWnd)
 				{
 					SendDlgData(pScanInfo);
-
 				}
-			}
-			else
-			{
-				TRACE(_T("End\n"));
-				return;
 			}
 		}
 
