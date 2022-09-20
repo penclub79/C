@@ -85,7 +85,7 @@ protected:
 	char m_aszDate[DATE_SIZE];
 	char m_aszIP[IP_SIZE];
 	BOOL m_bConnected;
-	BOOL m_bIsRunThr;
+	BOOL m_bTcpConnected;
 	SOCKET m_TcpSocket;
 
 private:

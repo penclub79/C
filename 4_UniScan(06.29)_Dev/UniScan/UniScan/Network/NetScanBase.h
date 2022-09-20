@@ -190,7 +190,7 @@ protected:
 	BOOL			m_bUserCancel;
 	ULONG			m_ulBindAddress;
 	DWORD			m_dwScanThreadID;
-	BOOL m_bIsFinish;
+	BOOL m_bIsSendPass;
 	//////////////////////////////////////////////////////////// ---------/
 
 
@@ -209,15 +209,19 @@ public:
 	virtual BOOL StartScan() = 0;
 	virtual BOOL SendScanRequest() = 0;
 
+
+	void _Lock();
+	void _Unlock();
 	void	SetUserInfo(char* _pszUserName, char* _pszPassword);
-	BOOL	StopScan();
+	BOOL	StopScan(int iType);
 	void	SetBindAddress(ULONG _ulBindAddress);
 	void	SetNotifyWindow(HWND _hWnd, LONG _msg);
 	void	SetCloseMsgRecvWindow(HWND _hWnd, LONG _msg/* = WM_CLOSE*/);
-	void	SendDlgData(SCAN_INFO* _pScanInfo);
+	void	SetScanIP(SCAN_INFO* _pstScanInfo);
 	void	DelBuff();
-	//void	ThreadExit();
+	void	ThreadExit();
 	//////////////////////////////////////////////////////////// ---------/
+	CRITICAL_SECTION m_mt;
 	char m_aszUserName[16];
 	char m_aszPassword[16];
 };

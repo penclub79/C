@@ -17,6 +17,7 @@ const char __aszMediaHeader[] =
 	"POST /onvif/media_service HTTP/1.1\r\nContent-Type: application/soap+xml; charset=utf-8; action=\"http://www.onvif.org/ver10/media/wsdl/GetProfiles\"\r\nHost: %s\r\nContent-Length: %d\r\nAccept-Encoding: gzip, deflate\r\nConnection: Close\r\n\r\n"
 };
 
+// Header, Body 포맷
 const char __aszSoap[] =
 {
 	"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
@@ -30,6 +31,7 @@ const char __aszSoap[] =
 		</Envelope>"
 };
 
+// Body만 보내는 포맷
 const char __aszSoapBody[] = 
 {
 	"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
@@ -61,7 +63,6 @@ const char __aszDigestHeaderXml[] =
 		</UsernameToken>\
 	</Security>"
 };
-
 
 const char __paszProbeBody[] = 
 {

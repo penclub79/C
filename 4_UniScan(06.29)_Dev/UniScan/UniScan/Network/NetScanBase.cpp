@@ -10,12 +10,12 @@ NetScanBase::NetScanBase()
 	m_hNotifyWnd		= NULL;
 	m_pReceive_buffer	= NULL;
 	m_bUserCancel		= FALSE;
-	m_bIsFinish			= FALSE;
 	m_lNotifyMsg		= 0;
 	m_ulBindAddress		= 0;
 	m_iRevPort			= 0;
 	m_lCloseMsg			= 0;
 	m_hReceiveSock		= 0;
+	m_bIsSendPass = FALSE;
 }
 
 NetScanBase::~NetScanBase()
@@ -25,9 +25,6 @@ NetScanBase::~NetScanBase()
 
 void NetScanBase::DelBuff()
 {
-	closesocket(m_hReceiveSock);
-	m_hReceiveSock = NULL;
-
 	if (NULL != m_pReceive_buffer)
 	{
 		delete[] m_pReceive_buffer;
@@ -55,10 +52,11 @@ BOOL NetScanBase::StartScanF(LPTHREAD_START_ROUTINE _pThreadFunc)
 }
 
 // Dlg에서 사용하는 Stop함수
-BOOL NetScanBase::StopScan()
+BOOL NetScanBase::StopScan(int iType)
 {
 	m_bUserCancel = TRUE;
-
+	
+	TRACE(_T("%d\n"), iType);
 	if (m_hReceiveSock)
 	{
 		closesocket(m_hReceiveSock);
@@ -66,19 +64,32 @@ BOOL NetScanBase::StopScan()
 	}
 
 	if (m_hScanThread)
-	{
-		m_dwScanThreadID = 0;
+	{	
 		TRACE("WaitForSingleObject\n");
 
 		if (WAIT_TIMEOUT == WaitForSingleObject(m_hScanThread, INFINITE))
 		{
 			TerminateThread(m_hScanThread, 0xffffffff);
 		}
+		m_dwScanThreadID = 0;
 		TRACE("WaitForSingleObject  -- PASS --\n");
 		CloseHandle(m_hScanThread);
 		m_hScanThread = NULL;
+			
 	}
 	return TRUE;
+}
+
+void NetScanBase::_Lock()
+{
+	// Critical Section에 진입.
+	EnterCriticalSection(&m_mt);
+}
+
+void NetScanBase::_Unlock()
+{
+	// Critical Section에서 빠져나옴
+	LeaveCriticalSection(&m_mt);
 }
 
 BOOL NetScanBase::SocketBind()
@@ -92,13 +103,11 @@ BOOL NetScanBase::SocketBind()
 	{
 		TRACE("2.setsocketopt error = %d\n", WSAGetLastError());
 
+		TRACE(_T("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\n"));
+		Sleep(1000);
+
 		if (m_hNotifyWnd)
-		{
-			m_bIsFinish = FALSE;
 			::SendMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_SOCKET_OPT);
-			m_bIsFinish = TRUE;
-		}
-			
 		
 		//ThreadExit();
 		return FALSE;
@@ -115,10 +124,11 @@ BOOL NetScanBase::SocketBind()
 		//TRACE("Bind Error = %d\n", WSAGetLastError());
 		if (m_hNotifyWnd)
 		{
-			m_bIsFinish = FALSE;
 			::SendMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_BIND);
-			m_bIsFinish = TRUE;
 		}
+
+		TRACE(_T("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\n"));
+		Sleep(1000);
 
 		//ThreadExit();
 		return FALSE;
@@ -165,23 +175,26 @@ void NetScanBase::WideCopyStringFromAnsi(WCHAR* _pwszString, int _iMaxBufferLen,
 }
 
 // receive 함수에 쓰임
-//void NetScanBase::ThreadExit()
-//{
-//	closesocket(m_hReceiveSock);
-//	m_hReceiveSock = NULL;
-//
-//	if (m_bUserCancel && m_hCloseMsgRecvWnd && ::IsWindow(m_hCloseMsgRecvWnd))
-//	{
-//		while (TRUE == m_bIsFinish)
-//		{
-//			::SendMessage(m_hCloseMsgRecvWnd, m_lCloseMsg, 0, 0);
-//			TRACE("Thread Exit\n");
-//			m_bUserCancel = FALSE;
-//		}
-//	}
-//}
-
-void NetScanBase::SendDlgData(SCAN_INFO* _pScanInfo)
+void NetScanBase::ThreadExit()
 {
-	::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)_pScanInfo, 0);
+	closesocket(m_hReceiveSock);
+	m_hReceiveSock = NULL;
+
+	if (m_bUserCancel && m_hCloseMsgRecvWnd && ::IsWindow(m_hCloseMsgRecvWnd))
+	{
+		::PostMessage(m_hCloseMsgRecvWnd, m_lCloseMsg, 0, 0);
+		TRACE("Thread Exit\n");
+		m_bUserCancel = FALSE;
+	}
+}
+
+void NetScanBase::SetScanIP(SCAN_INFO* _pstScanInfo)
+{
+	SCAN_INFO* pScanInfo = (SCAN_INFO*)_pstScanInfo;
+
+	if (0 != m_dwScanThreadID)
+	{
+		if (this->m_hNotifyWnd)
+			::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+	}
 }

@@ -1,5 +1,5 @@
-ï»¿
-// UniScanDlg.cpp : êµ¬í˜„ íŒŒì¼
+
+// UniScanDlg.cpp : ±¸Çö ÆÄÀÏ
 //
 
 #include "stdafx.h"
@@ -26,22 +26,22 @@
 const UINT IPSCAN_WINDOW_MIN_WIDTH = 890;
 const UINT IPSCAN_WINDOW_MIN_HEIGHT = 491;
 
-// ì‘ìš© í”„ë¡œê·¸ë¨ ì •ë³´ì— ì‚¬ìš©ë˜ëŠ” CAboutDlg ëŒ€í™” ìƒìì…ë‹ˆë‹¤.
+// ÀÀ¿ë ÇÁ·Î±×·¥ Á¤º¸¿¡ »ç¿ëµÇ´Â CAboutDlg ´ëÈ­ »óÀÚÀÔ´Ï´Ù.
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-	// ëŒ€í™” ìƒì ë°ì´í„°ì…ë‹ˆë‹¤.
+	// ´ëÈ­ »óÀÚ µ¥ÀÌÅÍÀÔ´Ï´Ù.
 	enum { IDD = IDD_ABOUTBOX };
 
 	BOOL GetVerInfo(CString& strVer);
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV ì§€ì›ì…ë‹ˆë‹¤.
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Áö¿øÀÔ´Ï´Ù.
 
-	// êµ¬í˜„ì…ë‹ˆë‹¤.
+	// ±¸ÇöÀÔ´Ï´Ù.
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
@@ -61,7 +61,7 @@ BOOL CAboutDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  ì—¬ê¸°ì— ì¶”ê°€ ì´ˆê¸°í™” ì‘ì—…ì„ ì¶”ê°€í•©ë‹ˆë‹¤.
+	// TODO:  ¿©±â¿¡ Ãß°¡ ÃÊ±âÈ­ ÀÛ¾÷À» Ãß°¡ÇÕ´Ï´Ù.
 
 	CString strVerInfo;
 	CString strProgrameInfo;
@@ -76,7 +76,7 @@ BOOL CAboutDlg::OnInitDialog()
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// ì˜ˆì™¸: OCX ì†ì„± í˜ì´ì§€ëŠ” FALSEë¥¼ ë°˜í™˜í•´ì•¼ í•©ë‹ˆë‹¤.
+	// ¿¹¿Ü: OCX ¼Ó¼º ÆäÀÌÁö´Â FALSE¸¦ ¹İÈ¯ÇØ¾ß ÇÕ´Ï´Ù.
 }
 
 BOOL CAboutDlg::GetVerInfo(CString& strVer)
@@ -112,7 +112,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CUniScanDlg ëŒ€í™” ìƒì
+// CUniScanDlg ´ëÈ­ »óÀÚ
 CUniScanDlg::CUniScanDlg(CWnd* pParent /*=NULL*/)
 : CDialog(CUniScanDlg::IDD, pParent)
 , m_bScanning(FALSE)
@@ -121,6 +121,7 @@ CUniScanDlg::CUniScanDlg(CWnd* pParent /*=NULL*/)
 , m_iSelectVersion(VERSION_2)
 , m_nCurSvrListSel(-1)
 , m_bInit(FALSE)
+, m_bIsClose(FALSE)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	InitializeCriticalSection(&m_mt);
@@ -179,7 +180,7 @@ BEGIN_MESSAGE_MAP(CUniScanDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CUniScanDlg ë©”ì‹œì§€ ì²˜ë¦¬ê¸°
+// CUniScanDlg ¸Ş½ÃÁö Ã³¸®±â
 
 BOOL CUniScanDlg::OnInitDialog()
 {
@@ -189,9 +190,9 @@ BOOL CUniScanDlg::OnInitDialog()
 #ifdef _DEBUG
 	_tsetlocale(LC_ALL, _T("korean"));
 #endif
-	// ì‹œìŠ¤í…œ ë©”ë‰´ì— "ì •ë³´..." ë©”ë‰´ í•­ëª©ì„ ì¶”ê°€í•©ë‹ˆë‹¤.
+	// ½Ã½ºÅÛ ¸Ş´º¿¡ "Á¤º¸..." ¸Ş´º Ç×¸ñÀ» Ãß°¡ÇÕ´Ï´Ù.
 
-	// IDM_ABOUTBOXëŠ” ì‹œìŠ¤í…œ ëª…ë ¹ ë²”ìœ„ì— ìˆì–´ì•¼ í•©ë‹ˆë‹¤.
+	// IDM_ABOUTBOX´Â ½Ã½ºÅÛ ¸í·É ¹üÀ§¿¡ ÀÖ¾î¾ß ÇÕ´Ï´Ù.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -209,10 +210,10 @@ BOOL CUniScanDlg::OnInitDialog()
 		}
 	}
 
-	// ì´ ëŒ€í™” ìƒìì˜ ì•„ì´ì½˜ì„ ì„¤ì •í•©ë‹ˆë‹¤. ì‘ìš© í”„ë¡œê·¸ë¨ì˜ ì£¼ ì°½ì´ ëŒ€í™” ìƒìê°€ ì•„ë‹ ê²½ìš°ì—ëŠ”
-	//  í”„ë ˆì„ì›Œí¬ê°€ ì´ ì‘ì—…ì„ ìë™ìœ¼ë¡œ ìˆ˜í–‰í•©ë‹ˆë‹¤.
-	SetIcon(m_hIcon, TRUE);			// í° ì•„ì´ì½˜ì„ ì„¤ì •í•©ë‹ˆë‹¤.
-	SetIcon(m_hIcon, FALSE);		// ì‘ì€ ì•„ì´ì½˜ì„ ì„¤ì •í•©ë‹ˆë‹¤.
+	// ÀÌ ´ëÈ­ »óÀÚÀÇ ¾ÆÀÌÄÜÀ» ¼³Á¤ÇÕ´Ï´Ù. ÀÀ¿ë ÇÁ·Î±×·¥ÀÇ ÁÖ Ã¢ÀÌ ´ëÈ­ »óÀÚ°¡ ¾Æ´Ò °æ¿ì¿¡´Â
+	//  ÇÁ·¹ÀÓ¿öÅ©°¡ ÀÌ ÀÛ¾÷À» ÀÚµ¿À¸·Î ¼öÇàÇÕ´Ï´Ù.
+	SetIcon(m_hIcon, TRUE);			// Å« ¾ÆÀÌÄÜÀ» ¼³Á¤ÇÕ´Ï´Ù.
+	SetIcon(m_hIcon, FALSE);		// ÀÛÀº ¾ÆÀÌÄÜÀ» ¼³Á¤ÇÕ´Ï´Ù.
 
 	//////////////////////////////////////////////////////////////////////////
 	// server list column initialize
@@ -230,15 +231,11 @@ BOOL CUniScanDlg::OnInitDialog()
 	m_cSvrList.SetExtendedStyle(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES);
 
 	//m_cSvrList.ModifyStyle(0, LVS_SINGLESEL);
-	// FIX ME : display í•  í•­ëª© ë³€ê²½ ì‹œ ë°‘ì— ìˆëŠ” CompareScanInfo í•¨ìˆ˜ë„ ê°™ì´ ë³€ê²½ í•  ê²ƒ
+	// FIX ME : display ÇÒ Ç×¸ñ º¯°æ ½Ã ¹Ø¿¡ ÀÖ´Â CompareScanInfo ÇÔ¼öµµ °°ÀÌ º¯°æ ÇÒ °Í
 	CString str;
 	CString strItem;
 	CRect cRec;
 	GetWindowRect(&cRec);
-
-	//CWnd* pWnd = AfxGetMainWnd();
-	//HWND hWnd = pWnd->m_hWnd;
-	//m_hInst = AfxGetInstanceHandle();
 
 	int iColumnCnt = 8;
 
@@ -273,7 +270,7 @@ BOOL CUniScanDlg::OnInitDialog()
 
 	strItem.LoadString(IDS_MODEL);
 	m_cSvrList.InsertColumn(SUBITEM_MODELTYPE, strItem, LVCFMT_CENTER, cRec.Width() / iColumnCnt, 0);
-	// InsertColumn(ì»¬ëŸ¼ìƒì„± ìˆœì„œ, ì»¬ëŸ¼ ì´ë¦„, ê¸€ì”¨ ì •ë ¬, widthê°’);
+	// InsertColumn(ÄÃ·³»ı¼º ¼ø¼­, ÄÃ·³ ÀÌ¸§, ±Û¾¾ Á¤·Ä, width°ª);
 
 	strItem.LoadString(IDS_FIRMWARE_VERSION);
 	m_cSvrList.InsertColumn(SUBITEM_FIRMWAREVERSION, strItem, LVCFMT_CENTER, cRec.Width() / iColumnCnt, 0);
@@ -299,17 +296,17 @@ BOOL CUniScanDlg::OnInitDialog()
 	CallLayoutManager();
 	_LoadNetworkAdaptorInformation();
 
-	// CreateFont CFont ì´ˆê¸°í™”í•œë‹¤.
+	// CreateFont CFont ÃÊ±âÈ­ÇÑ´Ù.
 	m_DISP_FONT.CreateFont(30, 0, 0, 0, FW_THIN, FALSE, FALSE, 0, ARABIC_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH, _T("MS Shell Dlg"));
 	m_btnScan.SetFont(&m_DISP_FONT);
 
 	/*
-	ì„ì‹œë¡œ ë²„íŠ¼ì„ ìˆ¨ê¹€.(2022-06-08)
+	ÀÓ½Ã·Î ¹öÆ°À» ¼û±è.(2022-06-08)
 	*/
 	(GetDlgItem(IDC_UPGRADE_BTN))->ShowWindow(FALSE);
 	(GetDlgItem(IDC_FACTORY_BTN))->ShowWindow(FALSE);
 
-	return TRUE;  // í¬ì»¤ìŠ¤ë¥¼ ì»¨íŠ¸ë¡¤ì— ì„¤ì •í•˜ì§€ ì•Šìœ¼ë©´ TRUEë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤.
+	return TRUE;  // Æ÷Ä¿½º¸¦ ÄÁÆ®·Ñ¿¡ ¼³Á¤ÇÏÁö ¾ÊÀ¸¸é TRUE¸¦ ¹İÈ¯ÇÕ´Ï´Ù.
 }
 
 //void CUniScanDlg::AddProtocolToCombo()
@@ -317,7 +314,7 @@ BOOL CUniScanDlg::OnInitDialog()
 //	CString strTemp;
 //	m_iSelectVersion	= VERSION_2;
 //
-//	//Model Comboì— Model ì¶”ê°€
+//	//Model Combo¿¡ Model Ãß°¡
 //	//m_cmbProtocol.ResetContent();
 //	/*m_cmbProtocol.AddString(L"Version1");*/
 //	m_cmbProtocol.AddString(L"Version2");
@@ -338,19 +335,19 @@ void CUniScanDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// ëŒ€í™” ìƒìì— ìµœì†Œí™” ë‹¨ì¶”ë¥¼ ì¶”ê°€í•  ê²½ìš° ì•„ì´ì½˜ì„ ê·¸ë¦¬ë ¤ë©´
-//  ì•„ë˜ ì½”ë“œê°€ í•„ìš”í•©ë‹ˆë‹¤. ë¬¸ì„œ/ë·° ëª¨ë¸ì„ ì‚¬ìš©í•˜ëŠ” MFC ì‘ìš© í”„ë¡œê·¸ë¨ì˜ ê²½ìš°ì—ëŠ”
-//  í”„ë ˆì„ì›Œí¬ì—ì„œ ì´ ì‘ì—…ì„ ìë™ìœ¼ë¡œ ìˆ˜í–‰í•©ë‹ˆë‹¤.
+// ´ëÈ­ »óÀÚ¿¡ ÃÖ¼ÒÈ­ ´ÜÃß¸¦ Ãß°¡ÇÒ °æ¿ì ¾ÆÀÌÄÜÀ» ±×¸®·Á¸é
+//  ¾Æ·¡ ÄÚµå°¡ ÇÊ¿äÇÕ´Ï´Ù. ¹®¼­/ºä ¸ğµ¨À» »ç¿ëÇÏ´Â MFC ÀÀ¿ë ÇÁ·Î±×·¥ÀÇ °æ¿ì¿¡´Â
+//  ÇÁ·¹ÀÓ¿öÅ©¿¡¼­ ÀÌ ÀÛ¾÷À» ÀÚµ¿À¸·Î ¼öÇàÇÕ´Ï´Ù.
 
 void CUniScanDlg::OnPaint()
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // ê·¸ë¦¬ê¸°ë¥¼ ìœ„í•œ ë””ë°”ì´ìŠ¤ ì»¨í…ìŠ¤íŠ¸
+		CPaintDC dc(this); // ±×¸®±â¸¦ À§ÇÑ µğ¹ÙÀÌ½º ÄÁÅØ½ºÆ®
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// í´ë¼ì´ì–¸íŠ¸ ì‚¬ê°í˜•ì—ì„œ ì•„ì´ì½˜ì„ ê°€ìš´ë°ì— ë§ì¶¥ë‹ˆë‹¤.
+		// Å¬¶óÀÌ¾ğÆ® »ç°¢Çü¿¡¼­ ¾ÆÀÌÄÜÀ» °¡¿îµ¥¿¡ ¸ÂÃä´Ï´Ù.
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -358,7 +355,7 @@ void CUniScanDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// ì•„ì´ì½˜ì„ ê·¸ë¦½ë‹ˆë‹¤.
+		// ¾ÆÀÌÄÜÀ» ±×¸³´Ï´Ù.
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -367,8 +364,8 @@ void CUniScanDlg::OnPaint()
 	}
 }
 
-// ì‚¬ìš©ìê°€ ìµœì†Œí™”ëœ ì°½ì„ ë„ëŠ” ë™ì•ˆì— ì»¤ì„œê°€ í‘œì‹œë˜ë„ë¡ ì‹œìŠ¤í…œì—ì„œ
-//  ì´ í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•©ë‹ˆë‹¤.
+// »ç¿ëÀÚ°¡ ÃÖ¼ÒÈ­µÈ Ã¢À» ²ô´Â µ¿¾È¿¡ Ä¿¼­°¡ Ç¥½ÃµÇµµ·Ï ½Ã½ºÅÛ¿¡¼­
+//  ÀÌ ÇÔ¼ö¸¦ È£ÃâÇÕ´Ï´Ù.
 HCURSOR CUniScanDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -382,11 +379,16 @@ void CUniScanDlg::OnBnClickedOk()
 
 void CUniScanDlg::OnBnClickedCancel()
 {
+
 	OnCancel();
 }
 
 void CUniScanDlg::OnBnClickedScanBtn()
 {
+	enum
+	{
+		ONVIF = 2
+	};
 	CString strMsg;
 	CString strUser;
 	CString strPassword;
@@ -394,7 +396,7 @@ void CUniScanDlg::OnBnClickedScanBtn()
 	char aszPassword[16] = { 0 };
 	int iScanIdx = 0;
 
-	if (!m_bScanning) // SCANì„ ëˆŒë €ì„ ë•Œ
+	if (!m_bScanning) // SCANÀ» ´­·¶À» ¶§
 	{
 		_ReadBindAddress();
 
@@ -415,7 +417,7 @@ void CUniScanDlg::OnBnClickedScanBtn()
 			m_bScanning = FALSE;
 			strMsg.LoadString(IDS_SCAN);
 			m_btnScan.SetWindowText(strMsg);
-			MessageBox(_T("IDë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”."));
+			MessageBox(_T("ID¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä."));
 			return;
 		}
 		else if (0 == wcslen(strPassword))
@@ -423,7 +425,7 @@ void CUniScanDlg::OnBnClickedScanBtn()
 			m_bScanning = FALSE;
 			strMsg.LoadString(IDS_SCAN);
 			m_btnScan.SetWindowText(strMsg);
-			MessageBox(_T("Passwordë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”."));
+			MessageBox(_T("Password¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä."));
 			return;
 		}
 		else
@@ -431,23 +433,19 @@ void CUniScanDlg::OnBnClickedScanBtn()
 			strcpy_s(aszUsername, sizeof(char) * sizeof(aszUsername), CT2A(strUser));
 			strcpy_s(aszPassword, sizeof(char) * sizeof(aszPassword), CT2A(strPassword));
 
-			m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
-			//m_apScanner[ONVIF]->SetUserInfo("ADMIN", "111111");
+			//m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
+			m_apScanner[ONVIF]->SetUserInfo("ADMIN", "111111");
 
-			//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-			//{
-			//	if (m_apScanner[i])
-			//	{
-			//		m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
-			//		m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			//		m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			//		m_apScanner[i]->StartScan();
-			//	}
-			//}
-			m_apScanner[2]->SetBindAddress(m_ulAcceptAddress);
-			m_apScanner[2]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			m_apScanner[2]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			m_apScanner[2]->StartScan();
+			for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+			{
+				if (m_apScanner[i])
+				{
+					m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
+					m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+					m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+					m_apScanner[i]->StartScan();
+				}
+			}
 
 			m_nScanAniCount = 0;
 			SetTimer(TM_SCANNING_ANI, 1000, NULL);
@@ -457,7 +455,7 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		GetDlgItem(IDC_EDIT_LOGINPWD)->EnableWindow(FALSE);
 
 	}
-	else // Stopì„ ëˆŒë €ì„ ë•Œ
+	else // StopÀ» ´­·¶À» ¶§
 	{
 		KillTimer(TM_SCANNING_ANI);
 
@@ -475,15 +473,13 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		SetStatusMsg(strMsg);
 
 		// stop
-		//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-		//{
-		//	if (m_apScanner[i])
-		//	{
-		//		m_apScanner[i]->StopScan();
-		//	}
-		//}
-		m_apScanner[2]->StopScan();
-
+		for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+		{
+			if (m_apScanner[i])
+			{
+				m_apScanner[i]->StopScan(i);
+			}
+		}
 	}
 }
 
@@ -518,10 +514,11 @@ void CUniScanDlg::OnBnClickedChangeipBtn()
 
 	if (dlg.DoModal() == IDOK)
 	{
+		_Lock();
 		// delete current item for validation
 		SCAN_INFO* pInfo = NULL;
 
-		// MAC ì£¼ì†Œë¥¼ ë¦¬ìŠ¤íŠ¸ì—ì„œ ì°¾ì•„ ìˆìœ¼ë©´ ì‚­ì œí•´ì¤€ë‹¤
+		// MAC ÁÖ¼Ò¸¦ ¸®½ºÆ®¿¡¼­ Ã£¾Æ ÀÖÀ¸¸é »èÁ¦ÇØÁØ´Ù
 		for (i = 0; i < m_cSvrList.GetItemCount(); i++)
 		{
 			pInfo = (SCAN_INFO*)m_cSvrList.GetItemData(i);
@@ -540,6 +537,7 @@ void CUniScanDlg::OnBnClickedChangeipBtn()
 				break;
 			}
 		}
+		_Unlock();
 	}
 }
 
@@ -552,7 +550,7 @@ void CUniScanDlg::OnBnClickedClose()
 	{
 		if (m_apScanner[i])
 		{
-			m_apScanner[i]->StopScan();
+			m_apScanner[i]->StopScan(i);
 			SAFE_DELETE(m_apScanner[i]);
 		}
 	}
@@ -589,12 +587,12 @@ BOOL CUniScanDlg::PreTranslateMessage(MSG* pMsg)
 void CUniScanDlg::OnClose()
 {
 	KillTimer(TM_SCANNING_ANI);
-
+	m_bIsClose = TRUE;
 	for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
 	{
 		if (m_apScanner[i])
 		{
-			m_apScanner[i]->StopScan();
+			m_apScanner[i]->StopScan(i);
 			SAFE_DELETE(m_apScanner[i]);
 		}
 	}
@@ -608,7 +606,7 @@ void CUniScanDlg::OnClose()
 void CUniScanDlg::OnBnClickedClearBtn()
 {
 	_Lock();
-	//ASSERT(m_bScanning != TRUE); // scanningì¤‘ì—ëŠ” ì§„ì… ë¶ˆê°€
+	//ASSERT(m_bScanning != TRUE); // scanningÁß¿¡´Â ÁøÀÔ ºÒ°¡
 	m_nListItemCount = 0;
 	m_nCurSvrListSel = -1;
 	ClearScanList();
@@ -624,7 +622,6 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 	int			nCurrentItem = -1;
 	int			i = 0;
 	long		iIsDelScanData = lParam;
-	CUniScanDlg* pMainDlg = (CUniScanDlg*)AfxGetMainWnd();
 
 	pScanInfo = (SCAN_INFO*)wParam;
 
@@ -635,20 +632,20 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		AfxMessageBox(strTemp, MB_ICONWARNING);
 		return 0L;
 	}
-	
+
 	//if( m_iSelectVersion != pScanInfo->version )
 	//{
-	//	// ì„ íƒë˜ì–´ ìˆëŠ” ë²„ì ¼ê³¼ ë°›ì€ ë²„ì ¼ì´ í‹€ë¦¬ë‹¤ë©´ ì‚­ì œí•œë‹¤.
+	//	// ¼±ÅÃµÇ¾î ÀÖ´Â ¹öÁ¯°ú ¹ŞÀº ¹öÁ¯ÀÌ Æ²¸®´Ù¸é »èÁ¦ÇÑ´Ù.
 	//	delete pScanInfo; 
 	//	return 0L;
 	//}
-	
+
 	_Lock();
-	
+
 	if (pScanInfo)
 	{
 		//////////////////////////////////////////
-		//// ì‘ë‹µì—†ëŠ” ì•„ì´í…œ ë¦¬ìŠ¤íŠ¸ì—ì„œ ì‚­ì œ ///////
+		//// ÀÀ´ä¾ø´Â ¾ÆÀÌÅÛ ¸®½ºÆ®¿¡¼­ »èÁ¦ ///////
 		//time_t		tCurrentTime	= GetCurrentTime();
 		//for(i = m_cSvrList.GetItemCount()-1; i>=0 ; i--)
 		//{
@@ -663,19 +660,19 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		//		SetCountMsg(m_nListItemCount);
 		//	}
 		//}
-		//// ì‘ë‹µì—†ëŠ” ì•„ì´í…œ ë¦¬ìŠ¤íŠ¸ì—ì„œ ì‚­ì œ ////////
+		//// ÀÀ´ä¾ø´Â ¾ÆÀÌÅÛ ¸®½ºÆ®¿¡¼­ »èÁ¦ ////////
 		//////////////////////////////////////////
 
 		////////////////////////////////////////
-		//{{ ì¤‘ë³µì œê±° //////////////////////////
+		//{{ Áßº¹Á¦°Å //////////////////////////
 
-		// ì‹œë‚˜ë¦¬ì˜¤ìƒ IPê°€ ì¤‘ë³µë  ìˆ˜ë„ ìˆìŒ
+		// ½Ã³ª¸®¿À»ó IP°¡ Áßº¹µÉ ¼öµµ ÀÖÀ½
 		for (i = 0; i < m_cSvrList.GetItemCount(); i++)
 		{
 			pOldScanInfo = (SCAN_INFO*)m_cSvrList.GetItemData(i);
-			//if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0) // ì›ë˜ ì½”ë“œ
+			//if (wcscmp(pOldScanInfo->szMAC, pScanInfo->szMAC) == 0) // ¿ø·¡ ÄÚµå
 
-			if (wcscmp(pOldScanInfo->szAddr, pScanInfo->szAddr) == 0) // IP ê°™ìœ¼ë©´
+			if (wcscmp(pOldScanInfo->szAddr, pScanInfo->szAddr) == 0) // IP °°À¸¸é
 			{
 				delete pScanInfo;
 				pScanInfo = NULL;
@@ -696,7 +693,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 				//	//	}
 				//	//	else
 				//	//	{
-				//	//		// ì´ì „ ì•„ì´í”¼ ì •ë³´ì™€ í˜„ì¬ì˜ ë°ì´í„°ê°€ ë‹¤ë¥´ë‹¤ë©´ ì—…ë°ì´íŠ¸ ì‹œí‚¨ë‹¤. 
+				//	//		// ÀÌÀü ¾ÆÀÌÇÇ Á¤º¸¿Í ÇöÀçÀÇ µ¥ÀÌÅÍ°¡ ´Ù¸£´Ù¸é ¾÷µ¥ÀÌÆ® ½ÃÅ²´Ù. 
 				//	//		pScanInfo->SetReceiveTime();
 				//	//		m_cSvrList.SetItemData(i, (DWORD_PTR)pScanInfo);
 
@@ -719,7 +716,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 			}
 		}
 		//}}
-		//{{ ì¤‘ë³µì œê±° //////////////////////////
+		//{{ Áßº¹Á¦°Å //////////////////////////
 		////////////////////////////////////////
 
 #ifdef _DEBUG
@@ -737,19 +734,19 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 
 		// add information into UI
 		/*
-		LV_ITEM : ë¦¬ìŠ¤íŠ¸ ì»¨íŠ¸ë¡¤ì— ë°ì´í„°ë¥¼ ì…ë ¥í•˜ê³ ì í•  ë•Œ, ì´ êµ¬ì¡°ì²´ë¥¼ ì‚¬ìš©.
-		CListCtrlí´ë˜ìŠ¤ì˜ ë©¤ë²„ í•¨ìˆ˜ insertItemê³¼ SetItemí•¨ìˆ˜ì— LV_ITEMêµ¬ì¡°ì²´ë¥¼ ì¸ìë¡œ ë„˜ê²¨
-		ì£¼ì–´ì„œ ë°ì´í„°ë¥¼ ì…ë ¥í•  ìˆ˜ ìˆë‹¤.
+		LV_ITEM : ¸®½ºÆ® ÄÁÆ®·Ñ¿¡ µ¥ÀÌÅÍ¸¦ ÀÔ·ÂÇÏ°íÀÚ ÇÒ ¶§, ÀÌ ±¸Á¶Ã¼¸¦ »ç¿ë.
+		CListCtrlÅ¬·¡½ºÀÇ ¸â¹ö ÇÔ¼ö insertItem°ú SetItemÇÔ¼ö¿¡ LV_ITEM±¸Á¶Ã¼¸¦ ÀÎÀÚ·Î ³Ñ°Ü
+		ÁÖ¾î¼­ µ¥ÀÌÅÍ¸¦ ÀÔ·ÂÇÒ ¼ö ÀÖ´Ù.
 		*/
 		LV_ITEM item;
-		memset(&item, 0, sizeof(item));
 
+		memset(&item, 0, sizeof(item));
 		item.mask = LVIF_TEXT | LVIF_PARAM;
-		item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem; // Updateì˜ ê²½ìš°ì—ëŠ” ì°¾ì€ ì¸ë±ìŠ¤(nCurrentItemìœ¼ë¡œ)
+		item.iItem = (nCurrentItem < 0) ? nInsertIndex : nCurrentItem; // UpdateÀÇ °æ¿ì¿¡´Â Ã£Àº ÀÎµ¦½º(nCurrentItemÀ¸·Î)
 		item.iSubItem = SUBITEM_IPADDRESS;
 		item.pszText = pScanInfo->szAddr;
 		item.lParam = (LPARAM)pScanInfo;
-		if (nCurrentItem < 0) // ìƒˆë¡œìš´ ì•„ì´í…œì˜ ê²½ìš°ì—ë§Œ insertí•´ì¤€ë‹¤
+		if (nCurrentItem < 0) // »õ·Î¿î ¾ÆÀÌÅÛÀÇ °æ¿ì¿¡¸¸ insertÇØÁØ´Ù
 			m_cSvrList.InsertItem(&item);
 
 		item.mask = LVIF_TEXT;
@@ -809,7 +806,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		item.iSubItem = SUBITEM_FIRMWAREVERSION;
 		item.pszText = (LPTSTR)(LPCTSTR)strTemp;
 		m_cSvrList.SetItem(&item);
-		
+
 		// update count;
 		m_nListItemCount++;
 
@@ -818,7 +815,7 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		//iCount = m_nScanAniCount + m_nScanMarkInCount;
 		SetCountMsg(m_nListItemCount);
 
-		// í˜„ì¬ ì„ íƒëœ Index ì•ìœ¼ë¡œ ì•„ì´í…œì„ ì§‘ì–´ ë„£ì€ ê²½ìš°, í˜„ì¬ ì„ íƒ ê°’ì— +1ì„ í•´ì¤€ë‹¤
+		// ÇöÀç ¼±ÅÃµÈ Index ¾ÕÀ¸·Î ¾ÆÀÌÅÛÀ» Áı¾î ³ÖÀº °æ¿ì, ÇöÀç ¼±ÅÃ °ª¿¡ +1À» ÇØÁØ´Ù
 		if (nCurrentItem < 0 && nInsertIndex <= m_nCurSvrListSel)
 		{
 			//OutputDebugString(L"Item++\n");
@@ -826,13 +823,14 @@ LRESULT CUniScanDlg::OnScanMsg(WPARAM wParam, LPARAM lParam)
 		}
 	}
 	_Unlock();
+
 	return 0;
 }
 
 LRESULT CUniScanDlg::OnScanCloseDlgMsg(WPARAM wParam, LPARAM lParam)
 {
 	//	TRACE(_T("Scanning ended some error\n"));
-	TRACE(_T("Close SendMessage ë°˜í™˜í•¨\n"));
+	TRACE(_T("Close SendMessage ¹İÈ¯ÇÔ\n"));
 		
 	return 0;
 }
@@ -935,7 +933,7 @@ void CUniScanDlg::OnNMDblclkSvrList(NMHDR *pNMHDR, LRESULT *pResult)
 		{
 			_Lock();
 			// delete current item for validation
-			// MAC ì£¼ì†Œë¥¼ ë¦¬ìŠ¤íŠ¸ì—ì„œ ì°¾ì•„ ìˆìœ¼ë©´ ì‚­ì œí•´ì¤€ë‹¤
+			// MAC ÁÖ¼Ò¸¦ ¸®½ºÆ®¿¡¼­ Ã£¾Æ ÀÖÀ¸¸é »èÁ¦ÇØÁØ´Ù
 			for (i = 0; i < m_cSvrList.GetItemCount(); i++)
 			{
 				pInfo = (SCAN_INFO*)m_cSvrList.GetItemData(i);
@@ -986,7 +984,7 @@ void  CUniScanDlg::ClearScanList()
 			delete pInfo;
 			pInfo = NULL;
 		}
-		else // pInfoì— ì“°ë ˆê¸° ê°’ì´ ë“¤ì–´ê°€ì„œ elseë¬¸ì„ ì¶”ê°€í•˜ì˜€ìŒ. ì™œ ì“°ë ˆê¸° ê°’ì´ ë“¤ì–´ê°€ëŠ”ì§€ ì›ì¸ íŒŒì•…ì´ ì•ˆëŒ.
+		else // pInfo¿¡ ¾²·¹±â °ªÀÌ µé¾î°¡¼­ else¹®À» Ãß°¡ÇÏ¿´À½. ¿Ö ¾²·¹±â °ªÀÌ µé¾î°¡´ÂÁö ¿øÀÎ ÆÄ¾ÇÀÌ ¾È‰Î.
 			continue;
 	}
 	m_cSvrList.DeleteAllItems();
@@ -1051,7 +1049,7 @@ BOOL CUniScanDlg::CallLayoutManager()
 	//pScanBtn->MoveWindow(&rcNewRect);
 
 	CWnd* pChangeIPBtn = GetDlgItem(IDC_CHANGEIP_BTN);
-	rcOriginateRect = rcNewRect; // ì´ì „ ìœ„ì¹˜ë¥¼ ê¸°ì¤€ìœ¼ë¡œ
+	rcOriginateRect = rcNewRect; // ÀÌÀü À§Ä¡¸¦ ±âÁØÀ¸·Î
 	pChangeIPBtn->GetWindowRect(rcControlRect);
 	rcNewRect.left = rcOriginateRect.right + 14;
 	rcNewRect.top = rcClientRect.left + 14;
@@ -1061,7 +1059,7 @@ BOOL CUniScanDlg::CallLayoutManager()
 
 	CWnd* pUpgradeBtn = GetDlgItem(IDC_UPGRADE_BTN);
 	pUpgradeBtn->GetWindowRect(&rcControlRect);
-	rcOriginateRect = rcNewRect; // ì´ì „ ìœ„ì¹˜ë¥¼ ê¸°ì¤€ìœ¼ë¡œ
+	rcOriginateRect = rcNewRect; // ÀÌÀü À§Ä¡¸¦ ±âÁØÀ¸·Î
 	rcNewRect.left = rcOriginateRect.right + 14;
 	rcNewRect.top = rcClientRect.top + 14;
 	rcNewRect.right = rcNewRect.left + rcControlRect.Width();
@@ -1070,7 +1068,7 @@ BOOL CUniScanDlg::CallLayoutManager()
 
 	CWnd* pFactoryDefaultBtn = GetDlgItem(IDC_FACTORY_BTN);
 	pFactoryDefaultBtn->GetWindowRect(&rcControlRect);
-	rcOriginateRect = rcNewRect; // ì´ì „ ìœ„ì¹˜ë¥¼ ê¸°ì¤€ìœ¼ë¡œ
+	rcOriginateRect = rcNewRect; // ÀÌÀü À§Ä¡¸¦ ±âÁØÀ¸·Î
 	rcNewRect.left = rcOriginateRect.right + 14;
 	rcNewRect.top = rcClientRect.top + 14;
 	rcNewRect.right = rcNewRect.left + rcControlRect.Width();
@@ -1079,7 +1077,7 @@ BOOL CUniScanDlg::CallLayoutManager()
 
 	CWnd* pClearBtn = GetDlgItem(IDC_CLEAR_BTN);
 	pClearBtn->GetWindowRect(&rcControlRect);
-	rcOriginateRect = rcNewRect; // ì´ì „ ìœ„ì¹˜ë¥¼ ê¸°ì¤€ìœ¼ë¡œ
+	rcOriginateRect = rcNewRect; // ÀÌÀü À§Ä¡¸¦ ±âÁØÀ¸·Î
 	rcNewRect.left = rcOriginateRect.right + 14;
 	rcNewRect.top = rcClientRect.top + 14;
 	rcNewRect.right = rcNewRect.left + rcControlRect.Width();
@@ -1089,7 +1087,7 @@ BOOL CUniScanDlg::CallLayoutManager()
 
 	//CWnd* pVersionStatic     = GetDlgItem(IDC_STATIC_VERSION);
 	//pVersionStatic->GetWindowRect(&rcControlRect);
-	//rcOriginateRect = rcNewRect; // ì´ì „ ìœ„ì¹˜ë¥¼ ê¸°ì¤€ìœ¼ë¡œ
+	//rcOriginateRect = rcNewRect; // ÀÌÀü À§Ä¡¸¦ ±âÁØÀ¸·Î
 	//rcNewRect.left = rcOriginateRect.right + 14;
 	//rcNewRect.top  = rcClientRect.top + 14;
 	//rcNewRect.right=rcNewRect.left + rcControlRect.Width();
@@ -1099,7 +1097,7 @@ BOOL CUniScanDlg::CallLayoutManager()
 
 	//CWnd* pProtocolcombo       = GetDlgItem(IDC_PROTOCAL_COMBO);
 	//pProtocolcombo->GetWindowRect(&rcControlRect);
-	//rcOriginateRect = rcNewRect; // ì´ì „ ìœ„ì¹˜ë¥¼ ê¸°ì¤€ìœ¼ë¡œ
+	//rcOriginateRect = rcNewRect; // ÀÌÀü À§Ä¡¸¦ ±âÁØÀ¸·Î
 	//rcNewRect.left = rcOriginateRect.right + 10;
 	//rcNewRect.top  = rcClientRect.top + 16;
 	//rcNewRect.right=rcNewRect.left + rcControlRect.Width();
@@ -1168,14 +1166,14 @@ int CUniScanDlg::_GetInsertPosition(SCAN_INFO* pInfo)
 		return -1;
 	}
 
-	//{{ older case : extraê°€ ì—†ìœ¼ë©´ ì œì¼ ë§ˆì§€ë§‰ì—, ê·¸ë¦¬ê³  ê·¸ì™¸ì—ëŠ” Model Typeì„ ê¸°ì¤€ìœ¼ë¡œ ì•„ì´í…œì„ ì‚½ì…
-	if (pInfo->nExtraFieldCount == 0) // insertí•  ë†ˆì´ Model ì •ë³´ê°€ ì—†ë‹¤ë©´, Model ì •ë³´ê°€ ì—†ëŠ” ì•„ì´í…œì„ ì°¾ì•„ì„œ ì£¼ì†Œê°€ í¬ë©´ ì§‘ì–´ë„£ëŠ”ë‹¤
+	//{{ older case : extra°¡ ¾øÀ¸¸é Á¦ÀÏ ¸¶Áö¸·¿¡, ±×¸®°í ±×¿Ü¿¡´Â Model TypeÀ» ±âÁØÀ¸·Î ¾ÆÀÌÅÛÀ» »ğÀÔ
+	if (pInfo->nExtraFieldCount == 0) // insertÇÒ ³ğÀÌ Model Á¤º¸°¡ ¾ø´Ù¸é, Model Á¤º¸°¡ ¾ø´Â ¾ÆÀÌÅÛÀ» Ã£¾Æ¼­ ÁÖ¼Ò°¡ Å©¸é Áı¾î³Ö´Â´Ù
 	{
-		nInsertPos = m_cSvrList.GetItemCount(); // ìœ„ì¹˜ ëª»ì°¾ìœ¼ë©´ ë§ˆì§€ë§‰ì— ì§‘ì–´ë„£ëŠ”ë‹¤
+		nInsertPos = m_cSvrList.GetItemCount(); // À§Ä¡ ¸øÃ£À¸¸é ¸¶Áö¸·¿¡ Áı¾î³Ö´Â´Ù
 	}
 	else if (pInfo->nExtraFieldCount > 0)
 	{
-		nInsertPos = m_cSvrList.GetItemCount(); // ìœ„ì¹˜ ëª»ì°¾ìœ¼ë©´ ë§ˆì§€ë§‰ì— ì§‘ì–´ë„£ëŠ”ë‹¤;
+		nInsertPos = m_cSvrList.GetItemCount(); // À§Ä¡ ¸øÃ£À¸¸é ¸¶Áö¸·¿¡ Áı¾î³Ö´Â´Ù;
 		for (i = 0; i < m_cSvrList.GetItemCount(); i++)
 		{
 			pCurrentInfo = (SCAN_INFO*)m_cSvrList.GetItemData(i);
@@ -1204,21 +1202,21 @@ int CUniScanDlg::_GetInsertPosition(SCAN_INFO* pInfo)
 		ASSERT(0);
 		return -1;
 	}
-	//}} older case : extraê°€ ì—†ìœ¼ë©´ ì œì¼ ë§ˆì§€ë§‰ì—, ê·¸ë¦¬ê³  ê·¸ì™¸ì—ëŠ” Model Typeì„ ê¸°ì¤€ìœ¼ë¡œ ì•„ì´í…œì„ ì‚½ì…
-	// FIX ME : new order ì ìš©
+	//}} older case : extra°¡ ¾øÀ¸¸é Á¦ÀÏ ¸¶Áö¸·¿¡, ±×¸®°í ±×¿Ü¿¡´Â Model TypeÀ» ±âÁØÀ¸·Î ¾ÆÀÌÅÛÀ» »ğÀÔ
+	// FIX ME : new order Àû¿ë
 
 	return nInsertPos;
 }
 
 void CUniScanDlg::_Lock()
 {
-	// Critical Sectionì— ì§„ì….
+	// Critical Section¿¡ ÁøÀÔ.
 	EnterCriticalSection(&m_mt);
 }
 
 void CUniScanDlg::_Unlock()
 {
-	// Critical Sectionì—ì„œ ë¹ ì ¸ë‚˜ì˜´
+	// Critical Section¿¡¼­ ºüÁ®³ª¿È
 	LeaveCriticalSection(&m_mt);
 }
 
@@ -1227,7 +1225,7 @@ void CUniScanDlg::OnDestroy()
 	_ClearAdaptorInfos();
 	m_DISP_FONT.DeleteObject();
 	CDialog::OnDestroy();
-	// CRITICAL_SECTION ê°ì²´ë¥¼ ì†Œë©¸ì‹œí‚¨ë‹¤.
+	// CRITICAL_SECTION °´Ã¼¸¦ ¼Ò¸ê½ÃÅ²´Ù.
 	DeleteCriticalSection(&m_mt);
 }
 
@@ -1409,7 +1407,7 @@ void CUniScanDlg::OnNMClickSvrList(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
-// ì ì‹œ ì—…ê·¸ë ˆì´ë“œ ë²„íŠ¼ Hideë¥¼ ìœ„í•œ ì£¼ì„ì²˜ë¦¬(2022-06-08)
+// Àá½Ã ¾÷±×·¹ÀÌµå ¹öÆ° Hide¸¦ À§ÇÑ ÁÖ¼®Ã³¸®(2022-06-08)
 //void CUniScanDlg::OnBnClickedUpgradeBtn()
 //{
 //	int			i			= 0;
@@ -1432,7 +1430,7 @@ void CUniScanDlg::OnNMClickSvrList(NMHDR *pNMHDR, LRESULT *pResult)
 //		return;
 //	}
 //
-//	pScanInfo = new SCAN_INFO[nUpgradeCnt]; // SCAN_INFO[] ë°°ì—´ì„ UpgradeDlgì— íŒŒë¼ë©”í„°ë¡œ ë„˜ê²¨ì¤€ë‹¤
+//	pScanInfo = new SCAN_INFO[nUpgradeCnt]; // SCAN_INFO[] ¹è¿­À» UpgradeDlg¿¡ ÆÄ¶ó¸ŞÅÍ·Î ³Ñ°ÜÁØ´Ù
 //	if(pScanInfo == NULL)
 //	{
 //		AfxMessageBox(_T("Out of memory"), MB_ICONWARNING);
@@ -1445,20 +1443,20 @@ void CUniScanDlg::OnNMClickSvrList(NMHDR *pNMHDR, LRESULT *pResult)
 //	{
 //		if(m_cSvrList.GetCheck(i))
 //		{
-//			pScanInfo[nCurPos++] = *((SCAN_INFO*)(m_cSvrList.GetItemData(i)));// ë°°ì—´ì˜ ê°ê° ìš”ì†Œë¥¼ ë³µì‚¬
+//			pScanInfo[nCurPos++] = *((SCAN_INFO*)(m_cSvrList.GetItemData(i)));// ¹è¿­ÀÇ °¢°¢ ¿ä¼Ò¸¦ º¹»ç
 //		}
 //	}
 //	_Unlock();
 //
 //	if( TRUE == bScanning )
 //	{
-//		// ìŠ¤ìº”ì¤‘ì´ ì—ˆë‹¤ë©´ ì—…ê·¸ë ˆì´ë“œ í•˜ê¸° ì´ì „ì— ì¢…ë£Œ ì‹œí‚¨ë‹¤. 
+//		// ½ºÄµÁßÀÌ ¾ú´Ù¸é ¾÷±×·¹ÀÌµå ÇÏ±â ÀÌÀü¿¡ Á¾·á ½ÃÅ²´Ù. 
 //		OnBnClickedScanBtn();
 //	}
 //
 //
 //	CUpgradeDlg dlg;
-//	dlg.SetScaninfo ( nUpgradeCnt, pScanInfo ); // SCAN_INFO[] ë°°ì—´ì„ UpgradeDlgì— íŒŒë¼ë©”í„°ë¡œ ë„˜ê²¨ì¤€ë‹¤
+//	dlg.SetScaninfo ( nUpgradeCnt, pScanInfo ); // SCAN_INFO[] ¹è¿­À» UpgradeDlg¿¡ ÆÄ¶ó¸ŞÅÍ·Î ³Ñ°ÜÁØ´Ù
 //
 //	if( dlg.DoModal() == IDOK)
 //	{
@@ -1511,7 +1509,7 @@ void CUniScanDlg::OnBnClickedChangeipBtn2()
 		return;
 	}
 
-	pSelScanInfo = new SCAN_INFO[nSelScanInfoCount]; // SCAN_INFO[] ë°°ì—´ì„ IP change dialogì— íŒŒë¼ë©”í„°ë¡œ ë„˜ê²¨ì¤€ë‹¤
+	pSelScanInfo = new SCAN_INFO[nSelScanInfoCount]; // SCAN_INFO[] ¹è¿­À» IP change dialog¿¡ ÆÄ¶ó¸ŞÅÍ·Î ³Ñ°ÜÁØ´Ù
 	if (pSelScanInfo == NULL)
 	{
 		AfxMessageBox(_T("Out of memory"), MB_ICONWARNING);
@@ -1540,7 +1538,7 @@ void CUniScanDlg::OnBnClickedChangeipBtn2()
 
 	if (TRUE == bScanning)
 	{
-		// ìŠ¤ìº”ì¤‘ì´ ì—ˆë‹¤ë©´ ì•„ì´í”¼ ë³€ê²½ í•˜ê¸° ì´ì „ì— ì¢…ë£Œ ì‹œí‚¨ë‹¤. 
+		// ½ºÄµÁßÀÌ ¾ú´Ù¸é ¾ÆÀÌÇÇ º¯°æ ÇÏ±â ÀÌÀü¿¡ Á¾·á ½ÃÅ²´Ù. 
 		OnBnClickedScanBtn();
 	}
 
@@ -1607,7 +1605,7 @@ void CUniScanDlg::OnNMDblclkSvrList2(NMHDR *pNMHDR, LRESULT *pResult)
 	AfxMessageBox(_T("Please select one or more ipcameras..."), MB_ICONWARNING);
 	return;
 	}
-	pSelectedInfo = new SCAN_INFO[nSelectedCnt]; // SCAN_INFO[] ë°°ì—´ì„ CIPChangeDlg2 íŒŒë¼ë©”í„°ë¡œ ë„˜ê²¨ì¤€ë‹¤.
+	pSelectedInfo = new SCAN_INFO[nSelectedCnt]; // SCAN_INFO[] ¹è¿­À» CIPChangeDlg2 ÆÄ¶ó¸ŞÅÍ·Î ³Ñ°ÜÁØ´Ù.
 	if(pSelectedInfo == NULL)
 	{
 	AfxMessageBox(_T("Out of memory"), MB_ICONWARNING);
@@ -1666,14 +1664,14 @@ void CUniScanDlg::OnNMDblclkSvrList2(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CUniScanDlg::OnNMDblclkSvrList3(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// ë¦¬ìŠ¤íŠ¸ ì»¨íŠ¸ë¡¤ì—ì„œ ë°ì´í„°ê°€ ìˆëŠ” ì˜ì—­ì˜ ë§ˆìš°ìŠ¤ ìš° í´ë¦­ íŒì—… ë©”ë‰´ ë„ìš°ê¸°
+	// ¸®½ºÆ® ÄÁÆ®·Ñ¿¡¼­ µ¥ÀÌÅÍ°¡ ÀÖ´Â ¿µ¿ªÀÇ ¸¶¿ì½º ¿ì Å¬¸¯ ÆË¾÷ ¸Ş´º ¶ç¿ì±â
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 
 	if (m_nCurSvrListSel >= 0)
 	{
 		CString szHttpAddress;
 		_Lock();
-		// ì„ íƒí•œ ì•„ì´í…œì˜ ì¸ë±ìŠ¤ë¥¼ ì–»ëŠ”ë‹¤.
+		// ¼±ÅÃÇÑ ¾ÆÀÌÅÛÀÇ ÀÎµ¦½º¸¦ ¾ò´Â´Ù.
 		SCAN_INFO* pInfo = (SCAN_INFO*)m_cSvrList.GetItemData(m_nCurSvrListSel);
 		if (pInfo)
 		{
@@ -1712,7 +1710,7 @@ void CUniScanDlg::OnBnClickedFactoryBtn()
 		return;
 	}
 
-	pSelectedInfo = new SCAN_INFO[nSelectedCnt]; // SCAN_INFOë¥¼ CFactoryDefaultDlgì˜ íŒŒë¼ë©”í„°ë¡œ ì „ë‹¬
+	pSelectedInfo = new SCAN_INFO[nSelectedCnt]; // SCAN_INFO¸¦ CFactoryDefaultDlgÀÇ ÆÄ¶ó¸ŞÅÍ·Î Àü´Ş
 	if (pSelectedInfo == NULL)
 	{
 		AfxMessageBox(_T("Out of memory"), MB_ICONWARNING);
@@ -1731,7 +1729,7 @@ void CUniScanDlg::OnBnClickedFactoryBtn()
 
 	if (TRUE == bScanning)
 	{
-		// ìŠ¤ìº”ì¤‘ì´ ì—ˆë‹¤ë©´ íŒ©í† ë¦¬ ë””í´íŠ¸ í•˜ê¸° ì´ì „ì— ì¢…ë£Œ ì‹œí‚¨ë‹¤. 
+		// ½ºÄµÁßÀÌ ¾ú´Ù¸é ÆÑÅä¸® µğÆúÆ® ÇÏ±â ÀÌÀü¿¡ Á¾·á ½ÃÅ²´Ù. 
 		OnBnClickedScanBtn();
 	}
 
@@ -1769,7 +1767,7 @@ LRESULT CUniScanDlg::OnConnectCheck(WPARAM wParam, LPARAM lParam)
 	SCAN_INFO* pScanInfo = (SCAN_INFO*)m_cSvrList.GetItemData(nIndex);
 	if (pScanInfo == NULL)
 	{
-		ASSERT(0); // ì´ëŸ° ê²½ìš°ê°€?
+		ASSERT(0); // ÀÌ·± °æ¿ì°¡?
 		return 0L;
 	}
 	LV_ITEM item;
@@ -1890,8 +1888,8 @@ LRESULT CUniScanDlg::OnSortRequest(WPARAM wParam, LPARAM lParam)
 	m_nSortOrient = stParam.nOrient;
 	m_bSortAscending = stParam.bAscending;
 
-	// ì¼ë¶€ í•­ëª©ì— ëŒ€í•´ì„œë§Œ sorting ì§€ì› -->
-	// ëª¨ë“  í•­ëª©ì— ëŒ€í•´ sorting ì§€ì›í•˜ë„ë¡ ì ìš©
+	// ÀÏºÎ Ç×¸ñ¿¡ ´ëÇØ¼­¸¸ sorting Áö¿ø -->
+	// ¸ğµç Ç×¸ñ¿¡ ´ëÇØ sorting Áö¿øÇÏµµ·Ï Àû¿ë
 	//switch(wParam)
 	//{
 	//case 0: // IP
@@ -1957,8 +1955,8 @@ void   CUniScanDlg::_ReadBindAddress()
 
 //WCHAR* CUniScanDlg::_mbcs2widechar(char* szSrcBuffer)
 //{
-//	// MBCSë¥¼ ìœ ë‹ˆì½”ë“œë¡œ ë³€í™˜
-//	::ZeroMemory(m_szTempValue, sizeof(m_szTempValue)); // sizeof(wszBuffer)ì€ 256ì„.
+//	// MBCS¸¦ À¯´ÏÄÚµå·Î º¯È¯
+//	::ZeroMemory(m_szTempValue, sizeof(m_szTempValue)); // sizeof(wszBuffer)Àº 256ÀÓ.
 //	::MultiByteToWideChar(CP_ACP, 0, szSrcBuffer, lstrlenA(szSrcBuffer)+1, m_szTempValue, sizeof(m_szTempValue)/sizeof(m_szTempValue[0]));
 //	
 //	return m_szTempValue;
@@ -2001,14 +1999,14 @@ void CUniScanDlg::_ClearAdaptorInfos()
 
 void CUniScanDlg::OnCbnSelchangeAdaptorCmb()
 {
-	// TODO: ì—¬ê¸°ì— ì»¨íŠ¸ë¡¤ ì•Œë¦¼ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
+	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
 	OnBnClickedClearBtn();
 }
 
 
 //void CUniScanDlg::OnCbnSelchangeProtocalCombo()
 //{
-//	// TODO: ì—¬ê¸°ì— ì»¨íŠ¸ë¡¤ ì•Œë¦¼ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
+//	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
 //		//if( m_iSelectVersion != m_cmbProtocol.GetCurSel() )
 //		//{
 //		//	if( TRUE == m_bScanning )
@@ -2025,7 +2023,7 @@ void CUniScanDlg::OnCbnSelchangeAdaptorCmb()
 
 void CUniScanDlg::OnClickedOpenXml()
 {
-	// TODO: ì—¬ê¸°ì— ì»¨íŠ¸ë¡¤ ì•Œë¦¼ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
+	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
 	//char*	pszBuff			= NULL;
 	//FILE*	pFile			= NULL;
 	//DWORD	dwFileSize		= 0;

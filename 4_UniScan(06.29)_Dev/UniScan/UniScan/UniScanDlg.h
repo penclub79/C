@@ -101,6 +101,8 @@ protected:
 	ULONG   m_ulAcceptAddress;
 	int     m_nSortOrient;
 	int     m_iSelectVersion;
+	BOOL m_bIsClose;
+
 
 	// Window GDI(그래픽 디바이스 인터페이스) 글꼴을 캡슐화하고 글꼴 조작을 위한 멤버 함수를 제공
 	CFont   m_DISP_FONT;
@@ -118,6 +120,8 @@ protected:
 	// 구현입니다.
 protected:
 	HICON			m_hIcon;
+
+	//void AddProtocolToCombo();
 	void SetStatusMsg(WCHAR* szMsg);
 	void SetStatusMsg(CString& strMsg);
 	void SetCountMsg(int nCount);

@@ -48,10 +48,10 @@ CIPChangeDlg2::~CIPChangeDlg2()
 
 	m_aSettingThread.RemoveAll();
 
-	if (m_pViScanner)
-	{
-		m_pViScanner->StopScan();
-	}
+	//if (m_pViScanner)
+	//{
+	//	m_pViScanner->StopScan();
+	//}
 
 	if (m_pScanInfo)
 	{

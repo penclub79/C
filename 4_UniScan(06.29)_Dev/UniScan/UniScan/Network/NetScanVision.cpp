@@ -10,7 +10,7 @@ CNetScanVision::CNetScanVision()
 
 CNetScanVision::~CNetScanVision(void)
 {
-	
+
 }
 
 void tagSCAN_STRUCT::SetReceiveTime()
@@ -137,7 +137,7 @@ DWORD CNetScanVision::thrScanThread(LPVOID pParam)
 		return 0;
 
 	pThis->thrReceiver();
-	TRACE(_T("return vision\n"));
+
 	return 0;
 }
 
@@ -179,14 +179,14 @@ void CNetScanVision::thrReceiver()
 		iSenderAddrLen = sizeof(SOCKADDR_IN);
 
 		m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE]; // allocate 64 k bytes buffer
-		if (m_pReceive_buffer == NULL)
-		{
-			if (this->m_hNotifyWnd)
-				::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_MEMORY); // PostMessage to MainWindow
+		//if (m_pReceive_buffer == NULL)
+		//{
+		//	if (this->m_hNotifyWnd)
+		//		::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_MEMORY); // PostMessage to MainWindow
 
-			//this->ThreadExit();
-			return;
-		}
+		//	return;
+		//}
+
 		memset(m_pReceive_buffer, 0, SCAN_INFO_RECEIVE_BUFFER_SIZE);
 
 		pReceive = (HEADER2*)m_pReceive_buffer;
@@ -196,16 +196,21 @@ void CNetScanVision::thrReceiver()
 		while (this->m_dwScanThreadID)
 		{
 
+			if (TRUE == m_bUserCancel)
+				goto FINAL;
+
 			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, SCAN_INFO_RECEIVE_BUFFER_SIZE, 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
 			{
 				dwLastError = WSAGetLastError();
 				TRACE("Vision recvfrom error = %d\n", dwLastError);
 				if (this->m_hNotifyWnd && dwLastError != 10004)
-					::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV); // PostMessage to MainWindow
-				TRACE(_T("Vision Thread Exit Func"));
-				//this->ThreadExit();
+				{
+						::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV);
+				}
+
 				break;
 			}
+
 			if (pReceive->magic == MAGIC2_CODE)
 			{
 				// parsing and update list
@@ -234,7 +239,7 @@ void CNetScanVision::thrReceiver()
 							//WideCopyStringFromAnsi(pScanInfo->szGateWay, 30, pInfo2->szGatewayIP);
 							WideCopyStringFromAnsi(pScanInfo->szSubnetMask, 30, pInfo2->szSubnetmask);
 						}
-	
+
 						pExtField = NULL;
 						// read extended field
 						if (pReceive->body_size > sizeof(IPUTIL_INFO2))
@@ -256,9 +261,9 @@ void CNetScanVision::thrReceiver()
 								iToRead -= (sizeof(CAPTION_HEADER)+lpCapt->nDataLen);
 								nItemCount++;
 							}
-							
+
 							// read data into array
-							pExtField = (BYTE*)(m_pReceive_buffer + sizeof(HEADER2)+sizeof(IPUTIL_INFO2)); // reset pointer
+							pExtField = (BYTE*)(m_pReceive_buffer + sizeof(HEADER2) + sizeof(IPUTIL_INFO2)); // reset pointer
 							if (nItemCount > 0)
 							{
 								iToRead = pReceive->body_size - (sizeof(HEADER2)+sizeof(IPUTIL_INFO2));
@@ -281,7 +286,7 @@ void CNetScanVision::thrReceiver()
 
 										memset(pszTemp, 0, sizeof(CHAR)*(pExtInfos[i].nValueLen));
 										memcpy(pszTemp, (char*)(pExtField + sizeof(CAPTION_HEADER)), lpCapt->nDataLen);
-										
+
 										pExtInfos[i].lpszValue = new WCHAR[pExtInfos[i].nValueLen];
 										memset(pExtInfos[i].lpszValue, 0, sizeof(WCHAR)*(pExtInfos[i].nValueLen));
 
@@ -291,7 +296,7 @@ void CNetScanVision::thrReceiver()
 											//{
 											//	//int it = 0;
 											//}
-											
+
 											// FIX ME: A2W가 문제될 거 같은데?
 											WideCopyStringFromAnsi(pExtInfos[i].lpszValue, pExtInfos[i].nValueLen, pszTemp);
 
@@ -302,7 +307,7 @@ void CNetScanVision::thrReceiver()
 										pExtField = pExtField + (sizeof(CAPTION_HEADER)+lpCapt->nDataLen);
 										iToRead -= (sizeof(CAPTION_HEADER)+lpCapt->nDataLen);
 										i++;
-										
+
 										if (NULL != pszTemp)
 										{
 											delete[] pszTemp;
@@ -315,19 +320,22 @@ void CNetScanVision::thrReceiver()
 								}
 							}
 						}
-						
+
 						if (0 != m_dwScanThreadID)
 						{
 							if (this->m_hNotifyWnd)
 							{
-								// PostMessage to MainWindow
-								SendDlgData(pScanInfo);
+								if (FALSE == m_bUserCancel)
+									::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
 							}
 						}
 						else
 						{
-							TRACE(_T("End\n"));
-							return;
+							if (NULL != pScanInfo)
+							{
+								delete pScanInfo;
+								pScanInfo = NULL;
+							}
 						}
 					}
 				}
@@ -378,10 +386,17 @@ void CNetScanVision::thrReceiver()
 		TRACE("Bind Fail = %d\n", WSAGetLastError());
 		return;
 	}
-
-	
 	
 	return;
+
+FINAL:
+	if (NULL != pScanInfo)
+	{
+		delete pScanInfo;
+		pScanInfo = NULL;
+	}
+	this->DelBuff();
+
 }
 
 //
@@ -558,9 +573,6 @@ BOOL CNetScanVision::SendScanRequest()
 		return FALSE;
 	}
 	//// clear temp datas
-	//Sleep(300); // 0.3 seconds wait
-	//closesocket(hSockSend);
-	//// clear temp datas
-	//Sleep(300); // 0.3 seconds wait
+
 	return TRUE;
 }

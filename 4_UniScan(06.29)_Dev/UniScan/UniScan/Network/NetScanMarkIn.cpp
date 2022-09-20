@@ -21,7 +21,7 @@ DWORD CNetScanMarkIn::thrMarkInScanThread(LPVOID pParam)
 		return 0;
 
 	pThis->thrMarkInReceiver();
-	TRACE(_T("return markin\n"));
+
 	return 0;
 }
 
@@ -61,24 +61,25 @@ void CNetScanMarkIn::thrMarkInReceiver()
 		m_pReceive_buffer = new char[SCAN_INFO_RECEIVE_BUFFER_SIZE];
 		pReceive = (HEADER_BODY*)m_pReceive_buffer; // 할당 메모리 크기로 구조체 사용
 		memset(m_pReceive_buffer, 0, sizeof(char)* SCAN_INFO_RECEIVE_BUFFER_SIZE);		// 초기화
-		// Recev Data Thread live
 
+		// Recev Data Thread live
 		while (this->m_dwScanThreadID)
 		{
-			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, sizeof(PACKET_HEADER)+sizeof(DEVICE_INFO), 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
+			if (TRUE == m_bUserCancel)
+				goto FINAL;
+
+			if (SOCKET_ERROR == recvfrom(this->m_hReceiveSock, m_pReceive_buffer, sizeof(PACKET_HEADER) + sizeof(DEVICE_INFO), 0, (SOCKADDR*)&stSockAddr, &iSenderAddrLen))
 			{
 				dwLastError = WSAGetLastError();
 				TRACE("MarkIn recvfrom error = %d\n", dwLastError);
 				if (this->m_hNotifyWnd && dwLastError != 10004)
-				{
 					::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV);
-				}
-				TRACE(_T("MarkIn Thread Exit Func"));
-				//this->ThreadExit();
+
 				break;
 			}
+
 			// Data Little Endian -> Big Endian all Change
-			pReceive->stPacket.uiCommand = htonl(pReceive->stPacket.uiCommand);
+			pReceive->stPacket.uiCommand = htonl(pReceive->stPacket.uiCommand); 
 			pReceive->stDevInfo.stNetwork_info.uiHttp_port = htonl(pReceive->stDevInfo.stNetwork_info.uiHttp_port);
 			pReceive->stDevInfo.stNetwork_info.uiBase_port = htonl(pReceive->stDevInfo.stNetwork_info.uiBase_port);
 
@@ -96,7 +97,8 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						//// Model Name
 						if (0 < strlen(pReceive->stDevInfo.aszModel_name))
 							sprintf_s(aszModelName, 30, "%s", pReceive->stDevInfo.aszModel_name);
-						//ConversionModelName(pReceive->stDevInfo.aszModel_name, &aszModelName[0]);
+							//ConversionModelName(pReceive->stDevInfo.aszModel_name, &aszModelName[0]);
+
 
 						//// IP - info
 						if (0 < pReceive->stDevInfo.stNetwork_info.aszIp[0])
@@ -106,10 +108,11 @@ void CNetScanMarkIn::thrMarkInReceiver()
 								pReceive->stDevInfo.stNetwork_info.aszIp[1],
 								pReceive->stDevInfo.stNetwork_info.aszIp[2],
 								pReceive->stDevInfo.stNetwork_info.aszIp[3]);
-						}
+						}	
 						else
 							wsprintf(pScanInfo->szAddr, _T("N/A"));
-						
+
+
 						//// Gateway
 						if (0 < pReceive->stDevInfo.stNetwork_info.aszGateway[0])
 						{
@@ -122,9 +125,11 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						else
 							wsprintf(pScanInfo->szGateWay, _T("N/A"));
 
+
 						//// MAC
 						if (0 < strlen(pReceive->stDevInfo.stNetwork_info.szMac_address))
 						{
+
 							iMacLen = strlen(pReceive->stDevInfo.stNetwork_info.szMac_address);
 							iValIdx = 2;
 							for (int i = 0; i < iMacLen / 2; i++)
@@ -140,7 +145,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						}
 						else
 							wsprintf(pScanInfo->szMAC, _T("N/A"));
-						
+
 						//// SW Version
 						if (0 < pReceive->stDevInfo.stSw_version.szMajor)
 						{
@@ -149,6 +154,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						}
 						else
 							wsprintf(pScanInfo->szSwVersion, _T("N/A"));
+
 						//// HW Version
 						if (0 != pReceive->stDevInfo.stHw_version.szMajor)
 						{
@@ -156,6 +162,7 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						}
 						else
 							wsprintf(pScanInfo->szFirmwareVer, _T("N/A"));
+
 						this->WideCopyStringFromAnsi(pScanInfo->szAddr, 32, aszIpAddress);
 						this->WideCopyStringFromAnsi(pScanInfo->szGateWay, 32, aszGateWay);
 						this->WideCopyStringFromAnsi(pScanInfo->szMAC, 30, aszMacAdrs);
@@ -166,26 +173,37 @@ void CNetScanMarkIn::thrMarkInReceiver()
 						pScanInfo->iBasePort = pReceive->stDevInfo.stNetwork_info.uiBase_port;
 						pScanInfo->iVideoCnt = pReceive->stDevInfo.szMax_channel;
 					}
+
+				
 				}
 			}
 			if (0 != m_dwScanThreadID)
 			{
 				if (this->m_hNotifyWnd)
 				{
-					SendDlgData(pScanInfo);
+					if (FALSE == m_bUserCancel)
+						::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
+				}
+			}
+			else
+			{
+				if (NULL != pScanInfo)
+				{
+					delete pScanInfo;
+					pScanInfo = NULL;
 				}
 			}
 		}
-
 	}
-	else
-	{
-		TRACE("Bind Fail = %d\n", WSAGetLastError());
-		return;
-	}
-	
-	
 	return;
+
+FINAL:
+	if (NULL != pScanInfo)
+	{
+		delete pScanInfo;
+		pScanInfo = NULL;
+	}
+
 }
 
 // Send Packet Set
