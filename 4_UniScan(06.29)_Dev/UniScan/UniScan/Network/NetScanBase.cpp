@@ -54,29 +54,84 @@ BOOL NetScanBase::StartScanF(LPTHREAD_START_ROUTINE _pThreadFunc)
 // Dlg에서 사용하는 Stop함수
 BOOL NetScanBase::StopScan(int iType)
 {
+	BOOL bLoopFlag = TRUE;
+
 	m_bUserCancel = TRUE;
-	
-	TRACE(_T("%d\n"), iType);
-	if (m_hReceiveSock)
+
+	TRACE(_T("%d --\n"), iType);
+
+	while (bLoopFlag)
 	{
-		closesocket(m_hReceiveSock);
-		m_hReceiveSock = NULL;
-	}
+		MSG msg;
 
-	if (m_hScanThread)
-	{	
-		TRACE("WaitForSingleObject\n");
+		//if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		//{
+		//	TranslateMessage(&msg);
+		//	DispatchMessage(&msg);
+		//}
 
-		if (WAIT_TIMEOUT == WaitForSingleObject(m_hScanThread, INFINITE))
+		switch (MsgWaitForMultipleObjects(1, &m_hScanThread, FALSE, INFINITE, QS_ALLINPUT))
 		{
-			TerminateThread(m_hScanThread, 0xffffffff);
+
+		case WAIT_OBJECT_0: // 스레드 정상 종료
+			TRACE("WAIT OBJECT --\n");
+			bLoopFlag = FALSE;
+			break;
+
+		case WAIT_TIMEOUT: // 스레드 대기
+			if (m_hReceiveSock)
+			{
+				closesocket(m_hReceiveSock);
+				m_hReceiveSock = NULL;
+			}
+
+			//TerminateThread(m_hScanThread, 0xffffffff);
+			m_dwScanThreadID = 0;
+			TRACE("WaitForSingleObject  -- PASS --\n");
+			CloseHandle(m_hScanThread);
+			m_hScanThread = NULL;
+			DelBuff();
+			break;
+
+		default:
+			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+			bLoopFlag = FALSE;
+			m_dwScanThreadID = 0;
+			TRACE("WaitForSingleObject  -- PASS --\n");
+			CloseHandle(m_hScanThread);
+			m_hScanThread = NULL;
+			DelBuff();
+
+			break;
 		}
-		m_dwScanThreadID = 0;
-		TRACE("WaitForSingleObject  -- PASS --\n");
-		CloseHandle(m_hScanThread);
-		m_hScanThread = NULL;
-			
 	}
+
+	////TRACE(_T("%d\n"), iType);
+	//if (m_hReceiveSock)
+	//{
+	//	closesocket(m_hReceiveSock);
+	//	m_hReceiveSock = NULL;
+	//}
+
+	//if (m_hScanThread)
+	//{	
+	//	TRACE("WaitForSingleObject\n");
+
+	//	//if (WAIT_TIMEOUT == MsgWaitForMultipleObjects(1, &m_hScanThread, FALSE, 3000, QS_ALLINPUT))
+	//	if (WAIT_TIMEOUT == WaitForSingleObject(m_hScanThread, INFINITE))
+	//	{
+	//		TerminateThread(m_hScanThread, 0xffffffff);
+	//	}
+	//	m_dwScanThreadID = 0;
+	//	TRACE("WaitForSingleObject  -- PASS --\n");
+	//	CloseHandle(m_hScanThread);
+	//	m_hScanThread = NULL;
+	//	DelBuff();
+	//}
 	return TRUE;
 }
 
@@ -102,10 +157,6 @@ BOOL NetScanBase::SocketBind()
 	if (SOCKET_ERROR == setsockopt(m_hReceiveSock, SOL_SOCKET, SO_BROADCAST, (char*)&bEnable, sizeof(bEnable)))
 	{
 		TRACE("2.setsocketopt error = %d\n", WSAGetLastError());
-
-		TRACE(_T("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\n"));
-		Sleep(1000);
-
 		if (m_hNotifyWnd)
 			::SendMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_SOCKET_OPT);
 		
@@ -126,9 +177,6 @@ BOOL NetScanBase::SocketBind()
 		{
 			::SendMessage(m_hNotifyWnd, m_lNotifyMsg, 0, SCAN_ERR_BIND);
 		}
-
-		TRACE(_T("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\n"));
-		Sleep(1000);
 
 		//ThreadExit();
 		return FALSE;
@@ -175,18 +223,19 @@ void NetScanBase::WideCopyStringFromAnsi(WCHAR* _pwszString, int _iMaxBufferLen,
 }
 
 // receive 함수에 쓰임
-void NetScanBase::ThreadExit()
-{
-	closesocket(m_hReceiveSock);
-	m_hReceiveSock = NULL;
-
-	if (m_bUserCancel && m_hCloseMsgRecvWnd && ::IsWindow(m_hCloseMsgRecvWnd))
-	{
-		::PostMessage(m_hCloseMsgRecvWnd, m_lCloseMsg, 0, 0);
-		TRACE("Thread Exit\n");
-		m_bUserCancel = FALSE;
-	}
-}
+//void NetScanBase::ThreadExit()
+//{
+//	closesocket(m_hReceiveSock);
+//	m_hReceiveSock = NULL;
+//
+//	if (m_bUserCancel && m_hCloseMsgRecvWnd && ::IsWindow(m_hCloseMsgRecvWnd))
+//	{
+//		//::SendMessage(m_hCloseMsgRecvWnd, m_lCloseMsg, 0, 0);
+//		::SendMessage(m_hCloseMsgRecvWnd, WM_CLOSE, NULL, NULL);
+//		TRACE("Thread Exit\n");
+//		m_bUserCancel = FALSE;
+//	}
+//}
 
 void NetScanBase::SetScanIP(SCAN_INFO* _pstScanInfo)
 {

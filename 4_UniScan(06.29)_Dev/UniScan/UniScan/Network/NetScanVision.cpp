@@ -204,9 +204,7 @@ void CNetScanVision::thrReceiver()
 				dwLastError = WSAGetLastError();
 				TRACE("Vision recvfrom error = %d\n", dwLastError);
 				if (this->m_hNotifyWnd && dwLastError != 10004)
-				{
-						::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV);
-				}
+					::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, 0, SCAN_ERR_RECV);
 
 				break;
 			}
@@ -326,15 +324,9 @@ void CNetScanVision::thrReceiver()
 							if (this->m_hNotifyWnd)
 							{
 								if (FALSE == m_bUserCancel)
+								{
 									::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
-							}
-						}
-						else
-						{
-							if (NULL != pScanInfo)
-							{
-								delete pScanInfo;
-								pScanInfo = NULL;
+								}
 							}
 						}
 					}
