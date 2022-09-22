@@ -433,8 +433,8 @@ void CUniScanDlg::OnBnClickedScanBtn()
 			strcpy_s(aszUsername, sizeof(char) * sizeof(aszUsername), CT2A(strUser));
 			strcpy_s(aszPassword, sizeof(char) * sizeof(aszPassword), CT2A(strPassword));
 
-			//m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
-			m_apScanner[ONVIF]->SetUserInfo("ADMIN", "111111");
+			m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
+			//m_apScanner[ONVIF]->SetUserInfo("ADMIN", "111111");
 
 			//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
 			//{
@@ -593,19 +593,15 @@ void CUniScanDlg::OnClose()
 {
 	KillTimer(TM_SCANNING_ANI);
 	m_bIsClose = TRUE;
-	//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-	//{
-	//	if (m_apScanner[i])
-	//	{
-	//		m_apScanner[i]->StopScan(i);
-	//		SAFE_DELETE(m_apScanner[i]);
-	//	}
-	//}
-
-	m_apScanner[2]->StopScan(2);
-	SAFE_DELETE(m_apScanner[2]);
+	for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+	{
+		if (m_apScanner[i])
+		{
+			m_apScanner[i]->StopScan(i);
+			SAFE_DELETE(m_apScanner[i]);
+		}
+	}
 	
-
 	ClearScanList();
 
 	CDialog::OnClose();

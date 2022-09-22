@@ -5,6 +5,7 @@
 #include "../xmlite/XMLite.h"
 #include "../../UniScan/XMLform.h"
 
+//############# Size ###############
 #define IP_SIZE		32
 #define NONCE_SIZE	36
 #define SHA_SIZE	41
@@ -12,7 +13,11 @@
 #define DATE_SIZE	56
 #define DIGEST_SIZE 64
 #define UUID_SIZE	128
+//############# * ##################
 
+//############# Port ###############
+#define MULTICAST_PORT 3702
+//############# * ##################
 
 typedef struct tagONVIFINFO
 {
@@ -36,7 +41,7 @@ typedef enum
 	VERSIONINFO,
 	DEVICEINFO_DIGEST,
 	NETWORKINFO_DIGEST,
-	PROFILEINFO_DIGEST
+	//PROFILEINFO_DIGEST
 };
 
 typedef enum _TCPCODE{
@@ -70,7 +75,7 @@ protected:
 	void GetDeviceInfo(ONVIF_INFO* pstOnvifInfo, char* pszNonceResult);
 	void GetNetworkInterface(ONVIF_INFO* pstOnvifInfo, char* pszNonceResult);
 	void GetIPAndModelName(ONVIF_INFO* pstOnvifInfo);
-	void DataParsing(ONVIF_INFO* pstOnvifInfo, SCAN_INFO* pstScanInfo);
+	void DataParsing(const ONVIF_INFO* pstOnvifInfo, const SCAN_INFO* pstScanInfo);
 	BOOL SendSSDP();
 	BOOL CreateMultiCastSocket();
 	BOOL ConnectTCPSocket(char* pszIP, int iPort);
@@ -86,7 +91,6 @@ protected:
 	char m_aszDate[DATE_SIZE];
 	char m_aszIP[IP_SIZE];
 	BOOL m_bConnected;
-	BOOL m_bTcpConnected;
 	SOCKET m_TcpSocket;
 
 private:

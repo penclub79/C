@@ -39,7 +39,6 @@ BOOL NetScanBase::StartScanF(LPTHREAD_START_ROUTINE _pThreadFunc)
 	if (NULL != m_hScanThread)
 		return TRUE;
 	
-
 	m_hScanThread = ::CreateThread(NULL, 0, _pThreadFunc, this, 0, &m_dwScanThreadID);
 
 	if (NULL == m_hScanThread)
@@ -54,84 +53,48 @@ BOOL NetScanBase::StartScanF(LPTHREAD_START_ROUTINE _pThreadFunc)
 // Dlg에서 사용하는 Stop함수
 BOOL NetScanBase::StopScan(int iType)
 {
-	BOOL bLoopFlag = TRUE;
-
+	MSG msg;
 	m_bUserCancel = TRUE;
 
-	TRACE(_T("%d --\n"), iType);
-
-	while (bLoopFlag)
+	if (m_hReceiveSock)
 	{
-		MSG msg;
-
-		//if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		//{
-		//	TranslateMessage(&msg);
-		//	DispatchMessage(&msg);
-		//}
-
-		switch (MsgWaitForMultipleObjects(1, &m_hScanThread, FALSE, INFINITE, QS_ALLINPUT))
-		{
-
-		case WAIT_OBJECT_0: // 스레드 정상 종료
-			TRACE("WAIT OBJECT --\n");
-			bLoopFlag = FALSE;
-			break;
-
-		case WAIT_TIMEOUT: // 스레드 대기
-			if (m_hReceiveSock)
-			{
-				closesocket(m_hReceiveSock);
-				m_hReceiveSock = NULL;
-			}
-
-			//TerminateThread(m_hScanThread, 0xffffffff);
-			m_dwScanThreadID = 0;
-			TRACE("WaitForSingleObject  -- PASS --\n");
-			CloseHandle(m_hScanThread);
-			m_hScanThread = NULL;
-			DelBuff();
-			break;
-
-		default:
-			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-			bLoopFlag = FALSE;
-			m_dwScanThreadID = 0;
-			TRACE("WaitForSingleObject  -- PASS --\n");
-			CloseHandle(m_hScanThread);
-			m_hScanThread = NULL;
-			DelBuff();
-
-			break;
-		}
+		closesocket(m_hReceiveSock);
+		m_hReceiveSock = NULL;
 	}
 
-	////TRACE(_T("%d\n"), iType);
-	//if (m_hReceiveSock)
-	//{
-	//	closesocket(m_hReceiveSock);
-	//	m_hReceiveSock = NULL;
-	//}
+	if (m_hScanThread)
+	{
+		TRACE("WaitForSingleObject\n");
 
-	//if (m_hScanThread)
-	//{	
-	//	TRACE("WaitForSingleObject\n");
+		//switch (MsgWaitForMultipleObjects(1, &m_hScanThread, FALSE, INFINITE, QS_ALLINPUT))
+		//{
+		//case WAIT_OBJECT_0:
+		//	break;
 
-	//	//if (WAIT_TIMEOUT == MsgWaitForMultipleObjects(1, &m_hScanThread, FALSE, 3000, QS_ALLINPUT))
-	//	if (WAIT_TIMEOUT == WaitForSingleObject(m_hScanThread, INFINITE))
-	//	{
-	//		TerminateThread(m_hScanThread, 0xffffffff);
-	//	}
-	//	m_dwScanThreadID = 0;
-	//	TRACE("WaitForSingleObject  -- PASS --\n");
-	//	CloseHandle(m_hScanThread);
-	//	m_hScanThread = NULL;
-	//	DelBuff();
-	//}
+		//case WAIT_TIMEOUT:
+		//	TerminateThread(m_hScanThread, 0xffffffff);
+		//	break;
+
+		//default:
+		//	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		//	{
+		//		TranslateMessage(&msg);
+		//		DispatchMessage(&msg);
+		//	}
+		//}
+		if (WAIT_TIMEOUT == WaitForSingleObject(m_hScanThread, INFINITE))
+		{
+			TerminateThread(m_hScanThread, 0xffffffff);
+		}
+
+		m_dwScanThreadID = 0;
+		TRACE("WaitForSingleObject  -- PASS --\n");
+		CloseHandle(m_hScanThread);
+		m_hScanThread = NULL;
+		DelBuff();
+		
+		
+	}
 	return TRUE;
 }
 
