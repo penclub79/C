@@ -26,7 +26,6 @@ CNetScanOnvif::~CNetScanOnvif(void)
 		closesocket(m_TcpSocket);
 		m_TcpSocket = NULL;
 	}
-
 }
 
 DWORD CNetScanOnvif::thrOnvifScanThread(LPVOID pParam)
@@ -53,7 +52,6 @@ BOOL CNetScanOnvif::CreateMultiCastSocket()
 	int			iReuse = 0;
 	struct		ip_mreq mreq;
 	struct		in_addr localInterface;
-
 
 	if (NULL == m_hReceiveSock)
 	{
@@ -258,14 +256,6 @@ void CNetScanOnvif::thrOnvifReceiver()
 					{
 						::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
 					}
-				}
-			}
-			else
-			{
-				if (NULL != pScanInfo)
-				{
-					delete pScanInfo;
-					pScanInfo = NULL;
 				}
 			}
 
@@ -633,18 +623,11 @@ BOOL CNetScanOnvif::ConnectTCPSocket(char* pszIP, int iPort)
 // Device Info Request
 void CNetScanOnvif::SendDeviceInfo(ONVIF_INFO* pstOnvifInfo)
 {
-	XNode			stNode;
-	LPXNode			lpBody = NULL;
-	char*			pszSendBuffer = NULL;
-	int				iSendDataSize = 0;
-	int				iError = 0;
 	sockaddr_in		HTTPSendSock = { 0 };
-	char*			pszSendAuthBuff = NULL;
 	char*			pszSlice = NULL;
 	char*			pszSliceNonce = NULL;
 	int				iHTTPStatus = 0;
 	char			aszStrCompare[6] = "nonce";
-	BOOL			bIsConnect = FALSE;
 	int				iHttpHeaderSize = 0;
 	int				iContentSize = 0;
 	char			aszCopyBuffer[20] = { 0 };
@@ -707,12 +690,8 @@ void CNetScanOnvif::SendOnvifVersion(ONVIF_INFO* pstOnvifInfo)
 	LPXNode			lpSupportedVersions = NULL;
 	LPXNode			lpMajor = NULL;
 	LPXNode			lpMinor = NULL;
-	char*			pszSendBuffer = NULL;
-	int				iSendDataSize = 0;
-	int				iError = 0;
 	char*			pszSlice = NULL;
 	int				iHTTPStatus = 0;
-	BOOL			bIsConnect = FALSE;
 	int				iHttpHeaderSize = 0;
 	int				iContentSize = 0;
 	char			aszCopyBuffer[20] = { 0 };
@@ -766,13 +745,10 @@ void CNetScanOnvif::SendAuthenticate(ONVIF_INFO* pstOnvifInfo)
 	char*		paszChild[6] = { "tt:Year", "tt:Month", "tt:Day", "tt:Hour", "tt:Minute", "tt:Second" };
 	char		aszTime[32] = { 0 };
 	char*		pszSendBuffer = NULL;
-	BOOL		bIsConnect = FALSE;
 	int			iHttpHeaderSize = 0;
 	int			iContentSize = 0;
-	int			iError = 0;
 	BOOL		bIsGetNonce = FALSE;
 	ONVIF_INFO* pOnvifInfo = (ONVIF_INFO*)pstOnvifInfo;
-
 
 	iHttpHeaderSize = strlen(__aszDeviceHeader) + strlen(m_aszIP) + 4;
 	iContentSize = strlen(__aszSystemDateXml);

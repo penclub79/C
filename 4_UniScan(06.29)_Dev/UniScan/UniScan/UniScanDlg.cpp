@@ -593,14 +593,16 @@ void CUniScanDlg::OnClose()
 {
 	KillTimer(TM_SCANNING_ANI);
 	m_bIsClose = TRUE;
-	for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-	{
-		if (m_apScanner[i])
-		{
-			m_apScanner[i]->StopScan(i);
-			SAFE_DELETE(m_apScanner[i]);
-		}
-	}
+	//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+	//{
+	//	if (m_apScanner[i])
+	//	{
+	//		m_apScanner[i]->StopScan(i);
+	//		SAFE_DELETE(m_apScanner[i]);
+	//	}
+	//}
+			m_apScanner[2]->StopScan(2);
+			SAFE_DELETE(m_apScanner[2]);
 	
 	ClearScanList();
 

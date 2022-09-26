@@ -73,6 +73,7 @@ typedef struct tagSCAN_STRUCT
 	}
 	~tagSCAN_STRUCT()
 	{
+		
 		if (NULL != pExtScanInfos)
 		{
 			SAFE_DELETEA(pExtScanInfos);
