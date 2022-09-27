@@ -54,6 +54,7 @@ BOOL NetScanBase::StartScanF(LPTHREAD_START_ROUTINE _pThreadFunc)
 BOOL NetScanBase::StopScan(int iType)
 {
 	MSG msg;
+
 	m_bUserCancel = TRUE;
 
 	if (m_hReceiveSock)
@@ -82,6 +83,7 @@ BOOL NetScanBase::StopScan(int iType)
 		//		DispatchMessage(&msg);
 		//	}
 		//}
+
 		if (WAIT_TIMEOUT == WaitForSingleObject(m_hScanThread, INFINITE))
 		{
 			TerminateThread(m_hScanThread, 0xffffffff);

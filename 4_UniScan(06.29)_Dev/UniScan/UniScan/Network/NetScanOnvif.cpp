@@ -254,6 +254,7 @@ void CNetScanOnvif::thrOnvifReceiver()
 				{
 					if (FALSE == m_bUserCancel)
 					{
+						//::SendMessageTimeout(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0, SMTO_NORMAL, 10, NULL);
 						::SendMessage(this->m_hNotifyWnd, this->m_lNotifyMsg, (WPARAM)pScanInfo, 0);
 					}
 				}

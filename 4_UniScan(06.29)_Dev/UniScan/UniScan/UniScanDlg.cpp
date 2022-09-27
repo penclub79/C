@@ -436,20 +436,20 @@ void CUniScanDlg::OnBnClickedScanBtn()
 			m_apScanner[ONVIF]->SetUserInfo(aszUsername, aszPassword);
 			//m_apScanner[ONVIF]->SetUserInfo("ADMIN", "111111");
 
-			//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-			//{
-			//	if (m_apScanner[i])
-			//	{
-			//		m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
-			//		m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-			//		m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-			//		m_apScanner[i]->StartScan();
-			//	}
-			//}
-					m_apScanner[2]->SetBindAddress(m_ulAcceptAddress);
-					m_apScanner[2]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
-					m_apScanner[2]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
-					m_apScanner[2]->StartScan();
+			for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+			{
+				if (m_apScanner[i])
+				{
+					m_apScanner[i]->SetBindAddress(m_ulAcceptAddress);
+					m_apScanner[i]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+					m_apScanner[i]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+					m_apScanner[i]->StartScan();
+				}
+			}
+					//m_apScanner[2]->SetBindAddress(m_ulAcceptAddress);
+					//m_apScanner[2]->SetNotifyWindow(m_hWnd, WM_SCAN_MSG);
+					//m_apScanner[2]->SetCloseMsgRecvWindow(m_hWnd, WM_SCAN_CLOSE_DLG_MSG);
+					//m_apScanner[2]->StartScan();
 
 			m_nScanAniCount = 0;
 			SetTimer(TM_SCANNING_ANI, 1000, NULL);
@@ -477,14 +477,13 @@ void CUniScanDlg::OnBnClickedScanBtn()
 		SetStatusMsg(strMsg);
 
 		// stop
-		//for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
-		//{
-		//	if (m_apScanner[i])
-		//	{
-		//		m_apScanner[i]->StopScan(i);
-		//	}
-		//}
-				m_apScanner[2]->StopScan(2);
+		for (int i = 0; i < COUNT_SCAN_CLIENT; i++)
+		{
+			if (m_apScanner[i])
+			{
+				m_apScanner[i]->StopScan(i);
+			}
+		}
 	}
 }
 

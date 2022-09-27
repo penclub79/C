@@ -192,6 +192,7 @@ protected:
 	ULONG			m_ulBindAddress;
 	DWORD			m_dwScanThreadID;
 	BOOL m_bIsSendPass;
+	LRESULT m_lRet;
 	//////////////////////////////////////////////////////////// ---------/
 
 
