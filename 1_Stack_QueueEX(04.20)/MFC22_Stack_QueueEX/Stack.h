@@ -25,9 +25,8 @@ public:
 	void DeleteAll();
 	BOOL Pop(Link_Data* pLinkData);						// 주소값을 참조한다
 	BOOL GetAt(int _iIndex, Link_Data* pLinkData);		// value를 가져온다
-	int GetCount();										// value count 체크
+	int	GetCount();										// value count 체크
 	
-								
 private:
 	Link_Item*	m_pLast;
 	Link_Item*	m_pRoot;

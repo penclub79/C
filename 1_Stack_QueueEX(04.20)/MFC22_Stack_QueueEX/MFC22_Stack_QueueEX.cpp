@@ -71,7 +71,7 @@ BOOL CMFC22_Stack_QueueEXApp::InitInstance()
 	SetRegistryKey(_T("로컬 응용 프로그램 마법사에서 생성된 응용 프로그램"));
 
 	CMFC22_Stack_QueueEXDlg dlg;
-	m_pMainWnd = &dlg;
+	
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{
