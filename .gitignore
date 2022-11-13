@@ -198,3 +198,15 @@ $RECYCLE.BIN/
 *.app
 
 # End of https://www.toptal.com/developers/gitignore/api/c++
+/4_UniScan(06.29)_Prob/UniScan/.vs/UniScan/v16/Browse.VC.db
+/C_Basic/PhoneNumbers/PhoneNumbers/.vs/PhoneNumbers/v16/Browse.VC.db
+/C_Basic/PhoneNumbers/PhoneNumbers/.vs/PhoneNumbers/v16/Browse.VC.db-shm
+/C_Basic/PhoneNumbers/PhoneNumbers/.vs/PhoneNumbers/v16/Browse.VC.db-wal
+/C_Basic/PhoneNumbers/PhoneNumbers/.vs/PhoneNumbers/v16/Browse.VC.opendb
+/C_Basic/PhoneNumbers/PhoneNumbers/PhoneNumbers.sln
+/C_Basic/PhoneNumbers/PhoneNumbers/PhoneNumbers/PhoneNumbers.vcxproj
+/C_Basic/PhoneNumbers/PhoneNumbers/PhoneNumbers/PhoneNumbers.vcxproj.filters
+/C_Basic/strcpy_libEx/strEx/.vs/strEx/v16/Browse.VC.db
+/C_Basic/strcpy_libEx/strEx/strEx.sln
+/C_Basic/strcpy_libEx/strEx/strEx/strEx.vcxproj
+/C_Basic/strcpy_libEx/strEx/strEx/strEx.vcxproj.filters
